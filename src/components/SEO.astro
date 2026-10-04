@@ -1,0 +1,61 @@
+---
+import site from '@/data/site.json';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'profile';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description = site.description, image = '/og/default.png', type = 'website', noindex = false, jsonLd = [] } =
+  Astro.props;
+
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | Engineer and Web Designer`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': `${site.url}/#person`,
+  name: site.name,
+  alternateName: site.shortName,
+  url: site.url,
+  email: `mailto:${site.email}`,
+  jobTitle: site.jobTitle,
+  address: { '@type': 'PostalAddress', addressLocality: 'Baton Rouge', addressRegion: 'LA', addressCountry: 'US' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Louisiana State University', sameAs: 'https://www.lsu.edu' },
+  affiliation: { '@type': 'CollegeOrUniversity', name: 'Louisiana State University' },
+  knowsAbout: ['Digital communications', 'Signal processing', 'Embedded systems', 'Web design', 'Web development', 'Accessibility'],
+  sameAs: [site.socials.github, site.socials.linkedin],
+};
+
+const graph = [person, ...jsonLd];
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+<meta name="author" content={site.name} />
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{site.googleSiteVerification && <meta name="google-site-verification" content={site.googleSiteVerification} />}
+
+<script is:inline type="application/ld+json" set:html={JSON.stringify(graph.length === 1 ? graph[0] : graph)} />

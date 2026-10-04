@@ -1,0 +1,501 @@
+---
+import { Image } from 'astro:assets';
+import type { MarkdownHeading } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import BrowserFrame from '@/components/BrowserFrame.astro';
+import ProjectArt from '@/components/ProjectArt.astro';
+import Icon from '@/components/Icon.astro';
+import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
+import { formatRange } from '@/lib/format';
+import site from '@/data/site.json';
+
+interface Props {
+  project: Project;
+  headings: MarkdownHeading[];
+  prev?: Project;
+  next?: Project;
+}
+
+const { project, headings, prev, next } = Astro.props;
+const d = project.data;
+const finished = d.status === 'complete' || d.status === 'archived';
+const period = formatRange(d.period.start, d.period.end ?? (finished ? d.period.start : null));
+const limited = d.confidentiality === 'limited';
+const toc = headings.filter((h) => h.depth === 2);
+const isSite = Boolean(d.links.live && d.cover && d.mobile);
+const ogImage = `/og/${project.id}.png`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: d.title,
+    description: d.summary,
+    url: new URL(projectHref(project), Astro.site).href,
+    creator: { '@id': `${site.url}/#person` },
+    dateCreated: d.period.start,
+    keywords: d.stack.join(', '),
+    ...(d.links.live ? { sameAs: d.links.live } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Work', item: `${site.url}/work/` },
+      { '@type': 'ListItem', position: 2, name: d.title, item: new URL(projectHref(project), Astro.site).href },
+    ],
+  },
+];
+---
+
+<BaseLayout title={d.title} description={d.summary} image={ogImage} type="article" jsonLd={jsonLd}>
+  <article class="case">
+    <header class="case__head">
+      <div class="wrap">
+        <nav aria-label="Breadcrumb" class="no-print">
+          <a href="/work/" class="back link">
+            <Icon name="arrow-left" class="h-4 w-4" /> All work
+          </a>
+        </nav>
+
+        <div class="mt-8 flex flex-wrap items-center gap-2">
+          <span class="chip chip--type">{typeLabels[d.type]}</span>
+          <span class="chip">
+            {(d.status === 'live' || d.status === 'ongoing') && <span class="status-dot" aria-hidden="true" />}
+            {statusLabels[d.status]}
+          </span>
+          {
+            limited && (
+              <span class="chip chip--limited">
+                <Icon name="lock" class="h-3 w-3" /> Limited detail
+              </span>
+            )
+          }
+        </div>
+
+        <h1 class="case__title">{d.title}</h1>
+        <p class="case__summary">{d.summary}</p>
+
+        <dl class="case__facts">
+          <div>
+            <dt class="label">My role</dt>
+            <dd>{d.role}</dd>
+          </div>
+          {
+            d.team && (
+              <div>
+                <dt class="label">Team</dt>
+                <dd>{d.team}</dd>
+              </div>
+            )
+          }
+          <div>
+            <dt class="label">When</dt>
+            <dd>{period}</dd>
+          </div>
+          <div>
+            <dt class="label">Built with</dt>
+            <dd>
+              <ul class="flex flex-wrap gap-1.5 pt-1">
+                {d.stack.map((s) => <li class="chip">{s}</li>)}
+              </ul>
+            </dd>
+          </div>
+        </dl>
+
+        <div class="mt-8 flex flex-wrap gap-3 no-print">
+          {
+            d.links.live && (
+              <a class="btn btn--primary" href={d.links.live}>
+                Visit the live site <Icon name="arrow-up-right" />
+              </a>
+            )
+          }
+          {
+            d.links.repo && !limited && (
+              <a class="btn" href={d.links.repo}>
+                <Icon name="github" /> Source on GitHub
+              </a>
+            )
+          }
+          {
+            d.links.writeup && (
+              <a class="btn" href={d.links.writeup}>
+                Public announcement <Icon name="arrow-up-right" />
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <div class="case__media">
+        {
+          isSite ? (
+            <BrowserFrame
+              src={d.cover!}
+              mobile={d.mobile}
+              alt={d.coverAlt ?? ''}
+              url={d.links.live}
+              eager
+              widths={[640, 960, 1280, 1440]}
+              sizes="(min-width: 1200px) 1100px, 100vw"
+            />
+          ) : d.cover ? (
+            <div class="case__shot">
+              <Image
+                src={d.cover}
+                alt={d.coverAlt ?? ''}
+                widths={[640, 960, 1280, 1440]}
+                sizes="(min-width: 1200px) 1100px, 100vw"
+                format="webp"
+                quality={80}
+                loading="eager"
+                fetchpriority="high"
+              />
+            </div>
+          ) : (
+            <div class="case__art">
+              <ProjectArt slug={project.id} />
+            </div>
+          )
+        }
+      </div>
+
+      {
+        d.metrics && !limited && (
+          <dl class="case__metrics">
+            {d.metrics.map((m) => (
+              <div>
+                <dd class="case__metric">{m.value}</dd>
+                <dt class="label">{m.label}</dt>
+              </div>
+            ))}
+          </dl>
+        )
+      }
+    </div>
+
+    <slot name="demo" />
+
+    <div class="wrap case__body">
+      {
+        toc.length > 2 && (
+          <aside class="case__toc no-print" aria-label="On this page">
+            <p class="label">On this page</p>
+            <ol>
+              {toc.map((h) => (
+                <li>
+                  <a href={`#${h.slug}`} data-toc-link>
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        )
+      }
+      <div class="prose case__prose">
+        <slot />
+      </div>
+    </div>
+
+    {
+      d.gallery && !limited && (
+        <section class="wrap case__gallery" aria-label="Gallery">
+          {d.gallery.map((g) => (
+            <figure class="shot" data-reveal>
+              <div class="shot__img">
+                <Image src={g.src} alt={g.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1000px, 100vw" format="webp" quality={80} />
+              </div>
+              {g.caption && <figcaption>{g.caption}</figcaption>}
+            </figure>
+          ))}
+        </section>
+      )
+    }
+
+    <nav class="wrap case__pager no-print" aria-label="More projects">
+      {
+        prev ? (
+          <a class="pager card card--lift" href={projectHref(prev)}>
+            <span class="label">
+              <Icon name="arrow-left" class="inline h-3 w-3" /> Previous
+            </span>
+            <span class="pager__title">{prev.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next && (
+          <a class="pager pager--next card card--lift" href={projectHref(next)}>
+            <span class="label">
+              Next <Icon name="arrow-right" class="inline h-3 w-3" />
+            </span>
+            <span class="pager__title">{next.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+
+    <section class="wrap pb-24 no-print">
+      <div class="case__cta card">
+        <div>
+          <p class="font-display text-2xl font-semibold tracking-tight">Want to talk about this project?</p>
+          <p class="mt-1 text-soft">I'm happy to go deeper on any of it. {site.replyTime}</p>
+        </div>
+        <a class="btn btn--primary" href={`/contact/?topic=${d.type === 'client-site' || d.type === 'nonprofit' ? 'website' : d.type === 'research' ? 'research' : 'job'}`}>
+          Get in touch <Icon name="arrow-right" />
+        </a>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .case__head {
+    padding-block: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 4vw, 3rem);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+  }
+
+  .case__title {
+    margin-top: 1.25rem;
+    max-width: 18ch;
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+
+  .case__summary {
+    margin-top: 1.25rem;
+    max-width: 44rem;
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    color: var(--text-soft);
+  }
+
+  .case__facts {
+    display: grid;
+    gap: 1.25rem 2rem;
+    margin-top: 2.25rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 900px) {
+    .case__facts {
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+  }
+
+  .case__facts dd {
+    margin-top: 0.35rem;
+    font-size: 0.95rem;
+  }
+
+  .case__media {
+    margin-top: 0.5rem;
+  }
+
+  .case__shot,
+  .case__art {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    background: var(--surface);
+  }
+
+  .case__art {
+    aspect-ratio: 16 / 9;
+  }
+
+  .case__shot :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .case__metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--surface);
+  }
+
+  .case__metrics > div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.35rem;
+    padding: 1.25rem 1.4rem;
+  }
+
+  .case__metrics > div + div {
+    border-left: 1px solid var(--line);
+  }
+
+  @media (max-width: 560px) {
+    .case__metrics > div + div {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  .case__metric {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .case__body {
+    display: grid;
+    gap: 3rem;
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+
+  @media (min-width: 1100px) {
+    .case__body {
+      grid-template-columns: 14rem minmax(0, 44rem);
+      justify-content: center;
+      gap: 4rem;
+    }
+  }
+
+  .case__toc {
+    display: none;
+  }
+
+  @media (min-width: 1100px) {
+    .case__toc {
+      display: block;
+      position: sticky;
+      top: 6rem;
+      align-self: start;
+    }
+  }
+
+  .case__toc ol {
+    margin-top: 0.85rem;
+    border-left: 1px solid var(--line);
+  }
+
+  .case__toc a {
+    display: block;
+    margin-left: -1px;
+    padding: 0.35rem 0 0.35rem 0.9rem;
+    border-left: 1px solid transparent;
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  .case__toc a:hover,
+  .case__toc a[aria-current='true'] {
+    color: var(--text);
+    border-left-color: var(--accent);
+  }
+
+  .case__prose > :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .case__gallery {
+    display: grid;
+    gap: 2.5rem;
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+    max-width: 68rem;
+  }
+
+  .shot {
+    margin: 0;
+  }
+
+  .shot__img {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    background: var(--surface);
+  }
+
+  .shot__img :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .shot figcaption {
+    margin-top: 0.85rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .case__pager {
+    display: grid;
+    gap: 1rem;
+    padding-bottom: 2rem;
+  }
+
+  @media (min-width: 720px) {
+    .case__pager {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .pager {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.25rem 1.4rem;
+    text-decoration: none;
+    box-shadow: none;
+  }
+
+  .pager--next {
+    text-align: right;
+  }
+
+  .pager__title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+
+  .case__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+  }
+</style>
+
+<script>
+  // Highlight the table of contents entry for the section in view.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  if (links.length) {
+    const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1)))).filter(Boolean) as HTMLElement[];
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          links.forEach((a) => a.setAttribute('aria-current', String(a.hash.slice(1) === e.target.id)));
+        }
+      },
+      { rootMargin: '-20% 0px -70% 0px' },
+    );
+    targets.forEach((t) => io.observe(t));
+  }
+</script>

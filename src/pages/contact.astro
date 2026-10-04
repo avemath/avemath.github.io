@@ -1,0 +1,40 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ContactForm from '@/components/ContactForm.astro';
+import Icon from '@/components/Icon.astro';
+import site from '@/data/site.json';
+---
+
+<BaseLayout title="Contact" description="Get in touch with Avery Matherne about a role, a research question or a website project.">
+  <section class="section">
+    <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.4fr]">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h1 class="section-title" style="font-size: clamp(2.5rem, 6vw, 4.25rem)">Send a note</h1>
+        <p class="section-lede">Have a role, a research question or a website in mind? {site.replyTime}</p>
+
+        <ul class="mt-10 space-y-4">
+          <li>
+            <p class="label">Email</p>
+            <a class="link mt-1 inline-flex items-center gap-2 text-lg" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
+          </li>
+          <li>
+            <p class="label">Elsewhere</p>
+            <div class="mt-1 flex flex-wrap gap-4">
+              <a class="link inline-flex items-center gap-2" href={site.socials.linkedin}><Icon name="linkedin" /> LinkedIn</a>
+              <a class="link inline-flex items-center gap-2" href={site.socials.github}><Icon name="github" /> GitHub</a>
+            </div>
+          </li>
+          <li>
+            <p class="label">Based in</p>
+            <p class="mt-1 inline-flex items-center gap-2"><Icon name="pin" /> {site.location}. Happy to work remotely.</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card p-6 sm:p-10">
+        <ContactForm idPrefix="contact" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

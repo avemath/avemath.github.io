@@ -1,0 +1,166 @@
+---
+// "I'm here to..." control. The reordering itself is pure CSS (:has on the
+// checked radio, see pages/index.astro), so it works before JavaScript
+// loads. The script only syncs the URL, the main call to action and a
+// screen reader announcement.
+const options = [
+  { id: 'hire', label: 'Hire an engineer', note: 'Engineering work and experience first.' },
+  { id: 'research', label: 'Talk research', note: 'Research and communications work first.' },
+  { id: 'website', label: 'Get a website', note: "Websites I've built and how I work first." },
+];
+---
+
+<fieldset class="switcher" data-audience-switcher>
+  <legend class="switcher__legend">I'm here to</legend>
+  <div class="switcher__track">
+    {
+      options.map((o, i) => (
+        <label class="switcher__option">
+          <input type="radio" name="audience" id={`aud-${o.id}`} value={o.id} checked={i === 0} />
+          <span>{o.label}</span>
+        </label>
+      ))
+    }
+    <span class="switcher__thumb" aria-hidden="true"></span>
+  </div>
+  <p class="sr-only" aria-live="polite" data-audience-status></p>
+</fieldset>
+
+<style>
+  .switcher {
+    margin-top: 2.5rem;
+    border: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .switcher__legend {
+    margin-bottom: 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .switcher__track {
+    position: relative;
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    padding: 0.3rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    backdrop-filter: blur(8px);
+    max-width: 100%;
+  }
+
+  .switcher__option {
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  .switcher__option input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .switcher__option span {
+    display: block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--text-soft);
+    transition: color 0.25s;
+  }
+
+  .switcher__option input:checked + span {
+    color: var(--bg);
+  }
+
+  .switcher__option input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .switcher__thumb {
+    position: absolute;
+    z-index: 0;
+    top: 0.3rem;
+    bottom: 0.3rem;
+    left: 0.3rem;
+    width: calc((100% - 0.6rem) / 3);
+    border-radius: 999px;
+    background: var(--accent);
+    transition: translate 0.45s var(--ease-out-expo);
+  }
+
+  .switcher__track:has(#aud-research:checked) .switcher__thumb {
+    translate: 100% 0;
+  }
+
+  .switcher__track:has(#aud-website:checked) .switcher__thumb {
+    translate: 200% 0;
+  }
+
+  @media (max-width: 560px) {
+    .switcher__track {
+      display: grid;
+      width: 100%;
+    }
+
+    .switcher__option span {
+      padding: 0.6rem 0.4rem;
+      font-size: 0.8rem;
+      white-space: normal;
+      line-height: 1.2;
+    }
+  }
+</style>
+
+<script>
+  const notes: Record<string, { cta: string; href: string; status: string }> = {
+    hire: { cta: 'See my work', href: '#featured', status: 'Showing engineering work and experience first.' },
+    research: { cta: 'See my research', href: '#research', status: 'Showing research and communications work first.' },
+    website: { cta: "See sites I've built", href: '#websites', status: "Showing websites I've built and how I work first." },
+  };
+
+  const radios = [...document.querySelectorAll<HTMLInputElement>('input[name="audience"]')];
+  const cta = document.querySelector<HTMLAnchorElement>('[data-primary-cta]');
+  const ctaLabel = document.querySelector<HTMLElement>('[data-primary-cta-label]');
+  const status = document.querySelector<HTMLElement>('[data-audience-status]');
+
+  function apply(value: string, announce: boolean) {
+    const n = notes[value] ?? notes.hire;
+    if (cta && ctaLabel) {
+      cta.href = n.href;
+      ctaLabel.textContent = n.cta;
+    }
+    document.documentElement.dataset.audience = value;
+    if (announce && status) status.textContent = n.status;
+  }
+
+  // Restore from ?for= so a link can open the page in a given mode.
+  const fromUrl = new URLSearchParams(location.search).get('for');
+  const initial = radios.find((r) => r.value === fromUrl);
+  if (initial) initial.checked = true;
+  apply(radios.find((r) => r.checked)?.value ?? 'hire', false);
+
+  radios.forEach((r) =>
+    r.addEventListener('change', () => {
+      apply(r.value, true);
+      const url = new URL(location.href);
+      if (r.value === 'hire') url.searchParams.delete('for');
+      else url.searchParams.set('for', r.value);
+      history.replaceState(null, '', url);
+    }),
+  );
+</script>

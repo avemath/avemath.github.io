@@ -1,0 +1,670 @@
+---
+import DemoShell from './DemoShell.astro';
+import Icon from '../Icon.astro';
+---
+
+<DemoShell
+  id="spectrum"
+  title="The visualizer, ported to the web"
+  lede="This runs the firmware's signal chain in JavaScript: 128 samples at 10 kHz, Hamming window, FFT, the same 16 band edges, noise gate, AGC, smoothing, peak dots and silence detection. Watch it fall back to the idle glow when the track goes quiet."
+  note="The demo track is generated in your browser. Microphone audio never leaves your device; it is processed in memory and dropped."
+>
+  <div class="spec" data-spectrum>
+    <div class="spec__matrix">
+      <canvas width="512" height="512" class="spec__canvas" data-spec-canvas role="img" aria-label="16 by 16 LED matrix showing the live spectrum"
+      ></canvas>
+      <span class="spec__mode mono" data-spec-mode>IDLE</span>
+    </div>
+
+    <div class="spec__side">
+      <div class="spec__controls" role="group" aria-label="Signal source">
+        <button type="button" class="btn btn--small btn--primary" data-spec-play aria-pressed="false">
+          <Icon name="play" /> <span data-spec-play-label>Play demo track</span>
+        </button>
+        <button type="button" class="btn btn--small" data-spec-mic aria-pressed="false">
+          <Icon name="mic" /> <span data-spec-mic-label>Use my microphone</span>
+        </button>
+      </div>
+      <p class="spec__msg" data-spec-msg role="status" aria-live="polite"></p>
+
+      <div class="meter" aria-hidden="true">
+        <div class="meter__track">
+          <span class="meter__band" data-band-enter></span>
+          <span class="meter__mark meter__mark--enter" data-mark-enter></span>
+          <span class="meter__mark meter__mark--exit" data-mark-exit></span>
+          <span class="meter__fill" data-meter-fill></span>
+        </div>
+        <div class="meter__legend mono">
+          <span><i class="dot dot--amp"></i>level</span>
+          <span><i class="dot dot--enter"></i>enter</span>
+          <span><i class="dot dot--exit"></i>exit</span>
+        </div>
+      </div>
+
+      <dl class="readout mono">
+        <div><dt>Level</dt><dd data-r="amp">0</dd></div>
+        <div><dt>Baseline</dt><dd data-r="base">0</dd></div>
+        <div><dt>Enter above</dt><dd data-r="enter">25</dd></div>
+        <div><dt>Exit below</dt><dd data-r="exit">18</dd></div>
+        <div><dt>AGC ceiling</dt><dd data-r="agc">650</dd></div>
+        <div><dt>Debounce</dt><dd data-r="deb">0 / 4</dd></div>
+      </dl>
+
+      <p class="spec__aside">
+        In a quiet room the floor values give real hysteresis: enter above 25, exit below 18. Once the room gets noisy enough to push
+        the baseline past about 13, the multipliers take over and the exit threshold ends up above the enter threshold, so the frame
+        debounce is what keeps it from flickering. That's the next thing I'd fix.
+      </p>
+    </div>
+  </div>
+</DemoShell>
+
+<style>
+  .spec {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .spec {
+      grid-template-columns: minmax(0, 26rem) 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .spec__matrix {
+    position: relative;
+    padding: 0.9rem;
+    border-radius: 1rem;
+    background: #05070c;
+    border: 1px solid #1d2638;
+    box-shadow: inset 0 0 40px rgb(0 0 0 / 0.6);
+  }
+
+  .spec__canvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .spec__mode {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.6rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 0.3rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: #8a9bb8;
+    background: rgb(255 255 255 / 0.06);
+  }
+
+  .spec__mode[data-on] {
+    color: #05070c;
+    background: #3ddcff;
+  }
+
+  .spec__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .spec__msg {
+    min-height: 1.4em;
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .meter {
+    margin-top: 1rem;
+  }
+
+  .meter__track {
+    position: relative;
+    height: 0.9rem;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .meter__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--amber));
+    opacity: 0.85;
+  }
+
+  .meter__band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(45deg, var(--accent-wash) 0 4px, transparent 4px 8px);
+  }
+
+  .meter__mark {
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    width: 2px;
+    z-index: 2;
+  }
+
+  .meter__mark--enter {
+    background: var(--ok);
+  }
+
+  .meter__mark--exit {
+    background: var(--danger);
+  }
+
+  .meter__legend {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.35rem;
+    border-radius: 50%;
+  }
+
+  .dot--amp {
+    background: var(--accent);
+  }
+  .dot--enter {
+    background: var(--ok);
+  }
+  .dot--exit {
+    background: var(--danger);
+  }
+
+  .readout {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .readout > div {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    background: var(--bg);
+  }
+
+  .readout dt {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .readout dd {
+    margin-top: 0.15rem;
+    font-size: 1rem;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .spec__aside {
+    margin-top: 1.25rem;
+    font-size: 0.88rem;
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 480px) {
+    .readout {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+  import { prefersReducedMotion } from '../../scripts/preferences';
+
+  // ---- Firmware constants, copied from the ESP32 source ----
+  const N = 128;
+  const FS = 10000;
+  const W = 16;
+  const H = 16;
+  const BAND_EDGES = [2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 20, 24, 28, 33, 38, 44, 52];
+  const SENSITIVITY_GAIN = 4.5;
+  const SMOOTHING = 0.7;
+  const FFT_NOISE_GATE = 20;
+  const AGC_RISE = 0.25;
+  const AGC_FALL = 0.008;
+  const LEVELMAX_FLOOR = 120;
+  const PEAK_HOLD_FRAMES = 5;
+  const PEAK_FALL_RATE = 3;
+  const SILENT_PEAK_FALL_RATE = 5;
+  const AMP_DECAY = 0.9;
+  const BASELINE_ALPHA_FAST = 0.02;
+  const BASELINE_ALPHA_SLOW = 0.0015;
+  const WARMUP_MS = 2500;
+  const ENTER_MULT = 1.25;
+  const ENTER_ADD = 5;
+  const EXIT_MULT = 1.5;
+  const EXIT_ADD = 5;
+  const ENTER_FRAMES = 4;
+  const EXIT_FRAMES = 8;
+  const IDLE_MIN = 18;
+  const IDLE_MAX = 90;
+  const IDLE_PERIOD = 2600;
+  const FRAME_MS = 28; // about the firmware's loop time (12.8 ms sampling + 10 ms delay + FFT and render)
+
+  const root = document.querySelector<HTMLElement>('[data-spectrum]');
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-spec-canvas]')!;
+    const ctx = canvas.getContext('2d')!;
+    const modeEl = root.querySelector<HTMLElement>('[data-spec-mode]')!;
+    const playBtn = root.querySelector<HTMLButtonElement>('[data-spec-play]')!;
+    const playLabel = root.querySelector<HTMLElement>('[data-spec-play-label]')!;
+    const micBtn = root.querySelector<HTMLButtonElement>('[data-spec-mic]')!;
+    const micLabel = root.querySelector<HTMLElement>('[data-spec-mic-label]')!;
+    const msg = root.querySelector<HTMLElement>('[data-spec-msg]')!;
+    const fill = root.querySelector<HTMLElement>('[data-meter-fill]')!;
+    const markEnter = root.querySelector<HTMLElement>('[data-mark-enter]')!;
+    const markExit = root.querySelector<HTMLElement>('[data-mark-exit]')!;
+    const bandEl = root.querySelector<HTMLElement>('[data-band-enter]')!;
+    const r = (k: string) => root.querySelector<HTMLElement>(`[data-r="${k}"]`)!;
+
+    // ---- State, mirroring the firmware globals ----
+    const re = new Float64Array(N);
+    const im = new Float64Array(N);
+    const smoothed = new Float64Array(16);
+    const bandValues = new Int32Array(16);
+    const peakValues = new Int32Array(16);
+    const peakHold = new Int32Array(16);
+    let levelMax = 650;
+    let ampSmoothed = 0;
+    let noiseBaseline = 0;
+    let enterThreshold = 25;
+    let exitThreshold = 18;
+    let enterCount = 0;
+    let exitCount = 0;
+    let spectrumMode = false;
+    let idleHue = 150;
+    let lastHueStep = 0;
+    let startClock = 0; // virtual ms when the detector last reset
+    let clock = 0; // virtual milliseconds of signal time
+
+    let source: 'none' | 'demo' | 'mic' = 'none';
+    let running = false;
+    let raf = 0;
+    let acc = 0;
+    let last = 0;
+    let visible = true;
+
+    // Mic plumbing.
+    let audioCtx: AudioContext | null = null;
+    let analyser: AnalyserNode | null = null;
+    let stream: MediaStream | null = null;
+    let timeData: Float32Array<ArrayBuffer> | null = null;
+
+    // ---- Radix-2 FFT, in place ----
+    const bitrev = new Uint8Array(N);
+    for (let i = 0, bits = Math.log2(N); i < N; i++) {
+      let x = i, y = 0;
+      for (let b = 0; b < bits; b++) (y = (y << 1) | (x & 1)), (x >>= 1);
+      bitrev[i] = y;
+    }
+    const hamming = Float64Array.from({ length: N }, (_, i) => 0.54 - 0.46 * Math.cos((2 * Math.PI * i) / (N - 1)));
+
+    function fft() {
+      for (let i = 0; i < N; i++) {
+        const j = bitrev[i];
+        if (j > i) {
+          [re[i], re[j]] = [re[j], re[i]];
+          [im[i], im[j]] = [im[j], im[i]];
+        }
+      }
+      for (let size = 2; size <= N; size <<= 1) {
+        const half = size >> 1;
+        const step = (-2 * Math.PI) / size;
+        for (let start = 0; start < N; start += size) {
+          for (let k = 0; k < half; k++) {
+            const wr = Math.cos(step * k), wi = Math.sin(step * k);
+            const a = start + k, b = a + half;
+            const tr = wr * re[b] - wi * im[b];
+            const ti = wr * im[b] + wi * re[b];
+            re[b] = re[a] - tr;
+            im[b] = im[a] - ti;
+            re[a] += tr;
+            im[a] += ti;
+          }
+        }
+      }
+      for (let i = 0; i < N; i++) re[i] = Math.hypot(re[i], im[i]);
+    }
+
+    // ---- Signal sources, in 12-bit ADC counts around a mid-rail offset ----
+    let noiseSeed = 1;
+    const noise = () => ((noiseSeed = (noiseSeed * 16807) % 2147483647) / 2147483647) * 2 - 1;
+
+    // A generated track: kick, plucked bass, a moving arpeggio, a soft pad and
+    // high-passed hats. Each loop opens with 3 s of room tone, like the quiet
+    // room the board boots into, so the detector can learn the noise floor
+    // during warmup and you can watch it switch modes.
+    const LOOP = 13000;
+    const QUIET = 3000;
+    const roots = [98, 98, 116.5, 87.3];
+    const arp = [1, 1.5, 2, 3, 4, 6, 8, 12, 16, 12, 8, 6, 4, 3, 2, 1.5];
+    let lastNoise = 0;
+    function demoSample(tMs: number) {
+      const t = tMs / 1000;
+      const pos = tMs % LOOP;
+      let v = noise() * 9; // electrical noise floor
+      if (pos >= QUIET) {
+        const fade = Math.min(1, (pos - QUIET) / 300, (LOOP - pos) / 700);
+        const beat = (t * 2) % 1; // 120 bpm
+        const eighth = (t * 4) % 1;
+        const bar = Math.floor((t * 2) / 4) % roots.length;
+        const f = roots[bar];
+        const kick = Math.exp(-beat * 16) * Math.sin(2 * Math.PI * (60 + 110 * Math.exp(-beat * 24)) * t) * 380;
+        const bass = Math.exp(-eighth * 5) * (Math.sin(2 * Math.PI * f * 2 * t) * 90 + Math.sin(2 * Math.PI * f * 4 * t) * 35);
+        const step = Math.floor(t * 8) % arp.length;
+        const arpF = f * 4 * arp[step];
+        const lead = Math.exp(-((t * 8) % 1) * 5) * Math.sin(2 * Math.PI * arpF * t) * 120;
+        const pad =
+          (Math.sin(2 * Math.PI * f * 6 * t) + Math.sin(2 * Math.PI * f * 7.5 * t) + Math.sin(2 * Math.PI * f * 9 * t)) *
+          22 *
+          (0.5 + 0.5 * Math.sin(2 * Math.PI * 0.25 * t));
+        const n = noise();
+        const hiss = n - lastNoise; // first difference: a cheap high-pass
+        lastNoise = n;
+        const hat = hiss * Math.exp(-((t * 4 + 0.5) % 1) * 28) * 110;
+        v += (kick + bass + lead + pad + hat) * fade;
+      }
+      return 1850 + v;
+    }
+
+    function fillFrame() {
+      if (source === 'mic' && analyser && timeData && audioCtx) {
+        analyser.getFloatTimeDomainData(timeData);
+        // Resample the newest audio to 128 samples at 10 kHz.
+        const ratio = audioCtx.sampleRate / FS;
+        const startIdx = timeData.length - 1 - (N - 1) * ratio;
+        for (let i = 0; i < N; i++) {
+          const x = startIdx + i * ratio;
+          const i0 = Math.floor(x);
+          const frac = x - i0;
+          const s = timeData[i0] * (1 - frac) + timeData[Math.min(timeData.length - 1, i0 + 1)] * frac;
+          re[i] = 1850 + s * 2048 * 2.5;
+          im[i] = 0;
+        }
+      } else {
+        for (let i = 0; i < N; i++) {
+          re[i] = demoSample(clock + (i * 1000) / FS);
+          im[i] = 0;
+        }
+      }
+    }
+
+    // ---- One pass of the firmware loop() ----
+    function step(now: number) {
+      fillFrame();
+
+      let mean = 0;
+      for (let i = 0; i < N; i++) mean += re[i];
+      mean /= N;
+      let amp = 0;
+      for (let i = 0; i < N; i++) {
+        re[i] -= mean;
+        amp += Math.abs(re[i]);
+      }
+      amp /= N;
+      ampSmoothed = ampSmoothed * AMP_DECAY + amp * (1 - AMP_DECAY);
+
+      const warmingUp = clock - startClock < WARMUP_MS;
+      if (noiseBaseline < 0.1) noiseBaseline = ampSmoothed;
+      enterThreshold = Math.max(25, noiseBaseline * ENTER_MULT + ENTER_ADD);
+      exitThreshold = Math.max(18, noiseBaseline * EXIT_MULT + EXIT_ADD);
+      if (warmingUp || ampSmoothed < exitThreshold) {
+        const a = warmingUp ? BASELINE_ALPHA_FAST : BASELINE_ALPHA_SLOW;
+        noiseBaseline = noiseBaseline * (1 - a) + ampSmoothed * a;
+      }
+
+      if (!spectrumMode) {
+        if (ampSmoothed > enterThreshold) {
+          if (++enterCount >= ENTER_FRAMES) (spectrumMode = true), (enterCount = 0), (exitCount = 0);
+        } else enterCount = 0;
+      } else if (ampSmoothed < exitThreshold) {
+        if (++exitCount >= EXIT_FRAMES) (spectrumMode = false), (exitCount = 0), (enterCount = 0);
+      } else exitCount = 0;
+
+      for (let i = 0; i < N; i++) re[i] *= hamming[i];
+      fft();
+      mapBands(!spectrumMode);
+    }
+
+    function mapBands(silent: boolean) {
+      if (silent) {
+        for (let i = 0; i < 16; i++) {
+          smoothed[i] = 0;
+          bandValues[i] = 0;
+          peakValues[i] = Math.max(0, peakValues[i] - SILENT_PEAK_FALL_RATE);
+          peakHold[i] = 0;
+        }
+        levelMax = Math.max(levelMax, LEVELMAX_FLOOR);
+        return;
+      }
+      const raw = new Float64Array(16);
+      let peak = 0;
+      for (let b = 0; b < 16; b++) {
+        let sum = 0, cnt = 0;
+        for (let j = BAND_EDGES[b]; j < BAND_EDGES[b + 1]; j++) (sum += re[j]), cnt++;
+        let val = cnt ? sum / cnt : 0;
+        if (val < FFT_NOISE_GATE) val = 0;
+        raw[b] = val;
+        if (val > peak) peak = val;
+      }
+      if (peak > levelMax) levelMax += (peak - levelMax) * AGC_RISE;
+      else levelMax = Math.max(LEVELMAX_FLOOR, levelMax * (1 - AGC_FALL));
+
+      for (let b = 0; b < 16; b++) {
+        const h = Math.min(H, Math.max(0, (raw[b] / levelMax) * H * SENSITIVITY_GAIN));
+        smoothed[b] = smoothed[b] * (1 - SMOOTHING) + h * SMOOTHING;
+        bandValues[b] = Math.min(H, Math.max(0, Math.floor(smoothed[b] + 0.5)));
+        if (bandValues[b] > peakValues[b]) (peakValues[b] = bandValues[b]), (peakHold[b] = PEAK_HOLD_FRAMES);
+        else if (peakHold[b] > 0) peakHold[b]--;
+        else peakValues[b] = Math.max(0, peakValues[b] - PEAK_FALL_RATE);
+      }
+    }
+
+    // ---- Drawing. FastLED's rainbow hue 0..255 maps to roughly 0..360 degrees. ----
+    const hsv = (hue: number, sat: number, val: number) =>
+      `hsl(${(hue / 256) * 360} ${(sat / 255) * 100}% ${Math.max(4, (val / 255) * 58)}%)`;
+    const OFF = '#121826';
+    const cell = canvas.width / W;
+
+    function led(x: number, y: number, color: string, glow = false) {
+      const cxp = x * cell + cell / 2;
+      const cyp = y * cell + cell / 2;
+      if (glow) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = cell * 0.6;
+      }
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(cxp, cyp, cell * 0.36, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    function render(now: number) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!spectrumMode) {
+        const phase = (now % IDLE_PERIOD) / IDLE_PERIOD;
+        const breath = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2;
+        const baseV = IDLE_MIN + breath * (IDLE_MAX - IDLE_MIN);
+        if (now - lastHueStep > 40 && running) (idleHue = (idleHue + 1) % 256), (lastHueStep = now);
+        for (let y = 0; y < H; y++)
+          for (let x = 0; x < W; x++) {
+            const d2 = (x - 7) ** 2 + (y - 7) ** 2;
+            const fall = 255 - (d2 / 98) * 165;
+            const v = (baseV * fall) / 255;
+            led(x, y, hsv((idleHue + (d2 >> 1)) % 256, 170, v * 2.2));
+          }
+      } else {
+        for (let x = 0; x < W; x++) {
+          for (let y = 0; y < H; y++) {
+            const fromBottom = H - 1 - y;
+            const on = fromBottom < bandValues[x];
+            led(x, y, on ? hsv((fromBottom / H) * 160, 255, 255) : OFF, on);
+          }
+          if (peakValues[x] > 0) led(x, H - 1 - Math.min(H - 1, peakValues[x]), '#ffffff', true);
+        }
+      }
+      modeEl.textContent = spectrumMode ? 'SPECTRUM' : 'IDLE';
+      modeEl.toggleAttribute('data-on', spectrumMode);
+    }
+
+    function updateReadout() {
+      const scale = Math.max(80, enterThreshold * 3, ampSmoothed * 1.15);
+      const pct = (v: number) => `${Math.min(100, (v / scale) * 100)}%`;
+      fill.style.width = pct(ampSmoothed);
+      markEnter.style.left = pct(enterThreshold);
+      markExit.style.left = pct(exitThreshold);
+      bandEl.style.left = pct(Math.min(enterThreshold, exitThreshold));
+      bandEl.style.width = `calc(${pct(Math.abs(exitThreshold - enterThreshold))})`;
+      r('amp').textContent = ampSmoothed.toFixed(1);
+      r('base').textContent = noiseBaseline.toFixed(1);
+      r('enter').textContent = enterThreshold.toFixed(1);
+      r('exit').textContent = exitThreshold.toFixed(1);
+      r('agc').textContent = levelMax.toFixed(0);
+      r('deb').textContent = spectrumMode ? `${exitCount} / ${EXIT_FRAMES} out` : `${enterCount} / ${ENTER_FRAMES} in`;
+    }
+
+    function loop(now: number) {
+      acc += Math.min(200, now - last);
+      last = now;
+      while (acc >= FRAME_MS) {
+        clock += FRAME_MS;
+        step(now);
+        acc -= FRAME_MS;
+      }
+      render(now);
+      updateReadout();
+      raf = requestAnimationFrame(loop);
+    }
+
+    function start() {
+      if (running || !visible || source === 'none') return;
+      running = true;
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+
+    function stop() {
+      running = false;
+      cancelAnimationFrame(raf);
+    }
+
+    function resetDetector() {
+      startClock = clock;
+      noiseBaseline = 0;
+      ampSmoothed = 0;
+      spectrumMode = false;
+      enterCount = exitCount = 0;
+      levelMax = 650;
+    }
+
+    function stopMic() {
+      stream?.getTracks().forEach((t) => t.stop());
+      stream = null;
+      audioCtx?.close();
+      audioCtx = null;
+      analyser = null;
+      micBtn.setAttribute('aria-pressed', 'false');
+      micLabel.textContent = 'Use my microphone';
+    }
+
+    function setPlayUi(playing: boolean) {
+      playBtn.setAttribute('aria-pressed', String(playing));
+      playLabel.textContent = playing ? 'Pause' : 'Play demo track';
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (source === 'demo' && running) {
+        stop();
+        setPlayUi(false);
+        return;
+      }
+      if (source === 'mic') stopMic();
+      if (source !== 'demo') {
+        clock = 0;
+        resetDetector();
+      }
+      source = 'demo';
+      setPlayUi(true);
+      msg.textContent = 'Playing the generated demo track. The detector warms up for 2.5 seconds first.';
+      start();
+    });
+
+    micBtn.addEventListener('click', async () => {
+      if (source === 'mic') {
+        stopMic();
+        stop();
+        source = 'none';
+        msg.textContent = 'Microphone off.';
+        render(performance.now());
+        return;
+      }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+        });
+        audioCtx = new AudioContext();
+        const src = audioCtx.createMediaStreamSource(stream);
+        // Anti-alias before the 10 kHz resample. (The real board has no filter here; see the notes.)
+        const lp = audioCtx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 4500;
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        timeData = new Float32Array(new ArrayBuffer(analyser.fftSize * 4));
+        src.connect(lp).connect(analyser);
+        stop();
+        setPlayUi(false);
+        source = 'mic';
+        resetDetector();
+        micBtn.setAttribute('aria-pressed', 'true');
+        micLabel.textContent = 'Stop microphone';
+        msg.textContent = 'Listening. Stay quiet for a couple of seconds so it learns the room, then play some music.';
+        start();
+      } catch {
+        msg.textContent = "I couldn't get microphone access. The demo track works without it.";
+      }
+    });
+
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      visible ? start() : stop();
+    }).observe(root);
+    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+
+    // First frame: idle glow. Autoplay the demo track only when motion is allowed.
+    render(performance.now());
+    if (!prefersReducedMotion()) {
+      source = 'demo';
+      setPlayUi(true);
+      start();
+    } else {
+      msg.textContent = 'Animation is paused because reduced motion is on. Press play to run it.';
+    }
+  }
+</script>

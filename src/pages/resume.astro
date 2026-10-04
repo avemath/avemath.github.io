@@ -1,0 +1,393 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import experience from '@/data/experience.json';
+import skills from '@/data/skills.json';
+import site from '@/data/site.json';
+import { formatRange, formatMonth } from '@/lib/format';
+
+const research = experience.roles.filter((r) => r.kind === 'research' || r.kind === 'engineering');
+const other = experience.roles.filter((r) => !(r.kind === 'research' || r.kind === 'engineering'));
+const resumeSkills = skills.filter((g) => g.group !== 'Professional');
+const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
+---
+
+<BaseLayout
+  title="Résumé"
+  description="Résumé for Avery Matherne: M.S. ECE student and graduate research assistant at LSU, with embedded, communications and web work."
+>
+  <div class="wrap resume-tools no-print">
+    <div class="flex flex-wrap items-center justify-between gap-4 py-8">
+      <div>
+        <p class="eyebrow">Résumé</p>
+        <p class="mt-2 text-soft">The same content as the PDF, kept in sync from one data file.</p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a class="btn btn--primary" href={site.resumePdf} download>
+          <Icon name="download" /> Download PDF
+        </a>
+        <button type="button" class="btn" data-print>Print</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap pb-24">
+    <article class="resume card" data-resume>
+      <header class="r-head">
+        <h1 class="r-name">{site.name}</h1>
+        <p class="r-contact">
+          <span>{site.location}</span>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <a href={site.socials.linkedin}>{host(site.socials.linkedin)}</a>
+          <a href={site.socials.github}>{host(site.socials.github)}</a>
+          <a href={site.url}>{host(site.url)}</a>
+        </p>
+      </header>
+
+      <section class="r-sec" aria-labelledby="r-edu">
+        <h2 id="r-edu" class="r-h">Education</h2>
+        {
+          experience.education.map((e) => (
+            <div class="r-item">
+              <div class="r-row">
+                <h3 class="r-title">{e.school}</h3>
+                <span class="r-when">{e.expected ? `Expected ${formatMonth(e.end)}` : formatMonth(e.end)}</span>
+              </div>
+              <p class="r-sub">{e.degree}</p>
+              {e.notes.length > 0 && (
+                <ul class="r-list">
+                  {e.notes.map((n) => (
+                    <li>{n}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))
+        }
+      </section>
+
+      <section class="r-sec" aria-labelledby="r-exp">
+        <h2 id="r-exp" class="r-h">Research and engineering experience</h2>
+        {
+          research.map((r) => (
+            <div class="r-item">
+              <div class="r-row">
+                <h3 class="r-title">
+                  {r.title}, {r.org}
+                </h3>
+                <span class="r-when">{formatRange(r.start, r.end)}</span>
+              </div>
+              <ul class="r-list">
+                {r.bullets.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section class="r-sec r-sec--brief" aria-labelledby="r-proj">
+        <h2 id="r-proj" class="r-h">Technical projects</h2>
+        {
+          experience.projects.map((p) => (
+            <div class={p.id === 'rampage' ? 'r-item r-item--full' : 'r-item'}>
+              <div class="r-row">
+                <h3 class="r-title">
+                  <a href={`/work/${p.project}/`}>{p.title}</a>
+                </h3>
+                <span class="r-when">{formatRange(p.start, p.end)}</span>
+              </div>
+              <p class="r-sub">{p.role}</p>
+              <ul class="r-list">
+                {p.bullets.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section class="r-sec r-sec--brief" aria-labelledby="r-prof">
+        <h2 id="r-prof" class="r-h">Professional experience and leadership</h2>
+        {
+          other.map((r) => (
+            <div class="r-item">
+              <div class="r-row">
+                <h3 class="r-title">
+                  {r.title}, {r.org}
+                </h3>
+                <span class="r-when">{formatRange(r.start, r.end)}</span>
+              </div>
+              <ul class="r-list">
+                {r.bullets.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section class="r-sec" aria-labelledby="r-skills">
+        <h2 id="r-skills" class="r-h">Skills</h2>
+        <dl class="r-skills">
+          {
+            resumeSkills.map((g) => (
+              <div class={g.group === 'Hardware' ? 'r-screen-only' : undefined}>
+                <dt>{g.group}:</dt>
+                <dd>{g.items.map((item) => <span class="r-skill">{item}</span>)}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .resume {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    box-shadow: var(--shadow);
+  }
+
+  .r-head {
+    text-align: center;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid var(--text);
+  }
+
+  .r-name {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .r-contact {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 1rem;
+    margin-top: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--text-soft);
+  }
+
+  .r-contact a {
+    text-decoration: none;
+  }
+
+  .r-contact a:hover {
+    color: var(--accent);
+  }
+
+  .r-sec {
+    margin-top: 1.75rem;
+  }
+
+  .r-h {
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .r-h {
+    color: var(--accent);
+  }
+
+  .r-item {
+    margin-top: 1rem;
+    break-inside: avoid;
+  }
+
+  .r-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+  }
+
+  .r-title {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .r-title a {
+    text-decoration: none;
+  }
+
+  .r-when {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .r-sub {
+    font-size: 0.93rem;
+    font-style: italic;
+    color: var(--text-soft);
+  }
+
+  .r-list {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 0.4rem;
+    padding-left: 1.1rem;
+    list-style: disc;
+    font-size: 0.93rem;
+    color: var(--text-soft);
+  }
+
+  .r-list li::marker {
+    color: var(--muted);
+  }
+
+  .r-skills {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+    font-size: 0.93rem;
+  }
+
+  .r-skills div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.4rem;
+  }
+
+  .r-skills dt {
+    font-weight: 600;
+  }
+
+  .r-skills dd {
+    color: var(--text-soft);
+  }
+
+  .r-skill + .r-skill::before {
+    content: ', ';
+  }
+
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.45in 0.55in;
+    }
+
+    .wrap {
+      padding: 0 !important;
+      max-width: none;
+    }
+
+    .resume {
+      max-width: none;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+      font-family: 'Inter Variable', Arial, sans-serif;
+    }
+
+    .r-head {
+      padding-bottom: 0.5rem;
+      border-bottom-width: 1.5px;
+    }
+
+    .r-name {
+      font-size: 18pt;
+    }
+
+    .r-contact {
+      gap: 0 0.7rem;
+      font-size: 8.4pt;
+      margin-top: 0.1rem;
+    }
+
+    .r-sec {
+      margin-top: 0.6rem;
+    }
+
+    .r-h {
+      font-size: 8.5pt;
+      color: #000 !important;
+    }
+
+    .r-item {
+      margin-top: 0.4rem;
+    }
+
+    .r-title {
+      font-size: 9.6pt;
+    }
+
+    .r-when {
+      font-size: 8pt;
+      color: #333;
+    }
+
+    .r-sub,
+    .r-list,
+    .r-skills {
+      font-size: 8.8pt;
+      color: #111;
+    }
+
+    .r-list {
+      gap: 0.05rem;
+      margin-top: 0.15rem;
+    }
+
+    .r-skills {
+      gap: 0.1rem;
+      margin-top: 0.35rem;
+    }
+
+    .resume {
+      line-height: 1.32;
+    }
+
+    /* One page: the PDF keeps the top three bullets per entry, two for the brief section. */
+    .r-list li:nth-child(n + 4),
+    .r-sec--brief .r-item:not(.r-item--full) .r-list li:nth-child(n + 3),
+    .r-skill:nth-child(n + 6),
+    .r-screen-only {
+      display: none !important;
+    }
+
+    @page {
+      margin: 0.4in 0.5in;
+    }
+
+    .r-sec {
+      margin-top: 0.38rem;
+    }
+
+    .r-item {
+      margin-top: 0.3rem;
+    }
+
+    .r-skills div {
+      display: block;
+    }
+
+    .r-skills dt,
+    .r-skills dd {
+      display: inline;
+    }
+  }
+</style>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>

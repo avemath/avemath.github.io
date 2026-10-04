@@ -1,0 +1,199 @@
+---
+import Icon from './Icon.astro';
+import site from '@/data/site.json';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { href: '/work/', label: 'Work' },
+  { href: '/services/', label: 'Services' },
+  { href: '/about/', label: 'About' },
+  { href: '/resume/', label: 'Résumé' },
+  { href: '/contact/', label: 'Contact' },
+];
+const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.startsWith(href.replace(/\/$/, '') + '/');
+---
+
+<header class="site-header no-print" data-header>
+  <div class="wrap flex h-16 items-center justify-between gap-4">
+    <a href="/" class="brand" aria-label={`${site.name}, home`}>
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14.5" stroke="currentColor" stroke-opacity=".35" />
+          <circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity=".55" />
+          <circle cx="16" cy="16" r="3.2" fill="currentColor" />
+          <path d="M16 16 27 6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </span>
+      <span class="brand__name">Avery Matherne</span>
+    </a>
+
+    <nav aria-label="Main" class="hidden md:block">
+      <ul class="flex items-center gap-1">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} class="nav-link" aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <button type="button" class="icon-btn kbd-btn" data-palette-open aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K">
+        <Icon name="search" />
+        <span class="hidden sm:inline">Jump to</span>
+        <kbd class="hidden lg:inline-flex" data-kbd-hint>Ctrl K</kbd>
+        <span class="sr-only sm:hidden">Open menu and search</span>
+      </button>
+      <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+        <Icon name="sun" class="theme-icon theme-icon--sun h-[1.15em] w-[1.15em]" />
+        <Icon name="moon" class="theme-icon theme-icon--moon h-[1.15em] w-[1.15em]" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in oklab, var(--bg) 78%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+  }
+
+  .site-header[data-scrolled] {
+    border-bottom-color: var(--line);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+
+  .brand__mark {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--accent);
+  }
+
+  .brand__mark svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .brand__mark path {
+    transform-origin: 16px 16px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='reduce']) .brand:hover .brand__mark path {
+      animation: sweep 1.6s linear infinite;
+    }
+  }
+
+  @keyframes sweep {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  .nav-link {
+    position: relative;
+    display: inline-block;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.94rem;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition:
+      color 0.2s,
+      background-color 0.2s;
+  }
+
+  .nav-link:hover {
+    color: var(--text);
+    background: var(--surface-2);
+  }
+
+  .nav-link[aria-current='page'] {
+    color: var(--text);
+  }
+
+  .nav-link[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.2rem;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding-inline: 0.7rem;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-soft);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  .icon-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  kbd {
+    align-items: center;
+    padding: 0.05rem 0.4rem;
+    border: 1px solid var(--line);
+    border-radius: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: var(--surface-2);
+  }
+
+  :global([data-theme='dark']) .theme-icon--sun,
+  :global(:root:not([data-theme='dark'])) .theme-icon--moon {
+    display: none;
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const onScroll = () => header?.toggleAttribute('data-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  if (/Mac|iPhone|iPad/.test(navigator.userAgent)) {
+    document.querySelectorAll('[data-kbd-hint]').forEach((el) => (el.textContent = '⌘ K'));
+  }
+</script>

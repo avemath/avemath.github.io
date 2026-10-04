@@ -1,0 +1,86 @@
+---
+import '@/styles/global.css';
+import SEO from '@/components/SEO.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import CommandPalette from '@/components/CommandPalette.astro';
+import site from '@/data/site.json';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'profile';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+  bare?: boolean;
+}
+
+const { bare = false, ...seo } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0b1220" />
+    <script is:inline>
+      // Apply saved or system theme and motion settings before first paint.
+      (function () {
+        var d = document.documentElement;
+        var theme, motion;
+        try {
+          theme = localStorage.getItem('theme');
+          motion = localStorage.getItem('motion');
+        } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        d.dataset.theme = theme;
+        if (motion === 'reduce') d.dataset.motion = 'reduce';
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#f6f8fb');
+      })();
+    </script>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <SEO {...seo} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    {!bare && <Header />}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    {!bare && <Footer />}
+    <CommandPalette />
+
+    <script>
+      import { initPreferenceControls } from '../scripts/preferences';
+      import { initReveals } from '../scripts/motion';
+      initPreferenceControls();
+      initReveals();
+    </script>
+
+    {
+      site.cloudflareAnalyticsToken && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: site.cloudflareAnalyticsToken })}
+        />
+      )
+    }
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

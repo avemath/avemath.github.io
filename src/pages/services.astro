@@ -1,0 +1,339 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import ProjectTile from '@/components/ProjectTile.astro';
+import { getProjects, isWebsite } from '@/lib/projects';
+
+const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.links.live);
+
+const offers = [
+  { title: 'Small business sites', body: 'A site that explains what you do, shows your work, and makes it easy to call or book. Built for phones first.' },
+  { title: 'Nonprofit sites', body: 'Mission, story, events and ways to help, with sources for every claim and pages your volunteers can update.' },
+  { title: 'Forms that do the work', body: 'Inquiry, intake and booking forms that collect what you need the first time and land in your inbox, organized.' },
+  { title: 'Redesigns', body: "If your current site is slow, dated or hard to change, I'll rebuild it and keep what's working." },
+];
+
+const steps = [
+  { name: 'Discover', body: 'A conversation about your business, your customers and what the site has to do. I come back with a plan and a quote.' },
+  { name: 'Design', body: 'Page structure and copy first, then the look. You see real pages with your content, not a template.' },
+  { name: 'Build', body: 'I build it fast, accessible and easy to edit. You get a preview link to click around on as it comes together.' },
+  { name: 'Launch', body: 'Domain, hosting, search setup and a final check on phones and browsers. Then it goes live.' },
+  { name: 'Support', body: 'A plain-English guide to editing your site, and I stay reachable for questions and changes.' },
+];
+
+const included = [
+  ['Mobile first', 'Designed and tested at phone size before desktop.'],
+  ['Accessible', 'Keyboard support, readable contrast, alt text and reduced-motion support.'],
+  ['Fast', 'Optimized images and very little JavaScript, so pages load quickly on real phones.'],
+  ['Search basics', 'Titles, descriptions, a sitemap and structured data so Google understands your business.'],
+  ['Analytics', 'Simple, privacy-friendly visitor stats, with no cookie banner needed.'],
+  ['Yours to edit', 'An editor for your text and photos, plus a written guide to every page.'],
+];
+
+const faqs = [
+  {
+    q: 'How long does a site take?',
+    a: "It depends on how many pages you need and how quickly the content comes together, which is usually the slow part. I'll give you a timeline with the quote, once I know the scope.",
+  },
+  {
+    q: 'Do I need to write all the content?',
+    a: "No. I'll ask you questions, pull from what you already have (an old site, a Facebook page, flyers), and draft the copy for you to review. You know your business. I know how to put it on a page.",
+  },
+  {
+    q: 'What about hosting and my domain?',
+    a: "I'll set up hosting that fits the site, often for free or close to it for a small static site, and connect the domain you own. If you don't have one yet, I'll help you buy it in your own name, so it always belongs to you.",
+  },
+  {
+    q: 'Can I make changes myself after launch?',
+    a: "Yes. Every site I build comes with an editor for the parts that change, like text, photos, events and team members, plus a guide written for you. For bigger changes, just ask.",
+  },
+  {
+    q: 'What does it cost?',
+    a: "Every project is quoted up front, based on scope, so there are no surprises. Tell me what you need and I'll send a clear number.",
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+---
+
+<BaseLayout
+  title="Website design for small businesses and nonprofits"
+  description="I design and build fast, accessible websites for small businesses and nonprofits, with an editor you can use yourself. See the process, what's included and recent work."
+  jsonLd={[faqLd]}
+>
+  <section class="section svc-hero">
+    <div class="wrap">
+      <p class="eyebrow">Services</p>
+      <h1 class="svc-title">Websites that work as hard as you do.</h1>
+      <p class="section-lede">
+        I build fast, accessible websites for small businesses and nonprofits. You get a site you can be proud of, a clear process, and a
+        launch you don't have to worry about.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a class="btn btn--primary" href="/contact/?topic=website">Start a project <Icon name="arrow-right" /></a>
+        <a class="btn" href="#recent">See recent sites</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="build-title">
+    <div class="wrap">
+      <p class="eyebrow">What I build</p>
+      <h2 id="build-title" class="section-title">Sites for people who'd rather be running their business</h2>
+      <div class="offers">
+        {
+          offers.map((o, i) => (
+            <div class="offer card" data-reveal>
+              <span class="mono offer__n">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="offer__title">{o.title}</h3>
+              <p>{o.body}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section grid-paper" aria-labelledby="process-title">
+    <div class="wrap">
+      <p class="eyebrow">Process</p>
+      <h2 id="process-title" class="section-title">Five steps, no mystery</h2>
+      <ol class="steps">
+        {
+          steps.map((s, i) => (
+            <li class="step" data-reveal>
+              <span class="step__n mono">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="step__name">{s.name}</h3>
+              <p>{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="get-title">
+    <div class="wrap">
+      <p class="eyebrow">What you get</p>
+      <h2 id="get-title" class="section-title">Included with every site</h2>
+      <dl class="included">
+        {
+          included.map(([t, b]) => (
+            <div class="inc" data-reveal>
+              <dt>
+                <Icon name="check" class="h-4 w-4 text-accent" /> {t}
+              </dt>
+              <dd>{b}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section id="recent" class="section" aria-labelledby="recent-title">
+    <div class="wrap">
+      <p class="eyebrow">Recent work</p>
+      <h2 id="recent-title" class="section-title">Live and in use</h2>
+      <div class="recent">
+        {sites.map((p) => <ProjectTile project={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="wrap-narrow">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-title" class="section-title">Questions people ask</h2>
+      <div class="faqs">
+        {
+          faqs.map((f) => (
+            <details class="faq">
+              <summary>
+                {f.q}
+                <span class="faq__icon" aria-hidden="true">
+                  +
+                </span>
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section pt-0">
+    <div class="wrap">
+      <div class="svc-cta card">
+        <div>
+          <h2 class="font-display text-3xl font-semibold tracking-tight">Tell me about your project</h2>
+          <p class="mt-2 text-soft">A few sentences is enough to start. I'll reply with questions or a plan.</p>
+        </div>
+        <a class="btn btn--primary" href="/contact/?topic=website">Get in touch <Icon name="arrow-right" /></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .svc-hero {
+    background:
+      radial-gradient(50rem 24rem at 90% 0%, color-mix(in oklab, var(--amber) 14%, transparent), transparent 70%),
+      radial-gradient(40rem 20rem at 0% 100%, var(--accent-wash), transparent 70%);
+  }
+
+  .svc-title {
+    margin-top: 1rem;
+    max-width: 16ch;
+    font-size: clamp(2.6rem, 7vw, 5rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+
+  .offers {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .offer {
+    padding: 1.5rem;
+    box-shadow: none;
+    color: var(--text-soft);
+  }
+
+  .offer__n {
+    font-size: 0.75rem;
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .offer__n,
+  :global([data-theme='dark']) .step__n {
+    color: var(--accent);
+  }
+
+  .offer__title {
+    margin: 0.75rem 0 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .steps {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    counter-reset: step;
+  }
+
+  @media (min-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .step {
+    position: relative;
+    padding: 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--surface);
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
+  .step__n {
+    font-size: 0.75rem;
+    color: var(--accent-ink);
+  }
+
+  .step__name {
+    margin: 0.6rem 0 0.4rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .included {
+    display: grid;
+    gap: 1.5rem 2.5rem;
+    margin-top: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+
+  .inc dt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .inc dd {
+    margin-top: 0.35rem;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
+  .recent {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 2.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .faqs {
+    margin-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .faq {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faq summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__icon {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    transition: rotate 0.3s var(--ease-out-expo);
+  }
+
+  .faq[open] .faq__icon {
+    rotate: 45deg;
+  }
+
+  .faq p {
+    padding-bottom: 1.2rem;
+    color: var(--text-soft);
+  }
+
+  .svc-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    background:
+      radial-gradient(40rem 20rem at 100% 0%, color-mix(in oklab, var(--amber) 14%, transparent), transparent 70%),
+      var(--surface);
+  }
+</style>

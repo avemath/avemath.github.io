@@ -1,0 +1,34 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import CaseStudyLayout from '@/layouts/CaseStudyLayout.astro';
+import SpectrumDemo from '@/components/demos/SpectrumDemo.astro';
+import WeaponLogicDemo from '@/components/demos/WeaponLogicDemo.astro';
+import OfdmDemo from '@/components/demos/OfdmDemo.astro';
+import { getProjects, type Project } from '@/lib/projects';
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, prev: projects[i - 1], next: projects[i + 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  project: Project;
+  prev?: Project;
+  next?: Project;
+}
+
+const { project, prev, next } = Astro.props;
+const { Content, headings } = await render(project);
+const demo = project.data.demo;
+---
+
+<CaseStudyLayout project={project} headings={headings} prev={prev} next={next}>
+  {demo === 'spectrum' && <SpectrumDemo slot="demo" />}
+  {demo === 'weapon-logic' && <WeaponLogicDemo slot="demo" />}
+  {demo === 'ofdm' && <OfdmDemo slot="demo" />}
+  <Content />
+</CaseStudyLayout>

@@ -1,0 +1,269 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+import NowStrip from '@/components/NowStrip.astro';
+import site from '@/data/site.json';
+
+// Topographic contour texture: a nod to land work and Louisiana waterways.
+const contours = Array.from({ length: 14 }, (_, i) => {
+  let d = '';
+  for (let x = -20; x <= 1220; x += 30) {
+    const y = 40 + i * 42 + Math.sin(x / 140 + i * 0.7) * 22 + Math.sin(x / 47 + i) * 6;
+    d += `${x === -20 ? 'M' : 'L'} ${x} ${y.toFixed(1)} `;
+  }
+  return d;
+});
+
+const principles = [
+  ['Say what\'s true', 'Every claim gets a source, a number or a link. If I don\'t know, I say so.'],
+  ['Build for everyone', 'Keyboard, screen reader, slow phone, reduced motion. If it doesn\'t work for them, it doesn\'t work.'],
+  ['Hand it over', 'The people who own a thing should be able to run it without me. I write the guide.'],
+  ['Test the scary part', 'Kill switches, signal loss, empty air tanks. Find out on the bench, not in the arena.'],
+];
+---
+
+<BaseLayout title="About" description="About Avery Matherne: computer engineer, graduate researcher at LSU, web designer, land agent and nonprofit co-founder.">
+  <section class="about-hero">
+    <svg class="contours" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      {contours.map((d, i) => <path d={d} style={`--i:${i}`} />)}
+    </svg>
+    <div class="wrap about-hero__inner">
+      <div>
+        <p class="eyebrow">About</p>
+        <h1 class="about-title">I like systems that work when it matters.</h1>
+        <p class="section-lede">
+          I'm Ave. I'm a computer engineer and graduate researcher at LSU, I design and build websites, I do ownership research as a land agent, and
+          I co-founded a drowning awareness nonprofit with my family. It sounds like a lot of different things. It's mostly the same thing:
+          figuring out how something really works, then building it so other people can rely on it.
+        </p>
+      </div>
+      <div class="portrait" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="96" />
+          <circle cx="100" cy="100" r="70" />
+          <circle cx="100" cy="100" r="44" />
+          <path d="M100 100 L168 32" class="portrait__sweep" />
+          <text x="100" y="112" text-anchor="middle">AM</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <NowStrip />
+
+  <section class="section">
+    <div class="wrap-narrow prose about-prose">
+      <h2>Engineering</h2>
+      <p>
+        I studied computer engineering at LSU, with a minor in computer science, on the Tiger Excellence Non-Resident Award all four
+        years. The work that hooked me lives where hardware meets signals. For senior design I was lead programmer on
+        <a href="/work/rampage/">RAMpage</a>, a 30 lb pneumatic combat robot that took first place. In my communications design course I
+        went past a research assignment and built a <a href="/work/v2v-bsm-ofdm/">vehicle-to-vehicle radio link</a> on real
+        software-defined radios. On my own time I built an <a href="/work/led-audio-spectrum/">LED spectrum visualizer</a> that runs
+        FFTs on live audio.
+      </p>
+      <p>
+        Now I'm working on an M.S. in electrical and computer engineering, focused on communications and signal processing, and I'm a
+        graduate research assistant on an <a href="/work/onr-intelligent-data-management/">Office of Naval Research project</a> with
+        Integer Technologies, where I also interned.
+      </p>
+
+      <h2>Websites</h2>
+      <p>
+        The people closest to me needed websites, and I wanted to build them right: a
+        <a href="/work/petro-land-ventures/">land services firm</a>, my sister's
+        <a href="/work/grace-mae-alterations/">bridal alterations studio</a>, and our family's
+        <a href="/work/because-of-adam/">nonprofit</a>. Each one is fast, accessible, tested, and editable by the person who owns it. Now I
+        take on projects for small businesses and nonprofits. <a href="/services/">Here's how I work.</a>
+      </p>
+
+      <h2>Land work</h2>
+      <p>
+        Since 2020 I've worked as a contract land agent, doing ownership research and permitting coordination for oil, gas and renewable
+        energy projects. It's detail work with real money and real families on the other end, and it taught me to be precise with records
+        and clear with people. It's also why I built <a href="/work/landspace/">Landspace</a>: I wanted the map, the records and the title
+        problems in one place.
+      </p>
+
+      <h2>Why water matters to me</h2>
+      <p>
+        On June 5, 2017, my little brother Adam drowned in our backyard pool. He was 14 months old, and the house was full of family.
+        He survived. In 2020 my siblings and I started <a href="/work/because-of-adam/">Because of ADAM</a> to share
+        everything we wish we'd known: drowning is fast and silent, and layers of protection save lives.
+      </p>
+    </div>
+  </section>
+
+  <section class="section grid-paper">
+    <div class="wrap">
+      <p class="eyebrow">How I work</p>
+      <h2 class="section-title">Four rules I keep</h2>
+      <dl class="rules">
+        {
+          principles.map(([t, b], i) => (
+            <div class="rule card" data-reveal>
+              <dt>
+                <span class="mono rule__n" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {t}
+              </dt>
+              <dd>{b}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="about-cta card">
+        <p class="font-display text-2xl font-semibold tracking-tight">Want to work together, or just talk shop?</p>
+        <div class="flex flex-wrap gap-3">
+          <a class="btn btn--primary" href="/contact/">Send a note <Icon name="arrow-right" /></a>
+          <a class="btn" href={site.resumePdf} download><Icon name="download" /> Résumé</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .contours {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .contours path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-opacity: calc(0.05 + var(--i) * 0.012);
+    stroke-width: 1;
+  }
+
+  .about-hero__inner {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 960px) {
+    .about-hero__inner {
+      grid-template-columns: 1.6fr 1fr;
+    }
+  }
+
+  .about-title {
+    margin-top: 1rem;
+    max-width: 15ch;
+    font-size: clamp(2.6rem, 6.5vw, 4.75rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+
+  .portrait {
+    justify-self: center;
+    width: min(20rem, 70vw);
+    aspect-ratio: 1;
+    padding: 1rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-wash), transparent 70%);
+  }
+
+  .portrait svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .portrait circle {
+    fill: none;
+    stroke: var(--accent);
+    stroke-opacity: 0.45;
+  }
+
+  .portrait__sweep {
+    stroke: var(--amber);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transform-origin: 100px 100px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not([data-motion='reduce'])) .portrait__sweep {
+      animation: spin 8s linear infinite;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  .portrait text {
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 600;
+    fill: var(--text);
+    letter-spacing: -1px;
+  }
+
+  .about-prose h2:first-child {
+    margin-top: 0;
+  }
+
+  .rules {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .rule {
+    padding: 1.5rem;
+    box-shadow: none;
+  }
+
+  .rule__n {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-size: 0.75rem;
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .rule__n {
+    color: var(--accent);
+  }
+
+  .rule dt {
+    margin-top: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .rule dd {
+    margin-top: 0.4rem;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
+  .about-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+  }
+</style>

@@ -1,0 +1,10 @@
+[
+  { "label": "Sites shipped", "value": "{sites}", "detail": "Counted from this site's own project files, so it is always true." },
+  { "label": "Degrees", "value": "2", "detail": "B.S. in Computer Engineering finished May 2026. M.S. by May 2028." },
+  { "label": "Day job plot twist", "value": "Land agent", "detail": "I've done ownership research for oil, gas and renewable projects since 2020. It's why I built Landspace." },
+  { "label": "Why water matters", "value": "Adam", "detail": "My little brother drowned in our backyard pool at 14 months old. He survived. Because of ADAM is everything we wish we'd known." },
+  { "label": "Shots per match", "value": "17", "detail": "RAMpage carried enough air for 17 plow strikes. The firmware counted every one and locked out at zero." },
+  { "label": "Radio workaround", "value": "2.9 GHz", "detail": "Real V2V runs at 5.9 GHz. The Pluto's radio tops out below that, so my link ran at 2.9." },
+  { "label": "Client site commits", "value": "485", "detail": "Across plvinc.com, gracemaealterations.com and becauseofadam.org, as of October 2026." },
+  { "label": "This site", "value": "Astro", "detail": "Static, near-zero JavaScript, hosted on GitHub Pages. The source is public." }
+]

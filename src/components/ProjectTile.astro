@@ -1,0 +1,260 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import ProjectArt from './ProjectArt.astro';
+import BrowserFrame from './BrowserFrame.astro';
+import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
+import { yearRange } from '@/lib/format';
+
+interface Props {
+  project: Project;
+  size?: 'xl' | 'lg' | 'md';
+  headingLevel?: 'h2' | 'h3';
+  style?: string;
+  eager?: boolean;
+}
+
+const { project, size = 'md', headingLevel: H = 'h3', style, eager = false } = Astro.props;
+const d = project.data;
+const href = projectHref(project);
+const chips = d.stack.slice(0, size === 'xl' ? 4 : 3);
+const finished = d.status === 'complete' || d.status === 'archived';
+const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.start : null));
+---
+
+<article class={`tile tile--${size} card card--lift`} style={style} data-reveal data-tags={[d.type, ...d.tags].join(' ')}>
+  <div class="tile__media">
+    {
+      size === 'xl' && d.cover && d.links.live ? (
+        <div class="tile__stage">
+          <BrowserFrame
+            src={d.cover}
+            mobile={d.mobile}
+            alt=""
+            url={d.links.live}
+            eager={eager}
+            widths={[640, 960, 1280]}
+            sizes="(min-width: 1100px) 760px, 100vw"
+          />
+        </div>
+      ) : d.cover ? (
+        <Image
+          src={d.cover}
+          alt=""
+          widths={[400, 640, 960, 1280]}
+          sizes={size === 'xl' ? '(min-width: 1024px) 60vw, 100vw' : '(min-width: 1024px) 40vw, 100vw'}
+          format="webp"
+          quality={76}
+          loading={eager ? 'eager' : 'lazy'}
+          class="tile__img"
+        />
+      ) : (
+        <ProjectArt slug={project.id} />
+      )
+    }
+    {d.links.live && !(size === 'xl' && d.cover) && <span class="tile__live mono"><span class="status-dot" aria-hidden="true" />{new URL(d.links.live).host}</span>}
+  </div>
+
+  <div class="tile__body">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="chip chip--type">{typeLabels[d.type]}</span>
+      {d.confidentiality === 'limited' && (
+        <span class="chip chip--limited">
+          <Icon name="lock" class="h-3 w-3" />
+          Limited detail
+        </span>
+      )}
+      <span class="label ml-auto">{when}</span>
+    </div>
+
+    <H class="tile__title">
+      <a href={href} class="stretched">{d.title}</a>
+    </H>
+    <p class="tile__summary">{size === 'md' ? (d.outcome ?? d.summary) : d.summary}</p>
+    {size !== 'md' && d.outcome && <p class="tile__outcome mono">→ {d.outcome}</p>}
+
+    <ul class="tile__chips" aria-label="Built with">
+      {chips.map((c) => <li class="chip">{c}</li>)}
+    </ul>
+
+    <div class="tile__links">
+      <span class="tile__cta" aria-hidden="true">
+        Case study <Icon name="arrow-right" />
+      </span>
+      {
+        d.links.live && (
+          <a class="above-stretch tile__ext link" href={d.links.live}>
+            Live site <Icon name="arrow-up-right" class="inline h-[0.9em] w-[0.9em]" />
+            <span class="sr-only">: {d.title}</span>
+          </a>
+        )
+      }
+    </div>
+  </div>
+  <span class="sr-only">{statusLabels[d.status]}</span>
+</article>
+
+<style>
+  .tile {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .tile__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+
+  .tile__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    transition: scale 0.8s var(--ease-out-expo);
+  }
+
+  .tile:hover .tile__img {
+    scale: 1.03;
+  }
+
+  .tile__live {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--bg) 82%, transparent);
+    backdrop-filter: blur(6px);
+    font-size: 0.7rem;
+    color: var(--text);
+  }
+
+  .tile__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.75rem;
+    padding: 1.25rem 1.35rem 1.35rem;
+  }
+
+  .tile__title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .tile--xl .tile__title {
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+  }
+
+  .tile__title a {
+    text-decoration: none;
+  }
+
+  .tile__title a:focus-visible {
+    outline: none;
+  }
+
+  .tile:has(.tile__title a:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .tile__summary {
+    color: var(--text-soft);
+    font-size: 0.97rem;
+    line-height: 1.55;
+  }
+
+  .tile__outcome {
+    font-size: 0.8rem;
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .tile__outcome {
+    color: var(--accent);
+  }
+
+  .tile__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: auto;
+    padding-top: 0.25rem;
+  }
+
+  .tile__links {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px dashed var(--line);
+    font-size: 0.9rem;
+  }
+
+  .tile__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .tile__cta :global(svg) {
+    transition: translate 0.3s var(--ease-out-expo);
+  }
+
+  .tile:hover .tile__cta :global(svg) {
+    translate: 4px 0;
+  }
+
+  .tile__ext {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  /* The large tile stages a browser frame and phone on a glow instead of cropping. */
+  .tile__stage {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    padding: clamp(1.25rem, 4vw, 2.75rem) clamp(1.5rem, 5vw, 3.5rem) clamp(2rem, 5vw, 3.25rem);
+    background:
+      radial-gradient(60% 70% at 30% 20%, var(--accent-wash), transparent 70%),
+      radial-gradient(50% 60% at 90% 100%, color-mix(in oklab, var(--amber) 12%, transparent), transparent 70%),
+      var(--surface-2);
+  }
+
+  .tile__stage > :global(.frame) {
+    width: 100%;
+    transition: translate 0.6s var(--ease-out-expo);
+  }
+
+  .tile:hover .tile__stage > :global(.frame) {
+    translate: 0 -4px;
+  }
+
+  .tile--xl .tile__media {
+    aspect-ratio: auto;
+  }
+
+  @media (min-width: 1100px) {
+    .tile--xl .tile__media {
+      flex: 1;
+    }
+
+    .tile--xl .tile__body {
+      flex: none;
+    }
+  }
+</style>

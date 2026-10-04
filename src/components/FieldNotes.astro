@@ -1,0 +1,155 @@
+---
+import facts from '@/data/facts.json';
+import { getProjects, isWebsite } from '@/lib/projects';
+
+// "Sites shipped" is counted from the content collection so it never goes stale.
+const sitesShipped = (await getProjects()).filter((p) => isWebsite(p) && p.data.status === 'live').length;
+const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String(sitesShipped)) }));
+---
+
+<section id="field-notes" class="section home-section grid-paper" aria-labelledby="notes-title" data-section="field-notes">
+  <div class="wrap">
+    <p class="eyebrow">Field notes</p>
+    <h2 id="notes-title" class="section-title">A few things that are true</h2>
+    <p class="section-lede">Tap a card to decode it.</p>
+
+    <ul class="notes" data-notes>
+      {
+        notes.map((n, i) => (
+          <li data-reveal>
+            <button type="button" class="note-card" aria-expanded="true" data-note>
+              <span class="note-card__top">
+                <span class="mono note-card__idx">N{String(i + 1).padStart(2, '0')}</span>
+                <span class="label">{n.label}</span>
+              </span>
+              <span class="sr-only">{n.value}</span>
+              <span class="note-card__value" data-note-value data-text={n.value} aria-hidden="true">
+                {n.value}
+              </span>
+              <span class="note-card__detail" data-note-detail>
+                {n.detail}
+              </span>
+              <span class="note-card__hint mono" aria-hidden="true">
+                tap to decode
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .notes {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  }
+
+  .note-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    height: 100%;
+    min-height: 13rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--surface);
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+      border-color 0.25s,
+      transform 0.4s var(--ease-out-expo),
+      box-shadow 0.4s;
+  }
+
+  .note-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+
+  .note-card__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .note-card__idx {
+    font-size: 0.72rem;
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .note-card__idx {
+    color: var(--accent);
+  }
+
+  .note-card__value {
+    margin-top: auto;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--text);
+  }
+
+  .note-card__detail {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-soft);
+  }
+
+  .note-card__hint {
+    display: none;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* Closed state only exists once JS has run, so no-JS visitors see every fact. */
+  .note-card[aria-expanded='false'] .note-card__value {
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .note-card[aria-expanded='false'] .note-card__detail {
+    display: none;
+  }
+
+  .note-card[aria-expanded='false'] .note-card__hint {
+    display: block;
+  }
+
+  .note-card[aria-expanded='false']::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0 3px, var(--grid) 3px 4px);
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { decode, mask } from '../scripts/decode';
+
+  const cards = [...document.querySelectorAll<HTMLButtonElement>('[data-note]')];
+
+  cards.forEach((card) => {
+    const value = card.querySelector<HTMLElement>('[data-note-value]')!;
+    const text = value.dataset.text ?? '';
+    card.setAttribute('aria-expanded', 'false');
+    value.textContent = mask(text);
+    card.addEventListener('click', () => {
+      const open = card.getAttribute('aria-expanded') !== 'true';
+      card.setAttribute('aria-expanded', String(open));
+      if (open) decode(value, text);
+      else value.textContent = mask(text);
+    });
+  });
+</script>

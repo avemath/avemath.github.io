@@ -1,0 +1,55 @@
+---
+// Living style guide: tokens and components in both themes. Not linked or indexed.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+
+const colors = ['--bg', '--bg-deep', '--surface', '--surface-2', '--line', '--line-strong', '--text', '--text-soft', '--muted', '--accent', '--accent-ink', '--amber', '--amber-ink', '--ok', '--danger'];
+---
+
+<BaseLayout title="Style guide" description="Design tokens and components." noindex>
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Style guide</p>
+      <h1 class="section-title">Signal design system</h1>
+      <p class="section-lede">Toggle the theme in the header to check both palettes. Contrast ratios are in docs/DESIGN.md.</p>
+
+      <h2 class="mt-12 text-2xl font-semibold">Color</h2>
+      <ul class="mt-4 grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr))">
+        {
+          colors.map((c) => (
+            <li class="card overflow-hidden" style="box-shadow:none">
+              <div style={`height:4rem;background:var(${c})`} />
+              <p class="mono p-3 text-xs">{c}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2 class="mt-12 text-2xl font-semibold">Type</h2>
+      <div class="mt-4 space-y-3">
+        <p class="font-display text-6xl font-semibold tracking-tight">Space Grotesk display</p>
+        <p class="text-lg">Inter body text. The quick brown fox jumps over the lazy dog, 0123456789.</p>
+        <p class="mono text-sm">JetBrains Mono labels, tags and data · 128-PT FFT · 10 kHz</p>
+        <p class="eyebrow">Eyebrow label</p>
+      </div>
+
+      <h2 class="mt-12 text-2xl font-semibold">Buttons and chips</h2>
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        <a class="btn btn--primary" href="#">Primary <Icon name="arrow-right" /></a>
+        <a class="btn" href="#">Secondary</a>
+        <a class="btn btn--small" href="#">Small</a>
+        <a class="link" href="#">Text link</a>
+        <span class="chip chip--type">Research</span>
+        <span class="chip">Astro</span>
+        <span class="chip chip--limited"><Icon name="lock" class="h-3 w-3" /> Limited detail</span>
+      </div>
+
+      <h2 class="mt-12 text-2xl font-semibold">Card</h2>
+      <div class="card card--lift mt-4 max-w-md p-6">
+        <p class="label">Label</p>
+        <p class="mt-2 font-display text-xl font-semibold">Card title</p>
+        <p class="mt-1 text-soft">Supporting text sits in the soft text color.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

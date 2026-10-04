@@ -1,0 +1,491 @@
+---
+import DemoShell from './DemoShell.astro';
+
+const stages = [
+  { id: 'cfo', label: 'Coarse CFO correction', hint: 'Phase step between preamble symbols' },
+  { id: 'lin', label: 'Linear phase fit and polarity', hint: 'Line through the training phase' },
+  { id: 'pll', label: 'Costas loop', hint: 'Tracks what is left' },
+  { id: 'mmse', label: 'MMSE equalizer', hint: 'Per-subcarrier channel estimate' },
+];
+---
+
+<DemoShell
+  id="ofdm"
+  title="Clean up a received packet, one stage at a time"
+  lede="Add a carrier frequency offset and noise, then switch on each receiver stage in order and watch the constellations snap into place. Left: the single-carrier sync symbols. Right: the 48 data subcarriers of the OFDM payload after a three-path channel."
+  note="A simplified browser model of the MATLAB receiver, not the original code. It uses the same frame numbers (10 MHz, 16 samples per symbol, 64-point FFT, CP 16, 48 data and 4 pilot subcarriers) and the same channel delays (0, 100 and 250 ns at 0, −5 and −9 dB). The FFT window starts three samples into the cyclic prefix, a common choice that the channel estimate absorbs. The raw BER is counted before Viterbi decoding."
+>
+  <div class="ofdm" data-ofdm>
+    <div class="ofdm__controls">
+      <label class="slider">
+        <span class="slider__top"><span>Carrier offset</span><output class="mono" data-out="cfo">5.0 kHz</output></span>
+        <input type="range" min="0" max="12" step="0.5" value="5" data-in="cfo" />
+      </label>
+      <label class="slider">
+        <span class="slider__top"><span>SNR</span><output class="mono" data-out="snr">18 dB</output></span>
+        <input type="range" min="0" max="30" step="1" value="18" data-in="snr" />
+      </label>
+
+      <fieldset class="stages">
+        <legend class="label">Receiver stages</legend>
+        {
+          stages.map((s, i) => (
+            <label class="stage">
+              <input type="checkbox" data-stage={s.id} />
+              <span class="stage__n mono">{i + 1}</span>
+              <span>
+                <span class="stage__label">{s.label}</span>
+                <span class="stage__hint">{s.hint}</span>
+              </span>
+            </label>
+          ))
+        }
+      </fieldset>
+
+      <div class="flex flex-wrap gap-2">
+        <button type="button" class="btn btn--small" data-act="all">All stages on</button>
+        <button type="button" class="btn btn--small" data-act="none">All off</button>
+        <button type="button" class="btn btn--small" data-act="new">New packet</button>
+      </div>
+    </div>
+
+    <div class="ofdm__plots">
+      <figure class="plot">
+        <figcaption class="label">Sync symbols · 256 BPSK</figcaption>
+        <canvas width="420" height="420" data-plot="sync" role="img" aria-label="Constellation of the training symbols"></canvas>
+      </figure>
+      <figure class="plot">
+        <figcaption class="label">OFDM payload · 4 symbols × 48 subcarriers</figcaption>
+        <canvas width="420" height="420" data-plot="ofdm" role="img" aria-label="Constellation of the OFDM data subcarriers"></canvas>
+      </figure>
+      <figure class="plot plot--wide">
+        <figcaption class="label">Channel magnitude per subcarrier · pilots in amber</figcaption>
+        <canvas width="860" height="150" data-plot="h" role="img" aria-label="Channel magnitude across 64 subcarriers"></canvas>
+      </figure>
+      <dl class="stats mono">
+        <div><dt>True CFO</dt><dd data-s="cfo">5.00 kHz</dd></div>
+        <div><dt>Estimated</dt><dd data-s="est">n/a</dd></div>
+        <div><dt>Sync phase error</dt><dd data-s="ph">n/a</dd></div>
+        <div><dt>Raw payload BER</dt><dd data-s="ber">n/a</dd></div>
+      </dl>
+      <p class="sr-only" aria-live="polite" data-ofdm-status></p>
+    </div>
+  </div>
+</DemoShell>
+
+<style>
+  .ofdm {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1000px) {
+    .ofdm {
+      grid-template-columns: 19rem 1fr;
+    }
+  }
+
+  .ofdm__controls {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .slider {
+    display: grid;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+  }
+
+  .slider__top {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .slider input {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .stages {
+    display: grid;
+    gap: 0.5rem;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .stages legend {
+    margin-bottom: 0.5rem;
+  }
+
+  .stage {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    background: var(--bg);
+    cursor: pointer;
+  }
+
+  .stage:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-wash);
+  }
+
+  .stage input {
+    margin-top: 0.3rem;
+    accent-color: var(--accent);
+  }
+
+  .stage__n {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  .stage__label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .stage__hint {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .ofdm__plots {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .plot {
+    margin: 0;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    background: var(--bg);
+  }
+
+  .plot canvas {
+    width: 100%;
+    height: auto;
+    margin-top: 0.5rem;
+  }
+
+  .plot--wide {
+    grid-column: 1 / -1;
+  }
+
+  .stats {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .stats > div {
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    background: var(--bg);
+  }
+
+  .stats dt {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stats dd {
+    margin-top: 0.15rem;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 640px) {
+    .ofdm__plots {
+      grid-template-columns: 1fr;
+    }
+
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+  type C = [number, number];
+
+  const FS = 10e6;
+  const SPS = 16;
+  const RS = FS / SPS; // sync symbol rate
+  const NSYNC = 256;
+  const NFFT = 64;
+  const CP = 16;
+  const PILOTS = [12, 26, 40, 54];
+  const NULLS = new Set([0, 1, 2, 3, 4, 5, 32, 59, 60, 61, 62, 63]);
+  const DATA = Array.from({ length: NFFT }, (_, k) => k).filter((k) => !NULLS.has(k) && !PILOTS.includes(k));
+  const FFT_BACKOFF = 3; // samples the FFT window starts inside the cyclic prefix
+  const PATHS = [
+    { delay: 0, gainDb: 0 },
+    { delay: 100e-9, gainDb: -5 },
+    { delay: 250e-9, gainDb: -9 },
+  ];
+
+  const root = document.querySelector<HTMLElement>('[data-ofdm]');
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const q = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+    const inCfo = q<HTMLInputElement>('[data-in="cfo"]');
+    const inSnr = q<HTMLInputElement>('[data-in="snr"]');
+    const outCfo = q<HTMLOutputElement>('[data-out="cfo"]');
+    const outSnr = q<HTMLOutputElement>('[data-out="snr"]');
+    const stages = [...root.querySelectorAll<HTMLInputElement>('[data-stage]')];
+    const syncCanvas = q<HTMLCanvasElement>('[data-plot="sync"]');
+    const ofdmCanvas = q<HTMLCanvasElement>('[data-plot="ofdm"]');
+    const hCanvas = q<HTMLCanvasElement>('[data-plot="h"]');
+    const s = (k: string) => q<HTMLElement>(`[data-s="${k}"]`);
+    const status = q<HTMLElement>('[data-ofdm-status]');
+
+    let seed = 42;
+    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const gauss = () => {
+      let u = 0, v = 0;
+      while (u === 0) u = rand();
+      while (v === 0) v = rand();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    };
+    const rot = ([a, b]: C, th: number): C => [a * Math.cos(th) - b * Math.sin(th), a * Math.sin(th) + b * Math.cos(th)];
+    const mul = ([a, b]: C, [c, d]: C): C => [a * c - b * d, a * d + b * c];
+    const conj = ([a, b]: C): C => [a, -b];
+    const abs2 = ([a, b]: C) => a * a + b * b;
+
+    let packetSeed = 42;
+    let packet: ReturnType<typeof makePacket>;
+
+    // Everything random about a packet is drawn once, so sliders move smoothly.
+    function makePacket() {
+      seed = packetSeed;
+      const sync = Array.from({ length: NSYNC }, () => (rand() < 0.5 ? -1 : 1));
+      const phase0 = rand() * 2 * Math.PI;
+      const syncNoise = Array.from({ length: NSYNC }, () => [gauss(), gauss()] as C);
+      const phaseWalk: number[] = [];
+      let w = 0;
+      for (let n = 0; n < NSYNC; n++) phaseWalk.push((w += gauss() * 0.012));
+      const bits = Array.from({ length: 4 * DATA.length }, () => (rand() < 0.5 ? 0 : 1));
+      const dataNoise = bits.map(() => [gauss(), gauss()] as C);
+      const prNoise = Array.from({ length: NFFT }, () => [gauss(), gauss()] as C);
+      return { sync, phase0, syncNoise, phaseWalk, bits, dataNoise, prNoise };
+    }
+
+    function channel(k: number): C {
+      const f = (k < NFFT / 2 ? k : k - NFFT) * (FS / NFFT);
+      let h: C = [0, 0];
+      for (const p of PATHS) {
+        const g = 10 ** (p.gainDb / 20);
+        const th = -2 * Math.PI * f * p.delay;
+        h = [h[0] + g * Math.cos(th), h[1] + g * Math.sin(th)];
+      }
+      // Starting the FFT early in the CP adds a linear phase ramp across subcarriers.
+      return rot(h, (2 * Math.PI * k * FFT_BACKOFF) / NFFT);
+    }
+
+    function run() {
+      const cfoHz = Number(inCfo.value) * 1000;
+      const snrDb = Number(inSnr.value);
+      outCfo.value = `${(cfoHz / 1000).toFixed(1)} kHz`;
+      outSnr.value = `${snrDb} dB`;
+      const on = Object.fromEntries(stages.map((x) => [x.dataset.stage!, x.checked]));
+      const sigma = Math.sqrt(1 / (2 * 10 ** (snrDb / 10)));
+      const p = packet;
+
+      // ---- Single-carrier sync symbols ----
+      const dphi = (2 * Math.PI * cfoHz) / RS;
+      let rx: C[] = p.sync.map((b, n) => {
+        const clean = rot([b, 0], p.phase0 + dphi * n + p.phaseWalk[n]);
+        return [clean[0] + sigma * p.syncNoise[n][0], clean[1] + sigma * p.syncNoise[n][1]];
+      });
+
+      // 1. Coarse CFO from the summed differential phase, with the known symbols stripped off.
+      let est = 0;
+      if (on.cfo) {
+        let acc: C = [0, 0];
+        for (let n = 1; n < NSYNC; n++) {
+          const a = mul(rx[n], [p.sync[n], 0]);
+          const b = mul(rx[n - 1], [p.sync[n - 1], 0]);
+          const d = mul(a, conj(b));
+          acc = [acc[0] + d[0], acc[1] + d[1]];
+        }
+        const step = Math.atan2(acc[1], acc[0]);
+        est = (step / (2 * Math.PI)) * RS;
+        rx = rx.map((z, n) => rot(z, -step * n));
+      }
+
+      let linCfo = 0;
+      // 2. Fit a line to the unwrapped phase on the training symbols, then fix polarity.
+      if (on.lin) {
+        const ph: number[] = [];
+        let prev = 0;
+        rx.forEach((z, n) => {
+          let a = Math.atan2(...(mul(z, [p.sync[n], 0]).reverse() as C));
+          while (a - prev > Math.PI) a -= 2 * Math.PI;
+          while (a - prev < -Math.PI) a += 2 * Math.PI;
+          ph.push((prev = a));
+        });
+        const n = ph.length;
+        const mx = (n - 1) / 2;
+        const my = ph.reduce((x, y) => x + y, 0) / n;
+        let sxy = 0, sxx = 0;
+        ph.forEach((y, i) => ((sxy += (i - mx) * (y - my)), (sxx += (i - mx) ** 2)));
+        const slope = sxy / sxx;
+        const icpt = my - slope * mx;
+        linCfo = (slope / (2 * Math.PI)) * RS;
+        rx = rx.map((z, i) => rot(z, -(icpt + slope * i)));
+        const corr = rx.reduce((acc, z, i) => acc + z[0] * p.sync[i], 0);
+        if (corr < 0) rx = rx.map(([a, b]) => [-a, -b]);
+      }
+
+      // 3. Decision-directed Costas loop for the leftover phase wander.
+      if (on.pll) {
+        let theta = 0;
+        const mu = 0.06;
+        rx = rx.map((z) => {
+          const y = rot(z, -theta);
+          const err = Math.sign(y[0]) * y[1];
+          theta += mu * err;
+          return y;
+        });
+      }
+
+      const phaseErr = rx.reduce((acc, z, n) => {
+        const a = Math.atan2(z[1] * p.sync[n], z[0] * p.sync[n]);
+        return acc + Math.abs(a);
+      }, 0) / NSYNC;
+
+      // ---- OFDM payload through the three-path channel ----
+      // Any CFO the sync chain didn't remove shows up as a common rotation.
+      const residualCfo = cfoHz - (on.cfo ? est : 0) - linCfo;
+      const ofdmRot = on.lin ? 0 : p.phase0;
+      const symDur = (NFFT + CP) / FS;
+      const H = Array.from({ length: NFFT }, (_, k) => channel(k));
+      const Hhat = H.map((h, k) => [h[0] + sigma * p.prNoise[k][0], h[1] + sigma * p.prNoise[k][1]] as C);
+      const pts: C[] = [];
+      let errors = 0;
+      p.bits.forEach((bit, i) => {
+        const sym = Math.floor(i / DATA.length);
+        const k = DATA[i % DATA.length];
+        const x: C = [bit ? 1 : -1, 0];
+        const drift = ofdmRot + 2 * Math.PI * residualCfo * (sym + 1) * symDur;
+        let y = rot(mul(H[k], x), drift);
+        y = [y[0] + sigma * p.dataNoise[i][0], y[1] + sigma * p.dataNoise[i][1]];
+        if (on.mmse) {
+          const hk = Hhat[k];
+          const n0 = 2 * sigma * sigma;
+          const num = mul(conj(hk), y);
+          const den = abs2(hk) + n0;
+          y = [num[0] / den, num[1] / den];
+        }
+        pts.push(y);
+        if ((y[0] >= 0 ? 1 : 0) !== bit) errors++;
+      });
+
+      // ---- Draw ----
+      drawConstellation(syncCanvas, rx, (n) => p.sync[n] > 0);
+      drawConstellation(ofdmCanvas, pts, (i) => p.bits[i] === 1);
+      drawChannel(hCanvas, H, on.mmse ? Hhat : null);
+
+      s('cfo').textContent = `${(cfoHz / 1000).toFixed(2)} kHz`;
+      s('est').textContent = on.cfo ? `${(est / 1000).toFixed(2)} kHz` : 'n/a';
+      s('ph').textContent = `${((phaseErr * 180) / Math.PI).toFixed(1)}°`;
+      const ber = errors / p.bits.length;
+      s('ber').textContent = `${(ber * 100).toFixed(1)}%  (${errors}/${p.bits.length})`;
+      status.textContent = `Raw bit error rate ${(ber * 100).toFixed(1)} percent.`;
+    }
+
+    function css(name: string) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function drawConstellation(canvas: HTMLCanvasElement, pts: C[], isOne: (i: number) => boolean) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      const sc = w / 4.4;
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = css('--line');
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      ctx.lineTo(w, h / 2);
+      ctx.moveTo(w / 2, 0);
+      ctx.lineTo(w / 2, h);
+      ctx.stroke();
+      ctx.setLineDash([3, 5]);
+      ctx.beginPath();
+      ctx.arc(w / 2, h / 2, sc, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      const accent = css('--accent');
+      const amber = css('--amber');
+      pts.forEach((z, i) => {
+        ctx.fillStyle = isOne(i) ? accent : amber;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.arc(w / 2 + z[0] * sc, h / 2 - z[1] * sc, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = css('--text');
+      [-1, 1].forEach((x) => {
+        ctx.beginPath();
+        ctx.arc(w / 2 + x * sc, h / 2, 7, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+    }
+
+    function drawChannel(canvas: HTMLCanvasElement, H: C[], Hhat: C[] | null) {
+      const ctx = canvas.getContext('2d')!;
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const bw = w / NFFT;
+      const max = 2.1;
+      const order = Array.from({ length: NFFT }, (_, i) => (i + NFFT / 2) % NFFT); // show DC in the middle
+      order.forEach((k, x) => {
+        if (NULLS.has(k)) return;
+        const mag = Math.sqrt(abs2(H[k]));
+        const bh = (mag / max) * (h - 10);
+        ctx.fillStyle = PILOTS.includes(k) ? css('--amber') : css('--accent');
+        ctx.globalAlpha = 0.75;
+        ctx.fillRect(x * bw + 1, h - bh, bw - 2, bh);
+        if (Hhat) {
+          const mh = (Math.sqrt(abs2(Hhat[k])) / max) * (h - 10);
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = css('--text');
+          ctx.fillRect(x * bw + 1, h - mh - 1, bw - 2, 2);
+        }
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    const rerun = () => requestAnimationFrame(run);
+    [inCfo, inSnr, ...stages].forEach((el) => el.addEventListener('input', rerun));
+    q('[data-act="all"]').addEventListener('click', () => (stages.forEach((x) => (x.checked = true)), run()));
+    q('[data-act="none"]').addEventListener('click', () => (stages.forEach((x) => (x.checked = false)), run()));
+    q('[data-act="new"]').addEventListener('click', () => {
+      packetSeed = Math.floor(Math.random() * 1e9) + 1;
+      packet = makePacket();
+      run();
+    });
+    window.addEventListener('themechange', run);
+
+    packet = makePacket();
+    run();
+  }
+</script>

@@ -1,0 +1,334 @@
+---
+import Icon from './Icon.astro';
+import site from '@/data/site.json';
+
+interface Props {
+  idPrefix?: string;
+}
+
+const { idPrefix = 'cf' } = Astro.props;
+const id = (name: string) => `${idPrefix}-${name}`;
+const hasKey = Boolean(site.web3formsKey);
+const topics = ['Job or internship', 'Research', 'Website project', 'Something else'];
+---
+
+<form
+  class="cform"
+  method="post"
+  action={hasKey ? 'https://api.web3forms.com/submit' : `mailto:${site.email}`}
+  enctype={hasKey ? undefined : 'text/plain'}
+  novalidate
+  data-contact-form
+  data-has-key={hasKey ? '' : undefined}
+  data-email={site.email}
+>
+  {
+    hasKey && (
+      <>
+        <input type="hidden" name="access_key" value={site.web3formsKey} />
+        <input type="hidden" name="subject" value="New message from avemath.github.io" />
+        <input type="hidden" name="from_name" value="avemath.github.io" />
+        <input type="hidden" name="redirect" value={`${site.url}/contact/?sent=1`} />
+      </>
+    )
+  }
+  <!-- Honeypot: people never see it, bots fill it in. -->
+  <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none" />
+
+  <div class="cform__row">
+    <div class="field">
+      <label for={id('name')}>Name</label>
+      <input id={id('name')} name="name" type="text" autocomplete="name" required aria-describedby={id('name-err')} />
+      <p class="field__err" id={id('name-err')} data-err></p>
+    </div>
+    <div class="field">
+      <label for={id('email')}>Email</label>
+      <input id={id('email')} name="email" type="email" autocomplete="email" required aria-describedby={id('email-err')} />
+      <p class="field__err" id={id('email-err')} data-err></p>
+    </div>
+  </div>
+
+  <fieldset class="field">
+    <legend>I'm reaching out about</legend>
+    <div class="topics">
+      {
+        topics.map((t, i) => (
+          <label class="topic">
+            <input type="radio" name="topic" value={t} checked={i === 0} data-topic={t} />
+            <span>{t}</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <label for={id('message')}>Message</label>
+    <textarea
+      id={id('message')}
+      name="message"
+      rows="6"
+      required
+      minlength="10"
+      aria-describedby={`${id('message-hint')} ${id('message-err')}`}
+      data-message></textarea>
+    <p class="field__hint" id={id('message-hint')} data-message-hint>A sentence or two is plenty. Links are welcome.</p>
+    <p class="field__err" id={id('message-err')} data-err></p>
+  </div>
+
+  <div class="cform__foot">
+    <button type="submit" class="btn btn--primary" data-submit>
+      <span data-submit-label>Send message</span>
+      <Icon name="arrow-right" />
+    </button>
+    <p class="text-sm text-muted">
+      Or email me directly at <a class="link" href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  </div>
+
+  <div class="cform__status" role="status" aria-live="polite" data-status></div>
+</form>
+
+<style>
+  .cform {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .cform__row {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .cform__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .field label,
+  .field legend {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .field legend {
+    margin-bottom: 0.5rem;
+  }
+
+  .field input[type='text'],
+  .field input[type='email'],
+  .field textarea {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.7rem;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 1rem;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-wash);
+  }
+
+  .field [aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+
+  .field__hint {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .field__err {
+    font-size: 0.82rem;
+    color: var(--danger);
+  }
+
+  .field__err:empty {
+    display: none;
+  }
+
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .topic {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .topic input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .topic span {
+    display: inline-block;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: var(--text-soft);
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .topic input:checked + span {
+    border-color: var(--accent);
+    background: var(--accent-wash);
+    color: var(--text);
+  }
+
+  .topic input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .cform__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+  }
+
+  .cform__status:empty {
+    display: none;
+  }
+
+  .cform__status {
+    padding: 1rem 1.1rem;
+    border-radius: 0.8rem;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+
+  .cform__status[data-kind='ok'] {
+    border-color: color-mix(in oklab, var(--ok) 60%, var(--line));
+  }
+
+  .cform__status[data-kind='error'] {
+    border-color: color-mix(in oklab, var(--danger) 60%, var(--line));
+  }
+</style>
+
+<script>
+  const hints: Record<string, string> = {
+    'Job or internship': 'What is the role, and where can I read more about it?',
+    Research: 'What are you working on, and where might my background fit?',
+    'Website project': 'Tell me about the business, what the site needs to do, and any timeline.',
+    'Something else': 'A sentence or two is plenty. Links are welcome.',
+  };
+
+  document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const label = form.querySelector<HTMLElement>('[data-submit-label]')!;
+    const hint = form.querySelector<HTMLElement>('[data-message-hint]')!;
+    const hasKey = form.hasAttribute('data-has-key');
+    const email = form.dataset.email!;
+
+    // Preselect a topic from ?topic=website and adapt the message hint.
+    const preset = new URLSearchParams(location.search).get('topic');
+    const map: Record<string, string> = { job: 'Job or internship', research: 'Research', website: 'Website project' };
+    if (preset && map[preset]) {
+      const radio = form.querySelector<HTMLInputElement>(`[data-topic="${map[preset]}"]`);
+      if (radio) radio.checked = true;
+    }
+    const syncHint = () => {
+      const t = form.querySelector<HTMLInputElement>('input[name="topic"]:checked')?.value ?? '';
+      hint.textContent = hints[t] ?? hints['Something else'];
+    };
+    form.querySelectorAll('input[name="topic"]').forEach((r) => r.addEventListener('change', syncHint));
+    syncHint();
+
+    if (new URLSearchParams(location.search).get('sent') === '1') {
+      status.dataset.kind = 'ok';
+      status.textContent = "Thanks, your message is on its way. I'll reply soon.";
+    }
+
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[required], textarea[required]')];
+    const messageFor = (f: HTMLInputElement | HTMLTextAreaElement) => {
+      if (f.validity.valueMissing) return f.name === 'email' ? 'I need an email address to reply to.' : `Please add your ${f.name}.`;
+      if (f.validity.typeMismatch) return 'That email address looks incomplete.';
+      if (f.validity.tooShort) return 'Could you add a little more detail?';
+      return '';
+    };
+    const check = (f: HTMLInputElement | HTMLTextAreaElement) => {
+      const msg = messageFor(f);
+      const err = document.getElementById(`${f.id}-err`);
+      if (err) err.textContent = msg;
+      f.setAttribute('aria-invalid', String(Boolean(msg)));
+      return !msg;
+    };
+    fields.forEach((f) => f.addEventListener('blur', () => f.value && check(f)));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const invalid = fields.filter((f) => !check(f));
+      if (invalid.length) {
+        invalid[0].focus();
+        return;
+      }
+
+      const data = new FormData(form);
+      if (data.get('botcheck')) return;
+
+      if (!hasKey) {
+        const body = `${data.get('message')}\n\n${data.get('name')}\n${data.get('email')}`;
+        location.href = `mailto:${email}?subject=${encodeURIComponent(`${data.get('topic')}: from ${data.get('name')}`)}&body=${encodeURIComponent(body)}`;
+        status.dataset.kind = 'ok';
+        status.textContent = 'Your email app should open with the message filled in.';
+        return;
+      }
+
+      submit.disabled = true;
+      label.textContent = 'Sending…';
+      status.textContent = '';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: data,
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json.success === false) throw new Error(json.message || 'Send failed');
+        form.reset();
+        syncHint();
+        status.dataset.kind = 'ok';
+        status.textContent = "Thanks, your message is on its way. I'll reply soon.";
+      } catch {
+        status.dataset.kind = 'error';
+        status.innerHTML = `That didn't go through. Please email me at <a class="link" href="mailto:${email}">${email}</a>.`;
+      } finally {
+        submit.disabled = false;
+        label.textContent = 'Send message';
+      }
+    });
+  });
+</script>

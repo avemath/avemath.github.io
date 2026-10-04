@@ -1,0 +1,616 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ------------------------------------------------------------------
+   Design tokens. "Signal": naval acoustics meets interface craft.
+   Every color pair used for text is checked for WCAG AA in both themes
+   (see docs/DESIGN.md for the measured ratios).
+   ------------------------------------------------------------------ */
+:root {
+  --bg: #f6f8fb;
+  --bg-deep: #e9eef6;
+  --surface: #ffffff;
+  --surface-2: #eef2f8;
+  --line: #d5dde9;
+  --line-strong: #b4c1d4;
+  --text: #0b1220;
+  --text-soft: #34425c;
+  --muted: #4f5e79;
+  --accent: #0077a8;
+  --accent-ink: #005f87;
+  --accent-wash: rgb(0 119 168 / 0.1);
+  --amber: #ffb547;
+  --amber-ink: #8a5300;
+  --on-amber: #1a1203;
+  --danger: #b42318;
+  --ok: #0f7b4f;
+  --grid: rgb(11 18 32 / 0.05);
+  --shadow: 0 1px 2px rgb(11 18 32 / 0.06), 0 12px 32px -16px rgb(11 18 32 / 0.25);
+  --shadow-lift: 0 2px 4px rgb(11 18 32 / 0.06), 0 24px 48px -20px rgb(11 18 32 / 0.35);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #0b1220;
+  --bg-deep: #070c16;
+  --surface: #111a2e;
+  --surface-2: #17223a;
+  --line: #22304b;
+  --line-strong: #33466b;
+  --text: #e6edf7;
+  --text-soft: #c3cfe2;
+  --muted: #8a9bb8;
+  --accent: #3ddcff;
+  --accent-ink: #7fe8ff;
+  --accent-wash: rgb(61 220 255 / 0.1);
+  --amber: #ffb547;
+  --amber-ink: #ffc670;
+  --on-amber: #1a1203;
+  --danger: #ff8a7a;
+  --ok: #5fe3a6;
+  --grid: rgb(230 237 247 / 0.04);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 56px -20px rgb(0 0 0 / 0.75);
+  color-scheme: dark;
+}
+
+@theme {
+  --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Code', Menlo, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-soft: var(--text-soft);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-amber: var(--amber);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: 5.5rem;
+    background: var(--bg);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='reduce']) {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    font-feature-settings: 'cv11', 'ss01';
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: var(--text);
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  img,
+  svg,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Layout primitives
+   ------------------------------------------------------------------ */
+.wrap {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.wrap-narrow {
+  width: 100%;
+  max-width: 46rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.section {
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+}
+
+.section + .section {
+  border-top: 1px solid var(--line);
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--amber);
+  color: var(--on-amber);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------
+   Type helpers
+   ------------------------------------------------------------------ */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+
+[data-theme='dark'] .eyebrow {
+  color: var(--accent);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.eyebrow--plain::before {
+  display: none;
+}
+
+.section-title {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 600;
+  margin-top: 0.85rem;
+}
+
+.section-lede {
+  margin-top: 1rem;
+  max-width: 40rem;
+  color: var(--text-soft);
+  font-size: 1.125rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.link {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+  transition: text-decoration-color 0.2s;
+}
+
+[data-theme='dark'] .link {
+  color: var(--accent);
+}
+
+.link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ------------------------------------------------------------------
+   Buttons and chips
+   ------------------------------------------------------------------ */
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--text);
+  --btn-line: var(--line-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.875rem;
+  padding: 0.7rem 1.25rem;
+  border: 1px solid var(--btn-line);
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-weight: 600;
+  font-size: 0.975rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--ease-out-expo),
+    background-color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.25s;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  --btn-bg: var(--amber);
+  --btn-fg: var(--on-amber);
+  --btn-line: var(--amber);
+}
+
+.btn--primary:hover {
+  --btn-bg: color-mix(in oklab, var(--amber) 88%, white);
+  border-color: var(--btn-bg);
+  box-shadow: 0 10px 30px -12px color-mix(in oklab, var(--amber) 70%, transparent);
+}
+
+.btn--small {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+.btn svg {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-soft);
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.chip--type {
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+[data-theme='dark'] .chip--type {
+  color: var(--accent);
+}
+
+.chip--limited {
+  border-color: color-mix(in oklab, var(--amber) 55%, transparent);
+  color: var(--amber-ink);
+  background: color-mix(in oklab, var(--amber) 10%, transparent);
+}
+
+.status-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 25%, transparent);
+}
+
+/* ------------------------------------------------------------------
+   Cards
+   ------------------------------------------------------------------ */
+.card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.card--lift {
+  transition:
+    transform 0.4s var(--ease-out-expo),
+    box-shadow 0.4s var(--ease-out-expo),
+    border-color 0.3s;
+}
+
+.card--lift:hover,
+.card--lift:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+  border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+}
+
+/* Make a whole card clickable from its title link without nesting links. */
+.stretched::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.above-stretch {
+  position: relative;
+  z-index: 2;
+}
+
+/* Grid paper texture used behind sections */
+.grid-paper {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ------------------------------------------------------------------
+   Prose for case studies
+   ------------------------------------------------------------------ */
+.prose {
+  color: var(--text-soft);
+  font-size: 1.0625rem;
+}
+
+.prose > * + * {
+  margin-top: 1.15em;
+}
+
+.prose h2 {
+  margin-top: 2.75rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.prose h2::before {
+  content: '// ';
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  color: var(--accent);
+  letter-spacing: 0;
+}
+
+.prose h3 {
+  margin-top: 2rem;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.prose strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.prose a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+[data-theme='dark'] .prose a {
+  color: var(--accent);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+}
+
+.prose ul {
+  list-style: none;
+}
+
+.prose ul > li {
+  position: relative;
+}
+
+.prose ul > li::before {
+  content: '';
+  position: absolute;
+  left: -1.1rem;
+  top: 0.72em;
+  width: 0.4rem;
+  height: 1px;
+  background: var(--accent);
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose ol > li::marker {
+  font-family: var(--font-mono);
+  color: var(--accent-ink);
+  font-size: 0.85em;
+}
+
+[data-theme='dark'] .prose ol > li::marker {
+  color: var(--accent);
+}
+
+.prose li + li {
+  margin-top: 0.5em;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  border-radius: 0.3em;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------------
+   Motion. Reveals use CSS scroll-driven animations where supported,
+   with an IntersectionObserver fallback (see scripts/motion.ts).
+   Nothing is hidden unless motion is allowed and JS has run.
+   ------------------------------------------------------------------ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    html:not([data-motion='reduce']) [data-reveal] {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+
+  @supports not (animation-timeline: view()) {
+    html.io-reveal:not([data-motion='reduce']) [data-reveal]:not(.is-in) {
+      opacity: 0;
+      translate: 0 14px;
+    }
+
+    html.io-reveal:not([data-motion='reduce']) [data-reveal] {
+      transition:
+        opacity 0.7s var(--ease-out-expo),
+        translate 0.7s var(--ease-out-expo);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+  }
+}
+
+html[data-motion='reduce'] *,
+html[data-motion='reduce'] *::before,
+html[data-motion='reduce'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Print: the résumé page and case studies print cleanly.
+   ------------------------------------------------------------------ */
+@media print {
+  :root,
+  [data-theme='dark'] {
+    --bg: #fff;
+    --surface: #fff;
+    --surface-2: #fff;
+    --text: #000;
+    --text-soft: #111;
+    --muted: #333;
+    --line: #bbb;
+    --accent: #000;
+    --accent-ink: #000;
+    color-scheme: light;
+  }
+
+  .no-print,
+  .site-header,
+  .site-footer {
+    display: none !important;
+  }
+
+  body {
+    font-size: 10.5pt;
+    background: #fff;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}

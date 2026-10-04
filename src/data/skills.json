@@ -1,0 +1,26 @@
+[
+  {
+    "group": "Engineering and research",
+    "items": ["Digital communications (OFDM, BPSK, synchronization)", "Signal processing (FFT, filtering, AGC)", "Software-defined radio (ADALM-PLUTO)", "Channel coding (convolutional, Viterbi)", "Equalization (MMSE)", "Embedded control and safety logic", "System-level testing and latency debugging"]
+  },
+  {
+    "group": "Programming",
+    "items": ["Python", "MicroPython", "MATLAB", "C and C++", "JavaScript", "TypeScript", "Google Apps Script"]
+  },
+  {
+    "group": "Hardware",
+    "items": ["ESP32", "Raspberry Pi 4B", "Raspberry Pi Pico W", "WS2812B LED matrices", "RC PWM and interrupts", "Solenoid and relay control"]
+  },
+  {
+    "group": "Web",
+    "items": ["HTML and CSS", "Astro", "React", "Next.js", "Tailwind CSS", "Accessibility (WCAG)", "Performance and Core Web Vitals", "SEO and structured data", "Headless CMS setup"]
+  },
+  {
+    "group": "Tools",
+    "items": ["Git and GitHub", "GitHub Actions", "Linux", "Playwright", "Cloudflare", "Vercel", "Supabase", "Leaflet", "OpenCV"]
+  },
+  {
+    "group": "Professional",
+    "items": ["Client communication", "Public records research", "Title work", "Project management", "Fundraising and outreach"]
+  }
+]

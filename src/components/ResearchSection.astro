@@ -1,0 +1,153 @@
+---
+import Icon from './Icon.astro';
+import ProjectArt from './ProjectArt.astro';
+import { getEntry } from 'astro:content';
+
+const onr = await getEntry('projects', 'onr-intelligent-data-management');
+const v2v = await getEntry('projects', 'v2v-bsm-ofdm');
+const integer = await getEntry('projects', 'integer-internship');
+---
+
+<section id="research" class="section home-section research" aria-labelledby="research-title" data-section="research">
+  <div class="wrap">
+    <div class="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <div>
+        <p class="eyebrow">Research</p>
+        <h2 id="research-title" class="section-title">Deciding what matters when the link is thin</h2>
+        <p class="section-lede">
+          I'm a graduate research assistant at LSU on an Office of Naval Research project with Integer Technologies, advised by
+          Dr. Shuangqing Wei. The project builds decision-making tools that help distributed autonomous maritime systems, such as
+          underwater robots, decide which data matters and how to share it.
+        </p>
+
+        <dl class="facts">
+          <div>
+            <dt class="label">Sponsor</dt>
+            <dd>Office of Naval Research</dd>
+          </div>
+          <div>
+            <dt class="label">Partner</dt>
+            <dd>Integer Technologies</dd>
+          </div>
+          <div>
+            <dt class="label">Advisor</dt>
+            <dd>Dr. Shuangqing Wei, LSU ECE</dd>
+          </div>
+          <div>
+            <dt class="label">My focus</dt>
+            <dd>Communications and signal processing</dd>
+          </div>
+        </dl>
+
+        <p class="note">
+          <Icon name="lock" class="h-4 w-4 flex-none" />
+          <span>
+            This is sponsored research, so I only describe it in the words of the
+            <a class="link" href={onr?.data.links.writeup}>public announcement</a>. Happy to talk about what I can.
+          </span>
+        </p>
+      </div>
+
+      <div class="research__panel card" data-reveal>
+        <div class="research__art"><ProjectArt slug="onr-intelligent-data-management" /></div>
+        <ul class="research__list">
+          {
+            [onr, integer, v2v].filter(Boolean).map((p) => (
+              <li>
+                <a href={`/work/${p!.id}/`} class="research__row">
+                  <span>
+                    <span class="research__row-title">{p!.data.title}</span>
+                    <span class="research__row-sub">{p!.data.summary}</span>
+                  </span>
+                  <Icon name="arrow-right" class="h-4 w-4 flex-none" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .research {
+    background:
+      radial-gradient(60rem 30rem at 85% 20%, var(--accent-wash), transparent 70%),
+      var(--bg);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 2rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .facts dd {
+    margin-top: 0.3rem;
+    font-weight: 500;
+  }
+
+  .note {
+    display: flex;
+    gap: 0.65rem;
+    margin-top: 2rem;
+    padding: 0.9rem 1rem;
+    border: 1px dashed color-mix(in oklab, var(--amber) 60%, var(--line));
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-soft);
+  }
+
+  .note :global(svg) {
+    margin-top: 0.2rem;
+    color: var(--amber-ink);
+  }
+
+  .research__panel {
+    overflow: hidden;
+  }
+
+  .research__art {
+    aspect-ratio: 16 / 9;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .research__list li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .research__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.35rem;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .research__row:hover {
+    background: var(--surface-2);
+  }
+
+  .research__row-title {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  .research__row-sub {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

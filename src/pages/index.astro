@@ -1,0 +1,278 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import NowStrip from '@/components/NowStrip.astro';
+import ProjectTile from '@/components/ProjectTile.astro';
+import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
+import ResearchSection from '@/components/ResearchSection.astro';
+import Timeline from '@/components/Timeline.astro';
+import Skills from '@/components/Skills.astro';
+import FieldNotes from '@/components/FieldNotes.astro';
+import ContactForm from '@/components/ContactForm.astro';
+import Icon from '@/components/Icon.astro';
+import { getProjects } from '@/lib/projects';
+import site from '@/data/site.json';
+
+const projects = await getProjects();
+const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
+
+// Featured tiles. Size sets the bento span. Each audience gets its own order.
+const bento = [
+  { slug: 'because-of-adam', size: 'xl', order: { hire: 1, research: 3, website: 1 } },
+  { slug: 'onr-intelligent-data-management', size: 'lg', order: { hire: 2, research: 1, website: 6 } },
+  { slug: 'landspace', size: 'lg', order: { hire: 3, research: 4, website: 4 } },
+  { slug: 'rampage', size: 'lg', order: { hire: 4, research: 2, website: 5 } },
+  { slug: 'petro-land-ventures', size: 'lg', order: { hire: 5, research: 5, website: 2 } },
+  { slug: 'grace-mae-alterations', size: 'lg', order: { hire: 6, research: 6, website: 3 } },
+] as const;
+---
+
+<BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
+  <div class="home">
+    <Hero />
+    <NowStrip />
+
+    <div class="home-flow">
+      <section id="featured" class="section home-section" aria-labelledby="featured-title" data-section="featured">
+        <div class="wrap">
+          <div class="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p class="eyebrow">Featured work</p>
+              <h2 id="featured-title" class="section-title">Things I've built and shipped</h2>
+              <p class="section-lede">
+                <span class="aud aud--hire">Research, hardware, software and live websites. Every tile opens a case study with what I did and how.</span>
+                <span class="aud aud--research">Research and communications work first, then the engineering and software behind it.</span>
+                <span class="aud aud--website">Live client sites first. Every one was designed, built and launched by me.</span>
+              </p>
+            </div>
+            <a class="btn" href="/work/">All projects <Icon name="arrow-right" /></a>
+          </div>
+
+          <div class="bento">
+            {
+              bento.map((b, i) => {
+                const p = bySlug[b.slug];
+                return p ? (
+                  <ProjectTile
+                    project={p}
+                    size={b.size}
+                    eager={i === 0}
+                    style={`--o-hire:${b.order.hire};--o-research:${b.order.research};--o-website:${b.order.website}`}
+                  />
+                ) : null;
+              })
+            }
+          </div>
+        </div>
+      </section>
+
+      <WebsitesShowcase />
+      <ResearchSection />
+      <Timeline />
+      <Skills />
+      <FieldNotes />
+
+      <section id="services" class="section home-section" aria-labelledby="services-title" data-section="services">
+        <div class="wrap">
+          <div class="services-teaser card">
+            <div>
+              <p class="eyebrow">For clients</p>
+              <h2 id="services-title" class="section-title">Need a website?</h2>
+              <p class="section-lede">
+                I build fast, accessible websites for small businesses and nonprofits. You get a site you can be proud of, a clear
+                process, and a launch you don't have to worry about.
+              </p>
+              <div class="mt-8 flex flex-wrap gap-3">
+                <a class="btn btn--primary" href="/services/">See how I work <Icon name="arrow-right" /></a>
+                <a class="btn" href="/contact/?topic=website">Start a project</a>
+              </div>
+            </div>
+            <ul class="services-teaser__list">
+              <li><span class="mono">01</span> Marketing and service business sites</li>
+              <li><span class="mono">02</span> Nonprofit sites with donation and volunteer paths</li>
+              <li><span class="mono">03</span> Intake, booking and inquiry forms</li>
+              <li><span class="mono">04</span> Redesigns of sites that stopped working for you</li>
+              <li><span class="mono">05</span> An editor so you can update it yourself</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="section home-section" aria-labelledby="contact-title" data-section="contact">
+        <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.3fr]">
+          <div>
+            <p class="eyebrow">Contact</p>
+            <h2 id="contact-title" class="section-title">Send a note</h2>
+            <p class="section-lede">Have a role, a research question or a website in mind? {site.replyTime}</p>
+            <ul class="mt-8 space-y-3">
+              <li>
+                <a class="link inline-flex items-center gap-2" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
+              </li>
+              <li>
+                <a class="link inline-flex items-center gap-2" href={site.socials.linkedin}><Icon name="linkedin" /> LinkedIn</a>
+              </li>
+              <li>
+                <a class="link inline-flex items-center gap-2" href={site.socials.github}><Icon name="github" /> GitHub</a>
+              </li>
+              <li class="inline-flex items-center gap-2 text-soft"><Icon name="pin" /> {site.location}</li>
+            </ul>
+          </div>
+          <div class="card p-6 sm:p-8">
+            <ContactForm idPrefix="home" />
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .home-flow {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Sections keep their dividers whatever order the audience switcher picks. */
+  .home-flow > :global(.home-section) {
+    border-top: 1px solid var(--line);
+  }
+
+  .home-flow > :global(.home-section:first-child) {
+    border-top: 0;
+  }
+
+  /* Audience ordering. Pure CSS, driven by the checked radio in the hero. */
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='research']) {
+    order: -3;
+  }
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='featured']) {
+    order: -2;
+  }
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='experience']) {
+    order: -1;
+  }
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='websites']) {
+    order: 2;
+  }
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='services']) {
+    order: 3;
+  }
+
+  .home:has(#aud-website:checked) .home-flow > :global([data-section='websites']) {
+    order: -3;
+  }
+  .home:has(#aud-website:checked) .home-flow > :global([data-section='services']) {
+    order: -2;
+  }
+  .home:has(#aud-website:checked) .home-flow > :global([data-section='featured']) {
+    order: -1;
+  }
+  .home:has(#aud-website:checked) .home-flow > :global([data-section='research']) {
+    order: 2;
+  }
+
+  .home-flow > :global([data-section='contact']) {
+    order: 10;
+  }
+
+  /* Featured bento. */
+  .bento {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    grid-template-columns: 1fr;
+  }
+
+  .bento > :global(.tile) {
+    order: var(--o-hire);
+  }
+
+  .home:has(#aud-research:checked) .bento > :global(.tile) {
+    order: var(--o-research);
+  }
+
+  .home:has(#aud-website:checked) .bento > :global(.tile) {
+    order: var(--o-website);
+  }
+
+  @media (min-width: 720px) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bento > :global(.tile--xl) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .bento {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-auto-flow: dense;
+    }
+
+    .bento > :global(.tile--xl) {
+      grid-column: span 4;
+      grid-row: span 2;
+    }
+
+    .bento > :global(.tile--lg) {
+      grid-column: span 2;
+    }
+
+    .bento > :global(.tile--md) {
+      grid-column: span 2;
+    }
+  }
+
+  /* Audience-specific intro lines. */
+  .aud {
+    display: none;
+  }
+  .home:has(#aud-hire:checked) .aud--hire,
+  .home:has(#aud-research:checked) .aud--research,
+  .home:has(#aud-website:checked) .aud--website {
+    display: inline;
+  }
+  .home:not(:has(input[name='audience']:checked)) .aud--hire {
+    display: inline;
+  }
+
+  .services-teaser {
+    display: grid;
+    gap: 2.5rem;
+    padding: clamp(1.75rem, 4vw, 3.5rem);
+    background:
+      radial-gradient(40rem 20rem at 100% 0%, color-mix(in oklab, var(--amber) 14%, transparent), transparent 70%),
+      var(--surface);
+  }
+
+  @media (min-width: 960px) {
+    .services-teaser {
+      grid-template-columns: 1.3fr 1fr;
+      align-items: center;
+    }
+  }
+
+  .services-teaser__list li {
+    display: flex;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.02rem;
+  }
+
+  .services-teaser__list li:first-child {
+    border-top: 1px solid var(--line);
+  }
+
+  .services-teaser__list .mono {
+    font-size: 0.75rem;
+    color: var(--accent-ink);
+    padding-top: 0.25rem;
+  }
+
+  :global([data-theme='dark']) .services-teaser__list .mono {
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,154 @@
+{
+  "roles": [
+    {
+      "id": "lsu-gra",
+      "kind": "research",
+      "title": "Graduate Research Assistant",
+      "org": "Louisiana State University, Electrical and Computer Engineering",
+      "location": "Baton Rouge, LA",
+      "start": "2026",
+      "end": null,
+      "summary": "Office of Naval Research project with Integer Technologies, advised by Dr. Shuangqing Wei.",
+      "bullets": [
+        "Support LSU's side of Intelligent Data Management for Distributed Naval Platforms, a project building decision-making tools that help distributed autonomous maritime systems decide which data matters and how to share it."
+      ],
+      "project": "onr-intelligent-data-management"
+    },
+    {
+      "id": "integer-intern",
+      "kind": "engineering",
+      "title": "Engineering Intern",
+      "org": "Integer Technologies",
+      "location": "Baton Rouge, LA",
+      "start": "2026",
+      "end": "2026-08",
+      "summary": "Acoustic characterization and underwater network simulation for autonomous maritime systems.",
+      "bullets": [
+        "Worked on acoustic characterization and underwater network simulation in support of autonomous maritime systems."
+      ],
+      "project": "integer-internship"
+    },
+    {
+      "id": "web",
+      "kind": "web",
+      "title": "Web Designer and Developer",
+      "org": "Freelance",
+      "location": "Remote",
+      "start": "2026",
+      "end": null,
+      "summary": "Design, build, content structure and launch for small businesses and nonprofits.",
+      "bullets": [
+        "Shipped plvinc.com, gracemaealterations.com and becauseofadam.org, each with an editor the owner can use without me.",
+        "Accessible and fast by default: keyboard support, reduced motion, structured data and optimized images."
+      ]
+    },
+    {
+      "id": "adam",
+      "kind": "nonprofit",
+      "title": "Co-Founder",
+      "org": "Because of ADAM, 501(c)(3)",
+      "location": "Blair County, PA",
+      "start": "2020",
+      "end": null,
+      "summary": "Drowning awareness nonprofit my family started after my little brother Adam drowned and survived.",
+      "bullets": [
+        "Lead fundraising and community outreach, from cornhole tournaments to water safety booths.",
+        "Designed and built becauseofadam.org, where every statistic links to its source."
+      ],
+      "project": "because-of-adam"
+    },
+    {
+      "id": "land",
+      "kind": "land",
+      "title": "Land Agent (Contract)",
+      "org": "Harold J. Anderson Inc. · Lemoine Landman Services · Petro Land Ventures Inc.",
+      "location": null,
+      "start": "2020",
+      "end": null,
+      "summary": "Ownership research and permitting coordination for oil, gas and renewable energy projects.",
+      "bullets": [
+        "Research ownership and coordinate permitting for oil, gas and renewable energy projects.",
+        "Build and analyze Excel runsheets to trace title and support project development.",
+        "Manage title information and documentation across several clients and projects at once."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "rampage",
+      "title": "RAMpage Combat Robot, Senior Design Capstone",
+      "role": "Lead programmer and systems integration · 1st place, senior design combat robotics competition",
+      "start": "2024-08",
+      "end": "2025-05",
+      "bullets": [
+        "Wrote the control software for a 30 lb combat robot: MicroPython on a Raspberry Pi Pico W and Python on a Raspberry Pi 4B.",
+        "Designed a split architecture: the Pico W handles the weapon from direct RC PWM input, and the Pi 4B streams video on its own.",
+        "Built pneumatic weapon sequencing with a 17-shot air budget, a kill switch and signal-loss safety stops.",
+        "Streamed live video over UDP with OpenCV, stepping JPEG quality down so every frame fits in one datagram."
+      ],
+      "project": "rampage"
+    },
+    {
+      "id": "v2v",
+      "title": "V2V Collision Warning over OFDM",
+      "role": "EE 4003 final project, with Jason Phan",
+      "start": "2026-01",
+      "end": "2026-05",
+      "bullets": [
+        "Built a BPSK-OFDM physical layer in MATLAB, modeled on IEEE 802.11p, and ran it over two ADALM-PLUTO SDRs.",
+        "Implemented the receiver: packet detection, timing recovery, CFO correction, a Costas loop, MMSE equalization and Viterbi decoding.",
+        "Decoded two vehicles' safety messages and computed time-to-collision for a brake warning."
+      ],
+      "project": "v2v-bsm-ofdm"
+    },
+    {
+      "id": "lea",
+      "title": "16×16 LED Audio Spectrum Visualizer",
+      "role": "Personal project",
+      "start": "2025",
+      "end": "2025",
+      "bullets": [
+        "Built a real-time spectrum visualizer on an ESP32 with a 128-point FFT mapped to 16 log-spaced bands.",
+        "Added an adaptive noise baseline and debounced mode switching between the spectrum and an idle glow.",
+        "Tuned AGC, noise gating and smoothing so quiet and distant music still reads."
+      ],
+      "project": "led-audio-spectrum"
+    },
+    {
+      "id": "landspace",
+      "title": "Landspace, Land Research and Mapping App",
+      "role": "Personal project",
+      "start": "2025",
+      "end": null,
+      "bullets": [
+        "Building a local-first web and desktop app (React, Leaflet, Electron) for mineral title work.",
+        "Imports messy Excel runsheets, maps parcels, and flags problems in the chain of title automatically.",
+        "Optional cloud sync through Supabase with row-level security."
+      ],
+      "project": "landspace"
+    }
+  ],
+  "education": [
+    {
+      "id": "ms",
+      "degree": "M.S., Electrical and Computer Engineering (thesis track), communications and signal processing",
+      "school": "Louisiana State University",
+      "location": "Baton Rouge, LA",
+      "end": "2028-05",
+      "expected": true,
+      "notes": []
+    },
+    {
+      "id": "bs",
+      "degree": "B.S., Computer Engineering, minor in Computer Science",
+      "school": "Louisiana State University",
+      "location": "Baton Rouge, LA",
+      "end": "2026-05",
+      "expected": false,
+      "notes": [
+        "Tiger Excellence Non-Resident Award, all four years",
+        "Coursework: Signals and Systems, Digital Communication and Networking, Probability for ECE, Communications in Computing, Communications Engineering Design"
+      ]
+    }
+  ]
+}

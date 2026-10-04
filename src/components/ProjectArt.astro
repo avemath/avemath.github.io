@@ -1,0 +1,275 @@
+---
+// Drawn covers for projects without screenshots. Research and hardware
+// projects get abstract art on purpose: nothing here depicts real systems,
+// data or results.
+interface Props {
+  slug: string;
+  class?: string;
+}
+
+const { slug, class: className = '' } = Astro.props;
+const W = 600;
+const H = 375;
+
+// Small deterministic random so art is stable between builds.
+let seed = [...slug].reduce((a, c) => a + c.charCodeAt(0), 0) || 1;
+const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+// LED matrix: 16 columns of a spectrum shape.
+const ledCols = Array.from({ length: 16 }, (_, i) => {
+  const shape = 13 - Math.abs(i - 4.5) * 1.2 + Math.sin(i * 1.3) * 2;
+  return Math.max(2, Math.min(15, Math.round(shape + rand() * 2)));
+});
+const ledHue = (row: number) => {
+  // FastLED hue 0 to 160 runs red, yellow, green, aqua, blue.
+  const h = (row / 15) * 225;
+  return `hsl(${h} 95% 58%)`;
+};
+
+// Constellation for V2V: two BPSK clusters with noise.
+const constellation = Array.from({ length: 70 }, (_, i) => {
+  const s = i % 2 ? 1 : -1;
+  const g = () => (rand() + rand() + rand() - 1.5) * 0.32;
+  return { x: s + g(), y: g() * 0.8 };
+});
+
+// Distributed nodes for ONR art.
+const nodes = Array.from({ length: 7 }, () => ({ x: 80 + rand() * 440, y: 120 + rand() * 170 }));
+const links: [number, number][] = [];
+nodes.forEach((a, i) =>
+  nodes.forEach((b, j) => {
+    if (j > i && Math.hypot(a.x - b.x, a.y - b.y) < 200) links.push([i, j]);
+  }),
+);
+
+const contour = (y0: number, amp: number, ph: number) => {
+  let d = `M 0 ${y0}`;
+  for (let x = 0; x <= W; x += 20) d += ` L ${x} ${(y0 + Math.sin(x / 70 + ph) * amp + Math.sin(x / 23 + ph * 2) * amp * 0.25).toFixed(1)}`;
+  return d;
+};
+
+const wave = (y0: number, amp: number, f: number, ph = 0) => {
+  let d = `M 0 ${y0}`;
+  for (let x = 0; x <= W; x += 4) {
+    const env = Math.exp(-(((x - 300) / 170) ** 2));
+    d += ` L ${x} ${(y0 + Math.sin(x / f + ph) * amp * env).toFixed(1)}`;
+  }
+  return d;
+};
+---
+
+<svg class={`art ${className}`} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id={`grid-${slug}`} width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--art-grid)" stroke-width="1"></path>
+    </pattern>
+    <radialGradient id={`glow-${slug}`} cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="var(--accent)" stop-opacity=".18"></stop>
+      <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <rect width={W} height={H} fill="var(--art-bg)"></rect>
+  <rect width={W} height={H} fill={`url(#grid-${slug})`}></rect>
+  <rect width={W} height={H} fill={`url(#glow-${slug})`}></rect>
+
+  {
+    slug === 'onr-intelligent-data-management' && (
+      <g>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <path d={contour(70 + i * 62, 10 + i * 2, i * 0.9)} fill="none" stroke="var(--accent)" stroke-opacity={0.12 + i * 0.03} />
+        ))}
+        {links.map(([a, b]) => (
+          <line x1={nodes[a].x} y1={nodes[a].y} x2={nodes[b].x} y2={nodes[b].y} stroke="var(--accent)" stroke-opacity=".55" stroke-dasharray="3 6" />
+        ))}
+        {nodes.map((n, i) => (
+          <g>
+            <circle cx={n.x} cy={n.y} r={i === 2 ? 26 : 16} fill="none" stroke="var(--accent)" stroke-opacity=".25" />
+            <circle cx={n.x} cy={n.y} r={i === 2 ? 6 : 4.5} fill={i === 2 ? 'var(--amber)' : 'var(--accent)'} />
+          </g>
+        ))}
+        <text x="24" y="40" class="art-label">
+          DISTRIBUTED · LIMITED LINKS · WHAT MATTERS
+        </text>
+      </g>
+    )
+  }
+
+  {
+    slug === 'integer-internship' && (
+      <g>
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <path
+            d={`M 60 300 Q ${200 + i * 40} ${40 + i * 18} ${560} ${120 + i * 34}`}
+            fill="none"
+            stroke="var(--accent)"
+            stroke-opacity={0.15 + (i % 3) * 0.12}
+          />
+        ))}
+        <path d={wave(300, 40, 9)} fill="none" stroke="var(--amber)" stroke-width="1.6" />
+        <circle cx="60" cy="300" r="7" fill="var(--amber)" />
+        <path d="M 0 340 H 600" stroke="var(--accent)" stroke-opacity=".35" />
+        <text x="24" y="40" class="art-label">
+          ACOUSTIC CHARACTERIZATION · NETWORK SIMULATION
+        </text>
+      </g>
+    )
+  }
+
+  {
+    slug === 'rampage' && (
+      <g>
+        <g transform="translate(150 70)" fill="none" stroke="var(--accent)" stroke-width="1.5">
+          <rect x="40" y="20" width="220" height="230" rx="10" stroke-opacity=".8" />
+          <path d="M 40 250 L 0 300 L 300 300 L 260 250" stroke="var(--amber)" stroke-width="2" />
+          <rect x="18" y="40" width="22" height="70" rx="4" stroke-opacity=".6" />
+          <rect x="18" y="160" width="22" height="70" rx="4" stroke-opacity=".6" />
+          <rect x="260" y="40" width="22" height="70" rx="4" stroke-opacity=".6" />
+          <rect x="260" y="160" width="22" height="70" rx="4" stroke-opacity=".6" />
+          <rect x="70" y="50" width="70" height="44" rx="3" />
+          <rect x="160" y="50" width="70" height="44" rx="3" />
+          <rect x="95" y="140" width="110" height="60" rx="30" stroke="var(--amber)" stroke-opacity=".7" />
+          <path d="M 105 94 V 140 M 195 94 V 120" stroke-dasharray="3 4" stroke-opacity=".7" />
+        </g>
+        <text x="228" y="148" class="art-chip">
+          PICO W
+        </text>
+        <text x="318" y="148" class="art-chip">
+          PI 4B
+        </text>
+        <text x="270" y="243" class="art-chip" fill="var(--amber)">
+          AIR
+        </text>
+        <text x="24" y="40" class="art-label">
+          WEAPON · SAFETY · VIDEO
+        </text>
+        <text x="24" y="352" class="art-label">
+          17 STRIKES · 500 MS COOLDOWN · 3 E-STOP PATHS
+        </text>
+      </g>
+    )
+  }
+
+  {
+    slug === 'v2v-bsm-ofdm' && (
+      <g>
+        <g transform="translate(300 190)">
+          <line x1="-200" y1="0" x2="200" y2="0" stroke="var(--accent)" stroke-opacity=".3" />
+          <line x1="0" y1="-120" x2="0" y2="120" stroke="var(--accent)" stroke-opacity=".3" />
+          <circle r="110" fill="none" stroke="var(--accent)" stroke-opacity=".15" stroke-dasharray="2 6" />
+          {constellation.map((p) => (
+            <circle cx={(p.x * 110).toFixed(1)} cy={(p.y * 110).toFixed(1)} r="3" fill="var(--accent)" fill-opacity=".85" />
+          ))}
+          <circle cx="-110" cy="0" r="7" fill="none" stroke="var(--amber)" stroke-width="2" />
+          <circle cx="110" cy="0" r="7" fill="none" stroke="var(--amber)" stroke-width="2" />
+        </g>
+        <g transform="translate(24 300)">
+          {Array.from({ length: 52 }, (_, i) => (
+            <rect
+              x={i * 10.7}
+              y={-(8 + ((i * 7) % 13))}
+              width="6"
+              height={8 + ((i * 7) % 13)}
+              fill={[5, 19, 32, 46].includes(i) ? 'var(--amber)' : 'var(--accent)'}
+              fill-opacity={[5, 19, 32, 46].includes(i) ? 1 : 0.45}
+            />
+          ))}
+        </g>
+        <text x="24" y="40" class="art-label">
+          BPSK · 64-PT OFDM · 802.11P STYLE
+        </text>
+        <text x="24" y="352" class="art-label">
+          48 DATA · 4 PILOTS · CP 16
+        </text>
+      </g>
+    )
+  }
+
+  {
+    slug === 'led-audio-spectrum' && (
+      <g transform="translate(140 30)">
+        <rect x="-14" y="-14" width="348" height="348" rx="14" fill="#05070c" stroke="var(--line-strong)" />
+        {ledCols.map((height, col) =>
+          Array.from({ length: 16 }, (_, row) => {
+            const fromBottom = 15 - row;
+            const on = fromBottom < height;
+            const peak = fromBottom === height;
+            return (
+              <circle
+                cx={col * 20 + 10}
+                cy={row * 20 + 10}
+                r="6.2"
+                fill={peak ? '#ffffff' : on ? ledHue(fromBottom) : '#1a2130'}
+                fill-opacity={on || peak ? 1 : 0.9}
+              />
+            );
+          }),
+        )}
+      </g>
+    )
+  }
+
+  {
+    slug === 'little-explorer-swim' && (
+      <g fill="none" stroke="var(--accent)" stroke-width="1.5">
+        <g transform="translate(60 110)">
+          <rect width="120" height="160" rx="10" />
+          {[0, 1, 2, 3].map((i) => (
+            <g>
+              <rect x="16" y={22 + i * 32} width="14" height="14" rx="3" stroke-opacity=".7" />
+              <path d={`M 40 ${29 + i * 32} H ${96 - (i % 2) * 18}`} stroke-opacity=".5" />
+            </g>
+          ))}
+        </g>
+        <path d="M 196 190 H 236" stroke="var(--amber)" stroke-dasharray="4 5" />
+        <g transform="translate(240 110)">
+          <rect width="120" height="160" rx="10" />
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <path d={`M 0 ${26 + i * 22} H 120`} stroke-opacity=".3" />
+          ))}
+          {[0, 1, 2].map((i) => (
+            <path d={`M ${40 + i * 27} 0 V 160`} stroke-opacity=".3" />
+          ))}
+        </g>
+        <path d="M 376 190 H 416" stroke="var(--amber)" stroke-dasharray="4 5" />
+        <g transform="translate(420 110)">
+          <path d="M 0 10 Q 0 0 10 0 H 92 L 120 28 V 150 Q 120 160 110 160 H 10 Q 0 160 0 150 Z" />
+          <path d="M 92 0 V 28 H 120" />
+          {[0, 1, 2, 3].map((i) => (
+            <path d={`M 18 ${50 + i * 24} H ${100 - (i % 2) * 20}`} stroke="var(--amber)" stroke-opacity=".7" />
+          ))}
+        </g>
+        <text x="24" y="40" class="art-label" stroke="none">
+          FORM · SHEET · REPORT
+        </text>
+        <text x="24" y="352" class="art-label" stroke="none">
+          PREFILLED LINKS · 3 TRIGGERS · ONE PDF PER CHILD
+        </text>
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .art {
+    --art-bg: color-mix(in oklab, var(--surface-2) 70%, var(--bg));
+    --art-grid: color-mix(in oklab, var(--accent) 9%, transparent);
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .art-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    fill: var(--muted);
+  }
+
+  .art-chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    fill: var(--accent);
+    text-anchor: middle;
+  }
+</style>

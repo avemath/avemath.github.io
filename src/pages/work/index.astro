@@ -1,0 +1,130 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectTile from '@/components/ProjectTile.astro';
+import { getProjects, typeLabels, allTags } from '@/lib/projects';
+import { projectTypes } from '@/content.config';
+
+const projects = await getProjects();
+const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p) => allTags(p).includes(t)).length]));
+---
+
+<BaseLayout
+  title="Work"
+  description="Research, engineering, software and client websites by Avery Matherne, each with a case study on what I did and how."
+>
+  <section class="section pb-10">
+    <div class="wrap">
+      <p class="eyebrow">Work</p>
+      <h1 class="section-title" style="font-size: clamp(2.5rem, 6vw, 4.5rem)">Everything, in one place</h1>
+      <p class="section-lede">
+        {projects.length} projects across research, hardware, software and live client sites. Filter by type, or open any card for the
+        full case study.
+      </p>
+
+      <div class="filters" role="group" aria-label="Filter projects by type" data-filters>
+        <button type="button" class="filter" aria-pressed="true" data-filter="all">
+          All <span class="filter__n">{projects.length}</span>
+        </button>
+        {
+          projectTypes.map((t) => (
+            <button type="button" class="filter" aria-pressed="false" data-filter={t}>
+              {typeLabels[t]} <span class="filter__n">{counts[t]}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="sr-only" aria-live="polite" data-filter-status></p>
+    </div>
+  </section>
+
+  <section class="pb-24" aria-label="Projects">
+    <div class="wrap">
+      <div class="work-grid" data-work-grid>
+        {projects.map((p, i) => <ProjectTile project={p} headingLevel="h2" eager={i < 2} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  /* Space is reserved before JS runs so the grid never jumps. */
+  .filters:not([data-ready]) {
+    visibility: hidden;
+  }
+
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-soft);
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .filter:hover {
+    border-color: var(--accent);
+  }
+
+  .filter[aria-pressed='true'] {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .filter__n {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .work-grid {
+    display: grid;
+    gap: 1.1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  }
+
+  .work-grid > :global(.tile[hidden]) {
+    display: none;
+  }
+</style>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>('[data-filters]')!;
+  const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const tiles = [...document.querySelectorAll<HTMLElement>('[data-work-grid] > .tile')];
+  const status = document.querySelector<HTMLElement>('[data-filter-status]')!;
+  wrap.dataset.ready = '';
+
+  function apply(type: string, announce = true) {
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === type)));
+    let shown = 0;
+    tiles.forEach((t) => {
+      const match = type === 'all' || (t.dataset.tags ?? '').split(' ').includes(type);
+      t.hidden = !match;
+      if (match) shown++;
+    });
+    if (announce) status.textContent = `Showing ${shown} project${shown === 1 ? '' : 's'}.`;
+    const url = new URL(location.href);
+    if (type === 'all') url.searchParams.delete('type');
+    else url.searchParams.set('type', type);
+    history.replaceState(null, '', url);
+  }
+
+  buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter!)));
+  const initial = new URLSearchParams(location.search).get('type');
+  if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial, false);
+</script>

@@ -1,0 +1,67 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/Icon.astro';
+---
+
+<BaseLayout title="Page not found" description="That page doesn't exist." noindex>
+  <section class="section nf">
+    <div class="wrap-narrow text-center">
+      <div class="nf__scope" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="90"></circle>
+          <circle cx="100" cy="100" r="60"></circle>
+          <circle cx="100" cy="100" r="30"></circle>
+          <path d="M100 100 L163 37" class="nf__sweep"></path>
+        </svg>
+      </div>
+      <p class="eyebrow eyebrow--plain">Error 404 · no contact</p>
+      <h1 class="mt-4 font-display text-5xl font-semibold tracking-tight sm:text-6xl">Nothing on the scope.</h1>
+      <p class="mx-auto mt-4 max-w-md text-soft">
+        That page doesn't exist, or it moved. Try the work page, or press <kbd class="mono">/</kbd> to search the site.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a class="btn btn--primary" href="/">Back home <Icon name="arrow-right" /></a>
+        <a class="btn" href="/work/">See my work</a>
+        <button type="button" class="btn" data-palette-open>Search</button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf__scope {
+    width: 10rem;
+    margin: 0 auto 2rem;
+  }
+
+  .nf__scope circle {
+    fill: none;
+    stroke: var(--accent);
+    stroke-opacity: 0.35;
+  }
+
+  .nf__sweep {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transform-origin: 100px 100px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not([data-motion='reduce'])) .nf__sweep {
+      animation: spin 4s linear infinite;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  kbd {
+    padding: 0.05rem 0.4rem;
+    border: 1px solid var(--line);
+    border-radius: 0.3rem;
+  }
+</style>

@@ -1,0 +1,173 @@
+---
+import Icon from './Icon.astro';
+import AudienceSwitcher from './AudienceSwitcher.astro';
+import site from '@/data/site.json';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <canvas class="hero__canvas" aria-hidden="true" data-sonar></canvas>
+  <div class="hero__fade" aria-hidden="true"></div>
+
+  <div class="wrap hero__inner">
+    <p class="eyebrow" data-hero-eyebrow>{site.eyebrow}</p>
+    <h1 id="hero-title" class="hero__title" data-hero-title>{site.name}</h1>
+    <p class="hero__line" data-hero-line>{site.headline}</p>
+
+    <div class="hero__ctas" data-hero-ctas>
+      <a class="btn btn--primary" href="#featured" data-primary-cta>
+        <span data-primary-cta-label>See my work</span>
+        <Icon name="arrow-right" />
+      </a>
+      <a class="btn" href={site.resumePdf} download>
+        <Icon name="download" />
+        Download résumé
+      </a>
+      <a class="hero__textlink link" href="/services/">Need a website?</a>
+    </div>
+
+    <div data-hero-switcher>
+      <AudienceSwitcher />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    background: radial-gradient(
+      circle var(--scope-r, 26rem) at var(--scope-x, 74%) var(--scope-y, 48%),
+      var(--accent-wash),
+      transparent 100%
+    );
+    min-height: min(52rem, calc(100svh - 4rem));
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding-block: clamp(3rem, 8vw, 6rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .hero__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+
+  .hero__canvas[data-ready] {
+    opacity: 1;
+  }
+
+  /* Keeps text readable over the scope on narrow screens. */
+  .hero__fade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(90deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 70%, transparent) 45%, transparent 75%),
+      linear-gradient(0deg, var(--bg) 0%, transparent 25%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 899px) {
+    .hero {
+      align-items: flex-end;
+    }
+
+    .hero__fade {
+      background: linear-gradient(0deg, var(--bg) 35%, color-mix(in oklab, var(--bg) 55%, transparent) 70%, transparent 100%);
+    }
+  }
+
+  .hero__inner {
+    position: relative;
+  }
+
+  .hero__title {
+    margin-top: 1.25rem;
+    font-size: clamp(3rem, 9vw, 6.5rem);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+
+  .hero__line {
+    margin-top: 1.5rem;
+    max-width: 38rem;
+    font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+    line-height: 1.5;
+    color: var(--text-soft);
+  }
+
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 2.25rem;
+  }
+
+  .hero__textlink {
+    font-size: 0.95rem;
+    margin-left: 0.25rem;
+  }
+
+  /* Entrance: CSS only, so nothing waits on JavaScript. The headline and line
+     never start invisible, which keeps Largest Contentful Paint fast. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not([data-motion='reduce'])) .hero__title {
+      animation: settle 1.1s var(--ease-out-expo) both;
+    }
+
+    :global(html:not([data-motion='reduce'])) .hero__line {
+      animation: settle 1.1s 0.08s var(--ease-out-expo) both;
+    }
+
+    :global(html:not([data-motion='reduce'])) .hero__ctas {
+      animation: rise 0.9s 0.25s var(--ease-out-expo) both;
+    }
+
+    :global(html:not([data-motion='reduce'])) [data-hero-switcher] {
+      animation: rise 0.9s 0.38s var(--ease-out-expo) both;
+    }
+  }
+
+  @keyframes settle {
+    from {
+      translate: 0 0.35em;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+  }
+</style>
+
+<script>
+  import { mountSonar } from '../scripts/sonar-canvas';
+  import { prefersReducedMotion } from '../scripts/preferences';
+  import { decode } from '../scripts/decode';
+
+  // The scope is decorative, so it waits until the page has finished its real work.
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-sonar]');
+  if (canvas) {
+    const mount = () => mountSonar(canvas);
+    if ('requestIdleCallback' in window) requestIdleCallback(mount, { timeout: 1500 });
+    else setTimeout(mount, 300);
+  }
+
+  // The eyebrow "acquires signal" once the page is idle.
+  const eyebrow = document.querySelector<HTMLElement>('[data-hero-eyebrow]');
+  if (eyebrow && !prefersReducedMotion()) {
+    const text = eyebrow.textContent ?? '';
+    const run = () => decode(eyebrow, text, 1100);
+    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1200 });
+    else setTimeout(run, 500);
+  }
+</script>

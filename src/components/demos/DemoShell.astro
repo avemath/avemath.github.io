@@ -1,0 +1,79 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  lede: string;
+  note?: string;
+}
+
+const { id, title, lede, note } = Astro.props;
+---
+
+<section class="demo no-print" aria-labelledby={`${id}-title`}>
+  <div class="wrap">
+    <div class="demo__frame">
+      <header class="demo__head">
+        <p class="eyebrow">Try it in your browser</p>
+        <h2 id={`${id}-title`} class="demo__title">{title}</h2>
+        <p class="demo__lede">{lede}</p>
+      </header>
+      <slot />
+      {note && <p class="demo__note">{note}</p>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .demo {
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  .demo__frame {
+    position: relative;
+    padding: clamp(1.25rem, 3.5vw, 2.5rem);
+    border: 1px solid var(--line);
+    border-radius: 1.25rem;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 24px 24px,
+      var(--surface);
+  }
+
+  .demo__frame::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--accent), transparent 35%, transparent 65%, var(--amber));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .demo__title {
+    margin-top: 0.6rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+  }
+
+  .demo__lede {
+    margin-top: 0.6rem;
+    max-width: 44rem;
+    color: var(--text-soft);
+  }
+
+  .demo__head {
+    margin-bottom: 1.75rem;
+  }
+
+  .demo__note {
+    margin-top: 1.25rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+</style>
