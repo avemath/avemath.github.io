@@ -18,10 +18,10 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
         notes.map((n, i) => (
           <li class="note-card" data-reveal>
             <p class="note-card__top">
+              <span class="note-card__label">{n.label}</span>
               <span class="mono note-card__idx" aria-hidden="true">
                 N{String(i + 1).padStart(2, '0')}
               </span>
-              <span class="label">{n.label}</span>
             </p>
             <p class="note-card__value">{n.value}</p>
             <p class="note-card__detail">{n.detail}</p>
@@ -43,22 +43,35 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
   .note-card {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    min-height: 13rem;
-    padding: 1.25rem;
+    padding: 1.35rem 1.4rem 1.5rem;
     border: 1px solid var(--line);
     border-radius: 1rem;
     background: var(--surface);
   }
 
+  /* The label is the headline of the card: what the fact is about. */
   .note-card__top {
     display: flex;
+    align-items: baseline;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .note-card__label {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--text);
   }
 
   .note-card__idx {
+    flex: none;
     font-size: 0.72rem;
+    letter-spacing: 0.08em;
     color: var(--accent-ink);
   }
 
@@ -67,18 +80,19 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
   }
 
   .note-card__value {
-    margin-top: auto;
+    margin-top: 1rem;
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: clamp(2.25rem, 3vw, 2.75rem);
     font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
+    letter-spacing: -0.035em;
+    line-height: 1;
     color: var(--text);
   }
 
   .note-card__detail {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    margin-top: 0.75rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
     color: var(--text-soft);
   }
 </style>
