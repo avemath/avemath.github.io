@@ -1,9 +1,12 @@
 ---
 import { getProjects, projectHref, typeLabels } from '@/lib/projects';
 import site from '@/data/site.json';
+import testimonials from '@/data/testimonials.json';
 
 const projects = await getProjects();
 const onHome = Astro.url.pathname === '/';
+// The Recommendations section only renders once a quote is approved (see Testimonials.astro).
+const hasRecommendations = testimonials.some((t) => t.approved);
 
 type Item = { id: string; group: string; label: string; hint?: string; href?: string; action?: string; keywords?: string };
 
@@ -16,7 +19,9 @@ const homeSections: Item[] = [
   ['skills', 'Skills'],
   ['field-notes', 'Field notes'],
   ['contact', 'Contact'],
-].map(([id, label]) => ({ id: `s-${id}`, group: 'On this page', label, href: onHome ? `#${id}` : `/#${id}` }));
+]
+  .filter(([id]) => id !== 'recommendations' || hasRecommendations)
+  .map(([id, label]) => ({ id: `s-${id}`, group: 'On this page', label, href: onHome ? `#${id}` : `/#${id}` }));
 
 const items: Item[] = [
   { id: 'p-home', group: 'Pages', label: 'Home', href: '/' },
@@ -291,7 +296,14 @@ const items: Item[] = [
     dialog.close();
   }
 
-  dialog.addEventListener('close', () => opener?.focus());
+  // Return focus to whatever opened the palette. If that was inside the phone menu, which
+  // closes itself, focus the menu button instead so focus never drops to the page body.
+  dialog.addEventListener('close', () => {
+    if (!opener) return;
+    const folded = opener.closest('details');
+    if (folded && !folded.open) folded.querySelector<HTMLElement>('summary')?.focus();
+    else opener.focus();
+  });
 
   async function run(el: HTMLLIElement) {
     const { href, action } = el.dataset;

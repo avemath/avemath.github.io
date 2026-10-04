@@ -2,16 +2,16 @@
 // Drawn covers for projects without screenshots. Research and hardware
 // projects get abstract art on purpose: nothing here depicts real systems,
 // data or results.
-import { uniqueId } from '@/lib/uid';
-
 interface Props {
   slug: string;
   class?: string;
+  // SVG pattern ids must be unique per page. Pass a prefix when the same art appears twice
+  // on one page (the research panel does, since the ONR tile is also in the bento).
+  idPrefix?: string;
 }
 
-const { slug, class: className = '' } = Astro.props;
-// The same art can appear twice on one page (the ONR tile and the research panel), so ids get a per-instance suffix.
-const uid = uniqueId(slug);
+const { slug, class: className = '', idPrefix = '' } = Astro.props;
+const uid = `${idPrefix}${slug}`;
 const W = 600;
 const H = 375;
 

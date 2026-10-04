@@ -11,7 +11,7 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
   <div class="wrap">
     <p class="eyebrow">Field notes</p>
     <h2 id="notes-title" class="section-title">A few things that are true</h2>
-    <p class="section-lede">Each card decodes as it scrolls into view. Tap one to replay it.</p>
+    <p class="section-lede">Facts from the work above, and the stories behind them.</p>
 
     <ul class="notes" data-notes>
       {
@@ -170,13 +170,21 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
     });
     const io = new IntersectionObserver(
       (entries) => {
-        entries
-          .filter((e) => e.isIntersecting)
-          .forEach((e, i) => {
-            const card = e.target as HTMLButtonElement;
-            io.unobserve(card);
-            setTimeout(() => card.dataset.masked !== undefined && reveal(card), i * 140);
-          });
+        const entering = entries.filter((e) => e.isIntersecting).map((e) => e.target as HTMLButtonElement);
+        // Group by visual row (same top edge) and stagger left to right within it, like the scroll reveals.
+        const rows = new Map<number, HTMLButtonElement[]>();
+        for (const card of entering) {
+          const top = Math.round(card.getBoundingClientRect().top / 8);
+          rows.set(top, [...(rows.get(top) ?? []), card]);
+        }
+        for (const row of rows.values()) {
+          row
+            .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
+            .forEach((card, i) => {
+              io.unobserve(card);
+              setTimeout(() => card.dataset.masked !== undefined && reveal(card), i * 140);
+            });
+        }
       },
       { threshold: 0.5 },
     );

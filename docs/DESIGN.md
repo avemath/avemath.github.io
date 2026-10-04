@@ -69,7 +69,7 @@ The original plan used GSAP for the hero. In practice the only effect that neede
 | `FieldNotes` | each card decodes once as it scrolls into view, and a tap replays it. With no JS or reduced motion every fact is simply visible |
 | `Testimonials` | renders only quotes with `approved: true`, as a `figure` with `blockquote` and `figcaption` |
 | `ContactForm` | Web3Forms when a key is set, otherwise mailto. Honeypot, inline validation, live status |
-| `ProjectArt` | drawn SVG covers for projects without screenshots. Research art is abstract on purpose. Pattern ids get a per-instance suffix so the same art can appear twice on a page |
+| `ProjectArt` | drawn SVG covers for projects without screenshots. Research art is abstract on purpose. Takes an `idPrefix` when the same art appears twice on a page, since pattern ids must be unique |
 | `demos/*` | each demo loads only on its own case study page |
 
 ## Layout

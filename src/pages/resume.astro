@@ -171,13 +171,18 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: 0.25rem 1rem;
     margin-top: 0.6rem;
     font-size: 0.9rem;
     color: var(--text-soft);
   }
 
+  /* Each contact link is a 24px-tall touch target on its own, not just a line of text. */
   .r-contact a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
     text-decoration: none;
   }
 
@@ -217,8 +222,8 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     gap: 0.25rem 1rem;
   }
 
-  /* From phone-landscape up, a long title wraps while the date stays on its first line. */
-  @media (min-width: 480px) {
+  /* From phone-landscape up, and in print, a long title wraps while the date stays on its first line. */
+  @media print, (min-width: 480px) {
     .r-row {
       flex-wrap: nowrap;
     }
@@ -320,19 +325,6 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       border-bottom-width: 1.5px;
     }
 
-    .r-row {
-      flex-wrap: nowrap;
-    }
-
-    .r-title {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .r-when {
-      flex: none;
-    }
-
     .r-name {
       font-size: 18pt;
     }
@@ -341,6 +333,10 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       gap: 0 0.7rem;
       font-size: 8.4pt;
       margin-top: 0.1rem;
+    }
+
+    .r-contact a {
+      min-height: 0;
     }
 
     .r-sec {

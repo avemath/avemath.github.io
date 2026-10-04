@@ -6,26 +6,13 @@
 //
 // Run after a build: `npm run build && npm run assets`. Commit the output.
 // Needs Playwright's Chromium (`npx playwright install chromium`), or set CHROMIUM_PATH to a Chromium binary.
-import { createServer } from 'node:http';
 import { readFile, writeFile, readdir, mkdir, rm } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { join } from 'node:path';
 import { chromium } from 'playwright';
+import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const DIST = 'dist';
-const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.json': 'application/json' };
-
-const server = createServer(async (req, res) => {
-  let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-  if (path.endsWith('/')) path += 'index.html';
-  try {
-    const body = await readFile(join(DIST, path));
-    res.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' });
-    res.end(body);
-  } catch {
-    res.writeHead(404).end();
-  }
-}).listen(0);
-const base = `http://127.0.0.1:${server.address().port}`;
+const { server, base } = serveDist(DIST);
 
 const fonts = await readdir(join(DIST, '_astro'));
 const font = (prefix) => `/_astro/${fonts.find((f) => f.startsWith(prefix) && f.endsWith('.woff2'))}`;
@@ -35,6 +22,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 // ---- Résumé PDF ----
 {
   const page = await browser.newPage({ colorScheme: 'light' });
+  await page.route(...localOnly(base));
   await page.goto(`${base}/resume/`, { waitUntil: 'networkidle' });
   await page.emulateMedia({ media: 'print' });
   await page.evaluate(() => document.fonts.ready);

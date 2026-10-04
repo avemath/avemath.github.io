@@ -23,7 +23,7 @@ My portfolio and résumé site: research, engineering projects, and the websites
 - Self-hosted variable fonts: Space Grotesk, Inter, JetBrains Mono
 - No UI framework. Interactive pieces are small vanilla TypeScript modules that load only on the pages that use them.
 - Self-hosted fonts are preloaded and have metric-matched local fallbacks, so the swap to the web font does not shift the layout.
-- GitHub Actions lints the copy, type checks, builds, runs axe over every page, and deploys to GitHub Pages on every push to `main`, plus a monthly rebuild.
+- GitHub Actions lints the copy, type checks, builds, runs axe over every page, and deploys to GitHub Pages on every push to `main`.
 
 ## Numbers
 
@@ -54,12 +54,13 @@ src/
   components/         page sections, demos/ for the interactive pieces
   layouts/            BaseLayout, CaseStudyLayout
   pages/              routes
-  lib/                content helpers, date formatting, unique ids
+  lib/                content helpers and date formatting
   scripts/            sonar canvas, motion, preferences, text decode
   styles/global.css   tokens and shared styles
 scripts/
   lint-copy.mjs       fails CI on em dashes and filler phrases
   check-a11y.mjs      fails CI on any axe violation
+  lib/serve-dist.mjs  local server for the built site, shared by the two scripts above
   render-assets.mjs   résumé PDF, social cards, touch icon, favicon.ico
 docs/                 plan, design system, content guide
 ```
