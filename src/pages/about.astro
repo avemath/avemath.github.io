@@ -8,6 +8,7 @@ import site from '@/data/site.json';
 import offclock from '@/data/offclock.json';
 import gradHall from '@/assets/about/grad-taylor-hall.jpg';
 import gradTiger from '@/assets/about/grad-tiger.jpg';
+import rePlus from '@/assets/about/re-plus.jpg';
 
 // A real portrait replaces the scope the moment a file named portrait.* lands in src/assets.
 const portraitFiles = import.meta.glob<{ default: ImageMetadata }>('/src/assets/portrait.{jpg,jpeg,png,webp}', { eager: true });
@@ -115,6 +116,10 @@ const principles = [
         and clear with people. It's also why I built <a href="/work/landspace/">Landspace</a>: I wanted the map, the records and the title
         problems in one place.
       </p>
+      <figure class="about-fig">
+        <Image src={rePlus} alt="Avery and her brother smiling side by side at a crowded conference venue, both wearing lanyards." widths={[640, 960, 1280]} sizes="(min-width: 1100px) 42rem, 100vw" format="webp" quality={80} />
+        <figcaption>At RE+, a renewable energy conference, with my brother.</figcaption>
+      </figure>
 
       <h2>Why water matters to me</h2>
       <p>
@@ -375,7 +380,7 @@ const principles = [
     gap: 0.75rem;
   }
 
-  .about-fig__pair :global(img) {
+  .about-fig :global(img) {
     display: block;
     width: 100%;
     height: auto;

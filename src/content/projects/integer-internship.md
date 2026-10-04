@@ -15,6 +15,8 @@ keywords: ["internship", "intern", "acoustics", "underwater", "network simulatio
 stack: [Acoustic measurement, Network simulation, Data analysis]
 links:
   writeup: https://www.integer-tech.com
+cover: ../../assets/projects/integer-internship/wagon.jpg
+coverAlt: Three people seen from behind, walking across a sunny parking lot toward the cars, one in an LSU cap pushing a folding wagon loaded with gear.
 confidentiality: limited
 ---
 
