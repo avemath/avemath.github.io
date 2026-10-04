@@ -13,26 +13,18 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
     <h2 id="notes-title" class="section-title">A few things that are true</h2>
     <p class="section-lede">Facts from the work above, and the stories behind them.</p>
 
-    <ul class="notes" data-notes>
+    <ul class="notes">
       {
         notes.map((n, i) => (
-          <li data-reveal>
-            <button type="button" class="note-card" data-note>
-              <span class="note-card__top">
-                <span class="mono note-card__idx">N{String(i + 1).padStart(2, '0')}</span>
-                <span class="label">{n.label}</span>
+          <li class="note-card" data-reveal>
+            <p class="note-card__top">
+              <span class="mono note-card__idx" aria-hidden="true">
+                N{String(i + 1).padStart(2, '0')}
               </span>
-              <span class="sr-only">{n.value}</span>
-              <span class="note-card__value" data-note-value data-text={n.value} aria-hidden="true">
-                {n.value}
-              </span>
-              <span class="note-card__detail" data-note-detail>
-                {n.detail}
-              </span>
-              <span class="note-card__hint mono" aria-hidden="true">
-                tap to decode
-              </span>
-            </button>
+              <span class="label">{n.label}</span>
+            </p>
+            <p class="note-card__value">{n.value}</p>
+            <p class="note-card__detail">{n.detail}</p>
           </li>
         ))
       }
@@ -49,30 +41,14 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
   }
 
   .note-card {
-    position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    width: 100%;
-    height: 100%;
     min-height: 13rem;
     padding: 1.25rem;
     border: 1px solid var(--line);
     border-radius: 1rem;
     background: var(--surface);
-    text-align: left;
-    cursor: pointer;
-    overflow: hidden;
-    transition:
-      border-color 0.25s,
-      transform 0.4s var(--ease-out-expo),
-      box-shadow 0.4s;
-  }
-
-  .note-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow);
   }
 
   .note-card__top {
@@ -104,103 +80,5 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
     font-size: 0.9rem;
     line-height: 1.5;
     color: var(--text-soft);
-    transition: opacity 0.5s ease 0.2s;
-  }
-
-  .note-card__hint {
-    position: absolute;
-    left: 1.25rem;
-    bottom: 1.1rem;
-    display: none;
-    font-size: 0.7rem;
-    color: var(--muted);
-  }
-
-  /* The masked state only exists once JavaScript has run, so no-JS visitors see every fact.
-     The detail keeps its space (opacity, not display) so decoding never shifts the layout. */
-  .note-card[data-masked] .note-card__value {
-    color: var(--muted);
-    letter-spacing: 0.1em;
-  }
-
-  .note-card[data-masked] .note-card__detail {
-    opacity: 0;
-    transition: none;
-  }
-
-  .note-card[data-masked] .note-card__hint {
-    display: block;
-  }
-
-  .note-card[data-masked]::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent 0 3px, var(--grid) 3px 4px);
-    pointer-events: none;
   }
 </style>
-
-<script>
-  import { decode, mask } from '../scripts/decode';
-  import { prefersReducedMotion } from '../scripts/preferences';
-
-  const cards = [...document.querySelectorAll<HTMLButtonElement>('[data-note]')];
-  const valueOf = (card: HTMLButtonElement) => card.querySelector<HTMLElement>('[data-note-value]')!;
-  const textOf = (card: HTMLButtonElement) => valueOf(card).dataset.text ?? '';
-
-  function reveal(card: HTMLButtonElement) {
-    delete card.dataset.masked;
-    decode(valueOf(card), textOf(card));
-  }
-
-  function showAll() {
-    cards.forEach((card) => {
-      delete card.dataset.masked;
-      valueOf(card).textContent = textOf(card);
-    });
-  }
-
-  // Cards start masked and decode as they scroll into view, staggered across a row.
-  // With reduced motion every fact is simply shown.
-  if (!prefersReducedMotion() && 'IntersectionObserver' in window) {
-    cards.forEach((card) => {
-      card.dataset.masked = '';
-      valueOf(card).textContent = mask(textOf(card));
-    });
-    const io = new IntersectionObserver(
-      (entries) => {
-        const entering = entries.filter((e) => e.isIntersecting).map((e) => e.target as HTMLButtonElement);
-        // Group by visual row (same top edge) and stagger left to right within it, like the scroll reveals.
-        const rows = new Map<number, HTMLButtonElement[]>();
-        for (const card of entering) {
-          const top = Math.round(card.getBoundingClientRect().top / 8);
-          rows.set(top, [...(rows.get(top) ?? []), card]);
-        }
-        for (const row of rows.values()) {
-          row
-            .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
-            .forEach((card, i) => {
-              io.unobserve(card);
-              setTimeout(() => card.dataset.masked !== undefined && reveal(card), i * 140);
-            });
-        }
-      },
-      { threshold: 0.5 },
-    );
-    cards.forEach((card) => io.observe(card));
-  }
-
-  // A tap decodes a card early, or replays the effect.
-  cards.forEach((card) =>
-    card.addEventListener('click', () => {
-      if (card.dataset.masked === undefined && !prefersReducedMotion()) valueOf(card).textContent = mask(textOf(card));
-      reveal(card);
-    }),
-  );
-
-  // Turning motion off mid-visit shows everything at once.
-  window.addEventListener('motionchange', () => {
-    if (prefersReducedMotion()) showAll();
-  });
-</script>

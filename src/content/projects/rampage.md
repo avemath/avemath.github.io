@@ -16,6 +16,21 @@ keywords: ["robot", "combat robotics", "senior design", "capstone", "firmware", 
 stack: [MicroPython, Python, Raspberry Pi Pico W, Raspberry Pi 4B, OpenCV, UDP, FlySky RC]
 links:
   repo: https://github.com/avemath/RAMpage
+cover: ../../assets/projects/rampage/lid.jpg
+coverAlt: The robot's top plate, black with "RAMpage" hand-painted in red graffiti letters outlined in white, rivet heads showing through the paint.
+gallery:
+  - src: ../../assets/projects/rampage/internals.jpg
+    alt: Top-down view inside the chassis with the lid off. Two silver air tanks run front to back, solenoid valves and black air lines sit across the top, and the control electronics are wired in between the tanks.
+    caption: Under the lid. Two air tanks feed the plow through the solenoid valves, and the control boards sit between them.
+  - src: ../../assets/projects/rampage/bench.jpg
+    alt: Bench wiring on a blue mat. A Raspberry Pi Pico W on a green carrier board, a FlySky FS-iA6B receiver, a small power board taped to a battery, and the valves and motors in the background.
+    caption: Bench wiring before it went into the chassis, with the Pico W, the FS-iA6B receiver and the power board laid out on the mat.
+  - src: ../../assets/projects/rampage/pico.jpg
+    alt: Close-up of the Raspberry Pi Pico W on its carrier board, with jumper wires on the RC input and solenoid output pins and a micro USB cable attached.
+    caption: The Pico W that times the RC pulses and sequences the valves. Two input pins, two output pins, nothing else to wait on.
+  - src: ../../assets/projects/rampage/video-feed.jpg
+    alt: A laptop showing the robot's camera feed in a window with a green frame-rate overlay, beside a terminal full of log lines.
+    caption: The driver's view during testing. The Pi 4B's UDP stream with its frame-rate overlay, and the receiver's log beside it.
 metrics:
   - { label: Result, value: "1st place" }
   - { label: Plow strikes per match, value: "17" }
