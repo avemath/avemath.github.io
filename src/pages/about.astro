@@ -132,8 +132,11 @@ const principles = [
 </BaseLayout>
 
 <style>
+  /* isolation keeps the z-index: -1 contours inside this box; without it they fall behind
+     the body background and never paint. */
   .about-hero {
     position: relative;
+    isolation: isolate;
     overflow: hidden;
     padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 5rem);
   }
@@ -151,14 +154,13 @@ const principles = [
 
   .contours path {
     fill: none;
-    stroke: var(--accent);
-    stroke-opacity: calc(0.14 + var(--i) * 0.03);
+    stroke: var(--leaf);
+    stroke-opacity: calc(0.09 + var(--i) * 0.02);
     stroke-width: 1;
   }
 
   :global(:root:not([data-theme='dark'])) .contours path {
-    stroke: var(--leaf);
-    stroke-opacity: calc(0.22 + var(--i) * 0.03);
+    stroke-opacity: calc(0.16 + var(--i) * 0.025);
   }
 
   .about-hero__inner {

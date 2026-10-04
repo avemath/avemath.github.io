@@ -60,14 +60,23 @@ import site from '@/data/site.json';
   }
 
   /* Keeps text readable over the scope on narrow screens. */
+  /* The fade carries a faint leaf wash under the buttons on the paper theme, so the warmth
+     starts above the fold and not only below it. Dark keeps the plain fade. */
   .hero__fade {
     position: absolute;
     inset: 0;
     z-index: -1;
     background:
+      radial-gradient(42rem 18rem at 0% 100%, color-mix(in oklab, var(--leaf) 9%, transparent), transparent 70%),
       linear-gradient(90deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 70%, transparent) 45%, transparent 75%),
       linear-gradient(0deg, var(--bg) 0%, transparent 25%);
     pointer-events: none;
+  }
+
+  :global([data-theme='dark']) .hero__fade {
+    background:
+      linear-gradient(90deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 70%, transparent) 45%, transparent 75%),
+      linear-gradient(0deg, var(--bg) 0%, transparent 25%);
   }
 
   @media (max-width: 899px) {

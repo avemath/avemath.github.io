@@ -66,24 +66,24 @@ for (let i = 0; i < count; i++) {
   const ctrl = { x: p.x + d.x * length * 0.5 + u.x * length * 0.14, y: p.y + d.y * length * 0.5 + u.y * length * 0.14 };
   pinnae.push(`M ${r1(p.x)} ${r1(p.y)} Q ${r1(ctrl.x)} ${r1(ctrl.y)} ${r1(end.x)} ${r1(end.y)}`);
 
-  const steps = Math.max(3, Math.round(length / 13));
+  // Pinnules alternate sides along the pinna, the way they do on a real frond.
+  const steps = Math.max(5, Math.round(length / 7));
   for (let j = 1; j <= steps; j++) {
     const v = j / (steps + 1);
     const q = quad(p, ctrl, end, v);
     const qt = unit(quadTangent(p, ctrl, end, v));
     const pl = length * 0.2 * Math.sin(Math.PI * v) * (0.85 + rand() * 0.3);
-    for (const sd of [1, -1]) {
-      const pn = { x: -qt.y * sd, y: qt.x * sd };
-      const a = 0.55;
-      const e = { x: pn.x * Math.cos(a) + qt.x * Math.sin(a), y: pn.y * Math.cos(a) + qt.y * Math.sin(a) };
-      pinnules.push(`M ${r1(q.x)} ${r1(q.y)} l ${r1(e.x * pl)} ${r1(e.y * pl)}`);
-    }
+    const sd = j % 2 === 0 ? 1 : -1;
+    const pn = { x: -qt.y * sd, y: qt.x * sd };
+    const a = 0.55;
+    const e = { x: pn.x * Math.cos(a) + qt.x * Math.sin(a), y: pn.y * Math.cos(a) + qt.y * Math.sin(a) };
+    pinnules.push(`M ${r1(q.x)} ${r1(q.y)} l ${r1(e.x * pl)} ${r1(e.y * pl)}`);
   }
 }
 ---
 
 <svg class={className} viewBox="0 0 440 660" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
-  <path d={rachis} stroke-width="1.8" />
-  <path d={pinnae.join(' ')} stroke-width="1.1" />
-  <path d={pinnules.join(' ')} stroke-width="0.75" stroke-opacity="0.8" />
+  <path d={rachis} stroke-width="1.4" />
+  <path d={pinnae.join(' ')} stroke-width="1" />
+  <path d={pinnules.join(' ')} stroke-width="0.7" stroke-opacity="0.7" />
 </svg>

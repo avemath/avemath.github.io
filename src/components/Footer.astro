@@ -55,7 +55,7 @@ const year = new Date().getFullYear();
     </div>
   </div>
 
-  <div class="border-t border-line">
+  <div class="site-footer__bar border-t border-line">
     <div class="wrap flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
       <p>© <span data-year>{year}</span> {site.name} · {site.location}</p>
       <script is:inline>
@@ -96,7 +96,12 @@ const year = new Date().getFullYear();
   }
 
   :global([data-theme='dark']) .site-footer :global(.site-footer__frond) {
-    opacity: 0.32;
+    opacity: 0.45;
+  }
+
+  /* The bottom bar sits over the stem, so a translucent background keeps the small print clear. */
+  .site-footer__bar {
+    background: color-mix(in oklab, var(--bg-deep) 72%, transparent);
   }
 
   @media (max-width: 767px) {

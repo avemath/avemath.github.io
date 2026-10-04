@@ -52,6 +52,12 @@ const notes = facts;
     overflow: hidden;
   }
 
+  @media (max-width: 479px) {
+    .notes {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @media (min-width: 1100px) {
     .notes {
       grid-template-columns: repeat(3, minmax(0, 1fr));
