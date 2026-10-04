@@ -24,8 +24,8 @@ gallery:
     caption: The bustle explorer. Pick a style and a train, then press "Bustle it" to watch the pickup points travel.
 metrics:
   - { label: Lighthouse accessibility, value: "100" }
-  - { label: Lighthouse SEO, value: "100" }
-  - { label: Test specs, value: "16" }
+  - { label: Commits, value: "106" }
+  - { label: Fields the owner edits, value: "~435" }
 client:
   name: Grace Mae Alterations
   kind: Bridal and tailoring studio, Pittsburgh, PA
@@ -35,10 +35,6 @@ client:
 ## Context
 
 The site had three jobs: explain bustles, timelines and fittings to brides before they walk in; collect inquiries with the details Grace needs to quote; and let her switch bridal booking between open and waitlist herself. Grace is my sister, a formally trained designer and a former lead alterations specialist at David's Bridal, now running her own studio in Pittsburgh.
-
-## My role
-
-Design, build, content model, CMS, transactional email, testing and launch. 106 commits from April to September 2026.
 
 ## Approach
 

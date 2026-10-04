@@ -95,7 +95,7 @@ const principles = [
     </div>
   </section>
 
-  <section class="section grid-paper">
+  <section class="section">
     <div class="wrap">
       <p class="eyebrow">How I work</p>
       <h2 class="section-title">Four rules I keep</h2>
@@ -137,19 +137,27 @@ const principles = [
     padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 5rem);
   }
 
+  /* The contour lines sit behind the scope on the right, not behind the headline. */
   .contours {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     z-index: -1;
+    -webkit-mask-image: linear-gradient(90deg, transparent 30%, #000 65%);
+    mask-image: linear-gradient(90deg, transparent 30%, #000 65%);
   }
 
   .contours path {
     fill: none;
     stroke: var(--accent);
-    stroke-opacity: calc(0.05 + var(--i) * 0.012);
+    stroke-opacity: calc(0.14 + var(--i) * 0.03);
     stroke-width: 1;
+  }
+
+  :global(:root:not([data-theme='dark'])) .contours path {
+    stroke: var(--line-strong);
+    stroke-opacity: calc(0.45 + var(--i) * 0.03);
   }
 
   .about-hero__inner {
@@ -174,7 +182,7 @@ const principles = [
 
   .portrait {
     justify-self: center;
-    width: min(20rem, 70vw);
+    width: min(16rem, 60vw);
     aspect-ratio: 1;
     padding: 1rem;
     border-radius: 50%;

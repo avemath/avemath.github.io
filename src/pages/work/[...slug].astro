@@ -5,14 +5,18 @@ import CaseStudyLayout from '@/layouts/CaseStudyLayout.astro';
 import SpectrumDemo from '@/components/demos/SpectrumDemo.astro';
 import WeaponLogicDemo from '@/components/demos/WeaponLogicDemo.astro';
 import OfdmDemo from '@/components/demos/OfdmDemo.astro';
-import { getProjects, type Project } from '@/lib/projects';
+import { getProjects, isWebsite, type Project } from '@/lib/projects';
 
 export const getStaticPaths = (async () => {
   const projects = await getProjects();
-  return projects.map((project, i) => ({
-    params: { slug: project.id },
-    props: { project, prev: projects[i - 1], next: projects[i + 1] },
-  }));
+  // Previous and next stay within a group (the client sites, or the project's type) and skip
+  // limited-detail pages, so a reader finishing one case study lands on a related one.
+  const group = (p: Project) => (isWebsite(p) ? 'websites' : p.data.type);
+  return projects.map((project) => {
+    const chain = projects.filter((p) => group(p) === group(project) && (p.id === project.id || p.data.confidentiality !== 'limited'));
+    const i = chain.findIndex((p) => p.id === project.id);
+    return { params: { slug: project.id }, props: { project, prev: chain[i - 1], next: chain[i + 1] } };
+  });
 }) satisfies GetStaticPaths;
 
 interface Props {

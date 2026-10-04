@@ -2,16 +2,16 @@
 import skills from '@/data/skills.json';
 ---
 
-<section id="skills" class="section home-section" aria-labelledby="skills-title" data-section="skills">
+<section id="skills" class="section section--tight home-section" aria-labelledby="skills-title" data-section="skills">
   <div class="wrap">
     <p class="eyebrow">Skills</p>
-    <h2 id="skills-title" class="section-title">What I'd defend in an interview</h2>
+    <h2 id="skills-title" class="section-title section-title--sm">What I'd defend in an interview</h2>
     <p class="section-lede">No progress bars. If it's on this list, I've shipped something with it and I'm happy to talk through how.</p>
 
     <div class="skills">
       {
         skills.map((g, i) => (
-          <div class="skill card" data-reveal>
+          <div class="skill" data-reveal>
             <h3 class="skill__head">
               <span class="mono skill__idx" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
@@ -31,23 +31,30 @@ import skills from '@/data/skills.json';
 </section>
 
 <style>
+  /* A spec sheet, not another card grid: one ruled row per group. */
   .skills {
-    display: grid;
-    gap: 1rem;
-    margin-top: 2.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    margin-top: 2rem;
+    border-top: 1px solid var(--line);
   }
 
   .skill {
-    padding: 1.4rem 1.4rem 1.5rem;
-    box-shadow: none;
+    display: grid;
+    gap: 0.5rem 2.5rem;
+    padding: 1.1rem 0 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 720px) {
+    .skill {
+      grid-template-columns: 15rem minmax(0, 1fr);
+    }
   }
 
   .skill__head {
     display: flex;
     align-items: baseline;
     gap: 0.6rem;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
   }
 
@@ -63,16 +70,17 @@ import skills from '@/data/skills.json';
   .skill__list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 1rem;
+    gap: 0.35rem 0.9rem;
   }
 
   .skill__list li {
-    padding: 0.3rem 0.65rem;
-    border: 1px solid var(--line);
-    border-radius: 0.5rem;
-    font-size: 0.86rem;
+    font-size: 0.95rem;
     color: var(--text-soft);
-    background: var(--bg);
+  }
+
+  .skill__list li + li::before {
+    content: '·';
+    margin-right: 0.9rem;
+    color: var(--line-strong);
   }
 </style>

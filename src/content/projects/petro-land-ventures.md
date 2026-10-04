@@ -41,10 +41,6 @@ A lot of the people who find Petro Land Ventures are landowners and heirs holdin
 
 Those two visitors want completely different things. I also do contract land work for the firm, so I knew the questions both sides ask.
 
-## My role
-
-Everything: design, build, content structure, the editor, Cloudflare hosting and DNS. 119 commits from June to September 2026.
-
 ## Approach
 
 **Two doors from the first screen.** The hero offers "I own land or minerals" and "I represent a company," and each path leads to pages written for that reader. The contact form branches the same way: a short form for landowners and a project form for companies.

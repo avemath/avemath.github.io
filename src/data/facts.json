@@ -1,10 +1,8 @@
 [
-  { "label": "Sites shipped", "value": "{sites}", "detail": "Every one is live, and every owner edits it without calling me." },
-  { "label": "Degrees", "value": "1 of 2", "detail": "B.S. in Computer Engineering, May 2026. M.S. in progress, thesis track, expected May 2028." },
-  { "label": "Day job plot twist", "value": "Land agent", "detail": "I've done ownership research for oil, gas and renewable projects since 2020. It's why I built Landspace." },
-  { "label": "Why water matters", "value": "Adam", "detail": "My little brother drowned in our backyard pool at 14 months old. He survived. Because of ADAM is everything we wish we'd known." },
-  { "label": "Shots per match", "value": "17", "detail": "RAMpage carried enough air for 17 plow strikes. The firmware counted every one and locked out at zero." },
-  { "label": "Radio workaround", "value": "2.9 GHz", "detail": "Real V2V runs at 5.9 GHz. The Pluto's radio tops out below that, so my link ran at 2.9." },
-  { "label": "Where the voice came from", "value": "113 posts", "detail": "Because of ADAM sounds like my family because I wrote it from 113 Facebook posts my mom made over nine years." },
-  { "label": "How I got the research post", "value": "A radio link", "detail": "Dr. Aldo Duarte recommended me for the ONR project based on the software-defined radio work in his communications design course." }
+  {"label": "Day job plot twist", "value": "Land agent", "detail": "I've done ownership research for oil, gas and renewable projects since 2020. It's why I built Landspace."},
+  {"label": "Why water matters", "value": "Adam", "detail": "My little brother drowned in our backyard pool at 14 months old. He survived. Because of ADAM is everything we wish we'd known."},
+  {"label": "Shots per match", "value": "17", "detail": "RAMpage carried enough air for 17 plow strikes. The firmware counted every one and locked out at zero."},
+  {"label": "Radio workaround", "value": "2.9 GHz", "detail": "Real V2V runs at 5.9 GHz. The Pluto's radio tops out below that, so my link ran at 2.9."},
+  {"label": "Where the voice came from", "value": "113 posts", "detail": "Because of ADAM sounds like my family because I wrote it from 113 Facebook posts my mom made over nine years."},
+  {"label": "How I got the research post", "value": "A radio link", "detail": "Dr. Aldo Duarte recommended me for the ONR project based on the software-defined radio work in his communications design course."}
 ]

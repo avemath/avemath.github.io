@@ -21,7 +21,12 @@ const d = project.data;
 const finished = d.status === 'complete' || d.status === 'archived';
 const period = formatRange(d.period.start, d.period.end ?? (finished ? d.period.start : null));
 const limited = d.confidentiality === 'limited';
-const toc = headings.filter((h) => h.depth === 2);
+// The contents list covers the demo and the gallery too, not only the Markdown headings.
+const toc = [
+  ...(d.demo ? [{ slug: 'demo', text: 'Try it in your browser' }] : []),
+  ...headings.filter((h) => h.depth === 2).map((h) => ({ slug: h.slug, text: h.text })),
+  ...(d.gallery && !limited ? [{ slug: 'gallery', text: 'Gallery' }] : []),
+];
 const isSite = Boolean(d.links.live && d.cover && d.mobile);
 const ogImage = `/og/${project.id}.png`;
 
@@ -203,15 +208,18 @@ const jsonLd = [
 
     {
       d.gallery && !limited && (
-        <section class="wrap case__gallery" aria-label="Gallery">
-          {d.gallery.map((g) => (
-            <figure class="shot" data-reveal>
-              <div class="shot__img">
-                <Image src={g.src} alt={g.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1000px, 100vw" format="webp" quality={80} />
-              </div>
-              {g.caption && <figcaption>{g.caption}</figcaption>}
-            </figure>
-          ))}
+        <section id="gallery" class="wrap case__gallery-wrap" aria-labelledby="gallery-title">
+          <h2 id="gallery-title" class="section-title section-title--sm">Gallery</h2>
+          <div class="case__gallery">
+            {d.gallery.map((g) => (
+              <figure class="shot" data-reveal>
+                <div class="shot__img">
+                  <Image src={g.src} alt={g.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1000px, 100vw" format="webp" quality={80} />
+                </div>
+                {g.caption && <figcaption>{g.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
         </section>
       )
     }
@@ -226,17 +234,31 @@ const jsonLd = [
             <span class="pager__title">{prev.data.title}</span>
           </a>
         ) : (
-          <span />
+          <a class="pager card card--lift" href="/work/">
+            <span class="label">
+              <Icon name="arrow-left" class="inline h-3 w-3" /> Browse
+            </span>
+            <span class="pager__title">All work</span>
+          </a>
         )
       }
       {
-        next && (
+        next ? (
           <a class="pager pager--next card card--lift" href={projectHref(next)}>
             <span class="label">
               Next <Icon name="arrow-right" class="inline h-3 w-3" />
             </span>
             <span class="pager__title">{next.data.title}</span>
           </a>
+        ) : (
+          prev && (
+            <a class="pager pager--next card card--lift" href="/work/">
+              <span class="label">
+                Browse <Icon name="arrow-right" class="inline h-3 w-3" />
+              </span>
+              <span class="pager__title">All work</span>
+            </a>
+          )
         )
       }
     </nav>
@@ -412,15 +434,45 @@ const jsonLd = [
     margin-top: 0;
   }
 
+  /* Same width as the contents column plus the reading column, so the gallery lines up with the text above it. */
+  .case__gallery-wrap {
+    max-width: calc(62rem + 2 * clamp(1rem, 4vw, 2.5rem));
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
   .case__gallery {
     display: grid;
-    gap: 2.5rem;
-    padding-bottom: clamp(3rem, 6vw, 5rem);
-    max-width: 68rem;
+    gap: 2rem 1.25rem;
+    margin-top: 1.5rem;
+    counter-reset: shot;
+  }
+
+  @media (min-width: 720px) {
+    .case__gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .shot:first-child {
+      grid-column: 1 / -1;
+    }
   }
 
   .shot {
     margin: 0;
+    counter-increment: shot;
+  }
+
+  .shot figcaption::before {
+    content: 'Fig ' counter(shot, decimal-leading-zero) '  ';
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .shot figcaption::before {
+    color: var(--accent);
   }
 
   .shot__img {

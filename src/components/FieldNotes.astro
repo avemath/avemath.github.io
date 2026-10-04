@@ -1,16 +1,14 @@
 ---
 import facts from '@/data/facts.json';
-import { getProjects, isWebsite } from '@/lib/projects';
 
-// "Sites shipped" is counted from the content collection so it never goes stale.
-const sitesShipped = (await getProjects()).filter((p) => isWebsite(p) && p.data.status === 'live').length;
-const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String(sitesShipped)) }));
+// Six facts whose stories are not already told elsewhere on the home page.
+const notes = facts;
 ---
 
-<section id="field-notes" class="section home-section grid-paper" aria-labelledby="notes-title" data-section="field-notes">
+<section id="field-notes" class="section section--tight home-section grid-paper" aria-labelledby="notes-title" data-section="field-notes">
   <div class="wrap">
     <p class="eyebrow">Field notes</p>
-    <h2 id="notes-title" class="section-title">A few things that are true</h2>
+    <h2 id="notes-title" class="section-title section-title--sm">A few things that are true</h2>
     <p class="section-lede">Facts from the work above, and the stories behind them.</p>
 
     <ul class="notes">
@@ -33,20 +31,44 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
 </section>
 
 <style>
+  /* One ledger panel with hairline cells, not a grid of floating cards. Column counts
+     always give full rows (6 = 3 x 2 or 2 x 3), so no cell is ever empty. */
   .notes {
     display: grid;
-    gap: 1rem;
-    margin-top: 2.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 2rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  @media (min-width: 1100px) {
+    .notes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .note-card {
     display: flex;
     flex-direction: column;
     padding: 1.35rem 1.4rem 1.5rem;
-    border: 1px solid var(--line);
-    border-radius: 1rem;
     background: var(--surface);
+  }
+
+  @media (max-width: 719px) {
+    .note-card {
+      padding: 1rem 1rem 1.15rem;
+    }
+
+    .note-card__value {
+      font-size: clamp(1.5rem, 7vw, 2rem);
+    }
+
+    .note-card__detail {
+      font-size: 0.85rem;
+    }
   }
 
   /* The label is the headline of the card: what the fact is about. */

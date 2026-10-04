@@ -37,11 +37,7 @@ metrics:
 
 ## Context
 
-Title work happens in spreadsheets, PDFs, county websites and someone's memory. A runsheet might have headers on row 4, book and page in one column as "Vol. 12, Pg. 34," and dates in three formats. The chain of title lives in your head until you draw it. I do this work as a land agent, and I wanted one place that held the map, the records and the problems together.
-
-## My role
-
-Solo. I designed and built all of it. The data model, import rules and title checks come from how I actually work a tract.
+Title work happens in spreadsheets, PDFs, county websites and someone's memory. A runsheet might have headers on row 4, book and page in one column as "Vol. 12, Pg. 34," and dates in three formats. The chain of title lives in your head until you draw it. I do this work as a land agent, and I wanted one place that held the map, the records and the problems together. The data model, import rules and title checks come from how I actually work a tract.
 
 ## Approach
 

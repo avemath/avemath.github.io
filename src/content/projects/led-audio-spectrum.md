@@ -19,11 +19,7 @@ demo: spectrum
 
 ## Context
 
-I wanted a spectrum display that looks good in a real room: music from across the room, people talking, a fan running, long stretches of quiet. I built it to handle all of that.
-
-## My role
-
-Solo. I wired the hardware, wrote the firmware, and tuned it by listening.
+I wanted a spectrum display that looks good in a real room: music from across the room, people talking, a fan running, long stretches of quiet. I built it to handle all of that: I wired the hardware, wrote the firmware, and tuned it by listening.
 
 ## Approach
 

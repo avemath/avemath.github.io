@@ -16,11 +16,7 @@ stack: [Google Apps Script, Google Forms, Google Sheets, Google Drive]
 
 ## Context
 
-Infant Swim Resource lessons start with a check-in on how the child ate, slept and felt that day, because it changes what's safe in the water. My dad's ISR business, Little Explorer Swim, tracked that on a paper weekly interview sheet. Paper gets lost, it's hard to read across weeks, and it can't be in two places at once.
-
-## My role
-
-Solo. I built the system and wrote a plain-language guide so the instructor never has to touch code.
+Infant Swim Resource lessons start with a check-in on how the child ate, slept and felt that day, because it changes what's safe in the water. My dad's ISR business, Little Explorer Swim, tracked that on a paper weekly interview sheet. Paper gets lost, it's hard to read across weeks, and it can't be in two places at once. I built the replacement and wrote a plain-language guide so the instructor never has to touch code.
 
 ## Approach
 

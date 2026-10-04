@@ -9,14 +9,14 @@ const quotes = testimonials.filter((t) => t.approved);
   quotes.length > 0 && (
     <section
       id="recommendations"
-      class="section home-section"
+      class="section section--tight home-section"
       aria-labelledby="recommendations-title"
       data-section="recommendations"
     >
       <div class="wrap">
         <p class="eyebrow">Recommendations</p>
-        <h2 id="recommendations-title" class="section-title">Two professors, in their own words</h2>
-        <p class="section-lede">The advisors on RAMpage and the radio link, quoted with their permission.</p>
+        <h2 id="recommendations-title" class="section-title section-title--sm">Two professors, in their own words</h2>
+        <p class="section-lede">My senior design advisor and my communications design professor, quoted with their permission.</p>
 
         <ul class="quotes">
           {quotes.map((t) => (

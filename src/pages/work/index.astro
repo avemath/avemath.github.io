@@ -63,6 +63,7 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 2.75rem;
     padding: 0.5rem 0.95rem;
     border: 1px solid var(--line-strong);
     border-radius: 999px;
@@ -100,14 +101,42 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
   .work-grid > :global(.tile[hidden]) {
     display: none;
   }
+
+  /* A row of three that ends on one tile closes with a wide row instead of an orphan.
+     Before JavaScript runs the nth-child rule covers the unfiltered grid; after, the script
+     marks the last visible tile so filtered views behave the same. */
+  @media (min-width: 1100px) {
+    .work-grid > :global(.tile[data-orphan]),
+    .work-grid:not([data-ready]) > :global(.tile:nth-child(3n + 1):last-child) {
+      grid-column: 1 / -1;
+      flex-direction: row;
+    }
+
+    .work-grid > :global(.tile[data-orphan] .tile__media),
+    .work-grid:not([data-ready]) > :global(.tile:nth-child(3n + 1):last-child .tile__media) {
+      flex: 0 0 42%;
+      aspect-ratio: auto;
+      border-bottom: 0;
+      border-right: 1px solid var(--line);
+    }
+  }
 </style>
 
 <script>
   const wrap = document.querySelector<HTMLElement>('[data-filters]')!;
   const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('[data-filter]')];
-  const tiles = [...document.querySelectorAll<HTMLElement>('[data-work-grid] > .tile')];
+  const grid = document.querySelector<HTMLElement>('[data-work-grid]')!;
+  const tiles = [...grid.querySelectorAll<HTMLElement>(':scope > .tile')];
   const status = document.querySelector<HTMLElement>('[data-filter-status]')!;
   wrap.dataset.ready = '';
+
+  // A three-column row that ends on one tile gets a wide closing row (see the styles above).
+  function markOrphan() {
+    const visible = tiles.filter((t) => !t.hidden);
+    tiles.forEach((t) => t.removeAttribute('data-orphan'));
+    if (visible.length % 3 === 1) visible[visible.length - 1]?.setAttribute('data-orphan', '');
+    grid.dataset.ready = '';
+  }
 
   function apply(type: string, announce = true) {
     buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === type)));
@@ -117,6 +146,7 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
       t.hidden = !match;
       if (match) shown++;
     });
+    markOrphan();
     if (announce) status.textContent = `Showing ${shown} project${shown === 1 ? '' : 's'}.`;
     const url = new URL(location.href);
     if (type === 'all') url.searchParams.delete('type');
@@ -127,4 +157,5 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
   buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter!)));
   const initial = new URLSearchParams(location.search).get('type');
   if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial, false);
+  else markOrphan();
 </script>
