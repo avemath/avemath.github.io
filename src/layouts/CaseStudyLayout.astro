@@ -48,7 +48,7 @@ const jsonLd = [
 ];
 ---
 
-<BaseLayout title={d.title} description={d.summary} image={ogImage} type="article" jsonLd={jsonLd}>
+<BaseLayout title={d.seoTitle ?? d.title} description={d.seoDescription ?? d.summary} image={ogImage} type="article" jsonLd={jsonLd}>
   <article class="case">
     <header class="case__head">
       <div class="wrap">

@@ -14,7 +14,7 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
 ---
 
 <header class="site-header no-print" data-header>
-  <div class="wrap flex h-16 items-center justify-between gap-4">
+  <div class="wrap flex h-16 items-center justify-between gap-3">
     <a href="/" class="brand" aria-label={`${site.name}, home`}>
       <span class="brand__mark" aria-hidden="true">
         <svg viewBox="0 0 32 32" fill="none">
@@ -44,14 +44,40 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     <div class="flex items-center gap-2">
       <button type="button" class="icon-btn kbd-btn" data-palette-open aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K">
         <Icon name="search" />
-        <span class="hidden sm:inline">Jump to</span>
+        <span>Jump to</span>
         <kbd class="hidden lg:inline-flex" data-kbd-hint>Ctrl K</kbd>
-        <span class="sr-only sm:hidden">Open menu and search</span>
       </button>
       <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
         <Icon name="sun" class="theme-icon theme-icon--sun h-[1.15em] w-[1.15em]" />
         <Icon name="moon" class="theme-icon theme-icon--moon h-[1.15em] w-[1.15em]" />
       </button>
+
+      <!-- Phone menu. A native disclosure, so it opens before any JavaScript loads. -->
+      <details class="mnav" data-mnav>
+        <summary class="icon-btn mnav__button">
+          <Icon name="menu" class="mnav__icon mnav__icon--open h-[1.15em] w-[1.15em]" />
+          <Icon name="close" class="mnav__icon mnav__icon--close h-[1.15em] w-[1.15em]" />
+          Menu
+        </summary>
+        <nav aria-label="Menu" class="mnav__panel">
+          <ul>
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} class="mnav__link" aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+            <li>
+              <button type="button" class="mnav__link mnav__search" data-palette-open aria-haspopup="dialog">
+                <Icon name="search" /> Search the site
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </details>
     </div>
   </div>
 </header>
@@ -68,7 +94,8 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     transition: border-color 0.3s;
   }
 
-  .site-header[data-scrolled] {
+  .site-header[data-scrolled],
+  .site-header:has(.mnav[open]) {
     border-bottom-color: var(--line);
   }
 
@@ -170,6 +197,17 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     border-color: var(--accent);
   }
 
+  /* The search button lives in the phone menu below the md breakpoint. */
+  .kbd-btn {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .kbd-btn {
+      display: inline-flex;
+    }
+  }
+
   kbd {
     align-items: center;
     padding: 0.05rem 0.4rem;
@@ -185,6 +223,79 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
   :global(:root:not([data-theme='dark'])) .theme-icon--moon {
     display: none;
   }
+
+  /* Phone menu */
+  @media (min-width: 768px) {
+    .mnav {
+      display: none;
+    }
+  }
+
+  .mnav__button {
+    list-style: none;
+    font-weight: 500;
+  }
+
+  .mnav__button::-webkit-details-marker {
+    display: none;
+  }
+
+  .mnav[open] .mnav__button {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .mnav[open] .mnav__icon--open,
+  .mnav:not([open]) .mnav__icon--close {
+    display: none;
+  }
+
+  .mnav__panel {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    padding: 0.25rem clamp(1rem, 4vw, 2.5rem) 1rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .mnav__link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.85rem 0.25rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .mnav__link[aria-current='page'] {
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .mnav__link[aria-current='page'] {
+    color: var(--accent);
+  }
+
+  .mnav__search {
+    border-bottom: 0;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-soft);
+  }
+
+  .mnav__search :global(svg) {
+    width: 1.1em;
+    height: 1.1em;
+  }
 </style>
 
 <script>
@@ -195,5 +306,21 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
 
   if (/Mac|iPhone|iPad/.test(navigator.userAgent)) {
     document.querySelectorAll('[data-kbd-hint]').forEach((el) => (el.textContent = '⌘ K'));
+  }
+
+  // Phone menu: close on Escape, on a tap outside, and once a link or the search button is chosen.
+  const menu = document.querySelector<HTMLDetailsElement>('[data-mnav]');
+  if (menu) {
+    const close = () => menu.removeAttribute('open');
+    document.addEventListener('click', (e) => {
+      if (menu.open && !menu.contains(e.target as Node)) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.open) {
+        close();
+        menu.querySelector<HTMLElement>('summary')?.focus();
+      }
+    });
+    menu.querySelectorAll('a, button').forEach((el) => el.addEventListener('click', close));
   }
 </script>

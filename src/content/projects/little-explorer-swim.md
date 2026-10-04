@@ -10,6 +10,7 @@ status: live
 summary: A daily health intake and auto-generated lesson reports for my dad's Infant Swim Resource instruction business, built entirely on free Google tools.
 outcome: Replaced a paper weekly interview sheet with forms and reports that fill themselves in.
 role: Solo. I designed the form, wrote the Apps Script, and wrote the instructor's one-page guide.
+keywords: ["swim", "ISR", "forms", "Apps Script", "Google Sheets", "reports", "intake"]
 stack: [Google Apps Script, Google Forms, Google Sheets, Google Drive]
 ---
 

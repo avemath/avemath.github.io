@@ -55,7 +55,11 @@ const year = new Date().getFullYear();
 
   <div class="border-t border-line">
     <div class="wrap flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-      <p>© {year} {site.name} · {site.location}</p>
+      <p>© <span data-year>{year}</span> {site.name} · {site.location}</p>
+      <script is:inline>
+        // The build-time year is the fallback; this keeps it current between deploys.
+        document.querySelector('[data-year]').textContent = String(new Date().getFullYear());
+      </script>
       <p>
         Built with Astro and hosted on GitHub Pages.
         <a class="link" href="https://github.com/avemath/avemath.github.io">Source</a>

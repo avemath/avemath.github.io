@@ -11,6 +11,8 @@ summary: Senior design capstone. I wrote the control software for a 30 lb pneuma
 outcome: First place in the LSU senior design combat robotics competition.
 role: Lead programmer and systems integration. I owned the Pico W weapon and safety firmware, the Pi 4B video pipeline, and the test scripts.
 team: Five-person senior design team, advised by Dr. Adrian Stein.
+seoDescription: "Control software for a 30 lb pneumatic combat robot: weapon safety on a Pico W, live video on a Pi 4B, and first place in LSU's senior design competition."
+keywords: ["robot", "combat robotics", "senior design", "capstone", "firmware", "pneumatic", "kill switch", "UDP video"]
 stack: [MicroPython, Python, Raspberry Pi Pico W, Raspberry Pi 4B, OpenCV, UDP, FlySky RC]
 links:
   repo: https://github.com/avemath/RAMpage

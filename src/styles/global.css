@@ -3,6 +3,64 @@
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/jetbrains-mono';
 
+/* ------------------------------------------------------------------
+   Fallback faces with the web fonts' metrics. While the real files load,
+   text set in Arial or Courier New takes the same space, so the swap does
+   not move the layout. The size-adjust values were measured by rendering
+   the same sentence in both fonts; the overrides are the web fonts' hhea
+   metrics divided by that ratio. Semibold text gets its own face because
+   the bold fallback is already close to the web font's width.
+   ------------------------------------------------------------------ */
+@font-face {
+  font-family: 'Inter Fallback';
+  font-weight: 100 500;
+  src: local('Arial'), local('Liberation Sans'), local('Helvetica Neue'), local('Helvetica');
+  size-adjust: 106.7%;
+  ascent-override: 90.8%;
+  descent-override: 22.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Inter Fallback';
+  font-weight: 600 900;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Helvetica Neue Bold'), local('Helvetica-Bold');
+  size-adjust: 101.8%;
+  ascent-override: 95.2%;
+  descent-override: 23.7%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  font-weight: 100 500;
+  src: local('Arial'), local('Liberation Sans'), local('Helvetica Neue'), local('Helvetica');
+  size-adjust: 108.6%;
+  ascent-override: 90.6%;
+  descent-override: 26.9%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  font-weight: 600 900;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Helvetica Neue Bold'), local('Helvetica-Bold');
+  size-adjust: 101.4%;
+  ascent-override: 97%;
+  descent-override: 28.8%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  font-weight: 100 900;
+  src: local('Courier New'), local('Liberation Mono'), local('Menlo'), local('Consolas'), local('Cascadia Mono');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 /* ------------------------------------------------------------------
@@ -59,9 +117,9 @@
 }
 
 @theme {
-  --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Code', Menlo, monospace;
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono Fallback', ui-monospace, 'Cascadia Code', Menlo, monospace;
 
   --color-bg: var(--bg);
   --color-surface: var(--surface);

@@ -41,13 +41,14 @@ One person, one story: I engineer systems and I build the web. The research, the
 
 ## Before launch
 
-- [ ] Web3Forms access key in `src/data/site.json` (the form falls back to email until then)
-- [ ] Cloudflare Web Analytics token in `src/data/site.json`
-- [ ] Google Search Console verification token in `src/data/site.json`
+- [ ] Web3Forms access key in `src/data/site.json` (the form falls back to email until then). Sign up at web3forms.com with the contact address, paste the key into `web3formsKey`, push, and send one test message.
+- [ ] Cloudflare Web Analytics token in `src/data/site.json`. Cloudflare dashboard, Web Analytics, add a site for avemath.github.io, copy the token from the snippet into `cloudflareAnalyticsToken`.
+- [ ] Google Search Console verification token in `src/data/site.json`. Add a URL-prefix property for https://avemath.github.io/, pick the HTML tag method, paste only the `content` value into `googleSiteVerification`, push, verify, then submit `/sitemap-index.xml`.
+- [ ] Repository Settings, Pages, Source set to "GitHub Actions". While it is "Deploy from a branch", every push also runs a Jekyll build that fails.
 - [ ] Headshot for About
 - [ ] Written OK on research and internship wording
 - [ ] Owner OK for each client site and quote
-- [ ] Recommendation quotes approved by the writers (`src/data/testimonials.json`)
+- [x] Recommendation quotes approved by the writers (`src/data/testimonials.json`)
 
 ## Later
 

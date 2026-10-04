@@ -19,6 +19,9 @@ How to add work and keep the site current, plus the rules every page follows.
    status: live                         # live | ongoing | complete | archived
    summary: One sentence, under 200 characters, shown on cards.
    outcome: One line on what came of it.
+   seoTitle: Short title for search results     # optional, when the title runs past about 43 characters
+   seoDescription: Under 160 characters.        # optional, when the summary runs long
+   keywords: [radio, SDR]                        # optional extra search terms for the command palette
    role: What I did.
    team: Who else, if anyone.
    stack: [Next.js, Sanity, Playwright]
@@ -74,4 +77,4 @@ After changing experience data, run `npm run build && npm run assets` so the PDF
 - [ ] "Now" strip refreshed each semester
 - [ ] Résumé PDF regenerated after any experience change
 - [ ] Commit counts and Lighthouse numbers in case studies rechecked twice a year
-- [ ] `npm run verify` passes before every push
+- [ ] `npm run verify` and `npm run test:a11y` pass before every push

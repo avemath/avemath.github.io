@@ -11,6 +11,9 @@ summary: Graduate research on an Office of Naval Research project with Integer T
 outcome: Sponsored research, ongoing through my M.S.
 role: Graduate research assistant on the LSU team, advised by Dr. Shuangqing Wei.
 team: An LSU team across electrical and computer engineering, mechanical engineering, mathematics and computer science, working with Integer Technologies engineers.
+seoTitle: "ONR research: Intelligent Data Management"
+seoDescription: "Graduate research on an Office of Naval Research project with Integer Technologies, helping distributed autonomous maritime systems decide which data matters."
+keywords: ["navy", "ONR", "thesis", "graduate research", "LSU", "sponsored research", "maritime", "underwater"]
 stack: [Digital communications, Signal processing, Networked autonomy]
 links:
   writeup: https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php

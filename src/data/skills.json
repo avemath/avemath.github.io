@@ -5,7 +5,7 @@
   },
   {
     "group": "Programming",
-    "items": ["Python", "MicroPython", "MATLAB", "C and C++", "JavaScript", "TypeScript", "Google Apps Script"]
+    "items": ["Python", "MATLAB", "C and C++", "JavaScript", "TypeScript", "MicroPython", "Google Apps Script"]
   },
   {
     "group": "Hardware",

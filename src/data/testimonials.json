@@ -1,13 +1,13 @@
 [
   {
-    "approved": false,
+    "approved": true,
     "quote": "What particularly set Avery apart was her initiative to go beyond the project requirements.",
     "name": "Dr. Aldo Duarte",
     "title": "Adjunct Professor and Postdoctoral Researcher, LSU ECE",
     "context": "EE 4003, Communications Engineering Design"
   },
   {
-    "approved": false,
+    "approved": true,
     "quote": "She was proactive, dependable, and able to work effectively across both embedded and higher-level software components.",
     "name": "Dr. Adrian Stein",
     "title": "Assistant Professor, LSU Mechanical and Industrial Engineering",

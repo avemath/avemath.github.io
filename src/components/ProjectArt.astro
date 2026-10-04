@@ -5,9 +5,13 @@
 interface Props {
   slug: string;
   class?: string;
+  // SVG pattern ids must be unique per page. Pass a prefix when the same art appears twice
+  // on one page (the research panel does, since the ONR tile is also in the bento).
+  idPrefix?: string;
 }
 
-const { slug, class: className = '' } = Astro.props;
+const { slug, class: className = '', idPrefix = '' } = Astro.props;
+const uid = `${idPrefix}${slug}`;
 const W = 600;
 const H = 375;
 
@@ -60,17 +64,17 @@ const wave = (y0: number, amp: number, f: number, ph = 0) => {
 
 <svg class={`art ${className}`} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
   <defs>
-    <pattern id={`grid-${slug}`} width="24" height="24" patternUnits="userSpaceOnUse">
+    <pattern id={`grid-${uid}`} width="24" height="24" patternUnits="userSpaceOnUse">
       <path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--art-grid)" stroke-width="1"></path>
     </pattern>
-    <radialGradient id={`glow-${slug}`} cx="50%" cy="50%" r="60%">
+    <radialGradient id={`glow-${uid}`} cx="50%" cy="50%" r="60%">
       <stop offset="0%" stop-color="var(--accent)" stop-opacity=".18"></stop>
       <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"></stop>
     </radialGradient>
   </defs>
   <rect width={W} height={H} fill="var(--art-bg)"></rect>
-  <rect width={W} height={H} fill={`url(#grid-${slug})`}></rect>
-  <rect width={W} height={H} fill={`url(#glow-${slug})`}></rect>
+  <rect width={W} height={H} fill={`url(#grid-${uid})`}></rect>
+  <rect width={W} height={H} fill={`url(#glow-${uid})`}></rect>
 
   {
     slug === 'onr-intelligent-data-management' && (

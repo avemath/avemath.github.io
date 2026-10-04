@@ -10,6 +10,7 @@ status: live
 summary: A site for a two-person firm of Certified Professional Landmen that speaks to oil companies and confused landowners at the same time.
 outcome: Two audiences, one site, and an owner who edits it without me.
 role: Design, build, content structure, CMS, hosting and DNS.
+keywords: ["landmen", "oil and gas", "minerals", "Cloudflare", "Sveltia", "coverage map"]
 stack: [Astro, Sveltia CMS, Cloudflare Pages, Cloudflare Workers, Web3Forms, GitHub Actions]
 links:
   live: https://plvinc.com
