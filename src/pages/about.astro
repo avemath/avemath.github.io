@@ -245,6 +245,23 @@ const principles = [
     height: 100%;
   }
 
+  /* Below the two-column layout the placeholder scope would sit alone under the intro, so
+     it is hidden; a real portrait shows at a modest size instead. */
+  @media (max-width: 959px) {
+    .about-hero__inner {
+      gap: 2rem;
+    }
+
+    .portrait:not(.portrait--photo) {
+      display: none;
+    }
+
+    .portrait--photo {
+      width: min(11rem, 40vw);
+      justify-self: start;
+    }
+  }
+
   /* With a photo, the ring becomes a frame: the image fills the circle and the wash stays behind it. */
   .portrait--photo {
     padding: 0.5rem;
@@ -361,6 +378,16 @@ const principles = [
 
   :global([data-theme='dark']) .rule__n {
     color: var(--accent);
+  }
+
+  @media (max-width: 719px) {
+    .rule {
+      padding: 1.2rem 1.25rem;
+    }
+
+    .rule dt {
+      margin-top: 0.3rem;
+    }
   }
 
   .rule dt {

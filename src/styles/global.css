@@ -236,7 +236,7 @@
 }
 
 .section {
-  padding-block: clamp(4rem, 9vw, 7.5rem);
+  padding-block: clamp(3rem, 7vw, 6rem);
 }
 
 .section + .section {
@@ -245,7 +245,7 @@
 
 /* Supporting sections sit a size down from the main ones, so the page has a hierarchy of its own. */
 .section--tight {
-  padding-block: clamp(3rem, 6vw, 5rem);
+  padding-block: clamp(2.25rem, 5vw, 4rem);
 }
 
 .skip-link {

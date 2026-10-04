@@ -111,6 +111,16 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
     gap: 1rem;
   }
 
+  .site__metrics > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .site__metrics .site__metric {
+    margin-top: auto;
+    padding-top: 0.25rem;
+  }
+
   .site__metric {
     font-family: var(--font-display);
     font-size: 1.6rem !important;
