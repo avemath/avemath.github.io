@@ -1,0 +1,104 @@
+---
+import testimonials from '@/data/testimonials.json';
+
+// Only quotes their writers have approved are rendered (see docs/CONTENT-GUIDE.md).
+const quotes = testimonials.filter((t) => t.approved);
+---
+
+{
+  quotes.length > 0 && (
+    <section
+      id="recommendations"
+      class="section home-section"
+      aria-labelledby="recommendations-title"
+      data-section="recommendations"
+    >
+      <div class="wrap">
+        <p class="eyebrow">Recommendations</p>
+        <h2 id="recommendations-title" class="section-title">What the people I've worked with say</h2>
+        <p class="section-lede">From the professors who advised the projects above, quoted with their permission.</p>
+
+        <ul class="quotes">
+          {quotes.map((t) => (
+            <li class="quote card" data-reveal>
+              <figure>
+                <span class="quote__mark" aria-hidden="true">
+                  “
+                </span>
+                <blockquote class="quote__text">
+                  <p>{t.quote}</p>
+                </blockquote>
+                <figcaption class="quote__who">
+                  <span class="quote__name">{t.name}</span>
+                  <span class="quote__title">{t.title}</span>
+                  <span class="label">{t.context}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .quotes {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .quote {
+    padding: 1.75rem 1.75rem 1.6rem;
+    box-shadow: none;
+  }
+
+  .quote figure {
+    display: grid;
+    gap: 1.1rem;
+    margin: 0;
+    height: 100%;
+  }
+
+  .quote__mark {
+    display: block;
+    height: 1.4rem;
+    font-family: var(--font-display);
+    font-size: 3.25rem;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .quote__text p {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    text-wrap: pretty;
+  }
+
+  .quote__who {
+    display: grid;
+    gap: 0.2rem;
+    align-self: end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .quote__name {
+    font-weight: 600;
+  }
+
+  .quote__title {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+  }
+
+  .quote__who .label {
+    margin-top: 0.3rem;
+  }
+</style>

@@ -12,8 +12,9 @@ My portfolio and résumé site: research, engineering projects, and the websites
   - the LED spectrum visualizer's ESP32 signal chain, ported to JavaScript (same FFT size, band edges, AGC and silence detection), with an optional microphone mode
   - a line-for-line simulation of the RAMpage combat robot's weapon and E-stop firmware, including the serial console output
   - a simplified model of my V2V receiver chain, where you can switch on each sync stage and watch the constellation clean up
-- **Résumé** as an HTML page and a one-page PDF, both generated from the same data file.
-- **Services** for website clients, **About**, **Contact** (Web3Forms with a mailto fallback), and a command palette on every page (Ctrl K or Cmd K, or press `/`).
+- **Recommendations** from the professors who advised the projects. A quote renders only once its writer has approved it (`src/data/testimonials.json`).
+- **Résumé** as an HTML page and a one-page tagged PDF, both generated from the same data file.
+- **Services** for website clients, **About**, **Contact** (Web3Forms with a mailto fallback), and a command palette on every page (Ctrl K or Cmd K, or press `/`). On phones the header has a native Menu disclosure, so navigation works before any JavaScript loads.
 
 ## Stack
 
@@ -21,11 +22,12 @@ My portfolio and résumé site: research, engineering projects, and the websites
 - Tailwind CSS 4, with design tokens as CSS variables (see [docs/DESIGN.md](docs/DESIGN.md))
 - Self-hosted variable fonts: Space Grotesk, Inter, JetBrains Mono
 - No UI framework. Interactive pieces are small vanilla TypeScript modules that load only on the pages that use them.
-- GitHub Actions builds and deploys to GitHub Pages on every push to `main`.
+- Self-hosted fonts are preloaded and have metric-matched local fallbacks, so the swap to the web font does not shift the layout.
+- GitHub Actions lints the copy, type checks, builds, runs axe over every page, and deploys to GitHub Pages on every push to `main`, plus a monthly rebuild.
 
 ## Numbers
 
-Mobile Lighthouse, October 2026: Performance 96 to 99, Accessibility 100, Best Practices 100, SEO 100 on every page I tested. An axe scan of every page in both themes comes back clean.
+Mobile Lighthouse, October 2026: Performance 90 to 100 with zero layout shift, Accessibility 100, Best Practices 100, SEO 100 on every page tested. axe runs over every page, in both themes and at phone width, before every deploy.
 
 ## Run it
 
@@ -33,10 +35,11 @@ Mobile Lighthouse, October 2026: Performance 96 to 99, Accessibility 100, Best P
 npm install
 npm run dev        # http://localhost:4321
 npm run verify     # copy lint + type check + build
-npm run assets     # after a build: regenerates the résumé PDF and social images
+npm run test:a11y  # after a build: axe on every page, both themes, phone and desktop
+npm run assets     # after a build: regenerates the résumé PDF, social images and favicon.ico
 ```
 
-`npm run assets` uses Playwright's Chromium (`npx playwright install chromium` the first time).
+`npm run assets` and `npm run test:a11y` use Playwright's Chromium (`npx playwright install chromium` the first time), or set `CHROMIUM_PATH` to another Chromium binary.
 
 ## Add a project
 
@@ -51,11 +54,13 @@ src/
   components/         page sections, demos/ for the interactive pieces
   layouts/            BaseLayout, CaseStudyLayout
   pages/              routes
+  lib/                content helpers, date formatting, unique ids
   scripts/            sonar canvas, motion, preferences, text decode
   styles/global.css   tokens and shared styles
 scripts/
   lint-copy.mjs       fails CI on em dashes and filler phrases
-  render-assets.mjs   résumé PDF, social cards, touch icon
+  check-a11y.mjs      fails CI on any axe violation
+  render-assets.mjs   résumé PDF, social cards, touch icon, favicon.ico
 docs/                 plan, design system, content guide
 ```
 

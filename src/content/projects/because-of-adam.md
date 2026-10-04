@@ -10,6 +10,7 @@ status: live
 summary: The website for my family's drowning awareness nonprofit, built so a scared parent can find the facts fast and act on them tonight.
 outcome: 30+ pages, every statistic sourced, and an editor my family runs on their own.
 role: Co-founder of the organization. I designed and built the site, wrote the content plan, and set up the editor and publishing pipeline.
+keywords: ["nonprofit", "drowning", "water safety", "family", "Pagefind", "Pages CMS"]
 stack: [Astro, TypeScript, Pages CMS, Pagefind, GitHub Actions, GitHub Pages]
 links:
   live: https://becauseofadam.org
@@ -58,8 +59,8 @@ I co-founded the organization, and I designed and built the site end to end: con
 
 ## Outcome
 
-The site is live in preview at becauseofadam.org while my family reviews the last pages. It has more than 30 pages, costs nothing to host, and the people who run the organization can update it themselves.
+The site is live at becauseofadam.org, and my family is reviewing the last few pages before we announce it. It has more than 30 pages, costs nothing to host, and the people who run the organization can update it themselves.
 
 ## What I'd do next
 
-Launch publicly, connect a donation provider, and track pledge sign-ups so we can see whether the site changes what families do.
+Announce it publicly, connect a donation provider, and track pledge sign-ups so we can see whether the site changes what families do.

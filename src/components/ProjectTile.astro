@@ -41,8 +41,8 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
         <Image
           src={d.cover}
           alt=""
-          widths={[400, 640, 960, 1280]}
-          sizes={size === 'xl' ? '(min-width: 1024px) 60vw, 100vw' : '(min-width: 1024px) 40vw, 100vw'}
+          widths={[400, 640, 800, 960, 1280]}
+          sizes={size === 'xl' ? '(min-width: 1216px) 800px, (min-width: 720px) 92vw, 100vw' : '(min-width: 1216px) 400px, (min-width: 720px) 46vw, 100vw'}
           format="webp"
           quality={76}
           loading={eager ? 'eager' : 'lazy'}

@@ -17,14 +17,14 @@ const stages = [
 >
   <div class="ofdm" data-ofdm>
     <div class="ofdm__controls">
-      <label class="slider">
-        <span class="slider__top"><span>Carrier offset</span><output class="mono" data-out="cfo">5.0 kHz</output></span>
-        <input type="range" min="0" max="12" step="0.5" value="5" data-in="cfo" />
-      </label>
-      <label class="slider">
-        <span class="slider__top"><span>SNR</span><output class="mono" data-out="snr">18 dB</output></span>
-        <input type="range" min="0" max="30" step="1" value="18" data-in="snr" />
-      </label>
+      <div class="slider">
+        <div class="slider__top"><label for="ofdm-cfo">Carrier offset</label><output class="mono" for="ofdm-cfo" data-out="cfo">5.0 kHz</output></div>
+        <input id="ofdm-cfo" type="range" min="0" max="12" step="0.5" value="5" data-in="cfo" />
+      </div>
+      <div class="slider">
+        <div class="slider__top"><label for="ofdm-snr">SNR</label><output class="mono" for="ofdm-snr" data-out="snr">18 dB</output></div>
+        <input id="ofdm-snr" type="range" min="0" max="30" step="1" value="18" data-in="snr" />
+      </div>
 
       <fieldset class="stages">
         <legend class="label">Receiver stages</legend>

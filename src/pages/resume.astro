@@ -217,6 +217,22 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     gap: 0.25rem 1rem;
   }
 
+  /* From phone-landscape up, a long title wraps while the date stays on its first line. */
+  @media (min-width: 480px) {
+    .r-row {
+      flex-wrap: nowrap;
+    }
+
+    .r-title {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .r-when {
+      flex: none;
+    }
+  }
+
   .r-title {
     font-family: var(--font-sans);
     font-size: 1rem;
@@ -283,7 +299,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
   @media print {
     @page {
       size: letter;
-      margin: 0.45in 0.55in;
+      margin: 0.4in 0.5in;
     }
 
     .wrap {
@@ -304,6 +320,19 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       border-bottom-width: 1.5px;
     }
 
+    .r-row {
+      flex-wrap: nowrap;
+    }
+
+    .r-title {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .r-when {
+      flex: none;
+    }
+
     .r-name {
       font-size: 18pt;
     }
@@ -315,7 +344,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     }
 
     .r-sec {
-      margin-top: 0.6rem;
+      margin-top: 0.38rem;
     }
 
     .r-h {
@@ -324,7 +353,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     }
 
     .r-item {
-      margin-top: 0.4rem;
+      margin-top: 0.3rem;
     }
 
     .r-title {
@@ -363,18 +392,6 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     .r-skill:nth-child(n + 6),
     .r-screen-only {
       display: none !important;
-    }
-
-    @page {
-      margin: 0.4in 0.5in;
-    }
-
-    .r-sec {
-      margin-top: 0.38rem;
-    }
-
-    .r-item {
-      margin-top: 0.3rem;
     }
 
     .r-skills div {

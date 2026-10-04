@@ -5,6 +5,12 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import CommandPalette from '@/components/CommandPalette.astro';
 import site from '@/data/site.json';
+// The three Latin font files, preloaded so text can render in the right face on first paint.
+import spaceGroteskUrl from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import interUrl from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import monoUrl from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+
+const fontPreloads = [spaceGroteskUrl, interUrl, monoUrl];
 
 interface Props {
   title?: string;
@@ -44,8 +50,10 @@ const { bare = false, ...seo } = Astro.props;
         if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#f6f8fb');
       })();
     </script>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {fontPreloads.map((href) => <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />)}
     <link rel="sitemap" href="/sitemap-index.xml" />
     <SEO {...seo} />
     <slot name="head" />

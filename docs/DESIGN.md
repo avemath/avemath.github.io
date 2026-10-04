@@ -40,7 +40,7 @@ The one pair under 4.5 is light-theme `--accent` on `--surface-2` (4.45). It's o
 - **Inter** for body text at 17px with a 1.65 line height.
 - **JetBrains Mono** for labels, chips, dates and data. It's uppercase with wide tracking for eyebrows.
 
-All three are variable fonts, self-hosted through Fontsource, with only the Latin subset downloaded.
+All three are variable fonts, self-hosted through Fontsource, with only the Latin subset downloaded. The Latin files are preloaded, and each face has a metric-matched local fallback in `global.css` (`size-adjust` plus ascent and descent overrides against Arial or Courier New), so the swap to the web font does not move the layout.
 
 ## Motion
 
@@ -59,15 +59,17 @@ The original plan used GSAP for the hero. In practice the only effect that neede
 
 | Component | Notes |
 |---|---|
+| `Header` | Inline nav from 768px. Below that, a native `<details>` Menu with the same links and a search entry, so it works before JavaScript loads |
 | `Hero` | canvas, CTAs, audience switcher |
 | `AudienceSwitcher` | radio group. Section order is CSS `:has()`, and JS only syncs the URL (`?for=research`) and the main CTA |
 | `ProjectTile` | used in the bento grid and on /work. The whole card is clickable through a stretched link, and the "Live site" link sits above it |
 | `BrowserFrame` | static screenshot with a URL bar, plus an optional phone shot. Client sites are never iframed |
 | `Timeline` | native `<details>`, so it works by keyboard with no JS. "Expand all" is a progressive extra |
 | `CommandPalette` | native `<dialog>` with a combobox and listbox. Ctrl K, Cmd K or `/` opens it, and a visible header button covers touch |
-| `FieldNotes` | buttons with `aria-expanded`. With no JS every fact is visible |
+| `FieldNotes` | each card decodes once as it scrolls into view, and a tap replays it. With no JS or reduced motion every fact is simply visible |
+| `Testimonials` | renders only quotes with `approved: true`, as a `figure` with `blockquote` and `figcaption` |
 | `ContactForm` | Web3Forms when a key is set, otherwise mailto. Honeypot, inline validation, live status |
-| `ProjectArt` | drawn SVG covers for projects without screenshots. Research art is abstract on purpose |
+| `ProjectArt` | drawn SVG covers for projects without screenshots. Research art is abstract on purpose. Pattern ids get a per-instance suffix so the same art can appear twice on a page |
 | `demos/*` | each demo loads only on its own case study page |
 
 ## Layout

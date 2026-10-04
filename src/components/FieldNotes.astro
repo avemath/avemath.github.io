@@ -11,13 +11,13 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
   <div class="wrap">
     <p class="eyebrow">Field notes</p>
     <h2 id="notes-title" class="section-title">A few things that are true</h2>
-    <p class="section-lede">Tap a card to decode it.</p>
+    <p class="section-lede">Each card decodes as it scrolls into view. Tap one to replay it.</p>
 
     <ul class="notes" data-notes>
       {
         notes.map((n, i) => (
           <li data-reveal>
-            <button type="button" class="note-card" aria-expanded="true" data-note>
+            <button type="button" class="note-card" data-note>
               <span class="note-card__top">
                 <span class="mono note-card__idx">N{String(i + 1).padStart(2, '0')}</span>
                 <span class="label">{n.label}</span>
@@ -104,29 +104,35 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
     font-size: 0.9rem;
     line-height: 1.5;
     color: var(--text-soft);
+    transition: opacity 0.5s ease 0.2s;
   }
 
   .note-card__hint {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1.1rem;
     display: none;
     font-size: 0.7rem;
     color: var(--muted);
   }
 
-  /* Closed state only exists once JS has run, so no-JS visitors see every fact. */
-  .note-card[aria-expanded='false'] .note-card__value {
+  /* The masked state only exists once JavaScript has run, so no-JS visitors see every fact.
+     The detail keeps its space (opacity, not display) so decoding never shifts the layout. */
+  .note-card[data-masked] .note-card__value {
     color: var(--muted);
     letter-spacing: 0.1em;
   }
 
-  .note-card[aria-expanded='false'] .note-card__detail {
-    display: none;
+  .note-card[data-masked] .note-card__detail {
+    opacity: 0;
+    transition: none;
   }
 
-  .note-card[aria-expanded='false'] .note-card__hint {
+  .note-card[data-masked] .note-card__hint {
     display: block;
   }
 
-  .note-card[aria-expanded='false']::after {
+  .note-card[data-masked]::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -137,19 +143,56 @@ const notes = facts.map((f) => ({ ...f, value: f.value.replace('{sites}', String
 
 <script>
   import { decode, mask } from '../scripts/decode';
+  import { prefersReducedMotion } from '../scripts/preferences';
 
   const cards = [...document.querySelectorAll<HTMLButtonElement>('[data-note]')];
+  const valueOf = (card: HTMLButtonElement) => card.querySelector<HTMLElement>('[data-note-value]')!;
+  const textOf = (card: HTMLButtonElement) => valueOf(card).dataset.text ?? '';
 
-  cards.forEach((card) => {
-    const value = card.querySelector<HTMLElement>('[data-note-value]')!;
-    const text = value.dataset.text ?? '';
-    card.setAttribute('aria-expanded', 'false');
-    value.textContent = mask(text);
-    card.addEventListener('click', () => {
-      const open = card.getAttribute('aria-expanded') !== 'true';
-      card.setAttribute('aria-expanded', String(open));
-      if (open) decode(value, text);
-      else value.textContent = mask(text);
+  function reveal(card: HTMLButtonElement) {
+    delete card.dataset.masked;
+    decode(valueOf(card), textOf(card));
+  }
+
+  function showAll() {
+    cards.forEach((card) => {
+      delete card.dataset.masked;
+      valueOf(card).textContent = textOf(card);
     });
+  }
+
+  // Cards start masked and decode as they scroll into view, staggered across a row.
+  // With reduced motion every fact is simply shown.
+  if (!prefersReducedMotion() && 'IntersectionObserver' in window) {
+    cards.forEach((card) => {
+      card.dataset.masked = '';
+      valueOf(card).textContent = mask(textOf(card));
+    });
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries
+          .filter((e) => e.isIntersecting)
+          .forEach((e, i) => {
+            const card = e.target as HTMLButtonElement;
+            io.unobserve(card);
+            setTimeout(() => card.dataset.masked !== undefined && reveal(card), i * 140);
+          });
+      },
+      { threshold: 0.5 },
+    );
+    cards.forEach((card) => io.observe(card));
+  }
+
+  // A tap decodes a card early, or replays the effect.
+  cards.forEach((card) =>
+    card.addEventListener('click', () => {
+      if (card.dataset.masked === undefined && !prefersReducedMotion()) valueOf(card).textContent = mask(textOf(card));
+      reveal(card);
+    }),
+  );
+
+  // Turning motion off mid-visit shows everything at once.
+  window.addEventListener('motionchange', () => {
+    if (prefersReducedMotion()) showAll();
   });
 </script>

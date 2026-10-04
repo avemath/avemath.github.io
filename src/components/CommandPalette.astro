@@ -12,6 +12,7 @@ const homeSections: Item[] = [
   ['websites', "Websites I've built"],
   ['research', 'Research'],
   ['experience', 'Experience'],
+  ['recommendations', 'Recommendations'],
   ['skills', 'Skills'],
   ['field-notes', 'Field notes'],
   ['contact', 'Contact'],
@@ -31,7 +32,7 @@ const items: Item[] = [
     label: p.data.title,
     hint: typeLabels[p.data.type],
     href: projectHref(p),
-    keywords: [p.data.short, ...p.data.stack, ...p.data.tags].join(' '),
+    keywords: [p.data.short, p.data.summary, p.data.outcome, ...p.data.keywords, ...p.data.stack, ...p.data.tags].filter(Boolean).join(' '),
   })),
   { id: 'a-theme', group: 'Actions', label: 'Switch light or dark theme', action: 'theme', keywords: 'dark light mode' },
   { id: 'a-motion', group: 'Actions', label: 'Turn reduced motion on or off', action: 'motion', keywords: 'animation accessibility' },
@@ -42,7 +43,7 @@ const items: Item[] = [
 ];
 ---
 
-<dialog class="palette" data-palette aria-label="Jump to a page, project or action">
+<dialog class="palette" data-palette data-email={site.email} aria-label="Jump to a page, project or action">
   <div class="palette__box" role="presentation">
     <div class="palette__search">
       <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75"
@@ -250,7 +251,7 @@ const items: Item[] = [
   const options = [...dialog.querySelectorAll<HTMLLIElement>('[role=option]')];
   const empty = dialog.querySelector<HTMLElement>('[data-palette-empty]')!;
   const status = dialog.querySelector<HTMLElement>('[data-palette-status]')!;
-  const email = 'averymatherne@gmail.com';
+  const email = dialog.dataset.email ?? '';
   let opener: HTMLElement | null = null;
   let visible = options;
   let active = 0;
