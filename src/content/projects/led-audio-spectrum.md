@@ -8,7 +8,7 @@ order: 10
 period: { start: "2025", end: "2025" }
 status: complete
 summary: ESP32 firmware that turns a microphone into a 16-band spectrum on a 256-LED matrix, tuned by ear until quiet music across the room still reads.
-outcome: Switches between a live spectrum and an idle glow on its own.
+outcome: Reads quiet music from across the room, fades to a glow in silence, and runs the same logic in a browser demo on this page.
 role: Solo. Hardware, firmware and tuning.
 keywords: ["ESP32", "FFT", "music", "audio", "LEDs", "FastLED", "microphone", "firmware"]
 stack: [C++, ESP32, FastLED, arduinoFFT, WS2812B]

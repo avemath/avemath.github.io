@@ -40,7 +40,7 @@ demo: weapon-logic
 
 ## Context
 
-RAMpage was a 30 lb combat robot with a pneumatic plow, built by a five-person team for LSU's senior design combat robotics competition. Combat is a rough place for electronics: vibration, interference, flaky radio links and a limited tank of air. The software had two jobs that pull in opposite directions. The weapon and safety logic has to react on time, every time. Live video for the driver needs a full Linux computer, and Linux doesn't promise anything about timing.
+Combat is a rough place for electronics: vibration, interference, flaky radio links and a limited tank of air. RAMpage was a 30 lb combat robot with a pneumatic plow, built by a five-person team for LSU's senior design combat robotics competition. The software had two jobs that pull in opposite directions. The weapon and safety logic has to react on time, every time. Live video for the driver needs a full Linux computer, and Linux doesn't promise anything about timing.
 
 ## My role
 

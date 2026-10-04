@@ -8,7 +8,7 @@ order: 5
 period: { start: "2026-04", end: "2026-09" }
 status: live
 summary: A bridal alterations studio site with interactive guides that explain bustles and hems better than words can, and inquiry forms that arrive ready to quote.
-outcome: 100 accessibility score, 16 automated test suites, and about 435 fields the owner can edit.
+outcome: Lighthouse 100 for accessibility and SEO, inquiries that arrive ready to quote, and about 435 fields the owner edits herself.
 role: Design, build, CMS, email, testing and launch.
 keywords: ["bridal", "sewing", "alterations", "Pittsburgh", "Sanity", "Next.js", "bustle"]
 stack: [Next.js, React, TypeScript, Sanity, Tailwind CSS, Framer Motion, Resend, Playwright, Vercel]
@@ -34,7 +34,7 @@ client:
 
 ## Context
 
-My sister Grace is a formally trained designer and a former lead alterations specialist at David's Bridal, now running her own studio in Pittsburgh. The site had three jobs: explain bustles, timelines and fittings to brides before they walk in; collect inquiries with the details Grace needs to quote; and let her switch bridal booking between open and waitlist herself.
+The site had three jobs: explain bustles, timelines and fittings to brides before they walk in; collect inquiries with the details Grace needs to quote; and let her switch bridal booking between open and waitlist herself. Grace is my sister, a formally trained designer and a former lead alterations specialist at David's Bridal, now running her own studio in Pittsburgh.
 
 ## My role
 

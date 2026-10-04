@@ -8,7 +8,7 @@ order: 3
 period: { start: "2025" }
 status: live
 summary: A local-first workspace for mineral title work that maps parcels, imports messy runsheets, and flags problems in the chain of title on its own.
-outcome: The tool I wanted as a land agent, running on the web and the desktop.
+outcome: About 130 instrument types, nine test suites, and title flags that compute themselves instead of going stale.
 role: Solo. I designed and built it from my own work as a land agent.
 keywords: ["land", "title", "minerals", "map", "GIS", "runsheet", "Leaflet", "Electron", "local-first"]
 stack: [React, Vite, Leaflet, Electron, IndexedDB, Supabase, Vercel]
