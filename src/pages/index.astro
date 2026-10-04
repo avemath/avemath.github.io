@@ -119,7 +119,23 @@ const tileStyle = (b: (typeof bento)[number]) =>
             <p class="eyebrow">Contact</p>
             <h2 id="contact-title" class="section-title section-title--sm">Send a note</h2>
             <p class="section-lede">Have a role, a research question or a website in mind? {site.replyTime}</p>
-            <p class="mt-6 inline-flex items-center gap-2 text-soft"><Icon name="pin" /> {site.location}. Happy to work remotely.</p>
+            <ul class="mt-8 space-y-4">
+              <li>
+                <p class="label">Email</p>
+                <a class="link mt-1 inline-flex items-center gap-2 text-lg" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
+              </li>
+              <li>
+                <p class="label">Elsewhere</p>
+                <div class="mt-1 flex flex-wrap gap-4">
+                  <a class="link inline-flex items-center gap-2" href={site.socials.linkedin}><Icon name="linkedin" /> LinkedIn</a>
+                  <a class="link inline-flex items-center gap-2" href={site.socials.github}><Icon name="github" /> GitHub</a>
+                </div>
+              </li>
+              <li>
+                <p class="label">Based in</p>
+                <p class="mt-1 inline-flex items-center gap-2 text-soft"><Icon name="pin" /> {site.location}. Happy to work remotely.</p>
+              </li>
+            </ul>
           </div>
           <div class="card p-6 sm:p-8">
             <ContactForm idPrefix="home" emailLine={false} />

@@ -212,11 +212,12 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin-top: auto;
     padding-top: 0.25rem;
   }
 
+  /* Equal-height rows leave slack; it collects here, above the dashed rule. */
   .tile__links {
+    margin-top: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -304,13 +305,17 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
       height: 100%;
     }
 
+    .tile--xl .tile__media {
+      min-height: 26rem;
+    }
+
     .tile__body {
       justify-content: center;
       padding: clamp(1.5rem, 2.5vw, 2.25rem);
     }
 
-    .tile__chips {
-      margin-top: 0.25rem;
+    .tile__links {
+      margin-top: 0;
     }
   }
 </style>

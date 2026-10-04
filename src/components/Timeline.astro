@@ -30,8 +30,9 @@ const entries = [
 
 <section id="experience" class="section home-section" aria-labelledby="experience-title" data-section="experience">
   <div class="wrap">
-    <div class="grid gap-10 lg:grid-cols-[18rem_1fr]">
-      <div class="lg:sticky lg:top-28 lg:self-start">
+    <div class="grid gap-10 min-[1100px]:grid-cols-[18rem_1fr]">
+      <div class="min-[1100px]:sticky min-[1100px]:top-28 min-[1100px]:self-start md:grid md:grid-cols-[1fr_20rem] md:items-end md:gap-10 min-[1100px]:block">
+        <div>
         <p class="eyebrow">Experience</p>
         <h2 id="experience-title" class="section-title">Land agent since 2020, researcher since 2026</h2>
         <p class="section-lede text-base">Open any entry for the details, or read the résumé.</p>
@@ -39,8 +40,10 @@ const entries = [
           <a class="btn btn--small" href="/resume/">Résumé <Icon name="arrow-right" /></a>
           <button type="button" class="btn btn--small" data-timeline-all aria-pressed="false">Expand all</button>
         </div>
+        </div>
 
-        <p class="label mt-8">Education</p>
+        <div>
+        <p class="label mt-8 md:mt-0 min-[1100px]:mt-8">Education</p>
         <ul class="mt-2 space-y-2 text-sm text-soft">
           {
             experience.education.map((e) => (
@@ -50,6 +53,7 @@ const entries = [
             ))
           }
         </ul>
+        </div>
       </div>
 
       <ol class="timeline" data-timeline>

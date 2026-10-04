@@ -72,7 +72,8 @@ const principles = [
   <NowStrip />
 
   <section class="section">
-    <div class="wrap-narrow prose about-prose">
+    <div class="wrap about-grid">
+    <div class="prose about-prose">
       <h2>Engineering</h2>
       <p>
         I studied computer engineering at LSU, with a minor in computer science, on the Tiger Excellence Non-Resident Award all four
@@ -113,6 +114,26 @@ const principles = [
         everything we wish we'd known: drowning is fast and silent, and layers of protection save lives.
       </p>
     </div>
+    <aside class="about-rail" aria-labelledby="rules-title">
+      <p class="eyebrow">How I work</p>
+      <h2 id="rules-title" class="section-title section-title--sm">Four rules I keep</h2>
+      <dl class="rules">
+        {
+          principles.map(([t, b], i) => (
+            <div class="rule card" data-reveal>
+              <dt>
+                <span class="mono rule__n" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {t}
+              </dt>
+              <dd>{b}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </aside>
+    </div>
   </section>
 
   <section id="off-the-clock" class="section section--tight" aria-labelledby="offclock-title">
@@ -144,29 +165,7 @@ const principles = [
     </div>
   </section>
 
-  <section class="section">
-    <div class="wrap">
-      <p class="eyebrow">How I work</p>
-      <h2 class="section-title">Four rules I keep</h2>
-      <dl class="rules">
-        {
-          principles.map(([t, b], i) => (
-            <div class="rule card" data-reveal>
-              <dt>
-                <span class="mono rule__n" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                {t}
-              </dt>
-              <dd>{b}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </div>
-  </section>
-
-  <section class="section">
+  <section class="section section--band">
     <div class="wrap">
       <div class="about-cta card">
         <p class="font-display text-2xl font-semibold tracking-tight">Want to work together, or just talk shop?</p>
@@ -357,11 +356,62 @@ const principles = [
     margin-top: 0;
   }
 
+  /* The story reads at a measure on the left; the four rules keep it company on the right. */
+  .about-grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .about-prose {
+    max-width: 42rem;
+  }
+
+  @media (min-width: 1100px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 42rem) minmax(0, 1fr);
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-rail {
+      position: sticky;
+      top: 6rem;
+    }
+
+    /* One compact column in the rail, so the cards keep a readable measure. */
+    .about-grid .rules {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .about-grid .rule {
+      padding: 1.1rem 1.25rem;
+    }
+
+    .about-grid .rule dt {
+      margin-top: 0.25rem;
+    }
+  }
+
+  /* Two by two on tablets and four across on desktop, so four cards never leave a lone one. */
   .rules {
     display: grid;
     gap: 1rem;
     margin-top: 2.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 560px) {
+    .rules {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .rules {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   .rule {

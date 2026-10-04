@@ -337,7 +337,8 @@ const jsonLd = [
   }
 
   .case__art {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 21 / 9;
+    max-height: 24rem;
   }
 
   .case__shot :global(img) {
@@ -455,6 +456,13 @@ const jsonLd = [
     padding-bottom: clamp(3rem, 6vw, 5rem);
   }
 
+  /* The heading starts where the prose column starts, past the contents column. */
+  @media (min-width: 1100px) {
+    .case__gallery-wrap > .section-title {
+      margin-left: 18rem;
+    }
+  }
+
   .case__gallery {
     display: grid;
     gap: 2rem 1.25rem;
@@ -469,6 +477,20 @@ const jsonLd = [
 
     .shot:first-child {
       grid-column: 1 / -1;
+    }
+
+    /* With a wide lead shot, an even count would leave the last shot alone: it runs wide too. */
+    .shot:nth-child(even):last-child {
+      grid-column: 1 / -1;
+    }
+
+    /* Four shots: the three details sit in one row under the lead. */
+    .case__gallery:has(.shot:nth-child(4):last-child) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .case__gallery:has(.shot:nth-child(4):last-child) .shot:nth-child(4) {
+      grid-column: auto;
     }
   }
 
@@ -519,6 +541,10 @@ const jsonLd = [
     .case__pager {
       grid-template-columns: 1fr 1fr;
     }
+  }
+
+  .case__pager > .pager:only-child {
+    grid-column: 1 / -1;
   }
 
   @media (max-width: 719px) {
