@@ -49,7 +49,7 @@ Every animation respects `prefers-reduced-motion` and the site's own "Reduce mot
 - **Hero scope** (`src/scripts/sonar-canvas.ts`): a 2D canvas with no libraries. The rings and ticks are drawn once to an offscreen layer, and the sweep is a single conic gradient. It's capped at 30 fps, mounts after the page is idle, pauses off-screen and in background tabs, shows a still frame under reduced motion, and skips animation on low-power devices.
 - **Scroll reveals**: CSS scroll-driven animations (`animation-timeline: view()`) where supported, with an IntersectionObserver fallback that staggers each visual row left to right. Nothing is hidden unless motion is allowed and the browser can bring it back.
 - **Entrances**: CSS only. The headline and lede never start invisible, which keeps Largest Contentful Paint fast.
-- **Decode effect** (`src/scripts/decode.ts`): characters resolve out of random glyphs. Used on the hero eyebrow.
+- **Decode effect** (`src/scripts/decode.ts`): characters resolve out of random glyphs. Used on the hero eyebrow and on the field notes, whose values start masked and decode as they scroll into view; a tap replays one. The label above each value never masks, so the card always says what the fact is about.
 
 ### Why no GSAP
 
