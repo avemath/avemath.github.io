@@ -51,6 +51,8 @@ How to add work and keep the site current, plus the rules every page follows.
 
 | What | Where |
 |---|---|
+| Portrait on About | drop a photo at `src/assets/portrait.jpg` (or .png/.webp), square, at least 800px. It replaces the scope automatically. |
+| "Off the clock" on About | `src/data/offclock.json` for the words. Photos go in `src/assets/offclock/`, named in each entry's `photo`, with an `alt`. Entries without a photo render as text cards. |
 | "Now" strip | `src/data/now.json` |
 | Experience, education, résumé | `src/data/experience.json` (the HTML résumé and PDF both read it) |
 | Skills | `src/data/skills.json` |

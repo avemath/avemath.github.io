@@ -1,0 +1,89 @@
+---
+// A fern frond drawn by a function at build time: a curved rachis, alternating pinnae that
+// taper toward the tip, and short pinnules along each one. Deterministic, so every build
+// draws the same plant. Stroke only, in the current color, so it sits quietly behind text.
+interface Props {
+  class?: string;
+  seed?: number;
+}
+
+const { class: className, seed = 11 } = Astro.props;
+
+let s = seed;
+const rand = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+type Pt = { x: number; y: number };
+const P0: Pt = { x: 150, y: 640 };
+const P1: Pt = { x: 180, y: 430 };
+const P2: Pt = { x: 300, y: 230 };
+const P3: Pt = { x: 300, y: 24 };
+
+const cubic = (t: number): Pt => {
+  const m = 1 - t;
+  return {
+    x: m * m * m * P0.x + 3 * m * m * t * P1.x + 3 * m * t * t * P2.x + t * t * t * P3.x,
+    y: m * m * m * P0.y + 3 * m * m * t * P1.y + 3 * m * t * t * P2.y + t * t * t * P3.y,
+  };
+};
+const cubicTangent = (t: number): Pt => {
+  const m = 1 - t;
+  return {
+    x: 3 * m * m * (P1.x - P0.x) + 6 * m * t * (P2.x - P1.x) + 3 * t * t * (P3.x - P2.x),
+    y: 3 * m * m * (P1.y - P0.y) + 6 * m * t * (P2.y - P1.y) + 3 * t * t * (P3.y - P2.y),
+  };
+};
+const quad = (a: Pt, c: Pt, b: Pt, u: number): Pt => {
+  const m = 1 - u;
+  return { x: m * m * a.x + 2 * m * u * c.x + u * u * b.x, y: m * m * a.y + 2 * m * u * c.y + u * u * b.y };
+};
+const quadTangent = (a: Pt, c: Pt, b: Pt, u: number): Pt => ({
+  x: 2 * (1 - u) * (c.x - a.x) + 2 * u * (b.x - c.x),
+  y: 2 * (1 - u) * (c.y - a.y) + 2 * u * (b.y - c.y),
+});
+const unit = (v: Pt): Pt => {
+  const l = Math.hypot(v.x, v.y) || 1;
+  return { x: v.x / l, y: v.y / l };
+};
+
+const rachis = `M ${P0.x} ${P0.y} C ${P1.x} ${P1.y}, ${P2.x} ${P2.y}, ${P3.x} ${P3.y}`;
+const pinnae: string[] = [];
+const pinnules: string[] = [];
+
+const count = 24;
+for (let i = 0; i < count; i++) {
+  const t = 0.07 + (i / (count - 1)) * 0.88;
+  const p = cubic(t);
+  const u = unit(cubicTangent(t));
+  const side = i % 2 === 0 ? 1 : -1;
+  const n = { x: -u.y * side, y: u.x * side };
+  // Longest a third of the way up, short at the base and the tip.
+  const length = 150 * Math.pow(Math.sin(Math.PI * Math.pow(t, 0.8)), 0.9) * (0.92 + rand() * 0.16);
+  // Lean toward the tip, a little more the higher up the frond.
+  const lean = 0.5 + t * 0.4;
+  const d = { x: n.x * Math.cos(lean) + u.x * Math.sin(lean), y: n.y * Math.cos(lean) + u.y * Math.sin(lean) };
+  const end = { x: p.x + d.x * length, y: p.y + d.y * length };
+  const ctrl = { x: p.x + d.x * length * 0.5 + u.x * length * 0.14, y: p.y + d.y * length * 0.5 + u.y * length * 0.14 };
+  pinnae.push(`M ${r1(p.x)} ${r1(p.y)} Q ${r1(ctrl.x)} ${r1(ctrl.y)} ${r1(end.x)} ${r1(end.y)}`);
+
+  // Pinnules alternate sides along the pinna, the way they do on a real frond.
+  const steps = Math.max(5, Math.round(length / 7));
+  for (let j = 1; j <= steps; j++) {
+    const v = j / (steps + 1);
+    const q = quad(p, ctrl, end, v);
+    const qt = unit(quadTangent(p, ctrl, end, v));
+    const pl = length * 0.2 * Math.sin(Math.PI * v) * (0.85 + rand() * 0.3);
+    const sd = j % 2 === 0 ? 1 : -1;
+    const pn = { x: -qt.y * sd, y: qt.x * sd };
+    const a = 0.55;
+    const e = { x: pn.x * Math.cos(a) + qt.x * Math.sin(a), y: pn.y * Math.cos(a) + qt.y * Math.sin(a) };
+    pinnules.push(`M ${r1(q.x)} ${r1(q.y)} l ${r1(e.x * pl)} ${r1(e.y * pl)}`);
+  }
+}
+---
+
+<svg class={className} viewBox="0 0 440 660" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+  <path d={rachis} stroke-width="1.4" />
+  <path d={pinnae.join(' ')} stroke-width="1" />
+  <path d={pinnules.join(' ')} stroke-width="0.7" stroke-opacity="0.7" />
+</svg>
