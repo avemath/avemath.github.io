@@ -37,13 +37,9 @@ client:
 
 ## Context
 
-Petro Land Ventures does title research, leasing and due diligence across the Appalachian, Gulf Coast, Permian and Michigan basins. Their clients are energy companies. But a lot of the people who find them are landowners and heirs holding a letter about minerals they didn't know they owned.
+A lot of the people who find Petro Land Ventures are landowners and heirs holding a letter about minerals they didn't know they owned. The firm's clients are energy companies. It does title research, leasing and due diligence across the Appalachian, Gulf Coast, Permian and Michigan basins.
 
 Those two visitors want completely different things. I also do contract land work for the firm, so I knew the questions both sides ask.
-
-## My role
-
-Everything: design, build, content structure, the editor, Cloudflare hosting and DNS. 119 commits from June to September 2026.
 
 ## Approach
 

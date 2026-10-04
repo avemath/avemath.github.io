@@ -25,18 +25,6 @@ const entries = [
     bullets: r.bullets,
     project: r.project,
   })),
-  ...experience.education.map((e) => ({
-    id: e.id,
-    kind: 'education',
-    when: e.expected ? `Expected ${formatMonth(e.end)}` : formatMonth(e.end),
-    sort: e.end,
-    start: '',
-    title: e.degree,
-    org: e.school,
-    summary: e.notes[0] ?? '',
-    bullets: e.notes.slice(1),
-    project: undefined as string | undefined,
-  })),
 ].sort((a, b) => b.sort.localeCompare(a.sort) || b.start.localeCompare(a.start));
 ---
 
@@ -45,12 +33,23 @@ const entries = [
     <div class="grid gap-10 lg:grid-cols-[18rem_1fr]">
       <div class="lg:sticky lg:top-28 lg:self-start">
         <p class="eyebrow">Experience</p>
-        <h2 id="experience-title" class="section-title">Where I've been working</h2>
-        <p class="section-lede text-base">Open any entry for the details. The full version lives on the résumé page.</p>
+        <h2 id="experience-title" class="section-title">Land agent since 2020, researcher since 2026</h2>
+        <p class="section-lede text-base">Open any entry for the details, or read the résumé.</p>
         <div class="mt-6 flex flex-wrap gap-3">
           <a class="btn btn--small" href="/resume/">Résumé <Icon name="arrow-right" /></a>
           <button type="button" class="btn btn--small" data-timeline-all aria-pressed="false">Expand all</button>
         </div>
+
+        <p class="label mt-8">Education</p>
+        <ul class="mt-2 space-y-2 text-sm text-soft">
+          {
+            experience.education.map((e) => (
+              <li>
+                {e.degree}, {e.school}, {e.expected ? `expected ${formatMonth(e.end)}` : formatMonth(e.end)}
+              </li>
+            ))
+          }
+        </ul>
       </div>
 
       <ol class="timeline" data-timeline>

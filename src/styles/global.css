@@ -81,6 +81,8 @@
   --accent: #0077a8;
   --accent-ink: #005f87;
   --accent-wash: rgb(0 119 168 / 0.1);
+  /* Stronger wash for staged backgrounds, which go flat on the pale light surface. */
+  --accent-wash-strong: rgb(0 119 168 / 0.18);
   --amber: #ffb547;
   --amber-ink: #8a5300;
   --on-amber: #1a1203;
@@ -105,6 +107,7 @@
   --accent: #3ddcff;
   --accent-ink: #7fe8ff;
   --accent-wash: rgb(61 220 255 / 0.1);
+  --accent-wash-strong: rgb(61 220 255 / 0.12);
   --amber: #ffb547;
   --amber-ink: #ffc670;
   --on-amber: #1a1203;
@@ -231,6 +234,11 @@
   border-top: 1px solid var(--line);
 }
 
+/* Supporting sections sit a size down from the main ones, so the page has a hierarchy of its own. */
+.section--tight {
+  padding-block: clamp(3rem, 6vw, 5rem);
+}
+
 .skip-link {
   position: absolute;
   left: 1rem;
@@ -295,6 +303,11 @@
   font-size: clamp(2rem, 4.5vw, 3.25rem);
   font-weight: 600;
   margin-top: 0.85rem;
+}
+
+.section-title--sm {
+  font-size: clamp(1.6rem, 2.8vw, 2.25rem);
+  margin-top: 0.65rem;
 }
 
 .section-lede {

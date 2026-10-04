@@ -42,7 +42,7 @@ How to add work and keep the site current, plus the rules every page follows.
    ---
    ```
 
-3. Write the body with these sections: **Context**, **My role**, **Approach**, **Outcome**, **What I'd do next**. Bold the first words of each approach paragraph.
+3. Write the body with these sections: **Context**, **Approach**, **Outcome**, **What I'd do next**. Add **My role** after Context only when there was a team and the split matters; for solo work, one sentence at the end of Context is enough (the role line in the frontmatter already shows in the header). Bold the first words of each approach paragraph.
 4. Screenshots: capture at 1440×900 for desktop and 390×844 for mobile with reduced motion on, then save them as PNG in `src/assets/projects/<slug>/`. Astro converts them to WebP at build time, so the source size doesn't matter.
 5. To feature it on the home page, add it to the `bento` list in `src/pages/index.astro`.
 6. Run `npm run verify`, then `npm run assets` to make its social card. Commit and push.
@@ -54,7 +54,7 @@ How to add work and keep the site current, plus the rules every page follows.
 | "Now" strip | `src/data/now.json` |
 | Experience, education, résumé | `src/data/experience.json` (the HTML résumé and PDF both read it) |
 | Skills | `src/data/skills.json` |
-| Field notes | `src/data/facts.json` (`{sites}` is counted automatically) |
+| Field notes | `src/data/facts.json` (six facts whose stories are not already told elsewhere on the home page; keep the count at six so the ledger rows stay full) |
 | Quotes | `src/data/testimonials.json` (only entries with `"approved": true` render) |
 | Email, socials, form key, analytics token | `src/data/site.json` |
 

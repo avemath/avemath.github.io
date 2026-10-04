@@ -49,7 +49,7 @@ Every animation respects `prefers-reduced-motion` and the site's own "Reduce mot
 - **Hero scope** (`src/scripts/sonar-canvas.ts`): a 2D canvas with no libraries. The rings and ticks are drawn once to an offscreen layer, and the sweep is a single conic gradient. It's capped at 30 fps, mounts after the page is idle, pauses off-screen and in background tabs, shows a still frame under reduced motion, and skips animation on low-power devices.
 - **Scroll reveals**: CSS scroll-driven animations (`animation-timeline: view()`) where supported, with an IntersectionObserver fallback that staggers each visual row left to right. Nothing is hidden unless motion is allowed and the browser can bring it back.
 - **Entrances**: CSS only. The headline and lede never start invisible, which keeps Largest Contentful Paint fast.
-- **Decode effect** (`src/scripts/decode.ts`): characters resolve out of random glyphs. Used on the hero eyebrow and the field note cards.
+- **Decode effect** (`src/scripts/decode.ts`): characters resolve out of random glyphs. Used on the hero eyebrow.
 
 ### Why no GSAP
 
@@ -66,7 +66,7 @@ The original plan used GSAP for the hero. In practice the only effect that neede
 | `BrowserFrame` | static screenshot with a URL bar, plus an optional phone shot. Client sites are never iframed |
 | `Timeline` | native `<details>`, so it works by keyboard with no JS. "Expand all" is a progressive extra |
 | `CommandPalette` | native `<dialog>` with a combobox and listbox. Ctrl K, Cmd K or `/` opens it, and a visible header button covers touch |
-| `FieldNotes` | each card decodes once as it scrolls into view, and a tap replays it. With no JS or reduced motion every fact is simply visible |
+| `FieldNotes` | static cards: a label, a number or short value, and the story behind it. Nothing to click, just the shared scroll reveal |
 | `Testimonials` | renders only quotes with `approved: true`, as a `figure` with `blockquote` and `figcaption` |
 | `ContactForm` | Web3Forms when a key is set, otherwise mailto. Honeypot, inline validation, live status |
 | `ProjectArt` | drawn SVG covers for projects without screenshots. Research art is abstract on purpose. Takes an `idPrefix` when the same art appears twice on a page, since pattern ids must be unique |

@@ -9,11 +9,8 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 <section id="websites" class="section home-section" aria-labelledby="websites-title" data-section="websites">
   <div class="wrap">
     <p class="eyebrow">Client work</p>
-    <h2 id="websites-title" class="section-title">Websites I've built</h2>
-    <p class="section-lede">
-      Every site below is live. I handle design, build, content structure and launch, and each owner can edit their own site
-      without calling me.
-    </p>
+    <h2 id="websites-title" class="section-title">Live sites their owners run themselves</h2>
+    <p class="section-lede">Each entry has what the business needed, what I did, and a few numbers. The case study has the rest.</p>
 
     <ol class="sites">
       {
@@ -45,11 +42,11 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
                 )}
               </div>
               <div class="mt-6 flex flex-wrap gap-3">
-                <a class="btn btn--small btn--primary" href={projectHref(p)}>
+                <a class="btn btn--small" href={projectHref(p)}>
                   Read the case study <Icon name="arrow-right" />
                 </a>
-                <a class="btn btn--small" href={p.data.links.live}>
-                  Visit {new URL(p.data.links.live!).host} <Icon name="arrow-up-right" />
+                <a class="link inline-flex items-center gap-1 text-sm" href={p.data.links.live}>
+                  Visit {new URL(p.data.links.live!).host} <Icon name="arrow-up-right" class="h-[0.9em] w-[0.9em]" />
                 </a>
               </div>
             </div>

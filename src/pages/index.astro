@@ -18,13 +18,15 @@ const projects = await getProjects();
 const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
 
 // Featured tiles. Size sets the bento span. Each audience gets its own order.
+// The client sites have their own section below, so the bento shows the nonprofit site once
+// and the engineering work, including the two projects with in-browser demos.
 const bento = [
-  { slug: 'because-of-adam', size: 'xl', order: { hire: 1, research: 3, website: 1 } },
-  { slug: 'onr-intelligent-data-management', size: 'lg', order: { hire: 2, research: 1, website: 6 } },
-  { slug: 'landspace', size: 'lg', order: { hire: 3, research: 4, website: 4 } },
-  { slug: 'rampage', size: 'lg', order: { hire: 4, research: 2, website: 5 } },
-  { slug: 'petro-land-ventures', size: 'lg', order: { hire: 5, research: 5, website: 2 } },
-  { slug: 'grace-mae-alterations', size: 'lg', order: { hire: 6, research: 6, website: 3 } },
+  { slug: 'because-of-adam', size: 'xl', order: { hire: 1, research: 4, website: 1 } },
+  { slug: 'onr-intelligent-data-management', size: 'lg', order: { hire: 2, research: 1, website: 4 } },
+  { slug: 'landspace', size: 'lg', order: { hire: 3, research: 5, website: 2 } },
+  { slug: 'rampage', size: 'lg', order: { hire: 4, research: 3, website: 3 } },
+  { slug: 'v2v-bsm-ofdm', size: 'lg', order: { hire: 5, research: 2, website: 5 } },
+  { slug: 'led-audio-spectrum', size: 'lg', order: { hire: 6, research: 6, website: 6 } },
 ] as const;
 ---
 
@@ -39,14 +41,18 @@ const bento = [
           <div class="flex flex-wrap items-end justify-between gap-6">
             <div>
               <p class="eyebrow">Featured work</p>
-              <h2 id="featured-title" class="section-title">Things I've built and shipped</h2>
+              <h2 id="featured-title" class="section-title">
+                <span class="aud aud--hire">A combat robot, a radio link, a title app and my family's nonprofit</span>
+                <span class="aud aud--research">A combat robot, a radio link, a title app and my family's nonprofit</span>
+                <span class="aud aud--website">A combat robot, a radio link, a title app and sponsored research</span>
+              </h2>
               <p class="section-lede">
-                <span class="aud aud--hire">Research, hardware, software and live websites. Every tile opens a case study with what I did and how.</span>
-                <span class="aud aud--research">Research and communications work first, then the engineering and software behind it.</span>
-                <span class="aud aud--website">Live client sites first. Every one was designed, built and launched by me.</span>
+                <span class="aud aud--hire">Every tile opens a case study with what I did and how.</span>
+                <span class="aud aud--research">Research and communications work first, then the engineering and software behind it. Two tiles open live demos.</span>
+                <span class="aud aud--website">After the client sites above, the engineering behind how I work. Every tile opens a case study.</span>
               </p>
             </div>
-            <a class="btn" href="/work/">All projects <Icon name="arrow-right" /></a>
+            <a class="btn" href="/work/">All work <Icon name="arrow-right" /></a>
           </div>
 
           <div class="bento">
@@ -79,10 +85,10 @@ const bento = [
           <div class="services-teaser card">
             <div>
               <p class="eyebrow">For clients</p>
-              <h2 id="services-title" class="section-title">Need a website?</h2>
+              <h2 id="services-title" class="section-title">A website you can run yourself</h2>
               <p class="section-lede">
-                I build fast, accessible websites for small businesses and nonprofits. You get a site you can be proud of, a clear
-                process, and a launch you don't have to worry about.
+                Five steps from the first conversation to the written guide, with a quote before I start and a preview link while I
+                build. The services page has the details and the questions people ask.
               </p>
               <div class="mt-8 flex flex-wrap gap-3">
                 <a class="btn btn--primary" href="/services/">See how I work <Icon name="arrow-right" /></a>
@@ -100,27 +106,16 @@ const bento = [
         </div>
       </section>
 
-      <section id="contact" class="section home-section" aria-labelledby="contact-title" data-section="contact">
+      <section id="contact" class="section section--tight home-section" aria-labelledby="contact-title" data-section="contact">
         <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.3fr]">
           <div>
             <p class="eyebrow">Contact</p>
-            <h2 id="contact-title" class="section-title">Send a note</h2>
+            <h2 id="contact-title" class="section-title section-title--sm">Send a note</h2>
             <p class="section-lede">Have a role, a research question or a website in mind? {site.replyTime}</p>
-            <ul class="mt-8 space-y-3">
-              <li>
-                <a class="link inline-flex items-center gap-2" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
-              </li>
-              <li>
-                <a class="link inline-flex items-center gap-2" href={site.socials.linkedin}><Icon name="linkedin" /> LinkedIn</a>
-              </li>
-              <li>
-                <a class="link inline-flex items-center gap-2" href={site.socials.github}><Icon name="github" /> GitHub</a>
-              </li>
-              <li class="inline-flex items-center gap-2 text-soft"><Icon name="pin" /> {site.location}</li>
-            </ul>
+            <p class="mt-6 inline-flex items-center gap-2 text-soft"><Icon name="pin" /> {site.location}. Happy to work remotely.</p>
           </div>
           <div class="card p-6 sm:p-8">
-            <ContactForm idPrefix="home" />
+            <ContactForm idPrefix="home" emailLine={false} />
           </div>
         </div>
       </section>
@@ -143,14 +138,40 @@ const bento = [
     border-top: 0;
   }
 
-  /* Audience ordering. Pure CSS, driven by the checked radio in the hero. */
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='research']) {
+  /* Audience ordering. Pure CSS, driven by the checked radio in the hero. Sections without a
+     rule keep their document order (websites, field notes, services); contact is always last. */
+
+  /* Hire: work, then experience, skills and the people who vouch for it, then research. */
+  .home:has(#aud-hire:checked) .home-flow > :global([data-section='featured']) {
+    order: -5;
+  }
+  .home:has(#aud-hire:checked) .home-flow > :global([data-section='experience']) {
+    order: -4;
+  }
+  .home:has(#aud-hire:checked) .home-flow > :global([data-section='skills']) {
     order: -3;
   }
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='featured']) {
+  .home:has(#aud-hire:checked) .home-flow > :global([data-section='recommendations']) {
     order: -2;
   }
+  .home:has(#aud-hire:checked) .home-flow > :global([data-section='research']) {
+    order: -1;
+  }
+
+  /* Research: the project first, then the work and the advisors, websites last. */
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='research']) {
+    order: -5;
+  }
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='featured']) {
+    order: -4;
+  }
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='recommendations']) {
+    order: -3;
+  }
   .home:has(#aud-research:checked) .home-flow > :global([data-section='experience']) {
+    order: -2;
+  }
+  .home:has(#aud-research:checked) .home-flow > :global([data-section='skills']) {
     order: -1;
   }
   .home:has(#aud-research:checked) .home-flow > :global([data-section='websites']) {
@@ -160,13 +181,20 @@ const bento = [
     order: 3;
   }
 
+  /* Website: the sites and how a project runs, then the rest of the work, research last. */
   .home:has(#aud-website:checked) .home-flow > :global([data-section='websites']) {
-    order: -3;
+    order: -5;
   }
   .home:has(#aud-website:checked) .home-flow > :global([data-section='services']) {
-    order: -2;
+    order: -4;
   }
   .home:has(#aud-website:checked) .home-flow > :global([data-section='featured']) {
+    order: -3;
+  }
+  .home:has(#aud-website:checked) .home-flow > :global([data-section='field-notes']) {
+    order: -2;
+  }
+  .home:has(#aud-website:checked) .home-flow > :global([data-section='recommendations']) {
     order: -1;
   }
   .home:has(#aud-website:checked) .home-flow > :global([data-section='research']) {
@@ -175,6 +203,24 @@ const bento = [
 
   .home-flow > :global([data-section='contact']) {
     order: 10;
+  }
+
+  /* In website mode the client sites already had their own section above, so the bento
+     drops them and the title app takes the wide slot. */
+  .home:has(#aud-website:checked) .bento > :global(.tile[data-tags~='client-site']) {
+    display: none;
+  }
+
+  @media (min-width: 720px) {
+    .home:has(#aud-website:checked) .bento > :global(.tile[data-tags~='software']) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .home:has(#aud-website:checked) .bento > :global(.tile[data-tags~='software']) {
+      grid-column: span 4;
+    }
   }
 
   /* Featured bento. */

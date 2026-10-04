@@ -15,9 +15,9 @@ const integer = await getEntry('projects', 'integer-internship');
         <p class="eyebrow">Research</p>
         <h2 id="research-title" class="section-title">Deciding what matters when the link is thin</h2>
         <p class="section-lede">
-          I'm a graduate research assistant at LSU on an Office of Naval Research project with Integer Technologies, advised by
-          Dr. Shuangqing Wei. The project builds decision-making tools that help distributed autonomous maritime systems, such as
-          underwater robots, decide which data matters and how to share it.
+          Distributed autonomous maritime systems, such as underwater robots, have to decide which data matters and how to share it.
+          The project builds the decision-making tools for that, and I work on the LSU side as a thesis-track M.S. student in
+          communications and signal processing.
         </p>
 
         <dl class="facts">
@@ -34,8 +34,8 @@ const integer = await getEntry('projects', 'integer-internship');
             <dd>Dr. Shuangqing Wei, LSU ECE</dd>
           </div>
           <div>
-            <dt class="label">My focus</dt>
-            <dd>Communications and signal processing</dd>
+            <dt class="label">Role</dt>
+            <dd>Graduate research assistant, since 2026</dd>
           </div>
         </dl>
 
@@ -46,13 +46,18 @@ const integer = await getEntry('projects', 'integer-internship');
             <a class="link" href={onr?.data.links.writeup}>public announcement</a>. Happy to talk about what I can.
           </span>
         </p>
+
+        <a class="btn btn--primary mt-6" href="/work/onr-intelligent-data-management/">
+          Read the case study <Icon name="arrow-right" />
+        </a>
       </div>
 
       <div class="research__panel card" data-reveal>
         <div class="research__art"><ProjectArt slug="onr-intelligent-data-management" idPrefix="research-" /></div>
+        <p class="label research__related">Related work</p>
         <ul class="research__list">
           {
-            [onr, integer, v2v].filter(Boolean).map((p) => (
+            [integer, v2v].filter(Boolean).map((p) => (
               <li>
                 <a href={`/work/${p!.id}/`} class="research__row">
                   <span>
@@ -73,7 +78,7 @@ const integer = await getEntry('projects', 'integer-internship');
 <style>
   .research {
     background:
-      radial-gradient(60rem 30rem at 85% 20%, var(--accent-wash), transparent 70%),
+      radial-gradient(60rem 30rem at 85% 20%, var(--accent-wash-strong), transparent 70%),
       var(--bg);
   }
 
@@ -114,6 +119,10 @@ const integer = await getEntry('projects', 'integer-internship');
   .research__art {
     aspect-ratio: 16 / 9;
     border-bottom: 1px solid var(--line);
+  }
+
+  .research__related {
+    padding: 0.9rem 1.35rem 0;
   }
 
   .research__list li + li {
