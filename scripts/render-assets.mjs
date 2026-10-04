@@ -44,7 +44,7 @@ for (const f of (await readdir('src/content/projects')).filter((f) => f.endsWith
   projects.push({ id: f.replace(/\.md$/, ''), title: field('title'), type: LABELS[field('type')] ?? '', summary: field('summary') });
 }
 const cards = [
-  { file: 'default', eyebrow: 'Baton Rouge, LA · M.S. ECE @ LSU', title: 'Avery Matherne', sub: 'Communication systems for naval research. Websites people enjoy using.' },
+  { file: 'default', eyebrow: 'Baton Rouge, LA · M.S. ECE @ LSU', title: 'Avery Matherne', sub: 'Communication systems research. Websites people enjoy using.' },
   ...projects.map((p) => ({ file: p.id, eyebrow: p.type, title: p.title, sub: p.summary })),
 ];
 

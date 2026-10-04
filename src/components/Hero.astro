@@ -18,11 +18,9 @@ import site from '@/data/site.json';
         <span data-primary-cta-label>See my work</span>
         <Icon name="arrow-right" />
       </a>
-      <a class="btn" href={site.resumePdf} download>
-        <Icon name="download" />
-        Download résumé
+      <a class="btn" href="/resume/" data-secondary-cta>
+        <span data-secondary-cta-label>Résumé</span>
       </a>
-      <a class="hero__textlink link" href="/services/">Need a website?</a>
     </div>
 
     <div data-hero-switcher>
@@ -110,10 +108,6 @@ import site from '@/data/site.json';
     margin-top: 2.25rem;
   }
 
-  .hero__textlink {
-    font-size: 0.95rem;
-    margin-left: 0.25rem;
-  }
 
   /* Entrance: CSS only, so nothing waits on JavaScript. The headline and line
      never start invisible, which keeps Largest Contentful Paint fast. */

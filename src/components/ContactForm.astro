@@ -4,9 +4,11 @@ import site from '@/data/site.json';
 
 interface Props {
   idPrefix?: string;
+  // The "or email me directly" line under the button; off where the address is already beside the form.
+  emailLine?: boolean;
 }
 
-const { idPrefix = 'cf' } = Astro.props;
+const { idPrefix = 'cf', emailLine = true } = Astro.props;
 const id = (name: string) => `${idPrefix}-${name}`;
 const hasKey = Boolean(site.web3formsKey);
 const topics = ['Job or internship', 'Research', 'Website project', 'Something else'];
@@ -81,9 +83,13 @@ const topics = ['Job or internship', 'Research', 'Website project', 'Something e
       <span data-submit-label>Send message</span>
       <Icon name="arrow-right" />
     </button>
-    <p class="text-sm text-muted">
-      Or email me directly at <a class="link" href={`mailto:${site.email}`}>{site.email}</a>.
-    </p>
+    {
+      emailLine && (
+        <p class="text-sm text-muted">
+          Or email me directly at <a class="link" href={`mailto:${site.email}`}>{site.email}</a>.
+        </p>
+      )
+    }
   </div>
 
   <div class="cform__status" role="status" aria-live="polite" data-status></div>
@@ -264,8 +270,24 @@ const topics = ['Job or internship', 'Research', 'Website project', 'Something e
       const t = form.querySelector<HTMLInputElement>('input[name="topic"]:checked')?.value ?? '';
       hint.textContent = hints[t] ?? hints['Something else'];
     };
-    form.querySelectorAll('input[name="topic"]').forEach((r) => r.addEventListener('change', syncHint));
-    syncHint();
+    form.querySelectorAll('input[name="topic"]').forEach((r) =>
+      r.addEventListener('change', () => {
+        form.dataset.touched = '';
+        syncHint();
+      }),
+    );
+
+    // On the home page, follow the audience the visitor picked in the hero until they choose a topic themselves.
+    const byAudience: Record<string, string> = { hire: 'Job or internship', research: 'Research', website: 'Website project' };
+    const followAudience = () => {
+      if ((preset && map[preset]) || form.dataset.touched !== undefined) return;
+      const aud = document.documentElement.dataset.audience ?? new URLSearchParams(location.search).get('for') ?? '';
+      const radio = byAudience[aud] ? form.querySelector<HTMLInputElement>(`[data-topic="${byAudience[aud]}"]`) : null;
+      if (radio) radio.checked = true;
+      syncHint();
+    };
+    followAudience();
+    document.querySelectorAll('input[name="audience"]').forEach((r) => r.addEventListener('change', followAudience));
 
     if (new URLSearchParams(location.search).get('sent') === '1') {
       status.dataset.kind = 'ok';

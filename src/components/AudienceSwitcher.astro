@@ -127,15 +127,18 @@ const options = [
 </style>
 
 <script>
-  const notes: Record<string, { cta: string; href: string; status: string }> = {
-    hire: { cta: 'See my work', href: '#featured', status: 'Showing engineering work and experience first.' },
-    research: { cta: 'See my research', href: '#research', status: 'Showing research and communications work first.' },
-    website: { cta: "See sites I've built", href: '#websites', status: "Showing websites I've built and how I work first." },
+  type Note = { cta: string; href: string; second: { label: string; href: string }; status: string };
+  const notes: Record<string, Note> = {
+    hire: { cta: 'See my work', href: '#featured', second: { label: 'Résumé', href: '/resume/' }, status: 'Showing engineering work and experience first.' },
+    research: { cta: 'See my research', href: '#research', second: { label: 'Résumé', href: '/resume/' }, status: 'Showing research and communications work first.' },
+    website: { cta: "See sites I've built", href: '#websites', second: { label: 'How I work', href: '/services/' }, status: "Showing websites I've built and how I work first." },
   };
 
   const radios = [...document.querySelectorAll<HTMLInputElement>('input[name="audience"]')];
   const cta = document.querySelector<HTMLAnchorElement>('[data-primary-cta]');
   const ctaLabel = document.querySelector<HTMLElement>('[data-primary-cta-label]');
+  const second = document.querySelector<HTMLAnchorElement>('[data-secondary-cta]');
+  const secondLabel = document.querySelector<HTMLElement>('[data-secondary-cta-label]');
   const status = document.querySelector<HTMLElement>('[data-audience-status]');
 
   function apply(value: string, announce: boolean) {
@@ -143,6 +146,10 @@ const options = [
     if (cta && ctaLabel) {
       cta.href = n.href;
       ctaLabel.textContent = n.cta;
+    }
+    if (second && secondLabel) {
+      second.href = n.second.href;
+      secondLabel.textContent = n.second.label;
     }
     document.documentElement.dataset.audience = value;
     if (announce && status) status.textContent = n.status;

@@ -8,7 +8,7 @@ order: 5
 period: { start: "2026-04", end: "2026-09" }
 status: live
 summary: A bridal alterations studio site with interactive guides that explain bustles and hems better than words can, and inquiry forms that arrive ready to quote.
-outcome: 100 accessibility score, 16 automated test suites, and about 435 fields the owner can edit.
+outcome: Lighthouse 100 for accessibility and SEO, inquiries that arrive ready to quote, and about 435 fields the owner edits herself.
 role: Design, build, CMS, email, testing and launch.
 keywords: ["bridal", "sewing", "alterations", "Pittsburgh", "Sanity", "Next.js", "bustle"]
 stack: [Next.js, React, TypeScript, Sanity, Tailwind CSS, Framer Motion, Resend, Playwright, Vercel]
@@ -24,8 +24,8 @@ gallery:
     caption: The bustle explorer. Pick a style and a train, then press "Bustle it" to watch the pickup points travel.
 metrics:
   - { label: Lighthouse accessibility, value: "100" }
-  - { label: Lighthouse SEO, value: "100" }
-  - { label: Test specs, value: "16" }
+  - { label: Commits, value: "106" }
+  - { label: Fields the owner edits, value: "~435" }
 client:
   name: Grace Mae Alterations
   kind: Bridal and tailoring studio, Pittsburgh, PA
@@ -34,11 +34,7 @@ client:
 
 ## Context
 
-My sister Grace is a formally trained designer and a former lead alterations specialist at David's Bridal, now running her own studio in Pittsburgh. The site had three jobs: explain bustles, timelines and fittings to brides before they walk in; collect inquiries with the details Grace needs to quote; and let her switch bridal booking between open and waitlist herself.
-
-## My role
-
-Design, build, content model, CMS, transactional email, testing and launch. 106 commits from April to September 2026.
+The site had three jobs: explain bustles, timelines and fittings to brides before they walk in; collect inquiries with the details Grace needs to quote; and let her switch bridal booking between open and waitlist herself. Grace is my sister, a formally trained designer and a former lead alterations specialist at David's Bridal, now running her own studio in Pittsburgh.
 
 ## Approach
 

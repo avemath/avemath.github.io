@@ -8,7 +8,7 @@ order: 9
 period: { start: "2026-01", end: "2026-05" }
 status: complete
 summary: Two cars' safety messages sent through an 802.11p-style OFDM radio link I built in MATLAB and ran over real software-defined radios, ending in a time-to-collision brake warning.
-outcome: Went past a research assignment to a working radio link on hardware.
+outcome: The assignment asked for a report. We turned in a working radio link on two SDRs, with every receiver stage visible and checkable.
 role: Co-author with Jason Phan. Final project for EE 4003, Communications Engineering Design.
 team: Jason Phan
 seoDescription: "An 802.11p-style OFDM link built in MATLAB and run over two ADALM-PLUTO radios, carrying two cars' safety messages to a time-to-collision brake warning."
