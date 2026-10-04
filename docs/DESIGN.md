@@ -2,7 +2,7 @@
 
 Naval acoustics meets interface craft, written up in a field notebook. Sonar motifs, thin lines and crisp engineering labels, so the research side and the design side read as one person. The bento grid comes from a "blueprint" direction, and the About page borrows topographic contour lines as a nod to land work.
 
-The light theme is warm paper with a hint of sage rather than blue-white, and both themes carry a leaf green for living things: the live-site dots, the contour lines on the About page, and the fern in the footer. The fern (`src/components/Frond.astro`) is drawn by a function at build time, stroke only, so the nod to nature is made with the same tools as the rest of the site.
+The light theme is warm cream paper rather than blue-white, with no green cast of its own: the page is paper, and the plants are green. Both themes carry a leaf green for living things only: the live-site dots, the contour lines on the About page, and the fern in the footer. The fern (`src/components/Frond.astro`) is drawn by a function at build time, stroke only, so the nod to nature is made with the same tools as the rest of the site.
 
 The live reference is `/styleguide/` (not linked or indexed). Toggle the theme to check both palettes.
 
@@ -12,12 +12,12 @@ Tokens live in `src/styles/global.css` as CSS variables, redefined under `[data-
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | `#f3f4ee` (paper) | `#0b1220` (abyss navy) | page |
-| `--surface` | `#fbfbf8` | `#111a2e` | cards |
-| `--surface-2` | `#ebeee4` | `#17223a` | wells, frames |
-| `--text` | `#141a16` | `#e6edf7` | headings, body |
-| `--text-soft` | `#3a463f` | `#c3cfe2` | long-form body |
-| `--muted` | `#55635a` | `#8a9bb8` | labels, meta |
+| `--bg` | `#f5f3ee` (paper) | `#0b1220` (abyss navy) | page |
+| `--surface` | `#fcfbf8` | `#111a2e` | cards |
+| `--surface-2` | `#edebe4` | `#17223a` | wells, frames |
+| `--text` | `#1a1a16` | `#e6edf7` | headings, body |
+| `--text-soft` | `#45463f` | `#c3cfe2` | long-form body |
+| `--muted` | `#5d5e56` | `#8a9bb8` | labels, meta |
 | `--accent` | `#056f88` (teal) | `#3ddcff` (sonar cyan) | lines, focus, active states |
 | `--accent-ink` | `#045c71` | `#7fe8ff` | accent-colored text |
 | `--leaf` | `#4a7c59` (moss) | `#8fd19e` | fern, contours, decoration |
@@ -29,10 +29,10 @@ Tokens live in `src/styles/global.css` as CSS variables, redefined under `[data-
 
 | Pair | Light | Dark |
 |---|---|---|
-| text on bg | 16.0 | 15.9 |
-| text-soft on bg | 8.9 | 11.9 |
-| muted on bg | 5.7 | 6.7 |
-| muted on surface-2 | 5.4 | 5.6 |
+| text on bg | 15.7 | 15.9 |
+| text-soft on bg | 8.6 | 11.9 |
+| muted on bg | 5.9 | 6.7 |
+| muted on surface-2 | 5.5 | 5.6 |
 | accent-ink on bg | 6.8 | 13.3 |
 | accent on bg | 5.2 | 11.5 |
 | leaf-ink on bg | 6.8 | 12.4 |

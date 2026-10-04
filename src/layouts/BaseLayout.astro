@@ -47,7 +47,7 @@ const { bare = false, ...seo } = Astro.props;
         d.dataset.theme = theme;
         if (motion === 'reduce') d.dataset.motion = 'reduce';
         var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#f3f4ee');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#f5f3ee');
       })();
     </script>
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
