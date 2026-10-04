@@ -5,11 +5,13 @@ type: engineering
 tags: [engineering, research]
 featured: false
 order: 8
-period: { start: "2026", end: "2026-08" }
+period: { start: "2026-05", end: "2026-08" }
 status: complete
 summary: Acoustic characterization and underwater network simulation in support of autonomous maritime systems.
 outcome: Internship completed August 2026.
 role: Engineering intern on the Baton Rouge team.
+seoTitle: "Integer Technologies internship"
+keywords: ["internship", "intern", "acoustics", "underwater", "network simulation"]
 stack: [Acoustic measurement, Network simulation, Data analysis]
 links:
   writeup: https://www.integer-tech.com

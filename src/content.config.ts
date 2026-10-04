@@ -47,6 +47,12 @@ const projects = defineCollection({
           permission: z.boolean().default(false),
         })
         .optional(),
+      // Overrides for the <title> and meta description when the title or summary runs long.
+      // Search results cut titles near 60 characters, and the site name suffix takes 17 of them.
+      seoTitle: z.string().max(43).optional(),
+      seoDescription: z.string().max(160).optional(),
+      // Extra search terms for the command palette.
+      keywords: z.array(z.string()).default([]),
       // Which interactive demo to mount on the case study page, if any.
       demo: z.enum(['spectrum', 'weapon-logic', 'ofdm']).optional(),
       draft: z.boolean().default(false),

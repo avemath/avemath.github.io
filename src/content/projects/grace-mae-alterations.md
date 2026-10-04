@@ -10,6 +10,7 @@ status: live
 summary: A bridal alterations studio site with interactive guides that explain bustles and hems better than words can, and inquiry forms that arrive ready to quote.
 outcome: 100 accessibility score, 16 automated test suites, and about 435 fields the owner can edit.
 role: Design, build, CMS, email, testing and launch.
+keywords: ["bridal", "sewing", "alterations", "Pittsburgh", "Sanity", "Next.js", "bustle"]
 stack: [Next.js, React, TypeScript, Sanity, Tailwind CSS, Framer Motion, Resend, Playwright, Vercel]
 links:
   live: https://gracemaealterations.com

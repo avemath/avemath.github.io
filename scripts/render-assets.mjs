@@ -1,44 +1,33 @@
 // Renders the files that come from the site itself:
-//   public/resume/Avery-Matherne-Resume.pdf  printed from /resume/
+//   public/resume/Avery-Matherne-Resume.pdf  printed from /resume/ (tagged, one page)
 //   public/og/*.png                           1200x630 social cards
 //   public/apple-touch-icon.png
+//   public/favicon.ico                        16 and 32 px, for browsers and tools that skip SVG icons
 //
 // Run after a build: `npm run build && npm run assets`. Commit the output.
-// Needs Playwright's Chromium (`npx playwright install chromium`).
-import { createServer } from 'node:http';
+// Needs Playwright's Chromium (`npx playwright install chromium`), or set CHROMIUM_PATH to a Chromium binary.
 import { readFile, writeFile, readdir, mkdir, rm } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { join } from 'node:path';
 import { chromium } from 'playwright';
+import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const DIST = 'dist';
-const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.json': 'application/json' };
-
-const server = createServer(async (req, res) => {
-  let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-  if (path.endsWith('/')) path += 'index.html';
-  try {
-    const body = await readFile(join(DIST, path));
-    res.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'application/octet-stream' });
-    res.end(body);
-  } catch {
-    res.writeHead(404).end();
-  }
-}).listen(0);
-const base = `http://127.0.0.1:${server.address().port}`;
+const { server, base } = serveDist(DIST);
 
 const fonts = await readdir(join(DIST, '_astro'));
 const font = (prefix) => `/_astro/${fonts.find((f) => f.startsWith(prefix) && f.endsWith('.woff2'))}`;
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 
 // ---- Résumé PDF ----
 {
   const page = await browser.newPage({ colorScheme: 'light' });
+  await page.route(...localOnly(base));
   await page.goto(`${base}/resume/`, { waitUntil: 'networkidle' });
   await page.emulateMedia({ media: 'print' });
   await page.evaluate(() => document.fonts.ready);
   await mkdir('public/resume', { recursive: true });
-  const pdf = await page.pdf({ format: 'Letter', printBackground: false, preferCSSPageSize: true });
+  const pdf = await page.pdf({ format: 'Letter', printBackground: false, preferCSSPageSize: true, tagged: true });
   await writeFile('public/resume/Avery-Matherne-Resume.pdf', pdf);
   const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) ?? []).length;
   console.log(`résumé PDF: ${(pdf.length / 1024).toFixed(0)} KB, ${pages} page(s)`);
@@ -98,6 +87,36 @@ await page.setViewportSize({ width: 180, height: 180 });
 await page.setContent(`<body style="margin:0;background:#0b1220"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
 await page.waitForTimeout(200);
 await page.screenshot({ path: 'public/apple-touch-icon.png' });
+
+// ---- favicon.ico: 16 and 32 px PNGs in one container ----
+const icons = [];
+for (const size of [16, 32]) {
+  await page.setViewportSize({ width: size, height: size });
+  await page.setContent(`<body style="margin:0;background:transparent"><img src="${base}/favicon.svg" style="width:${size}px;height:${size}px;display:block"></body>`);
+  await page.waitForTimeout(100);
+  icons.push({ size, png: await page.screenshot({ omitBackground: true }) });
+}
+await writeFile('public/favicon.ico', ico(icons));
+
+function ico(images) {
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(images.length, 4);
+  let offset = 6 + 16 * images.length;
+  const entries = images.map(({ size, png }) => {
+    const e = Buffer.alloc(16);
+    e[0] = size % 256; // width (0 means 256)
+    e[1] = size % 256; // height
+    e.writeUInt16LE(1, 4); // color planes
+    e.writeUInt16LE(32, 6); // bits per pixel
+    e.writeUInt32LE(png.length, 8);
+    e.writeUInt32LE(offset, 12);
+    offset += png.length;
+    return e;
+  });
+  return Buffer.concat([header, ...entries, ...images.map((i) => i.png)]);
+}
 
 await rm(join(DIST, '__og.html'), { force: true });
 await browser.close();

@@ -11,6 +11,8 @@ summary: Two cars' safety messages sent through an 802.11p-style OFDM radio link
 outcome: Went past a research assignment to a working radio link on hardware.
 role: Co-author with Jason Phan. Final project for EE 4003, Communications Engineering Design.
 team: Jason Phan
+seoDescription: "An 802.11p-style OFDM link built in MATLAB and run over two ADALM-PLUTO radios, carrying two cars' safety messages to a time-to-collision brake warning."
+keywords: ["radio", "SDR", "software-defined radio", "wireless", "802.11p", "cars", "vehicles", "MATLAB", "Viterbi", "Costas loop"]
 stack: [MATLAB, Communications Toolbox, ADALM-PLUTO SDR, OFDM, Viterbi decoding]
 links:
   repo: https://github.com/avemath/v2v-bsm-ofdm

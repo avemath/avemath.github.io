@@ -128,4 +128,12 @@ const host = url ? new URL(url).host.replace(/^www\./, '') : '';
     object-position: top;
     border-radius: 0.85rem;
   }
+
+  /* On phones the frame sits inside the page gutter, so the phone tucks in instead of poking past the edge. */
+  @media (max-width: 640px) {
+    .frame__phone {
+      right: 0.25rem;
+      bottom: -1rem;
+    }
+  }
 </style>

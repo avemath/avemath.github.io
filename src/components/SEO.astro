@@ -10,8 +10,18 @@ interface Props {
   jsonLd?: Record<string, unknown>[];
 }
 
-const { title, description = site.description, image = '/og/default.png', type = 'website', noindex = false, jsonLd = [] } =
-  Astro.props;
+const {
+  title,
+  description: rawDescription = site.description,
+  image = '/og/default.png',
+  type = 'website',
+  noindex = false,
+  jsonLd = [],
+} = Astro.props;
+
+// Search results cut descriptions near 160 characters, so clamp at a word boundary.
+const clamp = (text: string, max = 160) => (text.length <= max ? text : `${text.slice(0, max - 1).replace(/\s+\S*$/, '')}…`);
+const description = clamp(rawDescription);
 
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | Engineer and Web Designer`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
