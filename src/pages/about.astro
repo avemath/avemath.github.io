@@ -1,10 +1,21 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
 import NowStrip from '@/components/NowStrip.astro';
 import site from '@/data/site.json';
+import offclock from '@/data/offclock.json';
 
-// Topographic contour texture: a nod to land work and Louisiana waterways.
+// A real portrait replaces the scope the moment a file named portrait.* lands in src/assets.
+const portraitFiles = import.meta.glob<{ default: ImageMetadata }>('/src/assets/portrait.{jpg,jpeg,png,webp}', { eager: true });
+const portrait = Object.values(portraitFiles)[0]?.default;
+
+// Off-the-clock photos are optional; entries without one render as text cards.
+const offclockFiles = import.meta.glob<{ default: ImageMetadata }>('/src/assets/offclock/*.{jpg,jpeg,png,webp}', { eager: true });
+const offclockPhoto = (name: string) => (name ? Object.entries(offclockFiles).find(([p]) => p.endsWith(`/${name}`))?.[1].default : undefined);
+
+// Topographic contour texture: a nod to land work and Louisiana waterways. Leaf green on the paper theme.
 const contours = Array.from({ length: 14 }, (_, i) => {
   let d = '';
   for (let x = -20; x <= 1220; x += 30) {
@@ -34,18 +45,27 @@ const principles = [
         <p class="section-lede">
           I'm Ave. I'm a computer engineer and graduate researcher at LSU, I design and build websites, I do ownership research as a land agent, and
           I co-founded a drowning awareness nonprofit with my family. It sounds like a lot of different things. It's mostly the same thing:
-          figuring out how something really works, then building it so other people can rely on it.
+          figuring out how something really works, then building it so other people can rely on it. Away from a desk I'm outside, usually
+          around plants.
         </p>
       </div>
-      <div class="portrait" aria-hidden="true">
-        <svg viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="96" />
-          <circle cx="100" cy="100" r="70" />
-          <circle cx="100" cy="100" r="44" />
-          <path d="M100 100 L168 32" class="portrait__sweep" />
-          <text x="100" y="112" text-anchor="middle">AM</text>
-        </svg>
-      </div>
+      {
+        portrait ? (
+          <div class="portrait portrait--photo">
+            <Image src={portrait} alt={site.name} widths={[320, 480, 640]} sizes="(min-width: 960px) 16rem, 60vw" format="webp" quality={82} />
+          </div>
+        ) : (
+          <div class="portrait" aria-hidden="true">
+            <svg viewBox="0 0 200 200">
+              <circle cx="100" cy="100" r="96" />
+              <circle cx="100" cy="100" r="70" />
+              <circle cx="100" cy="100" r="44" />
+              <path d="M100 100 L168 32" class="portrait__sweep" />
+              <text x="100" y="112" text-anchor="middle">AM</text>
+            </svg>
+          </div>
+        )
+      }
     </div>
   </section>
 
@@ -95,6 +115,35 @@ const principles = [
     </div>
   </section>
 
+  <section id="off-the-clock" class="section section--tight" aria-labelledby="offclock-title">
+    <div class="wrap">
+      <p class="eyebrow">Off the clock</p>
+      <h2 id="offclock-title" class="section-title section-title--sm">When I'm not building something</h2>
+      <p class="section-lede">The parts of me that don't show up on a résumé.</p>
+      <ul class="offclock">
+        {
+          offclock.map((o) => {
+            const photo = offclockPhoto(o.photo);
+            return (
+              <li class="offclock__item card" data-reveal>
+                {photo && (
+                  <div class="offclock__photo">
+                    <Image src={photo} alt={o.alt} widths={[480, 720, 960]} sizes="(min-width: 960px) 24rem, 100vw" format="webp" quality={80} />
+                  </div>
+                )}
+                <div class="offclock__body">
+                  <p class="label">{o.label}</p>
+                  <h3 class="offclock__title">{o.title}</h3>
+                  <p class="offclock__text">{o.text}</p>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </section>
+
   <section class="section">
     <div class="wrap">
       <p class="eyebrow">How I work</p>
@@ -131,8 +180,11 @@ const principles = [
 </BaseLayout>
 
 <style>
+  /* isolation keeps the z-index: -1 contours inside this box; without it they fall behind
+     the body background and never paint. */
   .about-hero {
     position: relative;
+    isolation: isolate;
     overflow: hidden;
     padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 5rem);
   }
@@ -150,14 +202,13 @@ const principles = [
 
   .contours path {
     fill: none;
-    stroke: var(--accent);
-    stroke-opacity: calc(0.14 + var(--i) * 0.03);
+    stroke: var(--leaf);
+    stroke-opacity: calc(0.09 + var(--i) * 0.02);
     stroke-width: 1;
   }
 
   :global(:root:not([data-theme='dark'])) .contours path {
-    stroke: var(--line-strong);
-    stroke-opacity: calc(0.45 + var(--i) * 0.03);
+    stroke-opacity: calc(0.16 + var(--i) * 0.025);
   }
 
   .about-hero__inner {
@@ -192,6 +243,64 @@ const principles = [
   .portrait svg {
     width: 100%;
     height: 100%;
+  }
+
+  /* With a photo, the ring becomes a frame: the image fills the circle and the wash stays behind it. */
+  .portrait--photo {
+    padding: 0.5rem;
+    background: radial-gradient(circle, var(--accent-wash), transparent 72%);
+  }
+
+  .portrait--photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+  }
+
+  .offclock {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+
+  .offclock__item {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .offclock__photo {
+    aspect-ratio: 4 / 3;
+    background: var(--surface-2);
+  }
+
+  .offclock__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .offclock__body {
+    padding: 1.35rem 1.4rem 1.5rem;
+  }
+
+  .offclock__title {
+    margin-top: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .offclock__text {
+    margin-top: 0.5rem;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    line-height: 1.6;
   }
 
   .portrait circle {

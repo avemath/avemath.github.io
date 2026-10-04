@@ -1,11 +1,13 @@
 ---
 import Icon from './Icon.astro';
+import Frond from './Frond.astro';
 import site from '@/data/site.json';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer no-print">
+  <Frond class="site-footer__frond" />
   <div class="wrap grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
     <div>
       <p class="font-display text-2xl font-semibold tracking-tight">Have something in mind?</p>
@@ -53,7 +55,7 @@ const year = new Date().getFullYear();
     </div>
   </div>
 
-  <div class="border-t border-line">
+  <div class="site-footer__bar border-t border-line">
     <div class="wrap flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
       <p>© <span data-year>{year}</span> {site.name} · {site.location}</p>
       <script is:inline>
@@ -70,8 +72,44 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     border-top: 1px solid var(--line);
     background: var(--bg-deep);
+  }
+
+  /* A fern, drawn by a function, growing up the right edge behind the columns. The SVG is
+     rendered by Frond.astro, so it sits outside this component's style scope. */
+  .site-footer :global(.site-footer__frond) {
+    position: absolute;
+    right: clamp(-3rem, -1vw, -1rem);
+    bottom: -0.5rem;
+    z-index: -1;
+    height: min(34rem, 115%);
+    width: auto;
+    color: var(--leaf);
+    opacity: 0.55;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 45%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 45%);
+  }
+
+  :global([data-theme='dark']) .site-footer :global(.site-footer__frond) {
+    opacity: 0.45;
+  }
+
+  /* The bottom bar sits over the stem, so a translucent background keeps the small print clear. */
+  .site-footer__bar {
+    background: color-mix(in oklab, var(--bg-deep) 72%, transparent);
+  }
+
+  @media (max-width: 767px) {
+    .site-footer :global(.site-footer__frond) {
+      height: 22rem;
+      right: -4rem;
+      opacity: 0.35;
+    }
   }
 
   .footer-link {

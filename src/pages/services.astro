@@ -182,10 +182,17 @@ const faqLd = {
 </BaseLayout>
 
 <style>
+  /* The amber wash goes brown over navy, so dark gets a lighter hand. */
   .svc-hero {
+    --amber-wash: color-mix(in oklab, var(--amber) 14%, transparent);
     background:
-      radial-gradient(50rem 24rem at 90% 0%, color-mix(in oklab, var(--amber) 14%, transparent), transparent 70%),
+      radial-gradient(50rem 24rem at 90% 0%, var(--amber-wash), transparent 70%),
       radial-gradient(40rem 20rem at 0% 100%, var(--accent-wash), transparent 70%);
+  }
+
+  :global([data-theme='dark']) .svc-hero,
+  :global([data-theme='dark']) .svc-cta {
+    --amber-wash: color-mix(in oklab, var(--amber) 6%, transparent);
   }
 
   .svc-title {
@@ -339,8 +346,9 @@ const faqLd = {
     justify-content: space-between;
     gap: 1.5rem;
     padding: clamp(1.5rem, 4vw, 3rem);
+    --amber-wash: color-mix(in oklab, var(--amber) 14%, transparent);
     background:
-      radial-gradient(40rem 20rem at 100% 0%, color-mix(in oklab, var(--amber) 14%, transparent), transparent 70%),
+      radial-gradient(40rem 20rem at 100% 0%, var(--amber-wash), transparent 70%),
       var(--surface);
   }
 </style>

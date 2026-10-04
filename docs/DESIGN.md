@@ -1,6 +1,8 @@
 # Design system: Signal
 
-Naval acoustics meets interface craft. A deep-ocean UI with sonar motifs, thin lines and crisp engineering labels, so the research side and the design side read as one person. The bento grid comes from a "blueprint" direction, and the About page borrows topographic contour lines as a nod to land work.
+Naval acoustics meets interface craft, written up in a field notebook. Sonar motifs, thin lines and crisp engineering labels, so the research side and the design side read as one person. The bento grid comes from a "blueprint" direction, and the About page borrows topographic contour lines as a nod to land work.
+
+The light theme is warm cream paper rather than blue-white, with no green cast of its own: the page is paper, and the plants are green. Both themes carry a leaf green for living things only: the live-site dots, the contour lines on the About page, and the fern in the footer. The fern (`src/components/Frond.astro`) is drawn by a function at build time, stroke only, so the nod to nature is made with the same tools as the rest of the site.
 
 The live reference is `/styleguide/` (not linked or indexed). Toggle the theme to check both palettes.
 
@@ -10,29 +12,34 @@ Tokens live in `src/styles/global.css` as CSS variables, redefined under `[data-
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | `#f6f8fb` | `#0b1220` (abyss navy) | page |
-| `--surface` | `#ffffff` | `#111a2e` | cards |
-| `--surface-2` | `#eef2f8` | `#17223a` | wells, frames |
-| `--text` | `#0b1220` | `#e6edf7` | headings, body |
-| `--text-soft` | `#34425c` | `#c3cfe2` | long-form body |
-| `--muted` | `#4f5e79` | `#8a9bb8` | labels, meta |
-| `--accent` | `#0077a8` | `#3ddcff` (sonar cyan) | lines, focus, active states |
-| `--accent-ink` | `#005f87` | `#7fe8ff` | accent-colored text |
+| `--bg` | `#f5f3ee` (paper) | `#0b1220` (abyss navy) | page |
+| `--surface` | `#fcfbf8` | `#111a2e` | cards |
+| `--surface-2` | `#edebe4` | `#17223a` | wells, frames |
+| `--text` | `#1a1a16` | `#e6edf7` | headings, body |
+| `--text-soft` | `#45463f` | `#c3cfe2` | long-form body |
+| `--muted` | `#5d5e56` | `#8a9bb8` | labels, meta |
+| `--accent` | `#056f88` (teal) | `#3ddcff` (sonar cyan) | lines, focus, active states |
+| `--accent-ink` | `#045c71` | `#7fe8ff` | accent-colored text |
+| `--leaf` | `#4a7c59` (moss) | `#8fd19e` | fern, contours, decoration |
+| `--leaf-ink` | `#2f5e3c` | `#a9dfb5` | leaf-colored text, if ever needed |
+| `--ok` | `#2f7a4b` | `#6fd39a` | live-site dots, success states |
 | `--amber` | `#ffb547` | `#ffb547` (signal amber) | primary buttons only |
 
 ### Measured contrast (WCAG AA needs 4.5:1 for body text)
 
 | Pair | Light | Dark |
 |---|---|---|
-| text on bg | 17.6 | 15.9 |
-| text-soft on bg | 9.5 | 11.9 |
-| muted on bg | 6.2 | 6.7 |
-| muted on surface-2 | 5.8 | 5.6 |
-| accent-ink on bg | 6.6 | 13.3 |
-| accent on bg | 4.7 | 11.5 |
+| text on bg | 15.7 | 15.9 |
+| text-soft on bg | 8.6 | 11.9 |
+| muted on bg | 5.9 | 6.7 |
+| muted on surface-2 | 5.5 | 5.6 |
+| accent-ink on bg | 6.8 | 13.3 |
+| accent on bg | 5.2 | 11.5 |
+| leaf-ink on bg | 6.8 | 12.4 |
+| ok on surface | 5.1 | 9.5 |
 | button text on amber | 10.6 | 10.6 |
 
-The one pair under 4.5 is light-theme `--accent` on `--surface-2` (4.45). It's only used for icons and decoration, never text.
+Light-theme `--leaf` on `--bg` is 4.4, so it is only used for strokes and decoration; text in green uses `--leaf-ink`.
 
 ## Type
 
@@ -49,7 +56,7 @@ Every animation respects `prefers-reduced-motion` and the site's own "Reduce mot
 - **Hero scope** (`src/scripts/sonar-canvas.ts`): a 2D canvas with no libraries. The rings and ticks are drawn once to an offscreen layer, and the sweep is a single conic gradient. It's capped at 30 fps, mounts after the page is idle, pauses off-screen and in background tabs, shows a still frame under reduced motion, and skips animation on low-power devices.
 - **Scroll reveals**: CSS scroll-driven animations (`animation-timeline: view()`) where supported, with an IntersectionObserver fallback that staggers each visual row left to right. Nothing is hidden unless motion is allowed and the browser can bring it back.
 - **Entrances**: CSS only. The headline and lede never start invisible, which keeps Largest Contentful Paint fast.
-- **Decode effect** (`src/scripts/decode.ts`): characters resolve out of random glyphs. Used on the hero eyebrow.
+- **Decode effect** (`src/scripts/decode.ts`): characters resolve out of random glyphs. Used on the hero eyebrow and on the field notes, whose values start masked and decode as they scroll into view; a tap replays one. The label above each value never masks, so the card always says what the fact is about.
 
 ### Why no GSAP
 

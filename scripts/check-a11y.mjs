@@ -1,6 +1,7 @@
 // Runs axe-core over every built page and fails on any violation.
 // Passes: dark and light at desktop width, dark and light at phone width. On the phone passes the
-// menu is opened and scanned too, so that state is covered as well as the server-rendered page.
+// menu is opened and scanned too, and on the home page the field notes are scanned in their masked
+// state, so those states are covered as well as the server-rendered page.
 // Pages load with reduced motion so scroll reveals do not hide content from the scan, and nothing
 // off this machine (the analytics beacon, for one) is requested.
 // Run after a build: `npm run build && npm run test:a11y`. CI runs it before every deploy.
@@ -70,6 +71,14 @@ for (const pass of PASSES) {
       return true;
     });
     if (menuOpened) await scan(page, `${pass.name}, menu open  ${path}`);
+
+    // Field notes start masked when motion is allowed; force that state here so its colors are checked.
+    const masked = await page.evaluate(() => {
+      const cards = document.querySelectorAll('[data-note]');
+      cards.forEach((card) => (card.dataset.masked = ''));
+      return cards.length > 0;
+    });
+    if (masked) await scan(page, `${pass.name}, field notes masked  ${path}`);
   }
   await ctx.close();
 }
