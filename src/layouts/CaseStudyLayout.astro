@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import BrowserFrame from '@/components/BrowserFrame.astro';
@@ -28,6 +28,12 @@ const toc = [
   ...(d.gallery && !limited ? [{ slug: 'gallery', text: 'Gallery' }] : []),
 ];
 const isSite = Boolean(d.links.live && d.cover && d.mobile);
+
+// Clips in the gallery get an optimized poster; nothing downloads until someone presses play.
+const posters = new Map<string, string>();
+for (const g of d.gallery ?? []) {
+  if ('video' in g) posters.set(g.video, (await getImage({ src: g.poster, width: 1280, format: 'webp', quality: 80 })).src);
+}
 const ogImage = `/og/${project.id}.png`;
 
 const jsonLd = [
@@ -214,7 +220,14 @@ const jsonLd = [
             {d.gallery.map((g) => (
               <figure class="shot" data-reveal>
                 <div class="shot__img">
-                  <Image src={g.src} alt={g.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1000px, 100vw" format="webp" quality={80} />
+                  {'video' in g ? (
+                    <video controls muted playsinline preload="none" loop={g.loop} poster={posters.get(g.video)} aria-label={g.alt}>
+                      <source src={g.video} type="video/mp4" />
+                      <track kind="captions" src={g.captions} srclang="en" label="English" default />
+                    </video>
+                  ) : (
+                    <Image src={g.src} alt={g.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1000px, 100vw" format="webp" quality={80} />
+                  )}
                 </div>
                 {g.caption && <figcaption>{g.caption}</figcaption>}
               </figure>
@@ -520,9 +533,15 @@ const jsonLd = [
     background: var(--surface);
   }
 
-  .shot__img :global(img) {
+  .shot__img :global(img),
+  .shot__img :global(video) {
+    display: block;
     width: 100%;
     height: auto;
+  }
+
+  .shot__img :global(video) {
+    background: #05070c;
   }
 
   .shot figcaption {

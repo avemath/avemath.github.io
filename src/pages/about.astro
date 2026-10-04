@@ -6,6 +6,8 @@ import Icon from '@/components/Icon.astro';
 import NowStrip from '@/components/NowStrip.astro';
 import site from '@/data/site.json';
 import offclock from '@/data/offclock.json';
+import gradHall from '@/assets/about/grad-taylor-hall.jpg';
+import gradTiger from '@/assets/about/grad-tiger.jpg';
 
 // A real portrait replaces the scope the moment a file named portrait.* lands in src/assets.
 const portraitFiles = import.meta.glob<{ default: ImageMetadata }>('/src/assets/portrait.{jpg,jpeg,png,webp}', { eager: true });
@@ -89,6 +91,13 @@ const principles = [
         Integer Technologies, where I also interned. The radio link is how I got there: Dr. Aldo Duarte recommended me for the project
         based on that work in his course.
       </p>
+      <figure class="about-fig">
+        <div class="about-fig__pair">
+          <Image src={gradHall} alt="Avery in an LSU graduation gown tossing a cap into the air in front of Patrick F. Taylor Hall." widths={[400, 640, 800]} sizes="(min-width: 1100px) 20rem, 50vw" format="webp" quality={80} />
+          <Image src={gradTiger} alt="Avery in a graduation gown hugging the bronze tiger statue on campus." widths={[400, 640, 800]} sizes="(min-width: 1100px) 20rem, 50vw" format="webp" quality={80} />
+        </div>
+        <figcaption>Graduation day, May 2026, outside Patrick F. Taylor Hall and at the tiger statue.</figcaption>
+      </figure>
 
       <h2>Websites</h2>
       <p>
@@ -290,7 +299,7 @@ const principles = [
   }
 
   .offclock__photo {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1;
     background: var(--surface-2);
   }
 
@@ -354,6 +363,30 @@ const principles = [
 
   .about-prose h2:first-child {
     margin-top: 0;
+  }
+
+  .about-fig {
+    margin: 0;
+  }
+
+  .about-fig__pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .about-fig__pair :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+  }
+
+  .about-fig figcaption {
+    margin-top: 0.7rem;
+    font-size: 0.85rem;
+    color: var(--muted);
   }
 
   /* The story reads at a measure on the left; the four rules keep it company on the right. */
