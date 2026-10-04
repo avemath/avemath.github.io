@@ -4,7 +4,7 @@ import Icon from '@/components/Icon.astro';
 import NowStrip from '@/components/NowStrip.astro';
 import site from '@/data/site.json';
 
-// Topographic contour texture: a nod to land work and Louisiana waterways.
+// Topographic contour texture: a nod to land work and Louisiana waterways. Leaf green on the paper theme.
 const contours = Array.from({ length: 14 }, (_, i) => {
   let d = '';
   for (let x = -20; x <= 1220; x += 30) {
@@ -34,7 +34,8 @@ const principles = [
         <p class="section-lede">
           I'm Ave. I'm a computer engineer and graduate researcher at LSU, I design and build websites, I do ownership research as a land agent, and
           I co-founded a drowning awareness nonprofit with my family. It sounds like a lot of different things. It's mostly the same thing:
-          figuring out how something really works, then building it so other people can rely on it.
+          figuring out how something really works, then building it so other people can rely on it. Away from a desk I'm outside, usually
+          around plants.
         </p>
       </div>
       <div class="portrait" aria-hidden="true">
@@ -156,8 +157,8 @@ const principles = [
   }
 
   :global(:root:not([data-theme='dark'])) .contours path {
-    stroke: var(--line-strong);
-    stroke-opacity: calc(0.45 + var(--i) * 0.03);
+    stroke: var(--leaf);
+    stroke-opacity: calc(0.22 + var(--i) * 0.03);
   }
 
   .about-hero__inner {

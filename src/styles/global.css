@@ -64,33 +64,39 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 /* ------------------------------------------------------------------
-   Design tokens. "Signal": naval acoustics meets interface craft.
+   Design tokens. "Signal": naval acoustics meets interface craft, on
+   field-notebook paper. The light theme is warm paper with a hint of
+   sage rather than blue-white; the dark theme is deep water. Both carry
+   a leaf green for living things: live-site dots, the fern in the
+   footer, the contour lines on the About page.
    Every color pair used for text is checked for WCAG AA in both themes
    (see docs/DESIGN.md for the measured ratios).
    ------------------------------------------------------------------ */
 :root {
-  --bg: #f6f8fb;
-  --bg-deep: #e9eef6;
-  --surface: #ffffff;
-  --surface-2: #eef2f8;
-  --line: #d5dde9;
-  --line-strong: #b4c1d4;
-  --text: #0b1220;
-  --text-soft: #34425c;
-  --muted: #4f5e79;
-  --accent: #0077a8;
-  --accent-ink: #005f87;
-  --accent-wash: rgb(0 119 168 / 0.1);
+  --bg: #f3f4ee;
+  --bg-deep: #e8ebe1;
+  --surface: #fbfbf8;
+  --surface-2: #ebeee4;
+  --line: #d4dacb;
+  --line-strong: #b3bda8;
+  --text: #141a16;
+  --text-soft: #3a463f;
+  --muted: #55635a;
+  --accent: #056f88;
+  --accent-ink: #045c71;
+  --accent-wash: rgb(5 111 136 / 0.1);
   /* Stronger wash for staged backgrounds, which go flat on the pale light surface. */
-  --accent-wash-strong: rgb(0 119 168 / 0.18);
+  --accent-wash-strong: rgb(5 111 136 / 0.18);
   --amber: #ffb547;
   --amber-ink: #8a5300;
   --on-amber: #1a1203;
   --danger: #b42318;
-  --ok: #0f7b4f;
-  --grid: rgb(11 18 32 / 0.05);
-  --shadow: 0 1px 2px rgb(11 18 32 / 0.06), 0 12px 32px -16px rgb(11 18 32 / 0.25);
-  --shadow-lift: 0 2px 4px rgb(11 18 32 / 0.06), 0 24px 48px -20px rgb(11 18 32 / 0.35);
+  --leaf: #4a7c59;
+  --leaf-ink: #2f5e3c;
+  --ok: #2f7a4b;
+  --grid: rgb(20 26 22 / 0.05);
+  --shadow: 0 1px 2px rgb(20 26 22 / 0.06), 0 12px 32px -16px rgb(20 26 22 / 0.25);
+  --shadow-lift: 0 2px 4px rgb(20 26 22 / 0.06), 0 24px 48px -20px rgb(20 26 22 / 0.35);
   color-scheme: light;
 }
 
@@ -112,7 +118,9 @@
   --amber-ink: #ffc670;
   --on-amber: #1a1203;
   --danger: #ff8a7a;
-  --ok: #5fe3a6;
+  --leaf: #8fd19e;
+  --leaf-ink: #a9dfb5;
+  --ok: #6fd39a;
   --grid: rgb(230 237 247 / 0.04);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 56px -20px rgb(0 0 0 / 0.75);
@@ -133,6 +141,7 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-amber: var(--amber);
+  --color-leaf: var(--leaf);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
