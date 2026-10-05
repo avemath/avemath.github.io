@@ -37,7 +37,7 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
     </div>
   </section>
 
-  <section class="pb-24" aria-label="Projects">
+  <section class="pb-16 md:pb-24" aria-label="Projects">
     <div class="wrap">
       <div class="work-grid" data-work-grid>
         {projects.map((p, i) => <ProjectTile project={p} headingLevel="h2" eager={i < 2} />)}
@@ -109,15 +109,6 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
     .work-grid > :global(.tile[data-orphan]),
     .work-grid:not([data-ready]) > :global(.tile:nth-child(3n + 1):last-child) {
       grid-column: 1 / -1;
-      flex-direction: row;
-    }
-
-    .work-grid > :global(.tile[data-orphan] .tile__media),
-    .work-grid:not([data-ready]) > :global(.tile:nth-child(3n + 1):last-child .tile__media) {
-      flex: 0 0 42%;
-      aspect-ratio: auto;
-      border-bottom: 0;
-      border-right: 1px solid var(--line);
     }
   }
 </style>

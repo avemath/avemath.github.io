@@ -6,6 +6,9 @@ import Icon from '@/components/Icon.astro';
 import NowStrip from '@/components/NowStrip.astro';
 import site from '@/data/site.json';
 import offclock from '@/data/offclock.json';
+import gradHall from '@/assets/about/grad-taylor-hall.jpg';
+import gradTiger from '@/assets/about/grad-tiger.jpg';
+import rePlus from '@/assets/about/re-plus.jpg';
 
 // A real portrait replaces the scope the moment a file named portrait.* lands in src/assets.
 const portraitFiles = import.meta.glob<{ default: ImageMetadata }>('/src/assets/portrait.{jpg,jpeg,png,webp}', { eager: true });
@@ -72,7 +75,8 @@ const principles = [
   <NowStrip />
 
   <section class="section">
-    <div class="wrap-narrow prose about-prose">
+    <div class="wrap about-grid">
+    <div class="prose about-prose">
       <h2>Engineering</h2>
       <p>
         I studied computer engineering at LSU, with a minor in computer science, on the Tiger Excellence Non-Resident Award all four
@@ -88,6 +92,13 @@ const principles = [
         Integer Technologies, where I also interned. The radio link is how I got there: Dr. Aldo Duarte recommended me for the project
         based on that work in his course.
       </p>
+      <figure class="about-fig">
+        <div class="about-fig__pair">
+          <Image src={gradHall} alt="Avery in an LSU graduation gown tossing a cap into the air in front of Patrick F. Taylor Hall." widths={[400, 640, 800]} sizes="(min-width: 1100px) 20rem, 50vw" format="webp" quality={80} />
+          <Image src={gradTiger} alt="Avery in a graduation gown hugging the bronze tiger statue on campus." widths={[400, 640, 800]} sizes="(min-width: 1100px) 20rem, 50vw" format="webp" quality={80} />
+        </div>
+        <figcaption>Graduation day, May 2026, outside Patrick F. Taylor Hall and at the tiger statue.</figcaption>
+      </figure>
 
       <h2>Websites</h2>
       <p>
@@ -105,6 +116,10 @@ const principles = [
         and clear with people. It's also why I built <a href="/work/landspace/">Landspace</a>: I wanted the map, the records and the title
         problems in one place.
       </p>
+      <figure class="about-fig">
+        <Image src={rePlus} alt="Avery and her brother smiling side by side at a crowded conference venue, both wearing lanyards." widths={[640, 960, 1280]} sizes="(min-width: 1100px) 42rem, 100vw" format="webp" quality={80} />
+        <figcaption>At RE+, a renewable energy conference, with my brother.</figcaption>
+      </figure>
 
       <h2>Why water matters to me</h2>
       <p>
@@ -112,6 +127,26 @@ const principles = [
         He survived. In 2020 my siblings and I started <a href="/work/because-of-adam/">Because of ADAM</a> to share
         everything we wish we'd known: drowning is fast and silent, and layers of protection save lives.
       </p>
+    </div>
+    <aside class="about-rail" aria-labelledby="rules-title">
+      <p class="eyebrow">How I work</p>
+      <h2 id="rules-title" class="section-title section-title--sm">Four rules I keep</h2>
+      <dl class="rules">
+        {
+          principles.map(([t, b], i) => (
+            <div class="rule card" data-reveal>
+              <dt>
+                <span class="mono rule__n" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {t}
+              </dt>
+              <dd>{b}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </aside>
     </div>
   </section>
 
@@ -144,29 +179,7 @@ const principles = [
     </div>
   </section>
 
-  <section class="section">
-    <div class="wrap">
-      <p class="eyebrow">How I work</p>
-      <h2 class="section-title">Four rules I keep</h2>
-      <dl class="rules">
-        {
-          principles.map(([t, b], i) => (
-            <div class="rule card" data-reveal>
-              <dt>
-                <span class="mono rule__n" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                {t}
-              </dt>
-              <dd>{b}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </div>
-  </section>
-
-  <section class="section">
+  <section class="section section--band">
     <div class="wrap">
       <div class="about-cta card">
         <p class="font-display text-2xl font-semibold tracking-tight">Want to work together, or just talk shop?</p>
@@ -245,6 +258,23 @@ const principles = [
     height: 100%;
   }
 
+  /* Below the two-column layout the placeholder scope would sit alone under the intro, so
+     it is hidden; a real portrait shows at a modest size instead. */
+  @media (max-width: 959px) {
+    .about-hero__inner {
+      gap: 2rem;
+    }
+
+    .portrait:not(.portrait--photo) {
+      display: none;
+    }
+
+    .portrait--photo {
+      width: min(11rem, 40vw);
+      justify-self: start;
+    }
+  }
+
   /* With a photo, the ring becomes a frame: the image fills the circle and the wash stays behind it. */
   .portrait--photo {
     padding: 0.5rem;
@@ -274,7 +304,7 @@ const principles = [
   }
 
   .offclock__photo {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1;
     background: var(--surface-2);
   }
 
@@ -340,11 +370,86 @@ const principles = [
     margin-top: 0;
   }
 
+  .about-fig {
+    margin: 0;
+  }
+
+  .about-fig__pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .about-fig :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+  }
+
+  .about-fig figcaption {
+    margin-top: 0.7rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  /* The story reads at a measure on the left; the four rules keep it company on the right. */
+  .about-grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .about-prose {
+    max-width: 42rem;
+  }
+
+  @media (min-width: 1100px) {
+    .about-grid {
+      grid-template-columns: minmax(0, 42rem) minmax(0, 1fr);
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-rail {
+      position: sticky;
+      top: 6rem;
+    }
+
+    /* One compact column in the rail, so the cards keep a readable measure. */
+    .about-grid .rules {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .about-grid .rule {
+      padding: 1.1rem 1.25rem;
+    }
+
+    .about-grid .rule dt {
+      margin-top: 0.25rem;
+    }
+  }
+
+  /* Two by two on tablets and four across on desktop, so four cards never leave a lone one. */
   .rules {
     display: grid;
     gap: 1rem;
     margin-top: 2.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 560px) {
+    .rules {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .rules {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   .rule {
@@ -361,6 +466,16 @@ const principles = [
 
   :global([data-theme='dark']) .rule__n {
     color: var(--accent);
+  }
+
+  @media (max-width: 719px) {
+    .rule {
+      padding: 1.2rem 1.25rem;
+    }
+
+    .rule dt {
+      margin-top: 0.3rem;
+    }
   }
 
   .rule dt {

@@ -19,18 +19,36 @@ links:
 cover: ../../assets/projects/rampage/lid.jpg
 coverAlt: The robot's top plate, black with "RAMpage" hand-painted in red graffiti letters outlined in white, rivet heads showing through the paint.
 gallery:
+  - video: /media/rampage-arena.mp4
+    poster: ../../assets/projects/rampage/arena-poster.jpg
+    captions: /media/rampage-arena.vtt
+    loop: true
+    alt: Overhead video of a match in the combat robotics arena. RAMpage pushes another team's robot across the plywood floor and off the stage while the crowd watches from behind the barrier.
+    caption: A few seconds of a match from the arena camera. After the other robot hit ours, RAMpage pushed it off the stage.
   - src: ../../assets/projects/rampage/internals.jpg
     alt: Top-down view inside the chassis with the lid off. Two silver air tanks run front to back, solenoid valves and black air lines sit across the top, and the control electronics are wired in between the tanks.
     caption: Under the lid. Two air tanks feed the plow through the solenoid valves, and the control boards sit between them.
+  - src: ../../assets/projects/rampage/carrier-board.jpg
+    alt: A green custom carrier board holding a Raspberry Pi Pico W, stacked on a Raspberry Pi 4 whose USB ports show at the edge, mounted across two silver air tanks with red, black and yellow wiring around it.
+    caption: The carrier board in place. The Pico W rides on a board over the Pi 4B, mounted across the air tanks.
   - src: ../../assets/projects/rampage/bench.jpg
     alt: Bench wiring on a blue mat. A Raspberry Pi Pico W on a green carrier board, a FlySky FS-iA6B receiver, a small power board taped to a battery, and the valves and motors in the background.
     caption: Bench wiring before it went into the chassis, with the Pico W, the FS-iA6B receiver and the power board laid out on the mat.
   - src: ../../assets/projects/rampage/pico.jpg
     alt: Close-up of the Raspberry Pi Pico W on its carrier board, with jumper wires on the RC input and solenoid output pins and a micro USB cable attached.
     caption: The Pico W that times the RC pulses and sequences the valves. Two input pins, two output pins, nothing else to wait on.
+  - src: ../../assets/projects/rampage/connector.jpg
+    alt: A hand pushing a multi-pin connector onto a header inside the robot, with the carrier board at top left and a black 12 V solenoid valve with a brass pneumatic fitting at right.
+    caption: Seating a connector on the carrier board, with one of the 12 V solenoid valves behind it.
   - src: ../../assets/projects/rampage/video-feed.jpg
     alt: A laptop showing the robot's camera feed in a window with a green frame-rate overlay, beside a terminal full of log lines.
     caption: The driver's view during testing. The Pi 4B's UDP stream with its frame-rate overlay, and the receiver's log beside it.
+  - src: ../../assets/projects/rampage/test-stand.jpg
+    alt: The robot standing on end on a load-test machine with its frame open, the two air tanks and the wiring exposed, and a force transducer mounted on a crossbar above it.
+    caption: Upright on a load-test stand in the lab for the mechanical team's load-cell test.
+  - src: ../../assets/projects/rampage/shop-lid.jpg
+    alt: The robot on a wooden shop bench with its painted lid on. A hacksaw, clamps and a roll of shop towels sit behind it.
+    caption: Lid on, back on the shop bench.
 metrics:
   - { label: Result, value: "1st place" }
   - { label: Plow strikes per match, value: "17" }

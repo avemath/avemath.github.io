@@ -14,6 +14,18 @@ keywords: ["ESP32", "FFT", "music", "audio", "LEDs", "FastLED", "microphone", "f
 stack: [C++, ESP32, FastLED, arduinoFFT, WS2812B]
 links:
   repo: https://github.com/avemath/led-audio-spectrum
+gallery:
+  - video: /media/led-spectrum.mp4
+    poster: ../../assets/projects/led-audio-spectrum/matrix-poster.jpg
+    captions: /media/led-spectrum.vtt
+    alt: Video of a 16 by 16 LED matrix on a desk showing a live audio spectrum. Columns of light rise and fall, red at the bottom through yellow and green to blue peaks at the top.
+    caption: The matrix running on the bench. Each column is one frequency band, red at the base and blue at the peak.
+  - src: ../../assets/projects/led-audio-spectrum/breadboard.jpg
+    alt: An ESP32 development board on a blue soldering mat, with jumper wires running to a microphone module held in a helping-hands clip and to the back of the LED matrix panel.
+    caption: First wiring on the bench. The ESP32, the microphone module in a clip, and the back of the matrix.
+  - src: ../../assets/projects/led-audio-spectrum/mic-module.jpg
+    alt: A small purple microphone breakout board held between two fingers, labeled adjustable gain, with three wires soldered to its output, ground and power pads. A lit LED strip glows in the background.
+    caption: The microphone module with its three leads soldered on.
 demo: spectrum
 ---
 

@@ -235,17 +235,33 @@
   padding-inline: clamp(1rem, 4vw, 2.5rem);
 }
 
-.section {
-  padding-block: clamp(4rem, 9vw, 7.5rem);
+/* Layered under components so Tailwind utilities (pt-0, pb-10, text-base) can override them. */
+@layer components {
+  .section {
+    padding-block: clamp(3rem, 7vw, 6rem);
+  }
+
+  /* A section that holds one card: the card frames the content, so the band stays short. */
+  .section--band {
+    padding-block: clamp(2rem, 4vw, 3rem);
+  }
+
+  .section + .section--band {
+    border-top: 0;
+  }
 }
 
-.section + .section {
-  border-top: 1px solid var(--line);
+@layer components {
+  .section + .section {
+    border-top: 1px solid var(--line);
+  }
 }
 
 /* Supporting sections sit a size down from the main ones, so the page has a hierarchy of its own. */
-.section--tight {
-  padding-block: clamp(3rem, 6vw, 5rem);
+@layer components {
+  .section--tight {
+    padding-block: clamp(2.25rem, 5vw, 4rem);
+  }
 }
 
 .skip-link {
@@ -319,11 +335,13 @@
   margin-top: 0.65rem;
 }
 
-.section-lede {
-  margin-top: 1rem;
-  max-width: 40rem;
-  color: var(--text-soft);
-  font-size: 1.125rem;
+@layer components {
+  .section-lede {
+    margin-top: 1rem;
+    max-width: 40rem;
+    color: var(--text-soft);
+    font-size: 1.125rem;
+  }
 }
 
 .mono {

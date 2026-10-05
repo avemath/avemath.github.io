@@ -23,6 +23,7 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
 ---
 
 <article class={`tile tile--${size} card card--lift`} style={style} data-reveal data-tags={[d.type, ...d.tags].join(' ')}>
+  <div class="tile__inner">
   <div class="tile__media">
     {
       size === 'xl' && d.cover && d.links.live ? (
@@ -95,14 +96,26 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
       }
     </div>
   </div>
+  </div>
   <span class="sr-only">{statusLabels[d.status]}</span>
 </article>
 
 <style>
+  /* The tile is a size container: once it is wide enough, the media and the body sit side
+     by side (see the container query at the end), so a tile that spans a whole row never
+     stacks a huge image over a short block of text. */
   .tile {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  .tile__inner {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     min-width: 0;
   }
 
@@ -199,11 +212,12 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin-top: auto;
     padding-top: 0.25rem;
   }
 
+  /* Equal-height rows leave slack; it collects here, above the dashed rule. */
   .tile__links {
+    margin-top: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -270,13 +284,38 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
     aspect-ratio: auto;
   }
 
-  @media (min-width: 1100px) {
-    .tile--xl .tile__media {
-      flex: 1;
+  /* A wide tile runs sideways: the media fills the left, the body sits beside it, and the
+     tile is only as tall as the text needs. Applies to the large home tile, to any tile
+     that spans a whole row, and to the closing tile on the work page. */
+  @container (min-width: 44rem) {
+    .tile__inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
     }
 
-    .tile--xl .tile__body {
-      flex: none;
+    .tile__media {
+      aspect-ratio: auto;
+      min-height: 22rem;
+      border-bottom: 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .tile__media > :global(svg) {
+      width: 100%;
+      height: 100%;
+    }
+
+    .tile--xl .tile__media {
+      min-height: 26rem;
+    }
+
+    .tile__body {
+      justify-content: center;
+      padding: clamp(1.5rem, 2.5vw, 2.25rem);
+    }
+
+    .tile__links {
+      margin-top: 0;
     }
   }
 </style>
