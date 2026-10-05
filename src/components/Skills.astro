@@ -78,9 +78,10 @@ import skills from '@/data/skills.json';
     color: var(--text-soft);
   }
 
-  .skill__list li + li::before {
+  /* The dot trails each item, so a wrapped line never starts with a stray separator. */
+  .skill__list li:not(:last-child)::after {
     content: '·';
-    margin-right: 0.9rem;
+    margin-left: 0.9rem;
     color: var(--line-strong);
   }
 </style>

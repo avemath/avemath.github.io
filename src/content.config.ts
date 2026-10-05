@@ -36,7 +36,23 @@ const projects = defineCollection({
       cover: image().optional(),
       mobile: image().optional(),
       coverAlt: z.string().optional(),
-      gallery: z.array(z.object({ src: image(), alt: z.string(), caption: z.string().optional() })).optional(),
+      // A gallery item is a photo, or a short clip: an mp4 in public/media with a poster image,
+      // a WebVTT captions file and a plain-language alt, never autoplayed.
+      gallery: z
+        .array(
+          z.union([
+            z.object({ src: image(), alt: z.string(), caption: z.string().optional() }),
+            z.object({
+              video: z.string().startsWith('/media/'),
+              poster: image(),
+              captions: z.string().startsWith('/media/'),
+              alt: z.string(),
+              caption: z.string().optional(),
+              loop: z.boolean().default(false),
+            }),
+          ]),
+        )
+        .optional(),
       metrics: z.array(z.object({ label: z.string(), value: z.string() })).optional(),
       confidentiality: z.enum(['public', 'limited']).default('public'),
       client: z

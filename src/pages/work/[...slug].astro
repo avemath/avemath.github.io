@@ -13,7 +13,9 @@ export const getStaticPaths = (async () => {
   // limited-detail pages, so a reader finishing one case study lands on a related one.
   const group = (p: Project) => (isWebsite(p) ? 'websites' : p.data.type);
   return projects.map((project) => {
-    const chain = projects.filter((p) => group(p) === group(project) && (p.id === project.id || p.data.confidentiality !== 'limited'));
+    const grouped = projects.filter((p) => group(p) === group(project) && (p.id === project.id || p.data.confidentiality !== 'limited'));
+    // A project alone in its group (the research post) pages through everything instead.
+    const chain = grouped.length > 1 ? grouped : projects.filter((p) => p.id === project.id || p.data.confidentiality !== 'limited');
     const i = chain.findIndex((p) => p.id === project.id);
     return { params: { slug: project.id }, props: { project, prev: chain[i - 1], next: chain[i + 1] } };
   });

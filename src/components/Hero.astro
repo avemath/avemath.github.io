@@ -38,7 +38,7 @@ import site from '@/data/site.json';
       var(--accent-wash),
       transparent 100%
     );
-    min-height: min(52rem, calc(100svh - 4rem));
+    min-height: min(42rem, calc(100svh - 4rem));
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -71,8 +71,12 @@ import site from '@/data/site.json';
   }
 
   @media (max-width: 899px) {
+    /* No forced full-screen height on phones: a deliberate band of scope above the text,
+       and the buttons land well above the fold. */
     .hero {
       align-items: flex-end;
+      min-height: 0;
+      padding-top: clamp(9rem, 26svh, 13rem);
     }
 
     .hero__fade {

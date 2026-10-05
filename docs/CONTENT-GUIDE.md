@@ -51,7 +51,9 @@ How to add work and keep the site current, plus the rules every page follows.
 
 | What | Where |
 |---|---|
-| Portrait on About | drop a photo at `src/assets/portrait.jpg` (or .png/.webp), square, at least 800px. It replaces the scope automatically. |
+| Portrait on About | `src/assets/portrait.jpg` (square, at least 800px). Replace the file to change it. |
+| Graduation pair on About | `src/assets/about/grad-taylor-hall.jpg` and `grad-tiger.jpg`, 4:5 crops, referenced in `src/pages/about.astro` |
+| Gallery clips | an mp4 and a WebVTT captions file in `public/media/`, a poster image beside the project's photos, and a `video:` entry in the project's `gallery` (see `rampage.md`). Transcode to H.264 at 720p or less, strip audio unless it matters, and keep each clip under about 5 MB. Clips never autoplay. |
 | "Off the clock" on About | `src/data/offclock.json` for the words. Photos go in `src/assets/offclock/`, named in each entry's `photo`, with an `alt`. Entries without a photo render as text cards. |
 | "Now" strip | `src/data/now.json` |
 | Experience, education, résumé | `src/data/experience.json` (the HTML résumé and PDF both read it) |
