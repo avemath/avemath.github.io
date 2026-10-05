@@ -30,11 +30,11 @@ const entries = [
 
 <section id="experience" class="section home-section" aria-labelledby="experience-title" data-section="experience">
   <div class="wrap">
-    <div class="grid gap-10 min-[1100px]:grid-cols-[18rem_1fr]">
-      <div class="min-[1100px]:sticky min-[1100px]:top-28 min-[1100px]:self-start md:grid md:grid-cols-[1fr_20rem] md:items-end md:gap-10 min-[1100px]:block">
+    <div class="tl-layout">
+      <div class="tl-intro">
         <div>
         <p class="eyebrow">Experience</p>
-        <h2 id="experience-title" class="section-title">Land agent since 2020, researcher since 2026</h2>
+        <h2 id="experience-title" class="section-title tl-title">Land agent since 2020, researcher since 2026</h2>
         <p class="section-lede text-base">Open any entry for the details, or read the résumé.</p>
         <div class="mt-6 flex flex-wrap gap-3">
           <a class="btn btn--small" href="/resume/">Résumé <Icon name="arrow-right" /></a>
@@ -43,7 +43,7 @@ const entries = [
         </div>
 
         <div>
-        <p class="label mt-8 md:mt-0 min-[1100px]:mt-8">Education</p>
+        <p class="label tl-edu-label">Education</p>
         <ul class="mt-2 space-y-2 text-sm text-soft">
           {
             experience.education.map((e) => (
@@ -96,6 +96,47 @@ const entries = [
 </section>
 
 <style>
+  .tl-layout {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .tl-edu-label {
+    margin-top: 2rem;
+  }
+
+  /* Tablets: the intro and the education list sit side by side above the timeline. */
+  @media (min-width: 768px) and (max-width: 1099px) {
+    .tl-intro {
+      display: grid;
+      grid-template-columns: 1fr 20rem;
+      align-items: end;
+      gap: 2.5rem;
+    }
+
+    .tl-edu-label {
+      margin-top: 0;
+    }
+  }
+
+  /* Desktop: a sticky intro column beside the timeline, wide enough that the heading
+     breaks into phrases instead of one word per line. */
+  @media (min-width: 1100px) {
+    .tl-layout {
+      grid-template-columns: 22rem 1fr;
+    }
+
+    .tl-intro {
+      position: sticky;
+      top: 7rem;
+      align-self: start;
+    }
+
+    .tl-title {
+      font-size: clamp(2rem, 3vw, 2.75rem);
+    }
+  }
+
   .timeline {
     position: relative;
     display: grid;
