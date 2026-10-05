@@ -55,7 +55,7 @@ const principles = [
       {
         portrait ? (
           <div class="portrait portrait--photo">
-            <Image src={portrait} alt={site.name} widths={[320, 480, 640]} sizes="(min-width: 960px) 16rem, 60vw" format="webp" quality={82} />
+            <Image src={portrait} alt={site.name} widths={[400, 640, 800]} sizes="(min-width: 960px) 24rem, 55vw" format="webp" quality={82} />
           </div>
         ) : (
           <div class="portrait" aria-hidden="true">
@@ -246,7 +246,7 @@ const principles = [
 
   .portrait {
     justify-self: center;
-    width: min(16rem, 60vw);
+    width: min(24rem, 60vw);
     aspect-ratio: 1;
     padding: 1rem;
     border-radius: 50%;
@@ -270,7 +270,7 @@ const principles = [
     }
 
     .portrait--photo {
-      width: min(11rem, 40vw);
+      width: min(15rem, 55vw);
       justify-self: start;
     }
   }
