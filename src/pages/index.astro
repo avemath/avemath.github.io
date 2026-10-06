@@ -19,16 +19,27 @@ const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
 
 // Featured tiles. Each audience gets its own order, and its own column spans so every row
 // of the bento is full: `cols` is [tablet span of 2, desktop span of 6] per audience. The
-// large tile always takes a whole row. The client sites have their own section below, so
-// the bento shows the nonprofit site once and the engineering work, including the two
-// projects with in-browser demos.
+// large tile always takes a whole row. The client sites also have their own section below.
+// The bento shows two of them (the nonprofit and plvinc.com) next to the engineering work,
+// including the two projects with in-browser demos. In website mode the client-site tiles
+// are hidden (see the CSS), so their website spans never render.
+//
+// Row check, per audience (desktop 6 columns / tablet 2 columns):
+//   hire:     ADAM 6 | ONR 2, PLV 2, LandSpace 2 | RAMpage 2, V2V 2, LED 2
+//             tablet: ADAM | ONR, PLV | LandSpace, RAMpage | V2V, LED
+//   research: ONR 2, V2V 2, RAMpage 2 | ADAM 6 | LandSpace 2, LED 2, PLV 2
+//             tablet: ONR, V2V | RAMpage | ADAM | LandSpace, LED | PLV
+//   website:  LandSpace 3, RAMpage 3 | ONR 2, V2V 2, LED 2 (ADAM and PLV hidden)
+//             tablet: LandSpace | RAMpage, ONR | V2V, LED
+// If you add or remove a tile, redo this check so no row has a hole.
 const bento = [
   { slug: 'because-of-adam', size: 'xl', order: { hire: 1, research: 4, website: 1 }, cols: { hire: [2, 6], research: [2, 6], website: [2, 6] } },
   { slug: 'onr-intelligent-data-management', size: 'lg', order: { hire: 2, research: 1, website: 4 }, cols: { hire: [1, 2], research: [1, 2], website: [1, 2] } },
-  { slug: 'landspace', size: 'lg', order: { hire: 3, research: 5, website: 2 }, cols: { hire: [1, 2], research: [1, 3], website: [2, 3] } },
-  { slug: 'rampage', size: 'lg', order: { hire: 4, research: 3, website: 3 }, cols: { hire: [1, 2], research: [2, 2], website: [1, 3] } },
-  { slug: 'v2v-bsm-ofdm', size: 'lg', order: { hire: 5, research: 2, website: 5 }, cols: { hire: [1, 3], research: [1, 2], website: [1, 2] } },
-  { slug: 'led-audio-spectrum', size: 'lg', order: { hire: 6, research: 6, website: 6 }, cols: { hire: [2, 3], research: [1, 3], website: [1, 2] } },
+  { slug: 'petro-land-ventures', size: 'lg', order: { hire: 3, research: 7, website: 7 }, cols: { hire: [1, 2], research: [2, 2], website: [1, 2] } },
+  { slug: 'landspace', size: 'lg', order: { hire: 4, research: 5, website: 2 }, cols: { hire: [1, 2], research: [1, 2], website: [2, 3] } },
+  { slug: 'rampage', size: 'lg', order: { hire: 5, research: 3, website: 3 }, cols: { hire: [1, 2], research: [2, 2], website: [1, 3] } },
+  { slug: 'v2v-bsm-ofdm', size: 'lg', order: { hire: 6, research: 2, website: 5 }, cols: { hire: [1, 2], research: [1, 2], website: [1, 2] } },
+  { slug: 'led-audio-spectrum', size: 'lg', order: { hire: 7, research: 6, website: 6 }, cols: { hire: [1, 2], research: [1, 2], website: [1, 2] } },
 ] as const;
 
 const tileStyle = (b: (typeof bento)[number]) =>
@@ -49,8 +60,8 @@ const tileStyle = (b: (typeof bento)[number]) =>
             <div>
               <p class="eyebrow">Featured work</p>
               <h2 id="featured-title" class="section-title">
-                <span class="aud aud--hire">A combat robot, a radio link, a title app and my family's nonprofit</span>
-                <span class="aud aud--research">A combat robot, a radio link, a title app and my family's nonprofit</span>
+                <span class="aud aud--hire">A combat robot, a radio link, a title app, a land firm's site and my family's nonprofit</span>
+                <span class="aud aud--research">A combat robot, a radio link, a title app, a land firm's site and my family's nonprofit</span>
                 <span class="aud aud--website">A combat robot, a radio link, a title app and sponsored research</span>
               </h2>
               <p class="section-lede">
