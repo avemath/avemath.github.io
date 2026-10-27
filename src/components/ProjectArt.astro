@@ -213,6 +213,28 @@ const wave = (y0: number, amp: number, f: number, ph = 0) => {
   }
 
   {
+    // BELLHOP: rays leaving a source on the sound channel axis and bending back toward it.
+    slug === 'bellhop-sim' && (
+      <g fill="none" stroke-width="1.5">
+        <path d={`M 0 188 H ${W}`} stroke="var(--muted)" stroke-dasharray="3 6" stroke-opacity=".7" />
+        {[0.35, 0.6, 0.85, 1.1, 1.35].map((a, i) =>
+          [1, -1].map((s) => {
+            const amp = 26 + a * 70;
+            const per = 150 + a * 70;
+            let d = `M 70 188`;
+            for (let x = 70; x <= W; x += 6) d += ` L ${x} ${(188 - s * amp * Math.sin(((x - 70) / per) * Math.PI)).toFixed(1)}`;
+            return <path d={d} stroke={i % 2 ? 'var(--amber)' : 'var(--accent)'} stroke-opacity={0.85 - i * 0.12} />;
+          }),
+        )}
+        <circle cx="70" cy="188" r="5" fill="var(--accent)" stroke="none" />
+        <text x="24" y="40" class="art-label" stroke="none">
+          RAY TRACE · SOUND CHANNEL AXIS
+        </text>
+      </g>
+    )
+  }
+
+  {
     // Pool alarm: a still surface with ripples spreading from one entry. It shows the problem
     // only, on purpose. Nothing here hints at sensors, placement or signals.
     slug === 'acoustic-pool-alarm' && (
