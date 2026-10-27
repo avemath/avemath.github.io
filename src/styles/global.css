@@ -619,6 +619,113 @@
   color: var(--text);
 }
 
+/* Wiring diagrams drawn inline in case study prose, so they follow the theme tokens. */
+.wiring {
+  margin-block: 2rem;
+}
+
+.wiring__frame {
+  max-width: 32rem;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface-2);
+}
+
+.wiring svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.wiring figcaption {
+  margin-top: 0.85rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.wiring__box {
+  fill: var(--surface);
+  stroke: var(--line-strong);
+  stroke-width: 1.25;
+}
+
+.wiring__t {
+  fill: var(--text);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.wiring__s,
+.wiring__note,
+.wiring__pin {
+  font-size: 11.5px;
+}
+
+.wiring__s {
+  fill: var(--muted);
+  font-family: var(--font-sans);
+}
+
+.wiring__pin {
+  fill: var(--text-soft);
+  font-family: var(--font-mono);
+}
+
+.wiring__note {
+  fill: var(--text-soft);
+  font-family: var(--font-sans);
+}
+
+.wiring__note--muted {
+  fill: var(--muted);
+}
+
+.wiring__w {
+  fill: none;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wiring__w--5v {
+  stroke: var(--danger);
+}
+
+.wiring__w--3v {
+  stroke: var(--amber-ink);
+}
+
+.wiring__w--gnd,
+.wiring__w--usb {
+  stroke: var(--text-soft);
+}
+
+.wiring__w--sig {
+  stroke: var(--accent);
+}
+
+.wiring__arrow--sig,
+.wiring__leds {
+  fill: var(--accent);
+}
+
+.wiring__dot {
+  fill: var(--text-soft);
+}
+
+.wiring__rec {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.75;
+  stroke-dasharray: 4 3;
+}
+
+.wiring__rec-dot {
+  fill: var(--muted);
+}
+
 /* ------------------------------------------------------------------
    Motion. Reveals use CSS scroll-driven animations where supported,
    with an IntersectionObserver fallback (see scripts/motion.ts).
