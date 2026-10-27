@@ -213,6 +213,24 @@ const wave = (y0: number, amp: number, f: number, ph = 0) => {
   }
 
   {
+    // Pool alarm: a still surface with ripples spreading from one entry. It shows the problem
+    // only, on purpose. Nothing here hints at sensors, placement or signals.
+    slug === 'acoustic-pool-alarm' && (
+      <g fill="none" stroke="var(--accent)" stroke-width="1.5">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <path d={contour(250 + i * 22, 3 - i * 0.4, i * 1.7)} stroke-opacity={0.32 - i * 0.05} />
+        ))}
+        {[18, 42, 72, 108, 150].map((r, i) => (
+          <ellipse cx="300" cy="196" rx={r} ry={r * 0.28} stroke-opacity={0.9 - i * 0.17} />
+        ))}
+        <text x="24" y="40" class="art-label" stroke="none">
+          BACKYARD POOL · EARLY RESEARCH
+        </text>
+      </g>
+    )
+  }
+
+  {
     slug === 'little-explorer-swim' && (
       <g fill="none" stroke="var(--accent)" stroke-width="1.5">
         <g transform="translate(60 110)">
