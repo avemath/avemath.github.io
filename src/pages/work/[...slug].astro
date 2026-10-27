@@ -5,6 +5,7 @@ import CaseStudyLayout from '@/layouts/CaseStudyLayout.astro';
 import SpectrumDemo from '@/components/demos/SpectrumDemo.astro';
 import WeaponLogicDemo from '@/components/demos/WeaponLogicDemo.astro';
 import OfdmDemo from '@/components/demos/OfdmDemo.astro';
+import SignalsDemo from '@/components/demos/SignalsDemo.astro';
 import { getProjects, isWebsite, type Project } from '@/lib/projects';
 
 export const getStaticPaths = (async () => {
@@ -36,5 +37,6 @@ const demo = project.data.demo;
   {demo === 'spectrum' && <SpectrumDemo slot="demo" />}
   {demo === 'weapon-logic' && <WeaponLogicDemo slot="demo" />}
   {demo === 'ofdm' && <OfdmDemo slot="demo" />}
+  {demo === 'signals' && <SignalsDemo slot="demo" />}
   <Content />
 </CaseStudyLayout>

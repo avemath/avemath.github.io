@@ -70,7 +70,7 @@ const projects = defineCollection({
       // Extra search terms for the command palette.
       keywords: z.array(z.string()).default([]),
       // Which interactive demo to mount on the case study page, if any.
-      demo: z.enum(['spectrum', 'weapon-logic', 'ofdm']).optional(),
+      demo: z.enum(['spectrum', 'weapon-logic', 'ofdm', 'signals']).optional(),
       draft: z.boolean().default(false),
     })
     .refine((p) => p.confidentiality === 'public' || (!p.gallery && !p.metrics && !p.links.repo), {

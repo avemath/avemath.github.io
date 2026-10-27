@@ -1,0 +1,767 @@
+---
+import DemoShell from './DemoShell.astro';
+
+const tabs = [
+  { id: 'fh', label: 'Frequency hopping' },
+  { id: 'const', label: 'Constellations' },
+  { id: 'ber', label: 'Bit errors' },
+  { id: 'mf', label: 'Matched filter' },
+  { id: 'mp', label: 'Multipath' },
+];
+
+const schemes = [
+  { id: 'bpsk', label: 'BPSK' },
+  { id: 'qpsk', label: 'QPSK' },
+  { id: '8psk', label: '8-PSK' },
+  { id: '16qam', label: '16-QAM' },
+];
+---
+
+<DemoShell
+  id="signals"
+  title="Five small demos of how a radio link works"
+  lede="Pick a demo. Each one runs in your browser, nothing plays sound until you press play, and every number it prints is computed on the spot from the settings you choose."
+>
+  <div class="sig" data-signals>
+    <div class="sig__note">
+      <p>
+        <strong>From the JANUS standard</strong>, as reported in public papers: the 9440 to 13600 Hz band (center 11520 Hz, 4160 Hz wide),
+        13 tone pairs (26 tones, 160 Hz apart), and 6.25 ms chips (160 per second).
+      </p>
+      <p>
+        <strong>Simplified:</strong> the hop order is made up, each pair is drawn as two neighboring tones, each chip carries one raw bit,
+        and the 32-chip preamble is left out. The other four demos are textbook models with ideal timing and white Gaussian noise.
+      </p>
+    </div>
+
+    <div class="sig__tabs" role="tablist" aria-label="Demos">
+      {
+        tabs.map((t, i) => (
+          <button
+            type="button"
+            role="tab"
+            class="sig__tab"
+            id={`sig-tab-${t.id}`}
+            aria-controls={`sig-panel-${t.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-tab={t.id}
+          >
+            <span class="sig__tab-n mono" aria-hidden="true">{i + 1}</span>
+            {t.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- 1. FH-BFSK -->
+    <section class="sig__panel" role="tabpanel" id="sig-panel-fh" aria-labelledby="sig-tab-fh" data-panel="fh">
+      <p class="sig__explain">
+        Frequency-hopping BFSK sends one chip at a time. Each chip jumps to one of 13 tone pairs, then plays the low tone of the pair for a 0
+        or the high tone for a 1. Click or press Enter on a column to flip its bit, and press play to hear it slowed down.
+      </p>
+      <p class="sig__flag"><strong>The hop order here is made up. The real order is set by the standard.</strong></p>
+
+      <div class="sig__row" role="group" aria-label="Playback">
+        <button type="button" class="btn btn--small btn--primary" data-fh="play">Play sequence</button>
+        <button type="button" class="btn btn--small" data-fh="step">Step</button>
+        <button type="button" class="btn btn--small" data-fh="stop">Stop</button>
+        <button type="button" class="btn btn--small" data-fh="rand">Random bits</button>
+        <button type="button" class="btn btn--small" data-fh="zeros">All 0</button>
+        <button type="button" class="btn btn--small" data-fh="ones">All 1</button>
+      </div>
+
+      <div class="sig__scroll">
+        <svg class="fh__plot" data-fh-plot role="group" aria-label="Frequency against time. Each column is one chip; press a column to flip its bit."></svg>
+      </div>
+      <p class="sig__hint">On a narrow screen, scroll the plot sideways to see every chip.</p>
+
+      <dl class="stats mono" aria-label="Selected chip">
+        <div><dt>Chip</dt><dd data-fh-r="chip">n/a</dd></div>
+        <div><dt>Tone pair</dt><dd data-fh-r="pair">n/a</dd></div>
+        <div><dt>Bit</dt><dd data-fh-r="bit">n/a</dd></div>
+        <div><dt>Band tone</dt><dd data-fh-r="f">n/a</dd></div>
+        <div><dt>Pair 0 / 1 tones</dt><dd data-fh-r="pairf">n/a</dd></div>
+        <div><dt>What you hear</dt><dd data-fh-r="audio">n/a</dd></div>
+      </dl>
+      <ul class="legend">
+        <li><span class="sw sw--zero"></span>0 is the low tone of the pair</li>
+        <li><span class="sw sw--one"></span>1 is the high tone of the pair</li>
+        <li><span class="sw sw--hop"></span>The pair the chip hopped to</li>
+        <li>The dashed line traces the hop path</li>
+      </ul>
+
+      <div class="fh__settings">
+        <div class="slider">
+          <div class="slider__top"><label for="fh-slow">Listening chip length</label><output class="mono" for="fh-slow" data-fh-out="slow">260 ms</output></div>
+          <input id="fh-slow" type="range" min="80" max="700" step="10" value="260" data-fh-in="slow" />
+          <small>The real chip is 6.25 ms, too short to hear, so playback stretches it.</small>
+        </div>
+        <div class="slider">
+          <div class="slider__top"><label for="fh-vol">Volume</label><output class="mono" for="fh-vol" data-fh-out="vol">35%</output></div>
+          <input id="fh-vol" type="range" min="0" max="1" step="0.05" value="0.35" data-fh-in="vol" />
+        </div>
+        <div class="field">
+          <label for="fh-pitch">Pitch mapping for audio</label>
+          <select id="fh-pitch" data-fh-in="pitch">
+            <option value="exag">Exaggerated gap (easiest to hear)</option>
+            <option value="prop">Proportional (true spacing)</option>
+            <option value="true">True band tones (shrill)</option>
+          </select>
+          <small data-fh-msg="pitch"></small>
+        </div>
+        <div class="field">
+          <label for="fh-bits">Bits (a string of 0s and 1s)</label>
+          <input id="fh-bits" type="text" class="mono" spellcheck="false" inputmode="numeric" autocomplete="off" data-fh-in="bits" />
+          <small>Paste a bit string and press Enter to load it. Clicking columns updates it too.</small>
+        </div>
+        <div class="field">
+          <label for="fh-n">Chips shown</label>
+          <input id="fh-n" type="number" min="2" max="48" value="16" class="mono" data-fh-in="n" />
+        </div>
+        <div class="field">
+          <label for="fh-seed">Made-up hop pattern seed</label>
+          <input id="fh-seed" type="number" step="1" value="87" class="mono" data-fh-in="seed" />
+          <small>Picks a pseudo-random pair for each chip, never the same pair twice in a row.</small>
+        </div>
+        <div class="field">
+          <label for="fh-hop">Custom hop order</label>
+          <input id="fh-hop" type="text" class="mono" spellcheck="false" autocomplete="off" placeholder="3, 11, 0, 7, 12" data-fh-in="hop" />
+          <small data-fh-msg="hop"></small>
+        </div>
+      </div>
+
+      <h3 class="sig__h">From the standard</h3>
+      <dl class="stats mono">
+        <div><dt>Band</dt><dd>9440 to 13600 Hz</dd></div>
+        <div><dt>Center</dt><dd>11520 Hz</dd></div>
+        <div><dt>Bandwidth</dt><dd>4160 Hz</dd></div>
+        <div><dt>Tone pairs</dt><dd>13 (26 tones, 160 Hz apart)</dd></div>
+        <div><dt>Chip</dt><dd>6.25 ms (160 per second)</dd></div>
+      </dl>
+      <p class="sig__small">
+        Simplified here: the tones sit at the centers of 26 equal 160 Hz slots, and pair P0 is the two lowest tones, P1 the next two, and so
+        on. Each chip carries one raw bit so the tone choice is easy to see; in the real waveform the bits are coded and interleaved first.
+      </p>
+      <p class="sr-only" aria-live="polite" data-fh-status></p>
+    </section>
+
+    <!-- 2. Constellation -->
+    <section class="sig__panel" role="tabpanel" id="sig-panel-const" aria-labelledby="sig-tab-const" data-panel="const" hidden>
+      <p class="sig__explain">
+        Each symbol is a point on the plane, and noise blurs where it lands. The receiver picks the nearest ideal point, so a symbol is
+        wrong when noise pushes it past the halfway line to a neighbor. More points per symbol means more bits, but closer neighbors.
+      </p>
+      <div class="sig__split">
+        <div class="sig__controls">
+          <fieldset class="seg">
+            <legend class="label">Modulation</legend>
+            {
+              schemes.map((s, i) => (
+                <label class="seg__opt">
+                  <input type="radio" name="const-scheme" value={s.id} checked={i === 1} data-const-scheme />
+                  <span>{s.label}</span>
+                </label>
+              ))
+            }
+          </fieldset>
+          <div class="slider">
+            <div class="slider__top"><label for="const-snr">E<sub>s</sub>/N<sub>0</sub></label><output class="mono" for="const-snr" data-const-out="snr">15.0 dB</output></div>
+            <input id="const-snr" type="range" min="0" max="30" step="0.5" value="15" data-const-in="snr" />
+          </div>
+          <button type="button" class="btn btn--small" data-const="new">New noise</button>
+          <dl class="stats stats--stack mono">
+            <div><dt>Noise sigma per dimension</dt><dd data-const-s="sigma">n/a</dd></div>
+            <div><dt>Bits per symbol</dt><dd data-const-s="bits">n/a</dd></div>
+            <div><dt>Symbol errors in this draw</dt><dd data-const-s="ser">n/a</dd></div>
+          </dl>
+          <p class="sig__small">
+            Average symbol energy is 1, and the noise standard deviation per dimension is √(1 / (2 E<sub>s</sub>/N<sub>0</sub>)). The noise
+            is seeded, so it holds still while you move the slider.
+          </p>
+        </div>
+        <figure class="plot">
+          <figcaption class="label">800 received symbols · errors in red</figcaption>
+          <canvas width="440" height="440" data-const-canvas role="img" aria-label="Constellation of received symbols with noise"></canvas>
+        </figure>
+      </div>
+      <p class="sr-only" aria-live="polite" data-const-status></p>
+    </section>
+
+    <!-- 3. BER -->
+    <section class="sig__panel" role="tabpanel" id="sig-panel-ber" aria-labelledby="sig-tab-ber" data-panel="ber" hidden>
+      <p class="sig__explain">
+        Bit error rate against E<sub>b</sub>/N<sub>0</sub>, the energy per bit over the noise density, from 0 to 20 dB. Press simulate
+        to send random bits through noise in your browser and count the errors; the dots should land on the curve.
+      </p>
+      <div class="sig__split">
+        <div class="sig__controls">
+          <fieldset class="seg">
+            <legend class="label">Simulate</legend>
+            {
+              schemes.map((s, i) => (
+                <label class="seg__opt">
+                  <input type="radio" name="ber-scheme" value={s.id} checked={i === 0} data-ber-scheme />
+                  <span>{s.label}</span>
+                </label>
+              ))
+            }
+          </fieldset>
+          <button type="button" class="btn btn--small btn--primary" data-ber="sim">Simulate</button>
+          <p class="sig__msg" data-ber-status role="status" aria-live="polite"></p>
+          <ul class="sig__formulas">
+            <li><strong>BPSK and QPSK:</strong> P<sub>b</sub> = Q(√(2 E<sub>b</sub>/N<sub>0</sub>))</li>
+            <li><strong>8-PSK, Gray coded (approximation):</strong> P<sub>b</sub> ≈ (2/3) Q(√(6 E<sub>b</sub>/N<sub>0</sub>) sin(π/8))</li>
+            <li><strong>16-QAM, Gray coded (approximation):</strong> P<sub>b</sub> ≈ (3/4) Q(√((4/5) E<sub>b</sub>/N<sub>0</sub>))</li>
+          </ul>
+          <p class="sig__small" data-ber-ref></p>
+        </div>
+        <figure class="plot">
+          <figcaption class="label">Bit error rate, log scale · dashed curves are approximations</figcaption>
+          <svg class="ber__plot" viewBox="0 0 520 400" data-ber-plot role="img" aria-label="Theory bit error rate curves for BPSK, QPSK, 8-PSK and 16-QAM"></svg>
+          <ul class="legend" data-ber-legend></ul>
+        </figure>
+      </div>
+      <div class="sig__table" data-ber-table tabindex="0" role="region" aria-labelledby="ber-table-cap" hidden>
+        <table>
+          <caption class="label" id="ber-table-cap">Simulated points</caption>
+          <thead><tr><th scope="col">E<sub>b</sub>/N<sub>0</sub></th><th scope="col">Bit errors</th><th scope="col">Bits sent</th><th scope="col">Measured</th><th scope="col">Theory</th></tr></thead>
+          <tbody data-ber-rows></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. Matched filter -->
+    <section class="sig__panel" role="tabpanel" id="sig-panel-mf" aria-labelledby="sig-tab-mf" data-panel="mf" hidden>
+      <p class="sig__explain">
+        A receiver finds a packet by sliding a copy of the known preamble along the signal and adding up the products. Where they line
+        up, every term adds and the output spikes; elsewhere the noise mostly cancels. A preamble four times longer makes the peak four
+        times taller while the noise in the output only doubles.
+      </p>
+      <div class="sig__split">
+        <div class="sig__controls">
+          <div class="slider">
+            <div class="slider__top"><label for="mf-noise">Noise σ</label><output class="mono" for="mf-noise" data-mf-out="noise">1.5</output></div>
+            <input id="mf-noise" type="range" min="0" max="4" step="0.1" value="1.5" data-mf-in="noise" />
+          </div>
+          <div class="slider">
+            <div class="slider__top"><label for="mf-len">Preamble length</label><output class="mono" for="mf-len" data-mf-out="len">32 chips</output></div>
+            <input id="mf-len" type="range" min="8" max="128" step="8" value="32" data-mf-in="len" />
+          </div>
+          <button type="button" class="btn btn--small" data-mf="new">Hide it somewhere new</button>
+          <dl class="stats stats--stack mono">
+            <div><dt>Hidden at sample</dt><dd data-mf-s="true">n/a</dd></div>
+            <div><dt>Peak found at</dt><dd data-mf-s="found">n/a</dd></div>
+            <div><dt>Peak over next highest</dt><dd data-mf-s="ratio">n/a</dd></div>
+          </dl>
+        </div>
+        <div class="mf__plots">
+          <figure class="plot">
+            <figcaption class="label">Known preamble (±1), stretched to fit</figcaption>
+            <svg viewBox="0 0 600 70" preserveAspectRatio="none" data-mf-plot="pre" role="img" aria-label="The known preamble"></svg>
+          </figure>
+          <figure class="plot">
+            <figcaption class="label">Received: preamble plus noise · 512 samples</figcaption>
+            <svg viewBox="0 0 600 120" preserveAspectRatio="none" data-mf-plot="rx" role="img" aria-label="Received signal with the preamble hidden in noise"></svg>
+          </figure>
+          <figure class="plot">
+            <figcaption class="label">Correlation output · amber tick marks the true spot</figcaption>
+            <svg viewBox="0 0 600 120" preserveAspectRatio="none" data-mf-plot="corr" role="img" aria-label="Correlation output with its peak"></svg>
+          </figure>
+        </div>
+      </div>
+      <p class="sr-only" aria-live="polite" data-mf-status></p>
+    </section>
+
+    <!-- 5. Multipath -->
+    <section class="sig__panel" role="tabpanel" id="sig-panel-mp" aria-labelledby="sig-tab-mp" data-panel="mp" hidden>
+      <p class="sig__explain">
+        Signals bounce, so the receiver hears the direct path plus late, weaker copies. When an echo arrives a good part of a symbol late, it
+        smears into the next symbol, and a strong flipped echo can push the sample point to the wrong side of zero.
+      </p>
+      <div class="sig__split">
+        <div class="sig__controls">
+          <fieldset class="paths">
+            <legend class="label">Echo 1</legend>
+            <div class="slider">
+              <div class="slider__top"><label for="mp-d1">Delay</label><output class="mono" for="mp-d1" data-mp-out="d1">0.40 symbols</output></div>
+              <input id="mp-d1" type="range" min="0" max="2" step="0.05" value="0.4" data-mp-in="d1" />
+            </div>
+            <div class="slider">
+              <div class="slider__top"><label for="mp-g1">Gain</label><output class="mono" for="mp-g1" data-mp-out="g1">0.60</output></div>
+              <input id="mp-g1" type="range" min="-1" max="1" step="0.05" value="0.6" data-mp-in="g1" />
+            </div>
+          </fieldset>
+          <fieldset class="paths">
+            <legend class="label">Echo 2</legend>
+            <label class="check"><input type="checkbox" data-mp-in="on2" /> Add a third path</label>
+            <div class="slider">
+              <div class="slider__top"><label for="mp-d2">Delay</label><output class="mono" for="mp-d2" data-mp-out="d2">1.10 symbols</output></div>
+              <input id="mp-d2" type="range" min="0" max="2" step="0.05" value="1.1" data-mp-in="d2" />
+            </div>
+            <div class="slider">
+              <div class="slider__top"><label for="mp-g2">Gain</label><output class="mono" for="mp-g2" data-mp-out="g2">-0.50</output></div>
+              <input id="mp-g2" type="range" min="-1" max="1" step="0.05" value="-0.5" data-mp-in="g2" />
+            </div>
+          </fieldset>
+          <dl class="stats stats--stack mono">
+            <div><dt>Longest echo</dt><dd data-mp-s="spread">n/a</dd></div>
+            <div><dt>Wrong at the sample point</dt><dd data-mp-s="wrong">n/a</dd></div>
+            <div><dt>Smallest margin</dt><dd data-mp-s="margin">n/a</dd></div>
+          </dl>
+        </div>
+        <div class="mf__plots">
+          <figure class="plot">
+            <figcaption class="label">Sent: 12 BPSK symbols</figcaption>
+            <svg viewBox="0 0 600 90" preserveAspectRatio="none" data-mp-plot="tx" role="img" aria-label="Transmitted symbol stream"></svg>
+          </figure>
+          <figure class="plot">
+            <figcaption class="label">Received: all paths added · dots are the sample points, red when wrong</figcaption>
+            <svg viewBox="0 0 600 150" preserveAspectRatio="none" data-mp-plot="rx" role="img" aria-label="Received signal after multipath, with echoes"></svg>
+          </figure>
+        </div>
+      </div>
+      <p class="sig__small">
+        This is why my V2V receiver put a 16-sample cyclic prefix in front of every OFDM symbol: echoes shorter than the prefix die out
+        before the FFT window opens. FH-BFSK takes another route and hops, so a late echo of one chip lands on a different tone pair than
+        the chip after it.
+      </p>
+      <p class="sr-only" aria-live="polite" data-mp-status></p>
+    </section>
+  </div>
+</DemoShell>
+
+<style>
+  .sig {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .sig__note {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 0.6rem;
+    background: var(--bg);
+    font-size: 0.88rem;
+    color: var(--text-soft);
+  }
+
+  .sig__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.35rem;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    background: var(--bg);
+  }
+
+  .sig__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid transparent;
+    border-radius: 0.6rem;
+    background: transparent;
+    color: var(--text-soft);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .sig__tab:hover {
+    color: var(--text);
+    border-color: var(--line);
+  }
+
+  .sig__tab[aria-selected='true'] {
+    color: var(--text);
+    border-color: var(--accent);
+    background: var(--accent-wash);
+  }
+
+  .sig__tab-n {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .sig__panel {
+    display: grid;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+
+  .sig__panel[hidden] {
+    display: none;
+  }
+
+  .sig__explain {
+    max-width: 46rem;
+    color: var(--text-soft);
+  }
+
+  .sig__flag {
+    padding: 0.6rem 0.85rem;
+    border-left: 3px solid var(--amber);
+    border-radius: 0.4rem;
+    background: var(--surface-2);
+    font-size: 0.9rem;
+  }
+
+  .sig__h {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .sig__small,
+  .sig__hint {
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 46rem;
+  }
+
+  .sig__hint {
+    margin-top: -0.75rem;
+  }
+
+  @media (min-width: 900px) {
+    .sig__hint {
+      display: none;
+    }
+  }
+
+  .sig__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .sig__split {
+    display: grid;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+
+  @media (min-width: 960px) {
+    .sig__split {
+      grid-template-columns: 19rem minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .sig__controls {
+    display: grid;
+    gap: 1.1rem;
+    align-content: start;
+  }
+
+  .sig__msg {
+    min-height: 1.4em;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .sig__formulas {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+  }
+
+  .sig__scroll {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    background: var(--bg);
+  }
+
+  .fh__plot {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .fh__settings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem 1.5rem;
+  }
+
+  .slider,
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+    align-content: start;
+  }
+
+  .slider__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .slider input {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .slider small,
+  .field small {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.5rem;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+
+  .seg {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .seg legend {
+    margin-bottom: 0.5rem;
+  }
+
+  .seg__opt {
+    position: relative;
+  }
+
+  .seg__opt input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .seg__opt span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--bg);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .seg__opt input:checked + span {
+    border-color: var(--accent);
+    background: var(--accent-wash);
+  }
+
+  .seg__opt input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .paths {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    background: var(--bg);
+  }
+
+  .paths legend {
+    padding: 0 0.3rem;
+  }
+
+  .check {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .check input {
+    accent-color: var(--accent);
+  }
+
+  .plot {
+    margin: 0;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    background: var(--bg);
+    min-width: 0;
+  }
+
+  .plot canvas,
+  .plot svg {
+    width: 100%;
+    height: auto;
+    margin-top: 0.5rem;
+  }
+
+  .plot canvas {
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+
+  .mf__plots {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .mf__plots svg {
+    height: 4.5rem;
+  }
+
+  .mf__plots .plot:not(:first-child) svg {
+    height: 7rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+    gap: 0.6rem;
+  }
+
+  .stats--stack {
+    grid-template-columns: 1fr;
+  }
+
+  .stats > div {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    background: var(--bg);
+  }
+
+  .stats dt {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stats dd {
+    margin-top: 0.15rem;
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+    padding: 0;
+    margin: 0.6rem 0 0;
+    list-style: none;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .sig :global(.sw) {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-right: 0.4rem;
+    border-radius: 2px;
+    vertical-align: -1px;
+  }
+
+  .sw--zero {
+    background: var(--accent);
+  }
+  .sw--one {
+    background: var(--amber-ink);
+  }
+  .sw--hop {
+    background: var(--accent-wash-strong);
+    border: 1px solid var(--line-strong);
+  }
+
+  .sig__table {
+    overflow-x: auto;
+  }
+
+  .sig__table table {
+    width: auto;
+    min-width: min(100%, 36rem);
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sig__table caption {
+    text-align: left;
+    margin-bottom: 0.5rem;
+  }
+
+  .sig__table th,
+  .sig__table td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--line);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .sig__table th {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* Plot content is drawn by script, so these rules reach into it. */
+  .sig :global(svg text) {
+    font-family: var(--font-mono);
+    fill: var(--muted);
+    font-size: 11px;
+  }
+
+  .sig :global(svg .t-ink) {
+    fill: var(--text);
+  }
+
+  .sig :global(.fh-col) {
+    cursor: pointer;
+    outline: none;
+  }
+
+  .sig :global(.fh-col:hover .fh-colbg) {
+    fill: var(--accent-wash);
+  }
+
+  .sig :global(.fh-col:focus-visible .fh-colbg) {
+    fill: var(--accent-wash);
+    stroke: var(--accent);
+    stroke-width: 2;
+  }
+</style>
+
+<script>
+  import { initSignals } from './signals/index';
+
+  const root = document.querySelector<HTMLElement>('[data-signals]');
+  if (root) initSignals(root);
+</script>

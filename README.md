@@ -8,10 +8,11 @@ My portfolio and résumé site: research, engineering projects, and the websites
 
 - **Home** with a sonar-scope hero, a "Now" strip, and an "I'm here to..." switcher that reorders the page for employers, research labs or website clients. The reordering is pure CSS (`:has()` on the checked option), so it works before any JavaScript loads.
 - **Work**, a filterable grid of every project, plus a case study page for each one.
-- **Three in-browser demos** built from my own project code:
+- **Four in-browser demos** built from my own project code:
   - the LED spectrum visualizer's ESP32 signal chain, ported to JavaScript (same FFT size, band edges, AGC and silence detection), with an optional microphone mode
   - a line-for-line simulation of the RAMpage combat robot's weapon and E-stop firmware, including the serial console output
   - a simplified model of my V2V receiver chain, where you can switch on each sync stage and watch the constellation clean up
+  - a signals playground: my FH-BFSK chip visualizer (with sound you start yourself), plus constellations, bit error rates, a matched filter and multipath
 - **Recommendations** from the professors who advised the projects. A quote renders only once its writer has approved it (`src/data/testimonials.json`).
 - **Résumé** as an HTML page and a one-page tagged PDF, both generated from the same data file.
 - **Services** for website clients, **About**, **Contact** (Web3Forms with a mailto fallback), and a command palette on every page (Ctrl K or Cmd K, or press `/`). On phones the header has a native Menu disclosure, so navigation works before any JavaScript loads.
@@ -60,6 +61,7 @@ src/
 scripts/
   lint-copy.mjs       fails CI on em dashes and filler phrases
   check-a11y.mjs      fails CI on any axe violation
+  check-comms.mjs     checks the signals playground math (Q function, BER curves) against textbook values
   lib/serve-dist.mjs  local server for the built site, shared by the two scripts above
   render-assets.mjs   résumé PDF, social cards, touch icon, favicon.ico
 docs/                 plan, design system, content guide
