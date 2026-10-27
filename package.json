@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "lint:copy": "node scripts/lint-copy.mjs",
-    "verify": "npm run lint:copy && npm run check && npm run build",
+    "test:comms": "node scripts/check-comms.mjs",
+    "verify": "npm run lint:copy && npm run test:comms && npm run check && npm run build",
     "test:a11y": "node scripts/check-a11y.mjs",
     "assets": "node scripts/render-assets.mjs"
   },
