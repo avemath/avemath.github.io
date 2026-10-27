@@ -34,6 +34,11 @@ const posters = new Map<string, string>();
 for (const g of d.gallery ?? []) {
   if ('video' in g) posters.set(g.video, (await getImage({ src: g.poster, width: 1280, format: 'webp', quality: 80 })).src);
 }
+// Gallery photos and figures link to a full-size copy, so dense figures stay readable on a phone.
+const fullSize = new Map<number, string>();
+for (const [i, g] of (d.gallery ?? []).entries()) {
+  if (!('video' in g)) fullSize.set(i, (await getImage({ src: g.src, format: 'webp', quality: 85 })).src);
+}
 const ogImage = `/og/${project.id}.png`;
 
 const jsonLd = [
@@ -217,7 +222,7 @@ const jsonLd = [
         <section id="gallery" class="wrap case__gallery-wrap" aria-labelledby="gallery-title">
           <h2 id="gallery-title" class="section-title section-title--sm">Gallery</h2>
           <div class="case__gallery">
-            {d.gallery.map((g) => (
+            {d.gallery.map((g, i) => (
               <figure class="shot" data-reveal>
                 <div class="shot__img">
                   {'video' in g ? (
@@ -226,7 +231,10 @@ const jsonLd = [
                       <track kind="captions" src={g.captions} srclang="en" label="English" default />
                     </video>
                   ) : (
-                    <Image src={g.src} alt={g.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1000px, 100vw" format="webp" quality={80} />
+                    <a class="shot__link" href={fullSize.get(i)}>
+                      <Image src={g.src} alt={g.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1000px, 100vw" format="webp" quality={80} />
+                      <span class="sr-only">(opens full size)</span>
+                    </a>
                   )}
                 </div>
                 {g.caption && <figcaption>{g.caption}</figcaption>}
@@ -542,6 +550,26 @@ const jsonLd = [
 
   .shot__img :global(video) {
     background: #05070c;
+  }
+
+  .shot__link {
+    position: relative;
+    display: block;
+    cursor: zoom-in;
+  }
+
+  /* The frame clips overflow and the image would cover an inset outline, so the focus ring is drawn on top. */
+  .shot__link:focus-visible {
+    outline: none;
+  }
+
+  .shot__link:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1rem;
+    box-shadow: inset 0 0 0 3px var(--accent);
+    pointer-events: none;
   }
 
   .shot figcaption {
