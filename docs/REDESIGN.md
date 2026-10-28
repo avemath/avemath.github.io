@@ -80,6 +80,7 @@ Unchanged faces, all self-hosted and preloaded: Space Grotesk for headings, Inte
 A waterfall spectrogram that receives my name once.
 
 - **The signal is real.** The browser draws AVERY / MATHERNE into a small raster in the heading font, 228 pixels wide. Each raster row becomes one OFDM symbol: a 512 point inverse FFT at 16 kHz, with one subcarrier per raster column, so the letters are drawn by 228 subcarriers from about 440 Hz to 7.6 kHz. Each subcarrier's amplitude is that pixel's coverage, so anti-aliased edges come out smooth. Every symbol carries a 6 ms cyclic prefix, and neighboring symbols crossfade inside it with a raised cosine, so nothing starts or stops instantly and there are no clicks. One linear up-chirp goes out first as the sync sweep.
+- **The water is the channel.** The signal passes through a gentle frequency-selective fade, as two paths would make, with a little level jitter per subcarrier and some noise. So the letters show real measured texture, while staying within a few dB of full level and clearly readable.
 - **The display is computed.** The receiver runs a 512 point FFT over each symbol's body, skipping the prefix, just as an OFDM receiver does. So every subcarrier reads its own level with no leakage from its neighbors. One row per symbol, newest at the top, about 6 seconds on screen.
 - **One copy, then a pause.** Each cycle starts on quiet water, sends the sweep and the name, holds for about 4 seconds with the full name centered, fades, and starts again.
 - **Instrument look.** A perceptual colormap mixed in OKLab, from deep navy through teal to amber. A faint grid at every kilohertz and every second. Frequency runs along the bottom (0 to 8 kHz) and time down the left (0 to 6 s ago). The screen is navy in both themes.
@@ -101,7 +102,7 @@ Both effects are CSS only. They animate only `transform`, run only while their b
 ### 3. Depth gauge and signal meter
 
 - **One label per section.** The depth leads each section's eyebrow: "200 m · Featured work". Zone names (Twilight, Midnight) appear only in the gauge.
-- **Desktop (1440px and up):** a gauge on its own panel, 1.75rem from the edge, so it reads the same over every band. It shows the current depth large, then the zone name, then the section name. Twelve marks are labeled in meters, and each is a link to the section at that depth: one link per audience mode, with the others set to `display: none`, so it works without JavaScript.
+- **Desktop (1440px and up):** a gauge on the water itself, with no panel, 16px from the edge and 40px clear of the content column at 1440px. It shows the current depth large, then the zone name, then the section name. Each part of it (each readout line, every mark, the meter) takes the ink of the band directly under it. Band edges count from below the wave crest, so the gauge stays legible while it crosses from light water to dark. Twelve marks are labeled in meters, and each is a link to the section at that depth: one link per audience mode, with the others set to `display: none`, so it works without JavaScript.
 - **One source of truth.** The current section is whichever band crosses 40% of the viewport. The gauge shows exactly that slot's depth, zone and name from `depth.ts`, which is the same slot the section's own label comes from. The marker still glides between marks with motion.
 - **Signal meter:** five bars that drop as you go deeper. They lock (all amber, LOCK) when the footer frame is in view.
 - **Narrower screens:** a 3px progress bar fixed at the very top, teal, turning amber on lock.
@@ -161,7 +162,25 @@ One overlap remains: both sites use Space Grotesk for headings. See open questio
 
 ## Phase 1 scope
 
-Tokens, hero, descent, gauge and meter, packet footer, project signatures, sound speed curve, the home page, and the V2V case study. The other pages pick up the new tokens automatically and get their own pass in phase 2.
+Tokens, hero, descent, gauge and meter, packet footer, project signatures, sound speed curve, the home page, and the V2V case study.
+
+## Phase 2: the other pages
+
+Every page shares the tokens, the solid header and the packet footer, which sits on the seafloor band (slot 11) everywhere. Each page's sections are zones in `<main class="descent">`, and each zone after the first rises over the one before with the same wave edge. Depth labels in the eyebrows stay on the home page only; elsewhere the bands carry the descent quietly.
+
+| Page | Bands |
+|---|---|
+| /work/ | 0 (header and filters, with light rays), 1 (the grid) |
+| /about/ | 0 (with light rays), Now strip at 1, then 2, 3, 4 |
+| /services/ | 0 (with light rays) through 4, one per section, grid paper removed |
+| /resume/ | one band at 1, around the paper card |
+| /contact/ | one band at 2 |
+| 404 | one band at 3 |
+| case studies | three bands one step apart: header and media, then demo and write-up, then gallery, pager and contact |
+
+Case studies start where their kind of work lives (`caseStart` in `depth.ts`): client sites and the nonprofit at 0, software at 1, engineering at 2, research at 3. The deepest case study band is slot 5, so long write-ups stay on light water in the light theme and the content leads.
+
+**Print:** zones restate the paper colors under `@media print`, so the résumé PDF prints exactly as it did on `main` (checked pixel for pixel against a build of `main`).
 
 ## Open questions
 

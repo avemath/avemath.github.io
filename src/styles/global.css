@@ -383,18 +383,19 @@
 }
 
 .home-flow > .zone,
+.descent > .zone + .zone,
 .now.zone,
 .site-footer.zone {
   --wave: clamp(1.25rem, 2.6vw, 2.5rem);
-  --wave-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22C160 8 300 6 470 18S760 38 960 26 1280 6 1440 20V40H0Z'/%3E%3C/svg%3E");
+  --wave-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22C160 8 300 6 470 18S760 38 960 26 1280 8 1440 22V40H0Z'/%3E%3C/svg%3E");
   margin-top: calc(-1 * var(--wave));
   border-top: var(--wave) solid transparent;
   -webkit-mask:
     var(--wave-shape) calc(var(--slot, 0) * -317px) 0 / 1440px var(--wave) repeat-x,
-    linear-gradient(#000 0 0) 0 var(--wave) / 100% 100% no-repeat;
+    linear-gradient(#000 0 0) 0 calc(var(--wave) - 2px) / 100% 100% no-repeat;
   mask:
     var(--wave-shape) calc(var(--slot, 0) * -317px) 0 / 1440px var(--wave) repeat-x,
-    linear-gradient(#000 0 0) 0 var(--wave) / 100% 100% no-repeat;
+    linear-gradient(#000 0 0) 0 calc(var(--wave) - 2px) / 100% 100% no-repeat;
 }
 
 /* Soft light rays from the surface, in the top two bands. They fade with depth and sway slowly. */
@@ -492,8 +493,8 @@ html[data-motion='reduce'] .sunlit::after {
   animation: none;
 }
 
-/* One label per section: its depth leads the eyebrow ("200 m · Featured work"). */
-.zone .eyebrow::before {
+/* One label per section on the home page: its depth leads the eyebrow ("200 m · Featured work"). */
+.home .zone .eyebrow::before {
   content: var(--depth, '') / '';
   width: auto;
   height: auto;
@@ -1015,6 +1016,30 @@ html[data-motion='reduce'] *::after {
   .no-print,
   .site-header,
   .site-footer {
+    display: none !important;
+  }
+
+  /* A zone sets its own shade inline and its own inks, so print restates the paper colors here. */
+  .zone {
+    --bg: #fff !important;
+    --surface: #fff !important;
+    --surface-2: #fff !important;
+    --text: #000 !important;
+    --text-soft: #111 !important;
+    --muted: #333 !important;
+    --line: #bbb !important;
+    --line-strong: #b9b4a6 !important;
+    --accent: #000 !important;
+    --accent-ink: #000 !important;
+    background: #fff !important;
+    margin-top: 0 !important;
+    border-top: 0 !important;
+    -webkit-mask: none !important;
+    mask: none !important;
+  }
+
+  .zone::before,
+  .zone::after {
     display: none !important;
   }
 

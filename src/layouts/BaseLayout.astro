@@ -61,7 +61,7 @@ const { bare = false, ...seo } = Astro.props;
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     {!bare && <Header />}
-    <main id="main" tabindex="-1">
+    <main id="main" class="descent" tabindex="-1">
       <slot />
     </main>
     {!bare && <Footer />}
@@ -72,6 +72,10 @@ const { bare = false, ...seo } = Astro.props;
       import { initReveals } from '../scripts/motion';
       initPreferenceControls();
       initReveals();
+
+      // The light rays, marine snow and glows only move while their band is on screen.
+      const fx = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('fx-live', e.isIntersecting)));
+      document.querySelectorAll('.zone').forEach((z) => fx.observe(z));
     </script>
 
     {

@@ -57,12 +57,19 @@ export const SNOW_SLOTS = [9, 10];
 
 export const formatDepth = (m: number) => `${m.toLocaleString('en-US')} m`;
 
-/** Everything a zone needs from its slot, as CSS custom properties. */
-export function slotVars(i: number) {
-  const vars = [`--slot:${i}`, `--band:var(--band-${i})`, `--deep:${i >= DEEP_FROM ? 1 : 0}`, `--depth:${css(`${formatDepth(slots[i].depth)} · `)}`];
+/** Everything a zone needs from its slot, as CSS custom properties. `label` adds the depth that
+ *  leads the section's eyebrow, which only the home page shows. */
+export function slotVars(i: number, label = true) {
+  const vars = [`--slot:${i}`, `--band:var(--band-${i})`, `--deep:${i >= DEEP_FROM ? 1 : 0}`];
+  if (label) vars.push(`--depth:${css(`${formatDepth(slots[i].depth)} · `)}`);
   if (SNOW_SLOTS.includes(i)) vars.push('--snow:block');
   return vars.join(';');
 }
+
+/** Where each kind of case study starts its descent: client and website work near the surface,
+ *  software and engineering mid-water, research deepest. Kept above the light theme's drop into
+ *  dark water, so long write-ups stay on light water in the light theme. */
+export const caseStart: Record<string, number> = { 'client-site': 0, nonprofit: 0, software: 1, engineering: 2, research: 3 };
 
 const css = (text: string) => `"${text.replace(/"/g, '\\"')}"`;
 

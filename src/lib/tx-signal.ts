@@ -98,6 +98,15 @@ export function synthesize(mask: Float32Array, rows: number): Float32Array<Array
   const phase = Float64Array.from({ length: BINS }, () => rand() * 2 * Math.PI);
   const tone = 0.03;
   const ifft = makeFft(N);
+  const gauss = () => {
+    let u = 0;
+    while (u === 0) u = rand();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
+  };
+  // The water is the channel: a gentle frequency-selective fade, as two paths would make, and a
+  // little level jitter per subcarrier and symbol. The name then reads as a measured signal
+  // with real texture, not flat text, while staying a few dB from full level.
+  const fade = Float64Array.from({ length: BINS }, (_, k) => 10 ** ((2.4 * Math.sin((2 * Math.PI * k) / 47 + 0.7) + 1.3 * Math.sin((2 * Math.PI * k) / 13 + 2.1)) / 20));
 
   // Each name symbol, as one period of its own periodic signal.
   const symbols: (Float64Array | null)[] = Array.from({ length: frames }, (_, f) => {
@@ -112,8 +121,9 @@ export function synthesize(mask: Float32Array, rows: number): Float32Array<Array
       if (a < 0.02) continue;
       any = true;
       const k = FIRST_BIN + c;
-      re[k] = (tone / 2) * a * Math.cos(phase[k]);
-      im[k] = (tone / 2) * a * Math.sin(phase[k]);
+      const amp = (tone / 2) * a * fade[k] * Math.max(0.4, 1 + 0.16 * gauss());
+      re[k] = amp * Math.cos(phase[k]);
+      im[k] = amp * Math.sin(phase[k]);
       re[N - k] = re[k];
       im[N - k] = -im[k];
     }
@@ -158,6 +168,6 @@ export function addNoise(out: Float32Array, rand = rng(7)) {
   for (let n = 0; n < out.length; n++) {
     let u = 0;
     while (u === 0) u = rand();
-    out[n] += 0.0015 * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
+    out[n] += 0.0021 * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
   }
 }

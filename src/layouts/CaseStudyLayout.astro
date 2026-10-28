@@ -8,6 +8,7 @@ import Icon from '@/components/Icon.astro';
 import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
 import { formatRange } from '@/lib/format';
 import site from '@/data/site.json';
+import { slotVars, caseStart } from '@/lib/depth';
 
 interface Props {
   project: Project;
@@ -40,6 +41,9 @@ for (const [i, g] of (d.gallery ?? []).entries()) {
   if (!('video' in g)) fullSize.set(i, (await getImage({ src: g.src, format: 'webp', quality: 85 })).src);
 }
 const ogImage = `/og/${project.id}.png`;
+// Three gentle bands, one step apart, starting where this kind of work lives (see depth.ts).
+const start = caseStart[d.type] ?? 1;
+const band = (step: number) => slotVars(start + step, false);
 
 const jsonLd = [
   {
@@ -65,7 +69,8 @@ const jsonLd = [
 ---
 
 <BaseLayout title={d.seoTitle ?? d.title} description={d.seoDescription ?? d.summary} image={ogImage} type="article" jsonLd={jsonLd}>
-  <article class="case">
+  <article class="case descent">
+    <div class="zone case__zone case__zone--top" style={band(0)}>
     <header class="case__head">
       <div class="wrap">
         <nav aria-label="Breadcrumb" class="no-print">
@@ -193,6 +198,9 @@ const jsonLd = [
       }
     </div>
 
+    </div>
+
+    <div class="zone case__zone" style={band(1)}>
     <slot name="demo" />
 
     <div class="wrap case__body">
@@ -217,6 +225,9 @@ const jsonLd = [
       </div>
     </div>
 
+    </div>
+
+    <div class="zone case__zone case__zone--end" style={band(2)}>
     {
       d.gallery && !limited && (
         <section id="gallery" class="wrap case__gallery-wrap" aria-labelledby="gallery-title">
@@ -295,10 +306,19 @@ const jsonLd = [
         </a>
       </div>
     </section>
+    </div>
   </article>
 </BaseLayout>
 
 <style>
+  .case__zone--top {
+    padding-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .case__zone--end {
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
   .case__head {
     padding-block: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 4vw, 3rem);
   }

@@ -19,17 +19,17 @@ const short = (m: number) => m.toLocaleString('en-US');
 
 <nav class="gauge" aria-label="Depth" data-gauge>
   <p class="gauge__now" aria-hidden="true">
-    <span class="gauge__label">Depth</span>
-    <span class="gauge__depth" data-gauge-depth>0 m</span>
-    <span class="gauge__zone" data-gauge-zone>{slots[0].zone}</span>
-    <span class="gauge__section" data-gauge-section>{sectionNames.top}</span>
+    <span class="gauge__label" data-ink>Depth</span>
+    <span class="gauge__depth" data-gauge-depth data-ink>0 m</span>
+    <span class="gauge__zone" data-gauge-zone data-ink>{slots[0].zone}</span>
+    <span class="gauge__section" data-gauge-section data-ink>{sectionNames.top}</span>
   </p>
   <div class="gauge__scale">
     <span class="gauge__marker" aria-hidden="true" data-gauge-marker></span>
     <ol>
       {
         marks.map((m, i) => (
-          <li class="gauge__mark" style={`--i:${i}`}>
+          <li class="gauge__mark" style={`--i:${i}`} data-ink>
             {m.links.map((l) => (
               <a href={`#${l.id}`} class:list={['gauge__link', l.aud && `gauge__link--${l.aud}`]} data-slot={i}>
                 <span class="gauge__tick" aria-hidden="true" />
@@ -46,7 +46,7 @@ const short = (m: number) => m.toLocaleString('en-US');
       }
     </ol>
   </div>
-  <div class="gauge__meter" aria-hidden="true" data-meter>
+  <div class="gauge__meter" aria-hidden="true" data-meter data-ink>
     <span class="gauge__bars"><i></i><i></i><i></i><i></i><i></i></span>
     <span class="gauge__meter-label" data-meter-label>Sig</span>
   </div>
@@ -59,24 +59,21 @@ const short = (m: number) => m.toLocaleString('en-US');
     display: none;
   }
 
-  /* Only where the page margin can hold it without touching the content. It sits on its own
-     panel, so it reads the same over every band in both themes. */
+  /* Only where the page margin can hold it. At 1440px the content column starts at 152px; the
+     gauge ends at 112px, so there are 40px between them. No panel: it sits on the water and
+     takes its ink from the band under it (the script sets data-deep over dark water). */
   @media (min-width: 1440px) {
     .gauge {
       position: fixed;
       z-index: 30;
-      left: 1.75rem;
+      left: 1rem;
       top: 50%;
       translate: 0 -50%;
       display: grid;
-      gap: 1.1rem;
-      width: 7.25rem;
-      padding: 0.9rem 0.85rem 0.85rem;
-      border: 1px solid var(--line);
-      border-radius: 0.75rem;
-      background: var(--surface);
-      box-shadow: var(--shadow);
+      gap: 1rem;
+      width: 6rem;
       font-family: var(--font-mono);
+      transition: color 0.3s;
     }
 
     .depthbar {
@@ -116,9 +113,10 @@ const short = (m: number) => m.toLocaleString('en-US');
   }
 
   .gauge__section {
-    overflow-wrap: anywhere;
+    hyphens: auto;
+    overflow-wrap: break-word;
     font-family: var(--font-sans);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     color: var(--text-soft);
   }
 
@@ -182,6 +180,21 @@ const short = (m: number) => m.toLocaleString('en-US');
     display: flex;
   }
 
+  /* Light theme over dark water: the dark-water inks, the same ones the bands use. Each part of
+     the gauge (the readout, every mark, the meter) reads the band directly under it, so the
+     gauge stays legible while it straddles a band edge. */
+  :global(:root:not([data-theme='dark'])) .gauge [data-deep] {
+    --text: #e4f0f5;
+    --text-soft: #c3d6df;
+    --muted: #adc6d2;
+    --accent: #7ccbe6;
+    --accent-ink: #93d5ec;
+    --amber-line: #f0a940;
+    --amber-ink: #f5c27a;
+    --line: rgb(228 240 245 / 0.16);
+    --line-strong: rgb(228 240 245 / 0.3);
+  }
+
   .gauge__marker {
     position: absolute;
     left: -0.3rem;
@@ -190,7 +203,7 @@ const short = (m: number) => m.toLocaleString('en-US');
     height: 0.55rem;
     border: 1.5px solid var(--amber-line);
     border-radius: 50%;
-    background: var(--bg);
+    background: var(--amber-line);
     translate: 0 -50%;
     transition: top 0.25s var(--ease-out-expo);
   }
@@ -267,7 +280,7 @@ const short = (m: number) => m.toLocaleString('en-US');
 </style>
 
 <script>
-  import { orders, slots, sectionNames, formatDepth, type Audience } from '../lib/depth';
+  import { orders, slots, sectionNames, formatDepth, DEEP_FROM, type Audience } from '../lib/depth';
   import { prefersReducedMotion } from '../scripts/preferences';
 
   const gauge = document.querySelector<HTMLElement>('[data-gauge]');
@@ -286,10 +299,23 @@ const short = (m: number) => m.toLocaleString('en-US');
 
   const audience = () => (document.querySelector<HTMLInputElement>('input[name="audience"]:checked')?.value ?? 'hire') as Audience;
 
+  // The gauge is fixed, so where its parts sit in the viewport only changes on resize.
+  let inked: { el: HTMLElement; y: number }[] = [];
+  let inkTops: number[] = [];
+
   function measure() {
+    inked = [...(gauge?.querySelectorAll<HTMLElement>('[data-ink]') ?? [])].map((el) => {
+      const r = el.getBoundingClientRect();
+      return { el, y: r.top + r.height / 2 };
+    });
     tops = orders[audience()].map((id) => {
       const el = document.getElementById(id);
       return el ? el.getBoundingClientRect().top + scrollY : Infinity;
+    });
+    // For ink, a band begins below its wave edge: above the crest the band before still shows.
+    inkTops = orders[audience()].map((id, k) => {
+      const el = document.getElementById(id);
+      return el ? tops[k] + parseFloat(getComputedStyle(el).borderTopWidth || '0') : Infinity;
     });
     update();
   }
@@ -313,6 +339,14 @@ const short = (m: number) => m.toLocaleString('en-US');
     if (zoneEl) zoneEl.textContent = slots[i].zone;
     if (sectionEl) sectionEl.textContent = sectionNames[orders[audience()][i]];
     links.forEach((a) => (Number(a.dataset.slot) === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
+
+    // Each part of the gauge takes the ink of the band under its own center.
+    inked.forEach(({ el, y }) => {
+      const at = scrollY + y;
+      let j = 0;
+      while (j < n - 1 && inkTops[j + 1] <= at) j++;
+      el.toggleAttribute('data-deep', j >= DEEP_FROM);
+    });
 
     // Signal strength drops with depth until the receiver on the seafloor locks on.
     const bars = Math.max(1, 5 - Math.floor(pos * 4.6));
