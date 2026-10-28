@@ -35,9 +35,8 @@ metrics:
 client:
   name: Nicholas Domke
   kind: Mechanical engineering student portfolio, LSU
-  permission: false # flip to true once Nicholas OKs
-# Hidden until Nicholas OKs. Then set draft to false.
-draft: true
+  permission: true
+draft: false
 ---
 
 ## Context
