@@ -6,7 +6,7 @@ My portfolio and résumé site: research, engineering projects, and the websites
 
 ## What's in it
 
-- **Home** with a sonar-scope hero, a "Now" strip, and an "I'm here to..." switcher that reorders the page for employers, research labs or website clients. The reordering is pure CSS (`:has()` on the checked option), so it works before any JavaScript loads.
+- **Home** designed as a signal sent down through the ocean: a live spectrogram hero that computes my name from a real synthesized signal (with sound you start yourself), sections that get darker with depth, a depth gauge, and a footer drawn as the received data frame. Then a "Now" strip and an "I'm here to..." switcher that reorders the page for employers, research labs or website clients. The reordering is pure CSS (`:has()` on the checked option), so it works before any JavaScript loads.
 - **Work**, a filterable grid of every project, plus a case study page for each one.
 - **Four in-browser demos** built from my own project code:
   - the LED spectrum visualizer's ESP32 signal chain, ported to JavaScript (same FFT size, band edges, AGC and silence detection), with an optional microphone mode
@@ -56,7 +56,7 @@ src/
   layouts/            BaseLayout, CaseStudyLayout
   pages/              routes
   lib/                content helpers and date formatting
-  scripts/            sonar canvas, motion, preferences, text decode
+  scripts/            spectrogram, motion, preferences, text decode
   styles/global.css   tokens and shared styles
 scripts/
   lint-copy.mjs       fails CI on em dashes and filler phrases
@@ -64,7 +64,7 @@ scripts/
   check-comms.mjs     checks the signals playground math (Q function, BER curves) against textbook values
   lib/serve-dist.mjs  local server for the built site, shared by the two scripts above
   render-assets.mjs   résumé PDF, social cards, touch icon, favicon.ico
-docs/                 plan, design system, content guide
+docs/                 plan, design system, redesign concept, content guide
 ```
 
 All content © Avery Matherne. Client sites belong to their owners.

@@ -11,6 +11,8 @@ import Skills from '@/components/Skills.astro';
 import FieldNotes from '@/components/FieldNotes.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import Icon from '@/components/Icon.astro';
+import DepthGauge from '@/components/DepthGauge.astro';
+import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
 
@@ -49,12 +51,13 @@ const tileStyle = (b: (typeof bento)[number]) =>
 ---
 
 <BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
+  <style is:inline slot="head" set:html={zoneStyles()} />
   <div class="home">
     <Hero />
     <NowStrip />
 
     <div class="home-flow">
-      <section id="featured" class="section home-section" aria-labelledby="featured-title" data-section="featured">
+      <section id="featured" class="section home-section zone" aria-labelledby="featured-title" data-section="featured">
         <div class="wrap">
           <div class="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -98,7 +101,7 @@ const tileStyle = (b: (typeof bento)[number]) =>
       <Skills />
       <FieldNotes />
 
-      <section id="services" class="section section--tight home-section" aria-labelledby="services-title" data-section="services">
+      <section id="services" class="section section--tight home-section zone" aria-labelledby="services-title" data-section="services">
         <div class="wrap">
           <div class="services-teaser card">
             <div>
@@ -124,7 +127,7 @@ const tileStyle = (b: (typeof bento)[number]) =>
         </div>
       </section>
 
-      <section id="contact" class="section section--tight home-section" aria-labelledby="contact-title" data-section="contact">
+      <section id="contact" class="section section--tight home-section zone" aria-labelledby="contact-title" data-section="contact">
         <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:items-center">
           <div>
             <p class="eyebrow">Contact</p>
@@ -154,6 +157,7 @@ const tileStyle = (b: (typeof bento)[number]) =>
         </div>
       </section>
     </div>
+    <DepthGauge />
   </div>
 </BaseLayout>
 
@@ -163,13 +167,21 @@ const tileStyle = (b: (typeof bento)[number]) =>
     flex-direction: column;
   }
 
-  /* Sections keep their dividers whatever order the audience switcher picks. */
+  /* The descent: each section takes the shade and zone tag of the slot it lands in, whatever
+     order the audience switcher picks. The per-section values come from src/lib/depth.ts. */
   .home-flow > :global(.home-section) {
-    border-top: 1px solid var(--line);
+    --slot: var(--slot-hire);
+    --tag: var(--tag-hire);
   }
 
-  .home-flow > :global(.home-section:first-child) {
-    border-top: 0;
+  .home:has(#aud-research:checked) .home-flow > :global(.home-section) {
+    --slot: var(--slot-research);
+    --tag: var(--tag-research);
+  }
+
+  .home:has(#aud-website:checked) .home-flow > :global(.home-section) {
+    --slot: var(--slot-website);
+    --tag: var(--tag-website);
   }
 
   /* Audience ordering. Pure CSS, driven by the checked radio in the hero. Sections without a

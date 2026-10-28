@@ -173,7 +173,7 @@ const jsonLd = [
             </div>
           ) : (
             <div class="case__art">
-              <ProjectArt slug={project.id} />
+              <ProjectArt slug={project.id} fit="meet" />
             </div>
           )
         }
@@ -357,9 +357,10 @@ const jsonLd = [
     background: var(--surface);
   }
 
+  /* The art is shown whole, so the frame takes the art's own background around it. */
   .case__art {
-    aspect-ratio: 21 / 9;
-    max-height: 24rem;
+    height: clamp(14rem, 32vw, 24rem);
+    background: color-mix(in oklab, var(--surface-2) 70%, var(--bg));
   }
 
   .case__shot :global(img) {

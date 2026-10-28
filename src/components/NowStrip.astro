@@ -2,7 +2,7 @@
 import now from '@/data/now.json';
 ---
 
-<section class="now" aria-label="What I'm doing now">
+<section id="now" class="now zone" aria-label="What I'm doing now" style={`--slot:1;--zone-edge:0px;--tag:"50 m · Sunlight zone"`}>
   <div class="wrap">
     <dl class="now__grid">
       {
@@ -24,8 +24,7 @@ import now from '@/data/now.json';
 
 <style>
   .now {
-    border-block: 1px solid var(--line);
-    background: var(--surface);
+    padding-block: 2rem 1.25rem;
   }
 
   .now__grid {
