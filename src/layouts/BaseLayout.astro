@@ -69,13 +69,17 @@ const { bare = false, ...seo } = Astro.props;
 
     <script>
       import { initPreferenceControls } from '../scripts/preferences';
-      import { initReveals } from '../scripts/motion';
+      import { initReveals, whenSettled } from '../scripts/motion';
       initPreferenceControls();
       initReveals();
 
-      // The light rays, marine snow and glows only move while their band is on screen.
-      const fx = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('fx-live', e.isIntersecting)));
-      document.querySelectorAll('.zone').forEach((z) => fx.observe(z));
+      // The light rays, marine snow and glows only move once the page has settled, and only
+      // while their band is on screen.
+      whenSettled(() => {
+        document.documentElement.classList.add('fx-ready');
+        const fx = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('fx-live', e.isIntersecting)));
+        document.querySelectorAll('.zone').forEach((z) => fx.observe(z));
+      });
     </script>
 
     {

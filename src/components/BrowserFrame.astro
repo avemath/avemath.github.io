@@ -13,7 +13,7 @@ interface Props {
   eager?: boolean;
 }
 
-const { src, mobile, alt, url, widths = [480, 720, 960, 1280], sizes = '(min-width: 1024px) 50vw, 100vw', eager = false } = Astro.props;
+const { src, mobile, alt, url, widths = [480, 680, 960, 1280], sizes = '(min-width: 1024px) 44vw, calc(100vw - 2rem)', eager = false } = Astro.props;
 const host = url ? displayUrl(url) : '';
 ---
 
@@ -38,7 +38,7 @@ const host = url ? displayUrl(url) : '';
   {
     mobile && (
       <div class="frame__phone" aria-hidden="true">
-        <Image src={mobile} alt="" widths={[180, 300]} sizes="150px" format="webp" quality={75} loading="lazy" class="frame__phone-shot" />
+        <Image src={mobile} alt="" widths={[120, 150, 220, 300]} sizes="(min-width: 720px) 150px, 64px" format="webp" quality={75} loading="lazy" class="frame__phone-shot" />
       </div>
     )
   }
