@@ -87,9 +87,8 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     position: sticky;
     top: 0;
     z-index: 40;
-    background: color-mix(in oklab, var(--bg) 90%, transparent);
-    backdrop-filter: saturate(1.4) blur(14px);
-    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    /* Solid, so page text never shows through while scrolling. It matches the surface band. */
+    background: var(--band-0);
     border-bottom: 1px solid transparent;
     transition: border-color 0.3s;
   }

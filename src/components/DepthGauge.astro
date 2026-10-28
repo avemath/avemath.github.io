@@ -21,7 +21,8 @@ const short = (m: number) => m.toLocaleString('en-US');
   <p class="gauge__now" aria-hidden="true">
     <span class="gauge__label">Depth</span>
     <span class="gauge__depth" data-gauge-depth>0 m</span>
-    <span class="gauge__zone" data-gauge-zone>Surface</span>
+    <span class="gauge__zone" data-gauge-zone>{slots[0].zone}</span>
+    <span class="gauge__section" data-gauge-section>{sectionNames.top}</span>
   </p>
   <div class="gauge__scale">
     <span class="gauge__marker" aria-hidden="true" data-gauge-marker></span>
@@ -58,19 +59,24 @@ const short = (m: number) => m.toLocaleString('en-US');
     display: none;
   }
 
-  /* Only where the page margin is wide enough to hold it without touching the content. */
-  @media (min-width: 1360px) {
+  /* Only where the page margin can hold it without touching the content. It sits on its own
+     panel, so it reads the same over every band in both themes. */
+  @media (min-width: 1440px) {
     .gauge {
       position: fixed;
       z-index: 30;
-      left: 1rem;
+      left: 1.75rem;
       top: 50%;
       translate: 0 -50%;
       display: grid;
-      gap: 1rem;
-      width: 4.75rem;
+      gap: 1.1rem;
+      width: 7.25rem;
+      padding: 0.9rem 0.85rem 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+      background: var(--surface);
+      box-shadow: var(--shadow);
       font-family: var(--font-mono);
-      text-transform: uppercase;
     }
 
     .depthbar {
@@ -80,31 +86,45 @@ const short = (m: number) => m.toLocaleString('en-US');
 
   .gauge__now {
     display: grid;
-    gap: 0.15rem;
-    font-size: 0.62rem;
-    letter-spacing: 0.1em;
+    gap: 0.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--line);
     line-height: 1.3;
+  }
+
+  .gauge__label {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--muted);
   }
 
   .gauge__depth {
-    font-size: 0.82rem;
-    letter-spacing: 0.02em;
+    white-space: nowrap;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
     color: var(--text);
     font-variant-numeric: tabular-nums;
   }
 
   .gauge__zone {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--accent-ink);
   }
 
-  :global([data-theme='dark']) .gauge__zone {
-    color: var(--accent);
+  .gauge__section {
+    overflow-wrap: anywhere;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    color: var(--text-soft);
   }
 
   .gauge__scale {
     position: relative;
-    height: min(52vh, 28rem);
+    height: min(44vh, 22rem);
     margin-left: 0.3rem;
     border-left: 1px solid var(--line-strong);
   }
@@ -122,8 +142,8 @@ const short = (m: number) => m.toLocaleString('en-US');
     gap: 0.4rem;
     min-height: 1.5rem;
     padding-right: 0.35rem;
-    font-size: 0.62rem;
-    letter-spacing: 0.04em;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
     color: var(--muted);
     text-decoration: none;
     font-variant-numeric: tabular-nums;
@@ -179,7 +199,10 @@ const short = (m: number) => m.toLocaleString('en-US');
     display: flex;
     align-items: flex-end;
     gap: 0.5rem;
-    font-size: 0.6rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.64rem;
+    text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--muted);
   }
@@ -244,7 +267,7 @@ const short = (m: number) => m.toLocaleString('en-US');
 </style>
 
 <script>
-  import { orders, slots, formatDepth, type Audience } from '../lib/depth';
+  import { orders, slots, sectionNames, formatDepth, type Audience } from '../lib/depth';
   import { prefersReducedMotion } from '../scripts/preferences';
 
   const gauge = document.querySelector<HTMLElement>('[data-gauge]');
@@ -252,6 +275,7 @@ const short = (m: number) => m.toLocaleString('en-US');
   const marker = gauge?.querySelector<HTMLElement>('[data-gauge-marker]');
   const depthEl = gauge?.querySelector<HTMLElement>('[data-gauge-depth]');
   const zoneEl = gauge?.querySelector<HTMLElement>('[data-gauge-zone]');
+  const sectionEl = gauge?.querySelector<HTMLElement>('[data-gauge-section]');
   const meter = gauge?.querySelector<HTMLElement>('[data-meter]');
   const meterLabel = gauge?.querySelector<HTMLElement>('[data-meter-label]');
   const links = [...(gauge?.querySelectorAll<HTMLAnchorElement>('.gauge__link') ?? [])];
@@ -273,20 +297,21 @@ const short = (m: number) => m.toLocaleString('en-US');
   function update() {
     queued = false;
     const n = slots.length;
-    const probe = scrollY + innerHeight * 0.35;
+    const probe = scrollY + innerHeight * 0.4;
     const atEnd = scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
     let i = 0;
     while (i < n - 1 && tops[i + 1] <= probe) i++;
     if (atEnd) i = n - 1;
-    // With motion, depth runs smoothly between marks; with reduced motion it jumps per section.
+    // The marker glides between marks with motion and jumps per section without it. The numbers
+    // always name the section the reading line is in, the same slot its own label comes from.
     const span = i < n - 1 ? tops[i + 1] - tops[i] : 1;
     const frac = prefersReducedMotion() || i === n - 1 ? 0 : Math.max(0, Math.min(1, (probe - tops[i]) / span));
-    const depth = slots[i].depth + (i < n - 1 ? (slots[i + 1].depth - slots[i].depth) * frac : 0);
     const pos = (i + frac) / (n - 1);
 
     marker?.style.setProperty('--pos', String(pos));
-    if (depthEl) depthEl.textContent = formatDepth(Math.round(depth / 10) * 10);
+    if (depthEl) depthEl.textContent = formatDepth(slots[i].depth);
     if (zoneEl) zoneEl.textContent = slots[i].zone;
+    if (sectionEl) sectionEl.textContent = sectionNames[orders[audience()][i]];
     links.forEach((a) => (Number(a.dataset.slot) === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
 
     // Signal strength drops with depth until the receiver on the seafloor locks on.

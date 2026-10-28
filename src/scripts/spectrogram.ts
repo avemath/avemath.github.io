@@ -1,85 +1,95 @@
-// The hero waterfall. It runs a 512 point FFT with a Hann window over the transmitted signal
-// (src/lib/tx-signal.ts) one frame at a time, newest at the top, and maps level to color. The
-// canvas is one pixel per bin and one per frame; CSS scales it up. "Hear it" plays the same
-// buffer, and while it plays the display follows the audio clock.
+// The hero waterfall. It draws my name into a raster in the heading font, builds the
+// transmission from it (src/lib/tx-signal.ts), and runs a 512 point FFT over that signal one
+// symbol at a time, newest at the top. Like an OFDM receiver, the FFT is aligned to each symbol
+// with no window, so every subcarrier reads its own level with no leakage from its neighbors.
+// Level maps through a navy, teal, amber colormap. Each cycle sends the name once, holds with the name centered, fades, and starts
+// again. "Hear it" plays the same buffer, and while it plays the display follows the audio clock.
 //
-// It pauses off-screen and in background tabs, and shows one still frame under reduced motion
-// or on low-power devices. Sound only ever starts from a click.
-import { FS, N, BINS, BIN_HZ, LOOP, VIEW_ROWS, STILL_TOP, synthesize } from '../lib/tx-signal';
+// It pauses off-screen and in background tabs, and shows the held frame under reduced motion or
+// on low-power devices. Sound only ever starts from a click.
+import { FS, N, CP, SYMBOL, BINS, BIN_HZ, FRAME_HZ, VIEW_ROWS, TEXT_BINS, LINES, holdFrame, makeFft, synthesize, addNoise } from '../lib/tx-signal';
 import { prefersReducedMotion } from './preferences';
 
-const DB_LO = -82;
-const DB_HI = -22;
-const FRAME_HZ = FS / N;
+const DB_LO = -84;
+const DB_HI = -32;
+const HOLD_MS = 4200;
+const FADE_MS = 700;
 
-export function mountSpectrogram(root: HTMLElement) {
+// Colormap stops, low to high level, mixed in OKLab so the ramp is perceptually even.
+const STOPS: [number, string][] = [
+  [0, '#061523'],
+  [0.3, '#0b3550'],
+  [0.55, '#14708c'],
+  [0.75, '#4fb3c9'],
+  [0.88, '#c9c48a'],
+  [1, '#f0a940'],
+];
+
+/** The name as a coverage raster TEXT_BINS wide: two lines, each fitted to the width of the longer. */
+function rasterName() {
+  const family = getComputedStyle(document.documentElement).getPropertyValue('--font-display').trim() || 'sans-serif';
+  const probe = document.createElement('canvas').getContext('2d')!;
+  probe.font = `600 100px ${family}`;
+  const wide = Math.max(...LINES.map((l) => probe.measureText(l).width));
+  const capH = probe.measureText('M').actualBoundingBoxAscent || 70;
+  const size = (100 * (TEXT_BINS - 2)) / wide;
+  const cap = (capH * size) / 100;
+  const gap = size * 0.32;
+  const rows = Math.ceil(cap * LINES.length + gap * (LINES.length - 1)) + 2;
+  const c = document.createElement('canvas');
+  c.width = TEXT_BINS;
+  c.height = rows;
+  const x = c.getContext('2d', { willReadFrequently: true })!;
+  x.font = `600 ${size}px ${family}`;
+  x.fillStyle = '#fff';
+  x.textAlign = 'center';
+  x.textBaseline = 'alphabetic';
+  LINES.forEach((line, i) => x.fillText(line, TEXT_BINS / 2, 1 + cap + i * (cap + gap)));
+  const px = x.getImageData(0, 0, TEXT_BINS, rows).data;
+  const mask = new Float32Array(TEXT_BINS * rows);
+  for (let i = 0; i < mask.length; i++) mask[i] = px[i * 4 + 3] / 255;
+  return { mask, rows };
+}
+
+export async function mountSpectrogram(root: HTMLElement) {
   const canvas = root.querySelector<HTMLCanvasElement>('canvas');
   const screen = root.querySelector<HTMLElement>('[data-tx-screen]');
-  const ctx = canvas?.getContext('2d');
+  const ctx = canvas?.getContext('2d', { alpha: false });
   if (!canvas || !screen || !ctx) return;
 
-  const signal = synthesize();
+  // Draw the name in the heading font once it is ready (it is preloaded, so this is quick).
+  await Promise.race([document.fonts?.load(`600 40px ${getComputedStyle(document.documentElement).getPropertyValue('--font-display')}`), new Promise((r) => setTimeout(r, 1500))]).catch(() => {});
+  const { mask, rows } = rasterName();
+  const signal = synthesize(mask, rows);
+  const HOLD = holdFrame(rows);
+  const quiet = new Float32Array(16 * SYMBOL);
+  addNoise(quiet);
+
   const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
   const lowPower = (navigator.hardwareConcurrency ?? 8) <= 2 || nav.connection?.saveData === true || (nav.deviceMemory ?? 8) < 2;
 
-  // ---- Radix-2 FFT, in place, with precomputed tables ----
+  const fft = makeFft(N);
   const re = new Float64Array(N);
   const im = new Float64Array(N);
-  const bits = Math.log2(N);
-  const bitrev = Uint16Array.from({ length: N }, (_, i) => {
-    let y = 0;
-    for (let b = 0, x = i; b < bits; b++, x >>= 1) y = (y << 1) | (x & 1);
-    return y;
-  });
-  const cosT = Float64Array.from({ length: N / 2 }, (_, k) => Math.cos((-2 * Math.PI * k) / N));
-  const sinT = Float64Array.from({ length: N / 2 }, (_, k) => Math.sin((-2 * Math.PI * k) / N));
-  const hann = Float64Array.from({ length: N }, (_, n) => 0.5 - 0.5 * Math.cos((2 * Math.PI * n) / N));
-
-  function fft() {
-    for (let i = 0; i < N; i++) {
-      const j = bitrev[i];
-      if (j > i) {
-        [re[i], re[j]] = [re[j], re[i]];
-        [im[i], im[j]] = [im[j], im[i]];
-      }
-    }
-    for (let size = 2; size <= N; size <<= 1) {
-      const half = size >> 1;
-      const stride = N / size;
-      for (let start = 0; start < N; start += size) {
-        for (let k = 0; k < half; k++) {
-          const wr = cosT[k * stride];
-          const wi = sinT[k * stride];
-          const a = start + k;
-          const b = a + half;
-          const tr = wr * re[b] - wi * im[b];
-          const ti = wr * im[b] + wi * re[b];
-          re[b] = re[a] - tr;
-          im[b] = im[a] - ti;
-          re[a] += tr;
-          im[a] += ti;
-        }
-      }
-    }
-  }
 
   // Levels in dBFS, screen order: row 0 is the newest frame.
   const levels = new Float32Array(VIEW_ROWS * BINS).fill(DB_LO);
   const image = ctx.createImageData(BINS, VIEW_ROWS);
   const px = image.data;
-  let lut = buildLut();
+  const lut = buildLut();
 
-  /** Analyze one frame of the loop into row 0. A full-scale tone reads 0 dBFS. */
+  /** Analyze one symbol into row 0: a frame of the transmission, or quiet water before it starts. */
   function analyze(frame: number) {
-    const base = (((frame % LOOP) + LOOP) % LOOP) * N;
+    const src = frame >= 0 && frame <= HOLD ? signal : quiet;
+    const base = (frame >= 0 && frame <= HOLD ? frame : ((frame % 16) + 16) % 16) * SYMBOL + CP;
     for (let n = 0; n < N; n++) {
-      re[n] = signal[base + n] * hann[n];
+      re[n] = src[base + n];
       im[n] = 0;
     }
-    fft();
+    fft(re, im, -1);
     levels.copyWithin(BINS, 0, levels.length - BINS);
     px.copyWithin(BINS * 4, 0, px.length - BINS * 4);
-    const scale = 4 / N;
+    const scale = 2 / N;
     for (let k = 0; k < BINS; k++) {
       const db = 20 * Math.log10(Math.hypot(re[k], im[k]) * scale + 1e-9);
       levels[k] = db;
@@ -89,68 +99,74 @@ export function mountSpectrogram(root: HTMLElement) {
 
   function paint(i: number, db: number) {
     const t = Math.max(0, Math.min(255, Math.round(((db - DB_LO) / (DB_HI - DB_LO)) * 255)));
-    const o = i * 4;
-    px[o] = lut[t * 4];
-    px[o + 1] = lut[t * 4 + 1];
-    px[o + 2] = lut[t * 4 + 2];
-    px[o + 3] = lut[t * 4 + 3];
+    px.set(lut.subarray(t * 4, t * 4 + 4), i * 4);
   }
 
-  function repaintAll() {
-    for (let i = 0; i < levels.length; i++) paint(i, levels[i]);
-    ctx!.putImageData(image, 0, 0);
-  }
-
-  // Quiet water is clear, so the screen color shows through. Signal comes up in teal and the
-  // strongest bins run to amber.
   function buildLut() {
-    const s = getComputedStyle(root);
-    const teal = rgb(s.getPropertyValue('--tx-ink').trim() || '#56b6d8');
-    const amber = rgb(s.getPropertyValue('--tx-hot').trim() || '#f0a940');
+    const lab = STOPS.map(([t, hex]) => [t, toLab(hex)] as const);
     const out = new Uint8ClampedArray(256 * 4);
     for (let i = 0; i < 256; i++) {
       const t = i / 255;
-      const hot = Math.max(0, (t - 0.72) / 0.28);
-      const a = t < 0.17 ? 0 : Math.min(1, ((t - 0.17) / 0.55) ** 1.4);
-      for (let c = 0; c < 3; c++) out[i * 4 + c] = teal[c] + (amber[c] - teal[c]) * hot;
-      out[i * 4 + 3] = a * 255;
+      let j = 0;
+      while (j < lab.length - 2 && t > lab[j + 1][0]) j++;
+      const [t0, a] = lab[j];
+      const [t1, b] = lab[j + 1];
+      const u = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
+      const rgb = fromLab(a.map((v, c) => v + (b[c] - v) * u) as [number, number, number]);
+      out.set([...rgb, 255], i * 4);
     }
     return out;
   }
 
-  function rgb(color: string): [number, number, number] {
-    const m = color.replace('#', '');
-    const n = parseInt(m.length === 3 ? [...m].map((c) => c + c).join('') : m, 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  }
-
-  // ---- Clock ----
-  let frame = 0; // newest frame analyzed
+  // ---- The cycle: send, hold with the name centered, fade, start again ----
+  let frame = -1; // newest frame analyzed
   let clock = 0; // frames, fractional
   let last = 0;
   let raf = 0;
   let running = false;
   let visible = true;
+  let phase: 'send' | 'hold' | 'fade' = 'send';
+  let phaseEnd = 0;
 
-  function fill(top: number) {
+  /** Fill the screen up to `top`: quiet water before the transmission, then the signal. */
+  function fillTo(top: number) {
     for (let f = top - VIEW_ROWS + 1; f <= top; f++) analyze(f);
     frame = top;
     clock = top;
     ctx!.putImageData(image, 0, 0);
   }
 
+  function restart(now: number) {
+    screen!.removeAttribute('data-fade');
+    phase = 'send';
+    fillTo(-1);
+    last = now;
+    if (playing) startAudio();
+  }
+
   const animated = () => !prefersReducedMotion() && !lowPower;
 
   function tick(now: number) {
-    const target = audio ? audioFrame() : (clock += ((now - last) / 1000) * FRAME_HZ);
-    last = now;
-    const due = Math.floor(target);
-    if (due - frame > VIEW_ROWS) frame = due - VIEW_ROWS;
-    if (due > frame) {
-      while (frame < due) analyze(++frame);
-      ctx!.putImageData(image, 0, 0);
-      if (cursor) showReadout();
+    if (phase === 'send') {
+      clock = audio ? audioFrame() : clock + ((now - last) / 1000) * FRAME_HZ;
+      const due = Math.min(HOLD, Math.floor(clock));
+      if (due > frame) {
+        while (frame < due) analyze(++frame);
+        ctx!.putImageData(image, 0, 0);
+        if (cursor) showReadout();
+      }
+      if (frame >= HOLD) {
+        phase = 'hold';
+        phaseEnd = now + HOLD_MS;
+      }
+    } else if (phase === 'hold' && now >= phaseEnd) {
+      phase = 'fade';
+      phaseEnd = now + FADE_MS;
+      screen!.setAttribute('data-fade', '');
+    } else if (phase === 'fade' && now >= phaseEnd) {
+      restart(now);
     }
+    last = now;
     raf = requestAnimationFrame(tick);
   }
 
@@ -176,10 +192,11 @@ export function mountSpectrogram(root: HTMLElement) {
   const fmtHz = (hz: number) => (hz >= 1000 ? `${(hz / 1000).toFixed(2)} kHz` : `${Math.round(hz)} Hz`);
   const level = () => (cursor ? levels[cursor.row * BINS + cursor.bin] : DB_LO);
   const fmtDb = (db: number) => (db <= -99 ? 'below -99 dBFS' : `${Math.round(db)} dBFS`.replace('-', '−'));
+  const fmtT = (row: number) => `${(row / FRAME_HZ).toFixed(1)} s ago`;
 
   function showReadout() {
     if (!cursor || !readout) return;
-    readout.textContent = `${fmtHz((cursor.bin + 0.5) * BIN_HZ)}  ${fmtDb(level())}`;
+    readout.textContent = `${fmtHz((cursor.bin + 0.5) * BIN_HZ)}  ${fmtDb(level())}  ${fmtT(cursor.row)}`;
     if (cross) {
       cross.hidden = false;
       cross.style.setProperty('--x', `${((cursor.bin + 0.5) / BINS) * 100}%`);
@@ -227,16 +244,18 @@ export function mountSpectrogram(root: HTMLElement) {
       row: Math.max(0, Math.min(VIEW_ROWS - 1, cursor.row + move[1])),
     };
     showReadout();
-    if (live) live.textContent = `${fmtHz((cursor.bin + 0.5) * BIN_HZ)}, ${fmtDb(level())}`;
+    if (live) live.textContent = `${fmtHz((cursor.bin + 0.5) * BIN_HZ)}, ${fmtDb(level())}, ${fmtT(cursor.row)}`;
   });
 
-  // ---- Hear it ----
+  // ---- Hear it: one transmission per cycle, in step with the display ----
   const play = root.querySelector<HTMLButtonElement>('[data-tx-play]');
   const playLabel = root.querySelector<HTMLElement>('[data-tx-play-label]');
   let audioCtx: AudioContext | null = null;
-  let audio: { source: AudioBufferSourceNode; gain: GainNode; t0: number; f0: number } | null = null;
+  let buffer: AudioBuffer | null = null;
+  let audio: { source: AudioBufferSourceNode; gain: GainNode; t0: number } | null = null;
+  let playing = false;
 
-  const audioFrame = () => (audio ? audio.f0 + (audioCtx!.currentTime - audio.t0) * FRAME_HZ : clock);
+  const audioFrame = () => (audio && audioCtx ? (audioCtx.currentTime - audio.t0) * FRAME_HZ : clock);
 
   function makeBuffer(ac: AudioContext) {
     try {
@@ -249,7 +268,7 @@ export function mountSpectrogram(root: HTMLElement) {
       for (let i = 0; i < up.length; i++) {
         const x = i / 3;
         const a = Math.floor(x);
-        const b = (a + 1) % signal.length;
+        const b = Math.min(a + 1, signal.length - 1);
         up[i] = signal[a] + (signal[b] - signal[a]) * (x - a);
       }
       const buf = ac.createBuffer(1, up.length, FS * 3);
@@ -258,56 +277,69 @@ export function mountSpectrogram(root: HTMLElement) {
     }
   }
 
-  let buffer: AudioBuffer | null = null;
-
-  async function startAudio() {
-    audioCtx ??= new AudioContext();
-    if (audioCtx.state === 'suspended') await audioCtx.resume();
+  function startAudio() {
+    if (!audioCtx) return;
     buffer ??= makeBuffer(audioCtx);
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
-    source.loop = true;
     const gain = audioCtx.createGain();
-    const t0 = audioCtx.currentTime + 0.02;
-    gain.gain.setValueAtTime(0, t0);
-    gain.gain.linearRampToValueAtTime(0.2, t0 + 0.05);
+    const t0 = audioCtx.currentTime + 0.03;
+    gain.gain.setValueAtTime(0.2, t0);
     source.connect(gain).connect(audioCtx.destination);
-    // Start the sound where the display is, so what you hear is the row arriving at the top.
-    const f0 = Math.floor(running ? clock : frame) + 1;
-    source.start(t0, ((((f0 % LOOP) + LOOP) % LOOP) * N) / FS);
-    audio = { source, gain, t0, f0 };
-    setPlaying(true);
+    source.start(t0);
+    source.addEventListener('ended', () => audio?.source === source && (audio = null));
+    audio = { source, gain, t0 };
   }
 
   function stopAudio() {
-    if (!audio || !audioCtx) return;
-    const { source, gain } = audio;
-    clock = audioFrame();
-    const t = audioCtx.currentTime;
-    gain.gain.cancelScheduledValues(t);
-    gain.gain.setValueAtTime(gain.gain.value, t);
-    gain.gain.linearRampToValueAtTime(0, t + 0.06);
-    source.stop(t + 0.08);
+    if (audio && audioCtx) {
+      clock = audioFrame();
+      const t = audioCtx.currentTime;
+      audio.gain.gain.setValueAtTime(audio.gain.gain.value, t);
+      audio.gain.gain.linearRampToValueAtTime(0, t + 0.06);
+      audio.source.stop(t + 0.08);
+    }
     audio = null;
-    setPlaying(false);
   }
 
   function setPlaying(on: boolean) {
-    if (!play || !playLabel) return;
-    play.setAttribute('aria-pressed', String(on));
-    playLabel.textContent = on ? 'Stop' : 'Hear it';
+    playing = on;
+    play?.setAttribute('aria-pressed', String(on));
+    if (playLabel) playLabel.textContent = on ? 'Stop' : 'Hear it';
   }
 
   if (play && 'AudioContext' in window) {
     play.hidden = false;
-    play.addEventListener('click', () => (audio ? stopAudio() : startAudio().catch(() => setPlaying(false))));
+    play.addEventListener('click', async () => {
+      if (playing) {
+        stopAudio();
+        setPlaying(false);
+        return;
+      }
+      try {
+        audioCtx ??= new AudioContext();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        setPlaying(true);
+        // Send the name again from the start, so the sound and the picture arrive together.
+        if (animated()) restart(performance.now());
+        else startAudio();
+      } catch {
+        setPlaying(false);
+      }
+    });
   }
 
   // ---- Lifecycle ----
   function refresh() {
     stop();
-    if (animated()) start();
-    else fill(STILL_TOP);
+    if (animated()) {
+      if (phase === 'hold') phaseEnd = performance.now() + HOLD_MS;
+      start();
+    } else {
+      screen!.removeAttribute('data-fade');
+      phase = 'hold';
+      fillTo(HOLD);
+    }
   }
 
   new IntersectionObserver(([entry]) => {
@@ -315,14 +347,34 @@ export function mountSpectrogram(root: HTMLElement) {
     visible ? start() : stop();
   }).observe(root);
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
-  window.addEventListener('themechange', () => {
-    lut = buildLut();
-    repaintAll();
-  });
   window.addEventListener('motionchange', refresh);
 
-  // Open on the still frame, so the name is on screen at once, then let it scroll.
-  fill(STILL_TOP);
+  // Open on the held frame, so the name is on screen at once, then begin the next cycle.
+  phase = 'hold';
+  fillTo(HOLD);
+  phaseEnd = performance.now() + HOLD_MS;
   root.dataset.live = '';
   start();
+}
+
+function toLab(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s];
+}
+
+function fromLab([L, a, b]: [number, number, number]): [number, number, number] {
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  return [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s].map((c) => {
+    const v = c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
+    return Math.round(Math.max(0, Math.min(1, v)) * 255);
+  }) as [number, number, number];
 }
