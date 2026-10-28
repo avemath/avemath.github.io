@@ -11,6 +11,12 @@ import { FS, N, CP, SYMBOL, BINS, BIN_HZ, FRAME_HZ, VIEW_ROWS, TEXT_BINS, LINES,
 import { prefersReducedMotion } from './preferences';
 
 const DB_LO = -84;
+
+/** Hand the main thread back to the page between batches of work, so setup never blocks it. */
+const pause = () => {
+  const sched = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  return sched?.yield ? sched.yield() : new Promise<void>((r) => setTimeout(r, 0));
+};
 const DB_HI = -27;
 const HOLD_MS = 4200;
 const FADE_MS = 700;
@@ -59,11 +65,15 @@ export async function mountSpectrogram(root: HTMLElement) {
 
   // Draw the name in the heading font once it is ready (it is preloaded, so this is quick).
   await Promise.race([document.fonts?.load(`600 40px ${getComputedStyle(document.documentElement).getPropertyValue('--font-display')}`), new Promise((r) => setTimeout(r, 1500))]).catch(() => {});
+  // Setup is split into small batches that yield in between (see pause), so it never makes one
+  // long task. The results are the same as doing it in one go.
   const { mask, rows } = rasterName();
-  const signal = synthesize(mask, rows);
+  await pause();
+  const signal = await synthesize(mask, rows, pause);
   const HOLD = holdFrame(rows);
   const quiet = new Float32Array(16 * SYMBOL);
   addNoise(quiet);
+  await pause();
 
   const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
   const lowPower = (navigator.hardwareConcurrency ?? 8) <= 2 || nav.connection?.saveData === true || (nav.deviceMemory ?? 8) < 2;
@@ -128,19 +138,33 @@ export async function mountSpectrogram(root: HTMLElement) {
   let phase: 'send' | 'hold' | 'fade' = 'send';
   let phaseEnd = 0;
 
-  /** Fill the screen up to `top`: quiet water before the transmission, then the signal. */
-  function fillTo(top: number) {
-    for (let f = top - VIEW_ROWS + 1; f <= top; f++) analyze(f);
+  /** Fill the screen up to `top` (quiet water before the transmission, then the signal) in
+   *  batches, and keep a copy, since the screens a cycle starts from never change. */
+  async function compute(top: number) {
+    for (let f = top - VIEW_ROWS + 1; f <= top; f++) {
+      analyze(f);
+      if ((f - top) % 24 === 0) await pause();
+    }
+    return { levels: levels.slice(), px: px.slice() };
+  }
+
+  /** Show a computed screen: copying it is instant, so a cycle restarts with no work to do. */
+  function show(snap: { levels: Float32Array; px: Uint8ClampedArray }, top: number) {
+    levels.set(snap.levels);
+    px.set(snap.px);
     frame = top;
     clock = top;
     ctx!.putImageData(image, 0, 0);
   }
 
+  const held = await compute(HOLD);
+  const calm = await compute(-1);
+
   function restart(now: number) {
     root.dataset.live = '';
     screen!.removeAttribute('data-fade');
     phase = 'send';
-    fillTo(-1);
+    show(calm, -1);
     last = now;
     if (playing) startAudio();
   }
@@ -339,7 +363,7 @@ export async function mountSpectrogram(root: HTMLElement) {
     } else {
       screen!.removeAttribute('data-fade');
       phase = 'hold';
-      fillTo(HOLD);
+      show(held, HOLD);
       root.dataset.live = '';
     }
   }
@@ -355,7 +379,7 @@ export async function mountSpectrogram(root: HTMLElement) {
   // stays through the first hold and then fades into the first live transmission, so loading this
   // code changes nothing on screen. Without motion the computed held frame replaces it at once.
   phase = 'hold';
-  fillTo(HOLD);
+  show(held, HOLD);
   phaseEnd = performance.now() + HOLD_MS;
   if (animated()) start();
   else root.dataset.live = '';

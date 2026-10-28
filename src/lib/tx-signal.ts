@@ -90,8 +90,12 @@ export function rng(seed: number) {
  * the name then reads upright. Each symbol is one inverse FFT, sent as a cyclic prefix and then
  * the body. Neighboring symbols crossfade across the prefix with a raised cosine, so amplitudes
  * change smoothly and there are no clicks, while the body the receiver reads stays exact.
+ *
+ * `pause` is awaited between small batches of work, so a browser can yield to the page while
+ * this runs. The batches run in the same order with the same random stream, so the result is the
+ * same with or without pauses.
  */
-export function synthesize(mask: Float32Array, rows: number): Float32Array<ArrayBuffer> {
+export async function synthesize(mask: Float32Array, rows: number, pause: () => Promise<unknown> = async () => {}): Promise<Float32Array<ArrayBuffer>> {
   const rand = rng(1979);
   const frames = holdFrame(rows) + 1;
   const out = new Float32Array(frames * SYMBOL);
@@ -109,7 +113,7 @@ export function synthesize(mask: Float32Array, rows: number): Float32Array<Array
   const fade = Float64Array.from({ length: BINS }, (_, k) => 10 ** ((2.4 * Math.sin((2 * Math.PI * k) / 47 + 0.7) + 1.3 * Math.sin((2 * Math.PI * k) / 13 + 2.1)) / 20));
 
   // Each name symbol, as one period of its own periodic signal.
-  const symbols: (Float64Array | null)[] = Array.from({ length: frames }, (_, f) => {
+  const symbol = (f: number): Float64Array | null => {
     const r = f - NAME_START;
     if (r < 0 || r >= rows) return null;
     const row = rows - 1 - r;
@@ -130,7 +134,12 @@ export function synthesize(mask: Float32Array, rows: number): Float32Array<Array
     if (!any) return null;
     ifft(re, im, 1);
     return re;
-  });
+  };
+  const symbols: (Float64Array | null)[] = [];
+  for (let f = 0; f < frames; f++) {
+    symbols.push(symbol(f));
+    if (f % 16 === 15) await pause();
+  }
 
   const w = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * u);
   for (let f = 0; f < frames; f++) {
@@ -155,7 +164,10 @@ export function synthesize(mask: Float32Array, rows: number): Float32Array<Array
     out[LEAD * SYMBOL + n] += 0.05 * edge * Math.cos(2 * Math.PI * (CHIRP.f0 * t + ((CHIRP.f1 - CHIRP.f0) / (2 * T)) * t * t));
   }
 
-  addNoise(out, rand);
+  for (let from = 0; from < out.length; from += 16384) {
+    addNoise(out, rand, from, Math.min(out.length, from + 16384));
+    await pause();
+  }
   let peak = 0;
   for (const v of out) peak = Math.max(peak, Math.abs(v));
   const g = 0.9 / peak;
@@ -163,9 +175,9 @@ export function synthesize(mask: Float32Array, rows: number): Float32Array<Array
   return out;
 }
 
-/** A low noise floor, so the water is never perfectly quiet. */
-export function addNoise(out: Float32Array, rand = rng(7)) {
-  for (let n = 0; n < out.length; n++) {
+/** A low noise floor, so the water is never perfectly quiet. Adds to out[from] up to out[to]. */
+export function addNoise(out: Float32Array, rand = rng(7), from = 0, to = out.length) {
+  for (let n = from; n < to; n++) {
     let u = 0;
     while (u === 0) u = rand();
     out[n] += 0.0021 * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
