@@ -23,3 +23,9 @@ export function yearRange(start: string, end?: string | null): string {
   const b = end.slice(0, 4);
   return a === b ? a : `${a} to ${b}`;
 }
+
+/** A live link as shown in badges and address bars: "plvinc.com", or "avemath.github.io/nmdomke" when it has a path. */
+export function displayUrl(url: string): string {
+  const u = new URL(url);
+  return u.host.replace(/^www\./, '') + u.pathname.replace(/\/+$/, '');
+}

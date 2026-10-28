@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { displayUrl } from '@/lib/format';
 
 interface Props {
   src: ImageMetadata;
@@ -13,7 +14,7 @@ interface Props {
 }
 
 const { src, mobile, alt, url, widths = [480, 720, 960, 1280], sizes = '(min-width: 1024px) 50vw, 100vw', eager = false } = Astro.props;
-const host = url ? new URL(url).host.replace(/^www\./, '') : '';
+const host = url ? displayUrl(url) : '';
 ---
 
 <figure class="frame">

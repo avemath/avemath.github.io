@@ -4,7 +4,7 @@ import Icon from './Icon.astro';
 import ProjectArt from './ProjectArt.astro';
 import BrowserFrame from './BrowserFrame.astro';
 import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
-import { yearRange } from '@/lib/format';
+import { yearRange, displayUrl } from '@/lib/format';
 
 interface Props {
   project: Project;
@@ -57,7 +57,7 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
         <ProjectArt slug={project.id} />
       )
     }
-    {d.links.live && !(size === 'xl' && d.cover) && <span class="tile__live mono"><span class="status-dot" aria-hidden="true" />{new URL(d.links.live).host}</span>}
+    {d.links.live && !(size === 'xl' && d.cover) && <span class="tile__live mono"><span class="status-dot" aria-hidden="true" />{displayUrl(d.links.live)}</span>}
   </div>
 
   <div class="tile__body">
