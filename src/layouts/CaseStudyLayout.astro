@@ -2,7 +2,6 @@
 import { Image, getImage } from 'astro:assets';
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
-import BrowserFrame from '@/components/BrowserFrame.astro';
 import ProjectArt from '@/components/ProjectArt.astro';
 import Icon from '@/components/Icon.astro';
 import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
@@ -28,7 +27,6 @@ const toc = [
   ...headings.filter((h) => h.depth === 2).map((h) => ({ slug: h.slug, text: h.text })),
   ...(d.gallery && !limited ? [{ slug: 'gallery', text: 'Gallery' }] : []),
 ];
-const isSite = Boolean(d.links.live && d.cover && d.mobile);
 
 // Clips in the gallery get an optimized poster; nothing downloads until someone presses play.
 const posters = new Map<string, string>();
@@ -100,18 +98,28 @@ const jsonLd = [
         <p class="case__summary">{d.summary}</p>
         </div>
 
-        {/* The project's signature beside the title: its drawn art, or its cover where it has one.
-            Limited-detail projects only ever show their drawn art. Decorative here, since the
-            full cover with its description follows below. */}
-        <div class="case__sig no-print" aria-hidden="true">
-          {
-            d.cover && !limited ? (
-              <Image src={d.cover} alt="" widths={[480, 720, 960]} sizes="(min-width: 1024px) 30rem, 100vw" format="webp" quality={76} loading="eager" />
-            ) : (
+        {/* The project's signature beside the title: its cover where it has one, or its drawn art.
+            Limited-detail projects only ever show their drawn art. */}
+        {
+          d.cover && !limited ? (
+            <div class="case__sig no-print">
+              <Image
+                src={d.cover}
+                alt={d.coverAlt ?? ''}
+                widths={[400, 560, 720, 960]}
+                sizes="(min-width: 1216px) 30rem, (min-width: 1024px) 38vw, calc(100vw - 2rem)"
+                format="webp"
+                quality={78}
+                loading="eager"
+                fetchpriority="high"
+              />
+            </div>
+          ) : (
+            <div class="case__sig no-print" aria-hidden="true">
               <ProjectArt slug={project.id} fit="meet" />
-            )
-          }
-        </div>
+            </div>
+          )
+        }
         </div>
 
         <dl class="case__facts">
@@ -168,39 +176,6 @@ const jsonLd = [
     </header>
 
     <div class="wrap">
-      <div class="case__media">
-        {
-          isSite ? (
-            <BrowserFrame
-              src={d.cover!}
-              mobile={d.mobile}
-              alt={d.coverAlt ?? ''}
-              url={d.links.live}
-              eager
-              widths={[640, 960, 1280, 1440]}
-              sizes="(min-width: 1200px) 1100px, 100vw"
-            />
-          ) : d.cover ? (
-            <div class="case__shot">
-              <Image
-                src={d.cover}
-                alt={d.coverAlt ?? ''}
-                widths={[640, 960, 1280, 1440]}
-                sizes="(min-width: 1200px) 1100px, 100vw"
-                format="webp"
-                quality={80}
-                loading="eager"
-                fetchpriority="high"
-              />
-            </div>
-          ) : (
-            <div class="case__art">
-              <ProjectArt slug={project.id} fit="meet" />
-            </div>
-          )
-        }
-      </div>
-
       {
         d.metrics && !limited && (
           <dl class="case__metrics">
@@ -420,30 +395,6 @@ const jsonLd = [
   .case__facts dd {
     margin-top: 0.35rem;
     font-size: 0.95rem;
-  }
-
-  .case__media {
-    margin-top: 0.5rem;
-  }
-
-  .case__shot,
-  .case__art {
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 1rem;
-    box-shadow: var(--shadow);
-    background: var(--surface);
-  }
-
-  /* The art is shown whole, so the frame takes the art's own background around it. */
-  .case__art {
-    height: clamp(14rem, 32vw, 24rem);
-    background: color-mix(in oklab, var(--surface-2) 70%, var(--bg));
-  }
-
-  .case__shot :global(img) {
-    width: 100%;
-    height: auto;
   }
 
   .case__metrics {

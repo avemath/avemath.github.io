@@ -54,27 +54,39 @@ const cards = [
   ...projects.map((p) => ({ file: p.id, eyebrow: p.type, title: p.title, sub: p.summary })),
 ];
 
+// The card is the site in miniature: the descent's dark-theme bands stepping down with wave edges,
+// soft light rays from the surface, and a slim depth scale on the right.
+const BANDS = ['#0f4955', '#0a424f', '#083a48', '#083442', '#062f3d', '#062938', '#062432', '#06202d', '#061c29', '#061824', '#061420', '#05111c'];
+const wave = (y, k) => `M0 ${y + 10} C 180 ${y - 4 + (k % 3) * 3} 360 ${y - 6} 560 ${y + 6} S 920 ${y + 22} 1200 ${y + 4} V 630 H 0 Z`;
+const bands = BANDS.map((c, k) => (k === 0 ? `<rect width="1200" height="630" fill="${c}"/>` : `<path d="${wave(k * 52 - 8, k)}" fill="${c}"/>`)).join('');
+const depths = [0, 50, 200, 400, 600, 800, 1000, 1500, 2000, 3000, 4000, 4500];
+const scale = depths
+  .map((d, k) => {
+    const y = 96 + k * 40;
+    return `<path d="M1112 ${y} H1124" stroke="#adc6d2" stroke-opacity=".55"/><text x="1104" y="${y + 5}" text-anchor="end">${d.toLocaleString('en-US')}</text>`;
+  })
+  .join('');
+
 const html = (c) => `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:SG;src:url(${font('space-grotesk-latin-wght')}) format('woff2');font-weight:300 700}
 @font-face{font-family:IN;src:url(${font('inter-latin-wght')}) format('woff2');font-weight:100 900}
 @font-face{font-family:JB;src:url(${font('jetbrains-mono-latin-wght')}) format('woff2');font-weight:100 800}
 *{margin:0;box-sizing:border-box}
-body{width:1200px;height:630px;background:#0b1220;color:#e6edf7;font-family:IN;position:relative;overflow:hidden}
-.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(230,237,247,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(230,237,247,.045) 1px,transparent 1px);background-size:40px 40px}
-svg{position:absolute;right:-170px;top:50%;translate:0 -50%;width:760px;height:760px}
-.c{position:absolute;left:80px;top:80px;bottom:80px;width:720px;display:flex;flex-direction:column}
-.e{font-family:JB;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:#3ddcff;display:flex;align-items:center;gap:16px}
-.e:before{content:'';width:40px;height:2px;background:#3ddcff}
+body{width:1200px;height:630px;background:#05111c;color:#e4f0f5;font-family:IN;position:relative;overflow:hidden}
+.w{position:absolute;inset:0}
+.rays{position:absolute;inset:0 -20% auto;height:420px;background:conic-gradient(from 0deg at 50% -40%,transparent 0 151deg,rgb(160 225 240/.13) 152.5deg,transparent 154.5deg 159deg,rgb(160 225 240/.1) 160.5deg,transparent 163deg 168deg,rgb(160 225 240/.12) 169.5deg,transparent 172deg 177deg,rgb(160 225 240/.09) 178.5deg,transparent 181deg 186deg,rgb(160 225 240/.12) 188deg,transparent 190.5deg 196deg,rgb(160 225 240/.09) 197.5deg,transparent 200deg 360deg);-webkit-mask-image:linear-gradient(#000,transparent 85%)}
+.g{position:absolute;inset:0;font-family:JB;font-size:14px;fill:#adc6d2;letter-spacing:.04em}
+.c{position:absolute;left:80px;top:80px;bottom:72px;width:820px;display:flex;flex-direction:column}
+.e{font-family:JB;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:#93d5ec;display:flex;align-items:center;gap:16px}
+.e:before{content:'';width:40px;height:2px;background:#7ccbe6}
 h1{font-family:SG;font-weight:600;font-size:${c.title.length > 40 ? 56 : c.title.length > 24 ? 66 : 84}px;line-height:1.02;letter-spacing:-.035em;margin-top:28px}
-p{margin-top:24px;font-size:26px;line-height:1.4;color:#c3cfe2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.f{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font-family:JB;font-size:20px;color:#8a9bb8}
-.dot{width:14px;height:14px;border-radius:50%;background:#ffb547;display:inline-block;margin-right:12px}
-</style></head><body><div class="grid"></div>
-<svg viewBox="0 0 200 200" fill="none" stroke="#3ddcff">
-<circle cx="100" cy="100" r="96" stroke-opacity=".25"/><circle cx="100" cy="100" r="72" stroke-opacity=".2"/>
-<circle cx="100" cy="100" r="48" stroke-opacity=".2"/><circle cx="100" cy="100" r="24" stroke-opacity=".2"/>
-<path d="M100 100 172 34" stroke-width="1.2" stroke-opacity=".9"/><path d="M100 100 L172 34 A96 96 0 0 0 128 8 Z" fill="#3ddcff" fill-opacity=".08" stroke="none"/>
-<circle cx="140" cy="62" r="2.5" fill="#ffb547" stroke="none"/><circle cx="70" cy="132" r="2" fill="#3ddcff" stroke="none"/></svg>
+p{margin-top:24px;font-size:26px;line-height:1.4;color:#c3d6df;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.f{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font-family:JB;font-size:20px;color:#adc6d2}
+.dot{width:14px;height:14px;border-radius:50%;background:#f0a940;display:inline-block;margin-right:12px}
+</style></head><body>
+<svg class="w" viewBox="0 0 1200 630" preserveAspectRatio="none">${bands}</svg>
+<div class="rays"></div>
+<svg class="g" viewBox="0 0 1200 630"><path d="M1124 96 V536" stroke="#adc6d2" stroke-opacity=".35"/>${scale}<circle cx="1124" cy="96" r="5" fill="#f0a940"/></svg>
 <div class="c"><div class="e">${c.eyebrow}</div><h1>${c.title}</h1><p>${c.sub}</p>
 <div class="f"><span><span class="dot"></span>avemath.github.io</span></div></div></body></html>`;
 
@@ -90,7 +102,7 @@ console.log(`social cards: ${cards.length}`);
 
 // ---- Apple touch icon ----
 await page.setViewportSize({ width: 180, height: 180 });
-await page.setContent(`<body style="margin:0;background:#0b1220"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
+await page.setContent(`<body style="margin:0;background:#061c2b"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
 await page.waitForTimeout(200);
 await page.screenshot({ path: 'public/apple-touch-icon.png' });
 
