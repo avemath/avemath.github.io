@@ -13,8 +13,9 @@ role: Design, build, content, 3D model pipeline, hosting.
 keywords: ["mechanical engineering", "portfolio", "three.js", "CAD", "dot matrix", "LSU"]
 stack: [HTML, CSS, JavaScript, three.js, GitHub Pages]
 links:
-  # Changes when the repo moves to Nicholas's GitHub. Update this link then.
+  # Once the repo moves to Nicholas's GitHub, update the live link; the label can stay.
   live: https://avemath.github.io/nmdomke/
+linkLabel: Visit Nicholas's site
 cover: ../../assets/projects/nicholas-domke/desktop.png
 mobile: ../../assets/projects/nicholas-domke/mobile.png
 coverAlt: Nicholas Domke's home page. A black hero with a faint dot grid shows his name in large dot-matrix letters, a one-line tagline, and buttons to email him, open LinkedIn, or get his résumé.

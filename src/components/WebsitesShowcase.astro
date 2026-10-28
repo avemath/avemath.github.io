@@ -46,7 +46,7 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
                   Read the case study <Icon name="arrow-right" />
                 </a>
                 <a class="link inline-flex items-center gap-1 text-sm" href={p.data.links.live}>
-                  Visit {new URL(p.data.links.live!).host} <Icon name="arrow-up-right" class="h-[0.9em] w-[0.9em]" />
+                  {p.data.linkLabel ?? `Visit ${new URL(p.data.links.live!).host}`} <Icon name="arrow-up-right" class="h-[0.9em] w-[0.9em]" />
                 </a>
               </div>
             </div>
