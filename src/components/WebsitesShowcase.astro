@@ -6,10 +6,10 @@ import { getProjects, isWebsite, projectHref } from '@/lib/projects';
 const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live);
 ---
 
-<section id="websites" class="section home-section" aria-labelledby="websites-title" data-section="websites">
+<section id="websites" class="section home-section zone" aria-labelledby="websites-title" data-section="websites">
   <div class="wrap">
     <p class="eyebrow">Client work</p>
-    <h2 id="websites-title" class="section-title">Live sites their owners run themselves</h2>
+    <h2 id="websites-title" class="section-title">Live sites built for real clients</h2>
     <p class="section-lede">Each entry has what the business needed, what I did, and a few numbers. The case study has the rest.</p>
 
     <ol class="sites">

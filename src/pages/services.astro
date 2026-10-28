@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { slotVars } from '@/lib/depth';
 import Icon from '@/components/Icon.astro';
 import ProjectTile from '@/components/ProjectTile.astro';
 import { getProjects, isWebsite } from '@/lib/projects';
@@ -65,7 +66,7 @@ const faqLd = {
   description="Fast, accessible websites for small businesses and nonprofits, with an editor you can use yourself. See the process, what's included and recent work."
   jsonLd={[faqLd]}
 >
-  <section class="section svc-hero">
+  <section class="section svc-hero zone sunlit" style={slotVars(0, false)}>
     <div class="wrap svc-hero__grid">
       <div>
         <p class="eyebrow">Services</p>
@@ -97,7 +98,7 @@ const faqLd = {
     </div>
   </section>
 
-  <section class="section" aria-labelledby="build-title">
+  <section class="section zone" style={slotVars(1, false)} aria-labelledby="build-title">
     <div class="wrap">
       <p class="eyebrow">What I build</p>
       <h2 id="build-title" class="section-title">Sites for people who'd rather be running their business</h2>
@@ -115,7 +116,7 @@ const faqLd = {
     </div>
   </section>
 
-  <section class="section grid-paper svc-process" aria-labelledby="process-title">
+  <section class="section svc-process zone" style={slotVars(2, false)} aria-labelledby="process-title">
     <div class="wrap">
       <p class="eyebrow">Process</p>
       <h2 id="process-title" class="section-title">Five steps, no mystery</h2>
@@ -135,7 +136,7 @@ const faqLd = {
 
 
 
-  <section id="recent" class="section" aria-labelledby="recent-title">
+  <section id="recent" class="section zone" style={slotVars(3, false)} aria-labelledby="recent-title">
     <div class="wrap">
       <p class="eyebrow">Recent work</p>
       <h2 id="recent-title" class="section-title">Live and in use</h2>
@@ -145,7 +146,7 @@ const faqLd = {
     </div>
   </section>
 
-  <section class="section" aria-labelledby="faq-title">
+  <section class="section zone" style={slotVars(4, false)} aria-labelledby="faq-title">
     <div class="wrap faq-grid">
       <div class="faq-col">
       <p class="eyebrow">FAQ</p>
@@ -183,7 +184,8 @@ const faqLd = {
     --amber-wash: color-mix(in oklab, var(--amber) 14%, transparent);
     background:
       radial-gradient(50rem 24rem at 90% 0%, var(--amber-wash), transparent 70%),
-      radial-gradient(40rem 20rem at 0% 100%, var(--accent-wash), transparent 70%);
+      radial-gradient(40rem 20rem at 0% 100%, var(--accent-wash), transparent 70%),
+      var(--bg);
   }
 
   :global([data-theme='dark']) .svc-hero,

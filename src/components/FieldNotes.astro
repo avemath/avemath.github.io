@@ -5,7 +5,7 @@ import facts from '@/data/facts.json';
 const notes = facts;
 ---
 
-<section id="field-notes" class="section section--tight home-section grid-paper" aria-labelledby="notes-title" data-section="field-notes">
+<section id="field-notes" class="section section--tight home-section zone" aria-labelledby="notes-title" data-section="field-notes">
   <div class="wrap">
     <p class="eyebrow">Field notes</p>
     <h2 id="notes-title" class="section-title section-title--sm">A few things that are true</h2>
@@ -39,17 +39,14 @@ const notes = facts;
 </section>
 
 <style>
-  /* One ledger panel with hairline cells, not a grid of floating cards. Column counts
+  /* Bioluminescence: each fact is a tile that glows softly in the dark water. Column counts
      always give full rows (6 = 3 x 2 or 2 x 3), so no cell is ever empty. */
   .notes {
+    --glow: color-mix(in srgb, var(--accent) 42%, transparent);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
+    gap: 1rem;
     margin-top: 2rem;
-    border: 1px solid var(--line);
-    border-radius: 1rem;
-    background: var(--line);
-    overflow: hidden;
   }
 
   @media (max-width: 479px) {
@@ -76,21 +73,59 @@ const notes = facts;
     width: 100%;
     height: 100%;
     padding: 1.35rem 1.4rem 1.5rem;
-    background: var(--surface);
+    border: 1px solid color-mix(in oklab, var(--accent) 34%, transparent);
+    border-radius: 0.9rem;
+    background:
+      radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 70%),
+      var(--surface);
+    box-shadow: 0 0 26px -10px var(--glow);
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition:
+      border-color 0.3s,
+      box-shadow 0.3s;
+  }
+
+  /* A slow glow that breathes, out of step from tile to tile. Opacity only, so it is cheap, and it
+     runs only while the band is on screen and motion is allowed. */
+  .note-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    box-shadow:
+      0 0 34px -6px var(--glow),
+      inset 0 0 22px -12px var(--glow);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not([data-motion='reduce']) .fx-live) .note-card::before {
+      animation: glow 6s ease-in-out infinite alternate;
+    }
+  }
+
+  .note:nth-child(2) .note-card::before { animation-delay: -1.7s; }
+  .note:nth-child(3) .note-card::before { animation-delay: -3.1s; }
+  .note:nth-child(4) .note-card::before { animation-delay: -4.4s; }
+  .note:nth-child(5) .note-card::before { animation-delay: -0.9s; }
+  .note:nth-child(6) .note-card::before { animation-delay: -2.6s; }
+
+  @keyframes glow {
+    to {
+      opacity: 1;
+    }
   }
 
   .note-card:hover {
-    background: color-mix(in oklab, var(--surface), var(--accent) 7%);
+    border-color: color-mix(in oklab, var(--accent) 60%, transparent);
+    box-shadow: 0 0 34px -8px var(--glow);
   }
 
-  /* The panel clips its cells, so the focus ring sits inside the cell. */
   .note-card:focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: -4px;
-    border-radius: 0.5rem;
+    outline-offset: 3px;
   }
 
   @media (max-width: 719px) {
@@ -151,6 +186,7 @@ const notes = facts;
     letter-spacing: -0.035em;
     line-height: 1;
     color: var(--text);
+    text-shadow: 0 0 18px var(--glow);
     transition: color 0.5s;
   }
 
@@ -192,6 +228,7 @@ const notes = facts;
     content: '';
     position: absolute;
     inset: 0;
+    border-radius: inherit;
     background: repeating-linear-gradient(0deg, transparent 0 3px, var(--grid) 3px 4px);
     pointer-events: none;
   }

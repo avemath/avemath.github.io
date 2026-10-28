@@ -31,7 +31,7 @@ const { bare = false, ...seo } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#0b1220" />
+    <meta name="theme-color" content="#061c2b" />
     <script is:inline>
       // Apply saved or system theme and motion settings before first paint.
       (function () {
@@ -47,7 +47,7 @@ const { bare = false, ...seo } = Astro.props;
         d.dataset.theme = theme;
         if (motion === 'reduce') d.dataset.motion = 'reduce';
         var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#f5f3ee');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#061c2b' : '#dff1f3');
       })();
     </script>
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
@@ -61,7 +61,7 @@ const { bare = false, ...seo } = Astro.props;
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     {!bare && <Header />}
-    <main id="main" tabindex="-1">
+    <main id="main" class="descent" tabindex="-1">
       <slot />
     </main>
     {!bare && <Footer />}
@@ -72,16 +72,25 @@ const { bare = false, ...seo } = Astro.props;
       import { initReveals } from '../scripts/motion';
       initPreferenceControls();
       initReveals();
+
+      // The light rays, marine snow and glows only move while their band is on screen.
+      const fx = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('fx-live', e.isIntersecting)));
+      document.querySelectorAll('.zone').forEach((z) => fx.observe(z));
     </script>
 
     {
+      // Analytics wait for the load event, so the beacon's third-party connection never competes
+      // with the hero text. It still reads the page's timings from the buffered performance entries.
       site.cloudflareAnalyticsToken && (
-        <script
-          is:inline
-          defer
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          data-cf-beacon={JSON.stringify({ token: site.cloudflareAnalyticsToken })}
-        />
+        <script is:inline define:vars={{ beacon: JSON.stringify({ token: site.cloudflareAnalyticsToken }) }}>
+          addEventListener('load', function () {
+            var s = document.createElement('script');
+            s.defer = true;
+            s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+            s.setAttribute('data-cf-beacon', beacon);
+            document.body.appendChild(s);
+          });
+        </script>
       )
     }
   </body>

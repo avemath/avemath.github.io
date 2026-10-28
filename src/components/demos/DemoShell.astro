@@ -32,27 +32,10 @@ const { id, title, lede, note } = Astro.props;
     position: relative;
     padding: clamp(1.25rem, 3.5vw, 2.5rem);
     border: 1px solid var(--line);
-    border-radius: 1.25rem;
-    background:
-      linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 24px 24px,
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 24px 24px,
-      var(--surface);
-  }
-
-  .demo__frame::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, var(--accent), transparent 35%, transparent 65%, var(--amber));
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0.5;
-    pointer-events: none;
+    border-top: 2px solid var(--accent);
+    border-radius: 1rem;
+    background: var(--surface);
+    box-shadow: var(--shadow);
   }
 
   .demo__title {
