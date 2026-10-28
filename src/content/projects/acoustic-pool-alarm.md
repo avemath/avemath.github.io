@@ -8,10 +8,9 @@ summary: "An alarm that listens underwater for a child falling into a backyard p
 role: "Solo. Early research and planning."
 keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "sonar"]
 stack: [Underwater acoustics, Signal processing, Prior-art review]
-draft: true
 ---
 
-<!-- NAME: placeholder until Avery picks one. Flip draft to false after, and delete this comment. -->
+<!-- NAME: working title until Avery picks one. Update the title then, and delete this comment. -->
 
 ## Why
 
