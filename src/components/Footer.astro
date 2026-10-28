@@ -1,54 +1,94 @@
 ---
 import Icon from './Icon.astro';
-import Frond from './Frond.astro';
 import site from '@/data/site.json';
+import { slotVars, slots, formatDepth } from '@/lib/depth';
 
 const year = new Date().getFullYear();
+
+// The footer is the receiver on the seafloor: a received data frame. The CRC is a real
+// CRC-16/CCITT-FALSE over the header and payload text, computed at build time.
+const header = [site.name, site.location];
+const payload = [site.email, site.socials.github, site.socials.linkedin, site.resumePdf];
+function crc16(text: string) {
+  let crc = 0xffff;
+  for (const byte of new TextEncoder().encode(text)) {
+    crc ^= byte << 8;
+    for (let b = 0; b < 8; b++) crc = crc & 0x8000 ? ((crc << 1) ^ 0x1021) & 0xffff : (crc << 1) & 0xffff;
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+const crc = crc16([...header, ...payload].join('\n'));
+// Alternating sync bits, drawn as a square wave.
+const sync = Array.from({ length: 16 }, (_, i) => i % 2);
+const wave = sync.map((b, i) => `${i === 0 ? 'M' : 'L'} ${i * 10} ${b ? 4 : 20} H ${i * 10 + 10}`).join(' ');
 ---
 
-<footer class="site-footer no-print">
-  <Frond class="site-footer__frond" />
-  <div class="wrap grid grid-cols-2 gap-x-6 gap-y-8 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:gap-10 md:py-14">
-    <div class="col-span-2 md:col-span-1">
+<footer id="footer" class="site-footer zone no-print" style={slotVars(11)}>
+  <div class="wrap py-12 md:py-14">
+    <div class="rx__intro">
       <p class="font-display text-2xl font-semibold tracking-tight">Have something in mind?</p>
       <p class="mt-2 max-w-sm text-soft">Email is the fastest way to reach me.</p>
-      <a class="btn mt-6" href={`mailto:${site.email}`}>
-        <Icon name="mail" />
-        {site.email}
-      </a>
     </div>
 
-    <nav aria-label="Footer">
-      <p class="label">Site</p>
-      <ul class="mt-3 space-y-1">
-        <li><a class="footer-link" href="/work/">Work</a></li>
-        <li><a class="footer-link" href="/services/">Services</a></li>
-        <li><a class="footer-link" href="/about/">About</a></li>
-        <li><a class="footer-link" href="/resume/">Résumé</a></li>
-        <li><a class="footer-link" href="/contact/">Contact</a></li>
-      </ul>
-    </nav>
+    <div class="rx" data-rx>
+      <p class="rx__title" aria-hidden="true"><span>{formatDepth(slots[11].depth)} · RX · Frame received</span><span class="rx__len">{header.length + payload.length} fields</span></p>
+      <div class="rx__frame">
+        <div class="rx__field rx__field--pre">
+          <p class="rx__name">Preamble</p>
+          <svg class="rx__sync" viewBox="0 0 160 24" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <path d={wave}></path>
+          </svg>
+          <p class="rx__bits" aria-hidden="true">{sync.join('')}</p>
+        </div>
 
-    <div>
-      <p class="label">Elsewhere</p>
-      <ul class="mt-3 space-y-1">
-        <li>
-          <a class="footer-link" href={site.socials.github} rel="me">
-            <Icon name="github" /> GitHub
-          </a>
-        </li>
-        <li>
-          <a class="footer-link" href={site.socials.linkedin} rel="me">
-            <Icon name="linkedin" /> LinkedIn
-          </a>
-        </li>
-        <li>
-          <a class="footer-link" href={site.resumePdf} download>
-            <Icon name="download" /> Résumé PDF
-          </a>
-        </li>
-      </ul>
-      <button type="button" class="motion-toggle mt-6" data-motion-toggle aria-pressed="false">
+        <div class="rx__field rx__field--hdr">
+          <p class="rx__name">Header</p>
+          <p class="rx__who">{site.name}</p>
+          <p class="rx__where"><Icon name="pin" /> {site.location}</p>
+        </div>
+
+        <div class="rx__field rx__field--payload">
+          <p class="rx__name">Payload</p>
+          <ul class="rx__links">
+            <li>
+              <a class="footer-link" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
+            </li>
+            <li>
+              <a class="footer-link" href={site.socials.github} rel="me"><Icon name="github" /> GitHub</a>
+            </li>
+            <li>
+              <a class="footer-link" href={site.socials.linkedin} rel="me"><Icon name="linkedin" /> LinkedIn</a>
+            </li>
+            <li>
+              <a class="footer-link" href={site.resumePdf} download><Icon name="download" /> Résumé PDF</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="rx__field rx__field--crc">
+          <p class="rx__name">CRC</p>
+          <p class="rx__crc">0x{crc}</p>
+          <p class="rx__status">
+            <span class="rx__ok" aria-hidden="true"><Icon name="check" /> OK</span>
+            <span class="rx__wait" aria-hidden="true">Wait</span>
+            <span class="sr-only">CRC OK</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rx__more">
+      <nav aria-label="Footer">
+        <p class="label">Site</p>
+        <ul class="rx__site">
+          <li><a class="footer-link" href="/work/">Work</a></li>
+          <li><a class="footer-link" href="/services/">Services</a></li>
+          <li><a class="footer-link" href="/about/">About</a></li>
+          <li><a class="footer-link" href="/resume/">Résumé</a></li>
+          <li><a class="footer-link" href="/contact/">Contact</a></li>
+        </ul>
+      </nav>
+      <button type="button" class="motion-toggle" data-motion-toggle aria-pressed="false">
         <span class="motion-toggle__track" aria-hidden="true"><span></span></span>
         Reduce motion
       </button>
@@ -72,44 +112,184 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
-    position: relative;
-    isolation: isolate;
+    padding-top: 1.25rem;
+  }
+
+  .rx__intro {
+    max-width: 40rem;
+  }
+
+  .rx {
+    margin-top: 2rem;
+    font-family: var(--font-mono);
+  }
+
+  .rx__title {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* One frame, four fields, hairline dividers. Stacked on phones, a single row from tablet up. */
+  .rx__frame {
+    display: grid;
+    gap: 1px;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.75rem;
+    background: var(--line-strong);
     overflow: hidden;
-    border-top: 1px solid var(--line);
-    background: var(--bg-deep);
   }
 
-  /* A fern, drawn by a function, growing up the right edge behind the columns. The SVG is
-     rendered by Frond.astro, so it sits outside this component's style scope. */
-  .site-footer :global(.site-footer__frond) {
-    position: absolute;
-    right: clamp(-3rem, -1vw, -1rem);
-    bottom: -0.5rem;
-    z-index: -1;
-    height: min(34rem, 115%);
-    width: auto;
-    color: var(--leaf);
-    opacity: 0.55;
-    pointer-events: none;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 45%);
-    mask-image: linear-gradient(90deg, transparent 0%, #000 45%);
-  }
-
-  :global([data-theme='dark']) .site-footer :global(.site-footer__frond) {
-    opacity: 0.45;
-  }
-
-  /* The bottom bar sits over the stem, so a translucent background keeps the small print clear. */
-  .site-footer__bar {
-    background: color-mix(in oklab, var(--bg-deep) 72%, transparent);
-  }
-
-  @media (max-width: 767px) {
-    .site-footer :global(.site-footer__frond) {
-      height: 22rem;
-      right: -4rem;
-      opacity: 0.35;
+  @media (min-width: 720px) {
+    .rx__frame {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 0.7fr);
     }
+  }
+
+  .rx__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.1rem 1.15rem;
+    background: var(--surface);
+  }
+
+  .rx__name {
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .rx__name {
+    color: var(--accent);
+  }
+
+  .rx__sync {
+    width: 100%;
+    height: 1.5rem;
+    margin-top: 0.35rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-dasharray: 400;
+    stroke-dashoffset: 0;
+  }
+
+  .rx__bits {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+
+  .rx__who {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .rx__where {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    color: var(--text-soft);
+  }
+
+  .rx__links {
+    display: grid;
+    gap: 0 1.25rem;
+    font-family: var(--font-sans);
+  }
+
+  @media (min-width: 480px) {
+    .rx__links {
+      grid-template-columns: repeat(2, minmax(0, max-content));
+    }
+  }
+
+  .rx__links li:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .rx__crc {
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    color: var(--text);
+  }
+
+  .rx__status {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .rx__ok {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--ok);
+  }
+
+  .rx__ok :global(svg) {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .rx__wait {
+    display: none;
+    color: var(--muted);
+  }
+
+  /* Waiting for the frame: only set by the script, and only when motion is allowed. */
+  .rx[data-pending] .rx__ok {
+    display: none;
+  }
+
+  .rx[data-pending] .rx__wait {
+    display: inline;
+  }
+
+  .rx[data-pending] .rx__sync {
+    stroke-dashoffset: 400;
+  }
+
+  .rx[data-locking] .rx__sync {
+    transition: stroke-dashoffset 0.9s var(--ease-out-expo);
+  }
+
+  .rx[data-locked] .rx__frame {
+    border-color: color-mix(in oklab, var(--amber-line) 70%, var(--line-strong));
+  }
+
+  .rx__more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+    margin-top: 2.25rem;
+  }
+
+  .rx__site {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .site-footer__bar {
+    background: color-mix(in oklab, var(--bg), #000 3%);
   }
 
   .footer-link {
@@ -123,6 +303,10 @@ const year = new Date().getFullYear();
   }
 
   .footer-link:hover {
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .footer-link:hover {
     color: var(--accent);
   }
 
@@ -170,3 +354,28 @@ const year = new Date().getFullYear();
     background: var(--accent);
   }
 </style>
+
+<script>
+  import { prefersReducedMotion } from '../scripts/preferences';
+
+  // The receiver locks when the frame scrolls into view: the preamble sweeps once and the CRC
+  // reads OK. The depth gauge listens for `rxlock` to lock its signal meter. Under reduced
+  // motion, and without JavaScript, the frame simply shows OK.
+  const rx = document.querySelector<HTMLElement>('[data-rx]');
+  if (rx && 'IntersectionObserver' in window) {
+    if (!prefersReducedMotion()) rx.dataset.pending = '';
+    new IntersectionObserver(
+      ([entry]) => {
+        const on = entry.isIntersecting;
+        if (on && rx.dataset.pending !== undefined) {
+          rx.dataset.locking = '';
+          requestAnimationFrame(() => delete rx.dataset.pending);
+        }
+        rx.toggleAttribute('data-locked', on);
+        dispatchEvent(new CustomEvent('rxlock', { detail: on }));
+      },
+      { threshold: 0.35 },
+    ).observe(rx.querySelector('.rx__frame')!);
+    addEventListener('motionchange', () => prefersReducedMotion() && delete rx.dataset.pending);
+  }
+</script>

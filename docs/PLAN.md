@@ -38,6 +38,7 @@ One person, one story: I engineer systems and I build the web. The research, the
 | 5. Polish and QA | image optimization, Lighthouse, axe, social images, sitemap, JSON-LD | done |
 | 6. Launch | Web3Forms key, analytics, Search Console, headshot, LinkedIn post | in progress |
 | 7. Maintain | see the checklist in CONTENT-GUIDE.md | ongoing |
+| 8. Redesign | the descent: spectrogram hero, depth zones, gauge, packet footer, signatures (see REDESIGN.md). Phase 1 is the home page and the V2V case study | in progress on `redesign` |
 
 ## Before launch
 

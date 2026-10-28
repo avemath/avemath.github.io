@@ -1,8 +1,9 @@
 ---
 import now from '@/data/now.json';
+import { slotVars } from '@/lib/depth';
 ---
 
-<section class="now" aria-label="What I'm doing now">
+<section id="now" class="now zone sunlit" aria-label="What I'm doing now" style={`${slotVars(1)};--rays:0.28`}>
   <div class="wrap">
     <dl class="now__grid">
       {
@@ -24,8 +25,7 @@ import now from '@/data/now.json';
 
 <style>
   .now {
-    border-block: 1px solid var(--line);
-    background: var(--surface);
+    padding-block: 2rem 1.25rem;
   }
 
   .now__grid {

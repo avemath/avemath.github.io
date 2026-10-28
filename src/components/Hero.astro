@@ -2,104 +2,126 @@
 import Icon from './Icon.astro';
 import AudienceSwitcher from './AudienceSwitcher.astro';
 import site from '@/data/site.json';
+import { slotVars } from '@/lib/depth';
+import { BINS, BIN_HZ, CHIRP, FRAME_HZ, LEAD, LINES, STILL, TEXT_BINS, VIEW_ROWS, holdFrame } from '@/lib/tx-signal';
+
+// The still picture that shows until the live display takes over (and without JavaScript): the
+// name where the live display holds it, centered, with the sweep below it. It uses the build-time
+// estimate of the raster, so the cross-fade to the computed picture barely moves.
+const hold = holdFrame(STILL.rows);
+const top = VIEW_ROWS / 2 - STILL.rows / 2;
+const lines = LINES.map((text, i) => ({ text, y: top + 1 + STILL.cap + i * (STILL.cap + STILL.gap) }));
+const chirp = { x1: CHIRP.f0 / BIN_HZ, y1: hold - LEAD, x2: CHIRP.f1 / BIN_HZ, y2: hold - (LEAD + CHIRP.frames) };
+const kHz = [0, 2, 4, 6, 8];
+const seconds = [0, 1, 2, 3, 4, 5, 6];
+const rowsPerSecond = FRAME_HZ;
 ---
 
-<section class="hero" aria-labelledby="hero-title">
-  <canvas class="hero__canvas" aria-hidden="true" data-sonar></canvas>
-  <div class="hero__fade" aria-hidden="true"></div>
+<section id="top" class="hero zone sunlit" aria-labelledby="hero-title" style={slotVars(0)}>
+  <div class="wrap hero__grid">
+    <div class="hero__text">
+      <p class="eyebrow" data-hero-eyebrow>{site.eyebrow}</p>
+      <h1 id="hero-title" class="hero__title" data-hero-title>{site.name}</h1>
+      <p class="hero__line" data-hero-line>{site.headline}</p>
 
-  <div class="wrap hero__inner">
-    <p class="eyebrow" data-hero-eyebrow>{site.eyebrow}</p>
-    <h1 id="hero-title" class="hero__title" data-hero-title>{site.name}</h1>
-    <p class="hero__line" data-hero-line>{site.headline}</p>
+      <div class="hero__ctas" data-hero-ctas>
+        <a class="btn btn--primary" href="#featured" data-primary-cta>
+          <span data-primary-cta-label>See my work</span>
+          <Icon name="arrow-right" />
+        </a>
+        <a class="btn" href="/resume/" data-secondary-cta>
+          <span data-secondary-cta-label>Résumé</span>
+        </a>
+      </div>
 
-    <div class="hero__ctas" data-hero-ctas>
-      <a class="btn btn--primary" href="#featured" data-primary-cta>
-        <span data-primary-cta-label>See my work</span>
-        <Icon name="arrow-right" />
-      </a>
-      <a class="btn" href="/resume/" data-secondary-cta>
-        <span data-secondary-cta-label>Résumé</span>
-      </a>
+      <div data-hero-switcher>
+        <AudienceSwitcher />
+      </div>
     </div>
 
-    <div data-hero-switcher>
-      <AudienceSwitcher />
-    </div>
+    <figure class="tx" data-tx>
+      <div class="tx__bar">
+        <p class="tx__title"><span class="tx__dot" aria-hidden="true"></span>TX · Spectrogram</p>
+        <button type="button" class="tx__play" data-tx-play aria-pressed="false" hidden>
+          <Icon name="volume" class="tx__icon tx__icon--on" />
+          <Icon name="stop" class="tx__icon tx__icon--off" />
+          <span data-tx-play-label>Hear it</span>
+        </button>
+      </div>
+      <div class="tx__plot">
+        <div class="tx__time" aria-hidden="true">
+          {seconds.map((t) => <span style={`--at:${(t * rowsPerSecond) / VIEW_ROWS}`}>{t === 6 ? '6 s' : t}</span>)}
+        </div>
+        <div class="tx__screen" data-tx-screen>
+          <svg class="tx__still" viewBox={`0 0 ${BINS} ${VIEW_ROWS}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            {
+              lines.map((l, i) => (
+                <text x={BINS / 2} y={l.y} font-size={STILL.font} text-anchor="middle" {...(i === 1 ? { textLength: TEXT_BINS - 2, lengthAdjust: 'spacingAndGlyphs' } : {})}>
+                  {l.text}
+                </text>
+              ))
+            }
+            <line x1={chirp.x1} y1={chirp.y1} x2={chirp.x2} y2={chirp.y2} />
+          </svg>
+          <canvas class="tx__canvas" width={BINS} height={VIEW_ROWS} aria-hidden="true"></canvas>
+          <span class="tx__grid" aria-hidden="true"></span>
+          <span class="tx__cross" data-tx-cross aria-hidden="true" hidden></span>
+        </div>
+        <div class="tx__axis" aria-hidden="true">
+          {kHz.map((t) => <span style={`--at:${t / 8}`}>{t === 8 ? '8 kHz' : t}</span>)}
+        </div>
+      </div>
+      <div class="tx__foot">
+        <p class="tx__readout" data-tx-readout aria-hidden="true">Point at the display to read it</p>
+        <p class="sr-only" aria-live="polite" data-tx-live></p>
+      </div>
+      <figcaption class="tx__caption">My name, sent as a real signal and drawn by an FFT as it arrives.</figcaption>
+    </figure>
   </div>
+
 </section>
 
 <style>
   .hero {
-    position: relative;
     isolation: isolate;
-    background: radial-gradient(
-      circle var(--scope-r, 26rem) at var(--scope-x, 74%) var(--scope-y, 48%),
-      var(--accent-wash),
-      transparent 100%
-    );
-    min-height: min(42rem, calc(100svh - 4rem));
-    display: flex;
-    align-items: center;
     overflow: hidden;
-    padding-block: clamp(3rem, 8vw, 6rem) clamp(3rem, 6vw, 5rem);
+    padding-block: clamp(3.25rem, 7vw, 5.5rem) clamp(4.5rem, 8vw, 6.5rem);
   }
 
-  .hero__canvas {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 1.2s ease;
+  .hero__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
   }
 
-  .hero__canvas[data-ready] {
-    opacity: 1;
-  }
-
-  /* Keeps text readable over the scope on narrow screens. */
-  .hero__fade {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(90deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 70%, transparent) 45%, transparent 75%),
-      linear-gradient(0deg, var(--bg) 0%, transparent 25%);
-    pointer-events: none;
-  }
-
-  @media (max-width: 899px) {
-    /* No forced full-screen height on phones: a deliberate band of scope above the text,
-       and the buttons land well above the fold. */
-    .hero {
-      align-items: flex-end;
-      min-height: 0;
-      padding-top: clamp(9rem, 26svh, 13rem);
+  @media (min-width: 1024px) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(2.5rem, 5vw, 4.5rem);
     }
-
-    .hero__fade {
-      background: linear-gradient(0deg, var(--bg) 35%, color-mix(in oklab, var(--bg) 55%, transparent) 70%, transparent 100%);
-    }
-  }
-
-  .hero__inner {
-    position: relative;
   }
 
   .hero__title {
     margin-top: 1.25rem;
-    font-size: clamp(3rem, 9vw, 6.5rem);
+    font-size: clamp(3rem, 7.4vw, 5.75rem);
     font-weight: 600;
     line-height: 0.95;
     letter-spacing: -0.045em;
   }
 
+  /* On phones the name stays on one line in both the fallback and the web font, sized to the
+     screen, so the font swap cannot rewrap it and push the page down. */
+  @media (max-width: 639px) {
+    .hero__title {
+      font-size: min(3rem, calc((100vw - 2 * var(--gutter)) / 8));
+      white-space: nowrap;
+    }
+  }
+
   .hero__line {
     margin-top: 1.5rem;
-    max-width: 38rem;
-    font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+    max-width: 36rem;
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
     line-height: 1.5;
     color: var(--text-soft);
   }
@@ -112,6 +134,242 @@ import site from '@/data/site.json';
     margin-top: 2.25rem;
   }
 
+  /* ---- The transmitter's display ---- */
+  .tx {
+    --tx-ink: var(--accent);
+    --tx-hot: var(--amber-line);
+    --tx-screen: #061523;
+    margin: 0;
+    padding: 0.85rem 0.85rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--surface), transparent 35%);
+    box-shadow: var(--shadow);
+    min-width: 0;
+  }
+
+
+  .tx__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    /* Room for the Hear it button before it is shown, so showing it moves nothing. */
+    min-height: calc(2.25rem + 0.7rem);
+    padding: 0 0.15rem 0.7rem;
+  }
+
+  .tx__title,
+  .tx__readout {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .tx__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .tx__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--amber) 28%, transparent);
+  }
+
+  .tx__play {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .tx__play:hover {
+    border-color: var(--accent);
+  }
+
+  .tx__play[aria-pressed='true'] {
+    border-color: var(--amber-line);
+    background: color-mix(in oklab, var(--amber) 16%, transparent);
+  }
+
+  .tx__play[hidden] {
+    display: none;
+  }
+
+  .tx__play :global(.tx__icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .tx__play :global(.tx__icon--off),
+  .tx__play[aria-pressed='true'] :global(.tx__icon--on) {
+    display: none;
+  }
+
+  .tx__play[aria-pressed='true'] :global(.tx__icon--off) {
+    display: block;
+  }
+
+  /* Time down the left (newest at the top), frequency along the bottom. */
+  .tx__plot {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr);
+    grid-template-areas: 'time screen' '. freq';
+  }
+
+  /* 256 bins by 160 frames, scaled up: square pixels at this aspect ratio. */
+  .tx__screen {
+    grid-area: screen;
+    position: relative;
+    aspect-ratio: 256 / 160;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, #56b6d8 30%, transparent);
+    border-radius: 0.4rem;
+    background: var(--tx-screen);
+    touch-action: pan-y;
+    cursor: crosshair;
+  }
+
+  .tx__screen:focus-visible {
+    outline-offset: 2px;
+  }
+
+  .tx__still,
+  .tx__canvas,
+  .tx__grid {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .tx__still {
+    font-family: var(--font-display);
+    font-weight: 600;
+    fill: #4fb3c9;
+    stroke: #f0a940;
+    stroke-opacity: 0.8;
+    stroke-width: 0.8;
+    paint-order: stroke;
+    transition: opacity 0.6s ease;
+  }
+
+  .tx__still text {
+    stroke: none;
+  }
+
+  .tx__canvas {
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+
+  [data-live] .tx__canvas {
+    opacity: 1;
+  }
+
+  [data-live] .tx__still {
+    opacity: 0;
+  }
+
+  /* Between cycles the picture fades out, then the next transmission starts on quiet water. */
+  .tx__screen[data-fade] .tx__canvas {
+    opacity: 0;
+  }
+
+  /* A faint grid: one line per kilohertz, one per second. */
+  .tx__grid {
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(90deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px 12.5%),
+      repeating-linear-gradient(180deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px calc(100% * 16000 / 608 / 160));
+  }
+
+  .tx__cross {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(#e4f0f5, #e4f0f5) var(--x) 0 / 1px 100% no-repeat,
+      linear-gradient(#e4f0f5, #e4f0f5) 0 var(--y) / 100% 1px no-repeat;
+    opacity: 0.45;
+  }
+
+  .tx__axis {
+    grid-area: freq;
+    position: relative;
+    height: 1.4rem;
+    margin-top: 0.35rem;
+  }
+
+  .tx__axis span,
+  .tx__time span {
+    position: absolute;
+    white-space: nowrap;
+    text-transform: none;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx__axis span {
+    top: 0.2rem;
+    left: calc(var(--at) * 100%);
+    translate: calc(var(--at) * -100%) 0;
+  }
+
+  .tx__time {
+    grid-area: time;
+    position: relative;
+  }
+
+  .tx__time span {
+    right: 0.4rem;
+    top: calc(var(--at) * 100%);
+    translate: 0 calc(var(--at) * -100%);
+  }
+
+  .tx__foot {
+    padding-left: 1.6rem;
+    min-height: 1.3rem;
+    margin-top: 0.15rem;
+  }
+
+  /* Units keep their real case: kHz and dBFS, not KHZ. */
+  .tx__readout {
+    text-transform: none;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    white-space: pre;
+    color: var(--text-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx__caption {
+    margin-top: 0.6rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--text-soft);
+  }
 
   /* Entrance: CSS only, so nothing waits on JavaScript. The headline and line
      never start invisible, which keeps Largest Contentful Paint fast. */
@@ -148,16 +406,15 @@ import site from '@/data/site.json';
 </style>
 
 <script>
-  import { mountSonar } from '../scripts/sonar-canvas';
   import { prefersReducedMotion } from '../scripts/preferences';
   import { decode } from '../scripts/decode';
 
-  // The scope is decorative, so it waits until the page has finished its real work.
-  const canvas = document.querySelector<HTMLCanvasElement>('[data-sonar]');
-  if (canvas) {
-    const mount = () => mountSonar(canvas);
-    if ('requestIdleCallback' in window) requestIdleCallback(mount, { timeout: 1500 });
-    else setTimeout(mount, 300);
+  // The live display is decorative, so its code loads only once the page has done its real work.
+  const tx = document.querySelector<HTMLElement>('[data-tx]');
+  if (tx) {
+    const mount = () => import('../scripts/spectrogram').then((m) => m.mountSpectrogram(tx));
+    if ('requestIdleCallback' in window) requestIdleCallback(mount, { timeout: 2000 });
+    else setTimeout(mount, 400);
   }
 
   // The eyebrow "acquires signal" once the page is idle.

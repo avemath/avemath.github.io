@@ -8,6 +8,7 @@ import Icon from '@/components/Icon.astro';
 import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
 import { formatRange } from '@/lib/format';
 import site from '@/data/site.json';
+import { slotVars, caseStart } from '@/lib/depth';
 
 interface Props {
   project: Project;
@@ -40,6 +41,9 @@ for (const [i, g] of (d.gallery ?? []).entries()) {
   if (!('video' in g)) fullSize.set(i, (await getImage({ src: g.src, format: 'webp', quality: 85 })).src);
 }
 const ogImage = `/og/${project.id}.png`;
+// Three gentle bands, one step apart, starting where this kind of work lives (see depth.ts).
+const start = caseStart[d.type] ?? 1;
+const band = (step: number) => slotVars(start + step, false);
 
 const jsonLd = [
   {
@@ -65,7 +69,8 @@ const jsonLd = [
 ---
 
 <BaseLayout title={d.seoTitle ?? d.title} description={d.seoDescription ?? d.summary} image={ogImage} type="article" jsonLd={jsonLd}>
-  <article class="case">
+  <article class="case descent">
+    <div class="zone case__zone case__zone--top" style={band(0)}>
     <header class="case__head">
       <div class="wrap">
         <nav aria-label="Breadcrumb" class="no-print">
@@ -74,6 +79,8 @@ const jsonLd = [
           </a>
         </nav>
 
+        <div class="case__intro">
+        <div class="case__intro-text">
         <div class="mt-8 flex flex-wrap items-center gap-2">
           <span class="chip chip--type">{typeLabels[d.type]}</span>
           <span class="chip">
@@ -91,6 +98,21 @@ const jsonLd = [
 
         <h1 class="case__title">{d.title}</h1>
         <p class="case__summary">{d.summary}</p>
+        </div>
+
+        {/* The project's signature beside the title: its drawn art, or its cover where it has one.
+            Limited-detail projects only ever show their drawn art. Decorative here, since the
+            full cover with its description follows below. */}
+        <div class="case__sig no-print" aria-hidden="true">
+          {
+            d.cover && !limited ? (
+              <Image src={d.cover} alt="" widths={[480, 720, 960]} sizes="(min-width: 1024px) 30rem, 100vw" format="webp" quality={76} loading="eager" />
+            ) : (
+              <ProjectArt slug={project.id} fit="meet" />
+            )
+          }
+        </div>
+        </div>
 
         <dl class="case__facts">
           <div>
@@ -173,7 +195,7 @@ const jsonLd = [
             </div>
           ) : (
             <div class="case__art">
-              <ProjectArt slug={project.id} />
+              <ProjectArt slug={project.id} fit="meet" />
             </div>
           )
         }
@@ -193,6 +215,9 @@ const jsonLd = [
       }
     </div>
 
+    </div>
+
+    <div class="zone case__zone" style={band(1)}>
     <slot name="demo" />
 
     <div class="wrap case__body">
@@ -217,6 +242,9 @@ const jsonLd = [
       </div>
     </div>
 
+    </div>
+
+    <div class="zone case__zone case__zone--end" style={band(2)}>
     {
       d.gallery && !limited && (
         <section id="gallery" class="wrap case__gallery-wrap" aria-labelledby="gallery-title">
@@ -295,10 +323,19 @@ const jsonLd = [
         </a>
       </div>
     </section>
+    </div>
   </article>
 </BaseLayout>
 
 <style>
+  .case__zone--top {
+    padding-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .case__zone--end {
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
   .case__head {
     padding-block: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 4vw, 3rem);
   }
@@ -308,6 +345,47 @@ const jsonLd = [
     align-items: center;
     gap: 0.4rem;
     font-size: 0.92rem;
+  }
+
+  /* Title block on the left, the project's signature on the right, as tall as the title block.
+     On phones the signature stacks below the summary. */
+  .case__intro {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  @media (min-width: 1024px) {
+    .case__intro {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: clamp(2rem, 4vw, 3.5rem);
+      align-items: stretch;
+    }
+  }
+
+  .case__sig {
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--surface-2) 70%, var(--bg));
+    box-shadow: var(--shadow);
+  }
+
+  @media (min-width: 1024px) {
+    .case__sig {
+      align-self: end;
+      aspect-ratio: auto;
+      height: 100%;
+      min-height: 15rem;
+      max-height: 24rem;
+    }
+  }
+
+  .case__sig :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
   }
 
   .case__title {
@@ -357,9 +435,10 @@ const jsonLd = [
     background: var(--surface);
   }
 
+  /* The art is shown whole, so the frame takes the art's own background around it. */
   .case__art {
-    aspect-ratio: 21 / 9;
-    max-height: 24rem;
+    height: clamp(14rem, 32vw, 24rem);
+    background: color-mix(in oklab, var(--surface-2) 70%, var(--bg));
   }
 
   .case__shot :global(img) {

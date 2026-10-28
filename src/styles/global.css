@@ -64,67 +64,138 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 /* ------------------------------------------------------------------
-   Design tokens. "Signal": naval acoustics meets interface craft, on
-   field-notebook paper. The light theme is warm cream paper rather than
-   blue-white, with no green cast of its own; the dark theme is deep
-   water. Both carry a leaf green for living things only: live-site
-   dots, the fern in the footer, the contour lines on the About page.
-   Every color pair used for text is checked for WCAG AA in both themes
-   (see docs/DESIGN.md for the measured ratios).
+   Design tokens. "Descent": a signal sent down through the ocean. The
+   home page is water that gets one clear step darker per section, from
+   a bright surface to a near-black seafloor, with sonar teal for lines
+   and signal amber for the one thing that matters on screen.
+
+   --band-0 to --band-11 are the twelve depth shades. A `.zone` takes
+   its shade from --band and redefines its surfaces and lines from it,
+   so cards always sit one step lighter than the water around them. In
+   the light theme the lower half of the descent is dark water: those
+   zones set --deep to 1 and switch to the light-on-dark inks. Every text
+   token passes AA on every band in both themes (see docs/REDESIGN.md).
    ------------------------------------------------------------------ */
 :root {
-  --bg: #f5f3ee;
-  --bg-deep: #ebe8e0;
-  --surface: #fcfbf8;
-  --surface-2: #edebe4;
-  --line: #d8d5ca;
-  --line-strong: #b9b4a6;
-  --text: #1a1a16;
-  --text-soft: #45463f;
-  --muted: #5d5e56;
-  --accent: #056f88;
-  --accent-ink: #045c71;
-  --accent-wash: rgb(5 111 136 / 0.1);
+  --band-0: #e4f8fd;
+  --band-1: #d9f0f7;
+  --band-2: #cee8f1;
+  --band-3: #c4e0ec;
+  --band-4: #bad8e6;
+  --band-5: #b1d0e0;
+  --band-6: #1d4357;
+  --band-7: #18384a;
+  --band-8: #142e3f;
+  --band-9: #102534;
+  --band-10: #0b1c2a;
+  --band-11: #07141f;
+  --bg: #e4f8fd;
+  --bg-deep: #c9e2e9;
+  --text: #0b1d29;
+  --text-soft: #223b49;
+  --muted: #334d5a;
+  --accent: #1d6a86;
+  --accent-ink: #0f5168;
+  --accent-wash: rgb(29 106 134 / 0.1);
   /* Stronger wash for staged backgrounds, which go flat on the pale light surface. */
-  --accent-wash-strong: rgb(5 111 136 / 0.18);
-  --amber: #ffb547;
-  --amber-ink: #8a5300;
+  --accent-wash-strong: rgb(29 106 134 / 0.18);
+  --amber: #f0a940;
+  /* Amber for strokes. Light amber is too pale to read as text, so text uses --amber-ink. */
+  --amber-line: #b8700a;
+  --amber-ink: #6f4200;
   --on-amber: #1a1203;
-  --danger: #b42318;
+  --danger: #9f1d13;
   --leaf: #4a7c59;
   --leaf-ink: #2f5e3c;
-  --ok: #2f7a4b;
-  --grid: rgb(26 26 22 / 0.05);
-  --shadow: 0 1px 2px rgb(26 26 22 / 0.06), 0 12px 32px -16px rgb(26 26 22 / 0.25);
-  --shadow-lift: 0 2px 4px rgb(26 26 22 / 0.06), 0 24px 48px -20px rgb(26 26 22 / 0.35);
+  --ok: #24693e;
+  --shadow: 0 1px 2px rgb(11 29 41 / 0.06), 0 12px 32px -16px rgb(11 29 41 / 0.28);
+  --shadow-lift: 0 2px 4px rgb(11 29 41 / 0.06), 0 24px 48px -20px rgb(11 29 41 / 0.38);
+  --gutter: clamp(1rem, 4vw, 2.5rem);
   color-scheme: light;
 }
 
 [data-theme='dark'] {
-  --bg: #0b1220;
-  --bg-deep: #070c16;
-  --surface: #111a2e;
-  --surface-2: #17223a;
-  --line: #22304b;
-  --line-strong: #33466b;
-  --text: #e6edf7;
-  --text-soft: #c3cfe2;
-  --muted: #8a9bb8;
-  --accent: #3ddcff;
-  --accent-ink: #7fe8ff;
-  --accent-wash: rgb(61 220 255 / 0.1);
-  --accent-wash-strong: rgb(61 220 255 / 0.12);
-  --amber: #ffb547;
-  --amber-ink: #ffc670;
+  --band-0: #0f4955;
+  --band-1: #0a424f;
+  --band-2: #083a48;
+  --band-3: #083442;
+  --band-4: #062f3d;
+  --band-5: #062938;
+  --band-6: #062432;
+  --band-7: #06202d;
+  --band-8: #061c29;
+  --band-9: #061824;
+  --band-10: #061420;
+  --band-11: #05111c;
+  --bg: #061c2b;
+  --bg-deep: #041420;
+  --text: #e4f0f5;
+  --text-soft: #c3d6df;
+  --muted: #adc6d2;
+  --accent: #7ccbe6;
+  --accent-ink: #93d5ec;
+  --accent-wash: rgb(124 203 230 / 0.1);
+  --accent-wash-strong: rgb(124 203 230 / 0.14);
+  --amber: #f0a940;
+  --amber-line: #f0a940;
+  --amber-ink: #f5c27a;
   --on-amber: #1a1203;
   --danger: #ff8a7a;
   --leaf: #8fd19e;
   --leaf-ink: #a9dfb5;
   --ok: #6fd39a;
-  --grid: rgb(230 237 247 / 0.04);
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
-  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 56px -20px rgb(0 0 0 / 0.75);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.65);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 56px -20px rgb(0 0 0 / 0.8);
   color-scheme: dark;
+}
+
+/* Surfaces and lines follow whatever --bg is in scope: the page's, or a zone's own shade. In the
+   light theme a deep zone (--deep: 1) mixes them the way the dark theme does. */
+:root,
+.zone {
+  --surface: color-mix(in oklab, var(--bg), #fff calc(62% - var(--deep, 0) * 57%));
+  --surface-2: color-mix(in oklab, var(--bg), #fff calc(32% - var(--deep, 0) * 24%));
+  --line: color-mix(in oklab, var(--bg), color-mix(in srgb, #0b1d29, #fff calc(var(--deep, 0) * 100%)) 13%);
+  --line-strong: color-mix(in oklab, var(--bg), color-mix(in srgb, #0b1d29, #fff calc(var(--deep, 0) * 100%)) 26%);
+  --grid: rgb(11 29 41 / 0.05);
+}
+
+/* Light theme, dark water: the inks swap to the dark theme's set. */
+:root:not([data-theme='dark']) .zone {
+  --text: color-mix(in srgb, #0b1d29, #e4f0f5 calc(var(--deep) * 100%));
+  --text-soft: color-mix(in srgb, #223b49, #c3d6df calc(var(--deep) * 100%));
+  --muted: color-mix(in srgb, #334d5a, #adc6d2 calc(var(--deep) * 100%));
+  --accent: color-mix(in srgb, #1d6a86, #7ccbe6 calc(var(--deep) * 100%));
+  --accent-ink: color-mix(in srgb, #0f5168, #93d5ec calc(var(--deep) * 100%));
+  --accent-wash: color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-wash-strong: color-mix(in srgb, var(--accent) 16%, transparent);
+  --amber-line: color-mix(in srgb, #b8700a, #f0a940 calc(var(--deep) * 100%));
+  --amber-ink: color-mix(in srgb, #6f4200, #f5c27a calc(var(--deep) * 100%));
+  --danger: color-mix(in srgb, #9f1d13, #ff8a7a calc(var(--deep) * 100%));
+  --ok: color-mix(in srgb, #24693e, #6fd39a calc(var(--deep) * 100%));
+}
+
+/* Tailwind's color utilities read these, and a variable resolves where it is declared, so each
+   zone declares them again to pick up its own shade and inks. */
+.zone {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-soft: var(--text-soft);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-amber-ink: var(--amber-ink);
+}
+
+[data-theme='dark'],
+[data-theme='dark'] .zone {
+  --surface: color-mix(in oklab, var(--bg), #fff 5%);
+  --surface-2: color-mix(in oklab, var(--bg), #fff 8%);
+  --line: color-mix(in oklab, var(--bg), #fff 13%);
+  --line-strong: color-mix(in oklab, var(--bg), #fff 24%);
+  --grid: rgb(228 240 245 / 0.04);
 }
 
 @theme {
@@ -141,6 +212,7 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-amber: var(--amber);
+  --color-amber-ink: var(--amber-ink);
   --color-leaf: var(--leaf);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -295,6 +367,143 @@
 }
 
 /* ------------------------------------------------------------------
+   The descent. A zone is a solid band in the shade of its slot (0 at
+   the surface, 11 on the seafloor; src/lib/depth.ts generates which
+   section gets which). Each band after the hero rises over the one
+   above with a soft wave edge: it overlaps by --wave, and a mask cuts
+   the overlap into a wave so the shade above shows in the troughs.
+   ------------------------------------------------------------------ */
+.zone {
+  --deep: 0;
+  --bg: var(--band, var(--band-0));
+  position: relative;
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.home-flow > .zone,
+.descent > .zone + .zone,
+.now.zone,
+.site-footer.zone {
+  --wave: clamp(1.25rem, 2.6vw, 2.5rem);
+  --wave-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22C160 8 300 6 470 18S760 38 960 26 1280 8 1440 22V40H0Z'/%3E%3C/svg%3E");
+  margin-top: calc(-1 * var(--wave));
+  border-top: var(--wave) solid transparent;
+  -webkit-mask:
+    var(--wave-shape) calc(var(--slot, 0) * -317px) 0 / 1440px var(--wave) repeat-x,
+    linear-gradient(#000 0 0) 0 calc(var(--wave) - 2px) / 100% 100% no-repeat;
+  mask:
+    var(--wave-shape) calc(var(--slot, 0) * -317px) 0 / 1440px var(--wave) repeat-x,
+    linear-gradient(#000 0 0) 0 calc(var(--wave) - 2px) / 100% 100% no-repeat;
+}
+
+/* Soft light rays from the surface, in the top two bands. They fade with depth and sway slowly. */
+.sunlit::after {
+  --ray: rgb(255 255 255 / 0.62);
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 -25% auto;
+  height: 100%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg at 50% -35%,
+    transparent 0 150deg,
+    var(--ray) 151.5deg,
+    transparent 153.5deg 157deg,
+    var(--ray) 158deg,
+    transparent 160.5deg 163deg,
+    var(--ray) 165deg,
+    transparent 166.5deg 171deg,
+    var(--ray) 172.5deg,
+    transparent 175deg 178deg,
+    var(--ray) 179deg,
+    transparent 180.5deg 185deg,
+    var(--ray) 187deg,
+    transparent 189deg 194deg,
+    var(--ray) 195deg,
+    transparent 196.5deg 200deg,
+    var(--ray) 202deg,
+    transparent 205deg 360deg
+  );
+  -webkit-mask-image: linear-gradient(#000, transparent 80%);
+  mask-image: linear-gradient(#000, transparent 80%);
+  opacity: var(--rays, 0.55);
+  transform-origin: 50% -35%;
+  animation: sway 16s ease-in-out infinite alternate paused;
+}
+
+[data-theme='dark'] .sunlit::after {
+  --ray: rgb(160 225 240 / 0.12);
+}
+
+@keyframes sway {
+  from {
+    rotate: -2.5deg;
+  }
+  to {
+    rotate: 2.5deg;
+  }
+}
+
+/* Marine snow: faint specks drifting down through the deepest two section bands. */
+.zone::before {
+  --speck: rgb(205 232 242 / 0.55);
+  content: '';
+  display: var(--snow, none);
+  position: absolute;
+  z-index: -1;
+  inset: -240px 0 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.6px 1.6px at 34px 42px, var(--speck), transparent),
+    radial-gradient(1px 1px at 128px 96px, var(--speck), transparent),
+    radial-gradient(1.3px 1.3px at 206px 172px, var(--speck), transparent),
+    radial-gradient(1px 1px at 76px 204px, var(--speck), transparent),
+    radial-gradient(1.2px 1.2px at 168px 18px, var(--speck), transparent),
+    radial-gradient(1px 1px at 58px 24px, var(--speck), transparent),
+    radial-gradient(1.4px 1.4px at 18px 92px, var(--speck), transparent);
+  background-size: 240px 240px, 240px 240px, 240px 240px, 240px 240px, 240px 240px, 120px 120px, 120px 120px;
+  opacity: 0.6;
+  animation: snow 70s linear infinite paused;
+}
+
+@keyframes snow {
+  to {
+    transform: translateY(240px);
+  }
+}
+
+/* Only while in view (scripts set fx-live), and never with reduced motion. */
+.zone.fx-live::before,
+.sunlit.fx-live::after {
+  animation-play-state: running;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zone::before,
+  .sunlit::after {
+    animation: none;
+  }
+}
+
+html[data-motion='reduce'] .zone::before,
+html[data-motion='reduce'] .sunlit::after {
+  animation: none;
+}
+
+/* One label per section on the home page: its depth leads the eyebrow ("200 m · Featured work"). */
+.home .zone .eyebrow::before {
+  content: var(--depth, '') / '';
+  width: auto;
+  height: auto;
+  margin-right: -0.6rem;
+  background: none;
+  white-space: pre;
+}
+
+/* ------------------------------------------------------------------
    Type helpers
    ------------------------------------------------------------------ */
 .eyebrow {
@@ -387,7 +596,7 @@
   min-height: 2.875rem;
   padding: 0.7rem 1.25rem;
   border: 1px solid var(--btn-line);
-  border-radius: 999px;
+  border-radius: 0.55rem;
   background: var(--btn-bg);
   color: var(--btn-fg);
   font-weight: 600;
@@ -440,7 +649,7 @@
   gap: 0.35rem;
   padding: 0.25rem 0.6rem;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 0.35rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   line-height: 1.4;
@@ -456,7 +665,7 @@
 }
 
 [data-theme='dark'] .chip--type {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .chip--limited {
@@ -479,7 +688,7 @@
 .card {
   position: relative;
   border: 1px solid var(--line);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   background: var(--surface);
   box-shadow: var(--shadow);
 }
@@ -807,6 +1016,30 @@ html[data-motion='reduce'] *::after {
   .no-print,
   .site-header,
   .site-footer {
+    display: none !important;
+  }
+
+  /* A zone sets its own shade inline and its own inks, so print restates the paper colors here. */
+  .zone {
+    --bg: #fff !important;
+    --surface: #fff !important;
+    --surface-2: #fff !important;
+    --text: #000 !important;
+    --text-soft: #111 !important;
+    --muted: #333 !important;
+    --line: #bbb !important;
+    --line-strong: #b9b4a6 !important;
+    --accent: #000 !important;
+    --accent-ink: #000 !important;
+    background: #fff !important;
+    margin-top: 0 !important;
+    border-top: 0 !important;
+    -webkit-mask: none !important;
+    mask: none !important;
+  }
+
+  .zone::before,
+  .zone::after {
     display: none !important;
   }
 

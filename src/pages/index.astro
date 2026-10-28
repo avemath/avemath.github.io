@@ -11,6 +11,8 @@ import Skills from '@/components/Skills.astro';
 import FieldNotes from '@/components/FieldNotes.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import Icon from '@/components/Icon.astro';
+import DepthGauge from '@/components/DepthGauge.astro';
+import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
 
@@ -49,12 +51,13 @@ const tileStyle = (b: (typeof bento)[number]) =>
 ---
 
 <BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
+  <style is:inline slot="head" set:html={zoneStyles()} />
   <div class="home">
     <Hero />
     <NowStrip />
 
     <div class="home-flow">
-      <section id="featured" class="section home-section" aria-labelledby="featured-title" data-section="featured">
+      <section id="featured" class="section home-section zone" aria-labelledby="featured-title" data-section="featured">
         <div class="wrap">
           <div class="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -73,15 +76,16 @@ const tileStyle = (b: (typeof bento)[number]) =>
             <a class="btn" href="/work/">All work <Icon name="arrow-right" /></a>
           </div>
 
+          {/* Every tile image loads lazily: the hero fills the first screen on phones and desktops,
+              so even the first tile is below the fold and should not compete with the hero text. */}
           <div class="bento">
             {
-              bento.map((b, i) => {
+              bento.map((b) => {
                 const p = bySlug[b.slug];
                 return p ? (
                   <ProjectTile
                     project={p}
                     size={b.size}
-                    eager={i === 0}
                     style={tileStyle(b)}
                   />
                 ) : null;
@@ -98,7 +102,7 @@ const tileStyle = (b: (typeof bento)[number]) =>
       <Skills />
       <FieldNotes />
 
-      <section id="services" class="section section--tight home-section" aria-labelledby="services-title" data-section="services">
+      <section id="services" class="section section--tight home-section zone" aria-labelledby="services-title" data-section="services">
         <div class="wrap">
           <div class="services-teaser card">
             <div>
@@ -124,7 +128,7 @@ const tileStyle = (b: (typeof bento)[number]) =>
         </div>
       </section>
 
-      <section id="contact" class="section section--tight home-section" aria-labelledby="contact-title" data-section="contact">
+      <section id="contact" class="section section--tight home-section zone" aria-labelledby="contact-title" data-section="contact">
         <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:items-center">
           <div>
             <p class="eyebrow">Contact</p>
@@ -154,22 +158,15 @@ const tileStyle = (b: (typeof bento)[number]) =>
         </div>
       </section>
     </div>
+    <DepthGauge />
   </div>
 </BaseLayout>
+
 
 <style>
   .home-flow {
     display: flex;
     flex-direction: column;
-  }
-
-  /* Sections keep their dividers whatever order the audience switcher picks. */
-  .home-flow > :global(.home-section) {
-    border-top: 1px solid var(--line);
-  }
-
-  .home-flow > :global(.home-section:first-child) {
-    border-top: 0;
   }
 
   /* Audience ordering. Pure CSS, driven by the checked radio in the hero. Sections without a

@@ -18,3 +18,7 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Lighthouse temp Chrome profiles (WSL names them like Windows paths)
+C:\\Users\\*/
+lighthouse.*/
