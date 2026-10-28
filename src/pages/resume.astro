@@ -8,7 +8,6 @@ import { formatRange, formatMonth } from '@/lib/format';
 
 const research = experience.roles.filter((r) => r.kind === 'research' || r.kind === 'engineering');
 const other = experience.roles.filter((r) => !(r.kind === 'research' || r.kind === 'engineering'));
-const resumeSkills = skills.filter((g) => g.group !== 'Professional');
 const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
 ---
 
@@ -134,9 +133,9 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
         <h2 id="r-skills" class="r-h">Skills</h2>
         <dl class="r-skills">
           {
-            resumeSkills.map((g) => (
-              <div class={g.group === 'Hardware' ? 'r-screen-only' : undefined}>
-                <dt>{g.group}:</dt>
+            skills.map((g) => (
+              <div>
+                <dt>{g.resume}:</dt>
                 <dd>{g.items.map((item) => <span class="r-skill">{item}</span>)}</dd>
               </div>
             ))
@@ -401,11 +400,10 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       line-height: 1.32;
     }
 
-    /* One page: the PDF keeps the top three bullets per entry, two for the brief section. */
+    /* One page: the PDF keeps the top three bullets per entry, two for the brief section, and 24 skills per group. */
     .r-list li:nth-child(n + 4),
     .r-sec--brief .r-item:not(.r-item--full) .r-list li:nth-child(n + 3),
-    .r-skill:nth-child(n + 6),
-    .r-screen-only {
+    .r-skill:nth-child(n + 25) {
       display: none !important;
     }
 
