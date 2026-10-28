@@ -76,15 +76,16 @@ const tileStyle = (b: (typeof bento)[number]) =>
             <a class="btn" href="/work/">All work <Icon name="arrow-right" /></a>
           </div>
 
+          {/* Every tile image loads lazily: the hero fills the first screen on phones and desktops,
+              so even the first tile is below the fold and should not compete with the hero text. */}
           <div class="bento">
             {
-              bento.map((b, i) => {
+              bento.map((b) => {
                 const p = bySlug[b.slug];
                 return p ? (
                   <ProjectTile
                     project={p}
                     size={b.size}
-                    eager={i === 0}
                     style={tileStyle(b)}
                   />
                 ) : null;
