@@ -398,6 +398,14 @@
     linear-gradient(#000 0 0) 0 calc(var(--wave) - 2px) / 100% 100% no-repeat;
 }
 
+/* The browser lays out a band only as it nears the screen, so the first paint does not wait on
+   the layout of the whole long page. Once laid out, a band keeps its real size. */
+.home-flow > .zone,
+.site-footer.zone {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1100px;
+}
+
 /* Soft light rays from the surface, in the top two bands. They fade with depth and sway slowly. */
 .sunlit::after {
   --ray: rgb(255 255 255 / 0.62);
