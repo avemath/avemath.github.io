@@ -24,7 +24,7 @@ const short = (m: number) => m.toLocaleString('en-US');
     <span class="gauge__zone" data-gauge-zone data-ink>{slots[0].zone}</span>
     <span class="gauge__section" data-gauge-section data-ink>{sectionNames.top}</span>
   </p>
-  <div class="gauge__scale">
+  <div class="gauge__scale" style={`--n:${slots.length}`}>
     <span class="gauge__marker" aria-hidden="true" data-gauge-marker></span>
     <ol>
       {
@@ -59,14 +59,15 @@ const short = (m: number) => m.toLocaleString('en-US');
     display: none;
   }
 
-  /* Only where the page margin can hold it. At 1440px the content column starts at 152px; the
-     gauge ends at 112px, so there are 40px between them. No panel: it sits on the water and
-     takes its ink from the band under it (the script sets data-deep over dark water). */
+  /* Only where the page margin can hold it. It sits on the right edge, since the signal trace
+     runs down the left gutter: at 1440px the content column ends 152px from the edge and the
+     gauge takes the outer 112px, so there are 40px between them. No panel: it sits on the water
+     and takes its ink from the band under it (the script sets data-deep over dark water). */
   @media (min-width: 1440px) {
     .gauge {
       position: fixed;
       z-index: 30;
-      left: 1rem;
+      right: 1rem;
       top: 50%;
       translate: 0 -50%;
       display: grid;
@@ -130,7 +131,7 @@ const short = (m: number) => m.toLocaleString('en-US');
   .gauge__mark {
     position: absolute;
     left: 0;
-    top: calc(var(--i) / 11 * 100%);
+    top: calc(var(--i) / (var(--n) - 1) * 100%);
     translate: 0 -50%;
   }
 

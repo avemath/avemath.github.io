@@ -7,7 +7,7 @@ import Icon from '@/components/Icon.astro';
 import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
 import { formatRange } from '@/lib/format';
 import site from '@/data/site.json';
-import { slotVars, caseStart } from '@/lib/depth';
+import { bandVars, caseStart } from '@/lib/depth';
 
 interface Props {
   project: Project;
@@ -41,7 +41,7 @@ for (const [i, g] of (d.gallery ?? []).entries()) {
 const ogImage = `/og/${project.id}.png`;
 // Three gentle bands, one step apart, starting where this kind of work lives (see depth.ts).
 const start = caseStart[d.type] ?? 1;
-const band = (step: number) => slotVars(start + step, false);
+const band = (step: number) => bandVars(start + step);
 
 const jsonLd = [
   {

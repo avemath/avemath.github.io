@@ -18,20 +18,20 @@ Each home page section is an ocean depth zone. The background steps one clear sh
 
 The "I'm here to..." switcher reorders the sections with CSS, so depth belongs to the **position** on the page, not to a section. Whatever sits third is always at 200 m. The table lives in `src/lib/depth.ts`, and everything about depth is generated from it: the band shade, the light or dark inks, the depth in each section's label, where the marine snow falls, and the depth gauge. The gauge and the labels cannot disagree.
 
-| Slot | Depth | Zone | Hire (default) | Research | Website |
-|---|---|---|---|---|---|
-| 0 | 0 m | Surface | hero | hero | hero |
-| 1 | 50 m | Sunlight zone | Now strip | Now strip | Now strip |
-| 2 | 200 m | Twilight zone | Featured work | Research | Websites |
-| 3 | 400 m | Twilight zone | Experience | Featured work | Services |
-| 4 | 600 m | Twilight zone | Skills | Recommendations | Featured work |
-| 5 | 800 m | Twilight zone | Recommendations | Experience | Field notes |
-| 6 | 1,000 m | Sound channel | Research | Skills | Recommendations |
-| 7 | 1,500 m | Midnight zone | Websites | Field notes | Experience |
-| 8 | 2,000 m | Midnight zone | Field notes | Websites | Skills |
-| 9 | 3,000 m | Midnight zone | Services | Services | Research |
-| 10 | 4,000 m | Abyss | Contact | Contact | Contact |
-| 11 | 4,500 m | Seafloor | Footer | Footer | Footer |
+The home page has eight slots. Each slot names one of the twelve band shades, so the water still steps clearly darker and drops into dark water at the sound channel.
+
+| Slot | Depth | Zone | Band | Hire (default) | Research | Website |
+|---|---|---|---|---|---|---|
+| 0 | 0 m | Surface | 0 | hero | hero | hero |
+| 1 | 50 m | Sunlight zone | 1 | Now strip | Now strip | Now strip |
+| 2 | 200 m | Twilight zone | 3 | Featured work | Research | Client work |
+| 3 | 1,000 m | Sound channel | 6 | Research | Featured work | Featured work |
+| 4 | 2,000 m | Midnight zone | 8 | Client work | Field notes | Field notes |
+| 5 | 3,000 m | Midnight zone | 9 | Field notes | Client work | Research |
+| 6 | 4,000 m | Abyss | 10 | Contact | Contact | Contact |
+| 7 | 4,500 m | Seafloor | 11 | Footer | Footer | Footer |
+
+The section order for each audience is generated from the same table (`zoneStyles` in `depth.ts`), so the order, the depths and the gauge cannot drift apart. Experience, Skills and Recommendations live on /about/; the home page links to them from Featured work.
 
 In the default order the research section lands on the sound channel axis at 1,000 m, which is where its sound speed curve puts the minimum.
 
@@ -147,6 +147,16 @@ The research section has an open layout with no card. The sound speed profile si
 - **Header:** solid, in the surface shade, so page text never shows through.
 - **Field notes:** tiles that glow softly like bioluminescence, with a slow breathing glow (opacity only, out of step tile to tile, only while on screen). Tap to decode works exactly as before.
 - **Research:** open, as above. The packet footer is unchanged apart from its depth label.
+
+### 8. Home layout, second pass
+
+- **A shorter page:** hero, Now, featured work, research, a compact strip of the client sites, field notes, contact. Featured work shows each project once: the research, engineering and software work, with the client sites in their own strip. The services pitch sits under the strip.
+- **The signal trace:** a thin waveform down the left gutter from TX in the hero to RX in the footer, with a node and a depth at each section. Each section draws its own segment from its slot's trace (`traceMask` in `depth.ts`), so the noise grows with depth and the trace follows any audience order with no script. It draws in as each section scrolls into view, and is static under reduced motion. On phones it is a faint straight line at the very edge.
+- **Trace and gauge stay separate.** The trace scrolls with the page and shows the path; the gauge stays fixed and reads where you are. One element cannot do both, so the gauge moved to the right edge (from 1440px) and the trace has the left gutter.
+- **Pinned side headings** for Featured work and Field notes from 1100px: the label, heading and links stay in a left column with a fine tick ruler while the content scrolls on the right.
+- **A varied bento:** one tall tile (RAMpage's photo), one wide (the research drawing) and four smaller ones, placed by named grid areas per audience, so no row can have a hole. Tiles with real metrics show the first one as a large numeral; limited-detail work never does.
+- **Projects tune in:** a drawn signature has a light speckle of noise at rest and resolves clean while its tile is hovered or focused. Always clean under reduced motion and on touch screens.
+- **Instrument details, sparingly:** the tick rulers on the pinned columns, and a mono count in one corner of Featured work, Client work and Field notes.
 
 ## Deliberately not borrowed
 
