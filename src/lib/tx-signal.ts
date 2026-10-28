@@ -77,36 +77,51 @@ function rng(seed: number) {
   };
 }
 
+/** Raised-cosine edge, in samples (6 ms), so no subcarrier starts or stops instantly. */
+export const RAMP = 96;
+
 /**
  * One loop of the transmitted signal, peak normalized. The name is built symbol by symbol as a
  * sum of subcarriers; each keeps a fixed phase, and every subcarrier fits a whole number of
- * cycles in a symbol, so the tones run continuously from row to row.
+ * cycles in a symbol, so a tone that stays on runs continuously from symbol to symbol. Where a
+ * subcarrier switches on or off, that edge of the symbol fades over RAMP samples instead of
+ * stepping, which is what removes the clicks.
  */
 export function synthesize(): Float32Array<ArrayBuffer> {
   const rand = rng(1979);
   const out = new Float32Array(LOOP * N);
   const phase = Float64Array.from({ length: BINS }, () => rand() * 2 * Math.PI);
   const tone = 0.032;
+  const rise = Float64Array.from({ length: RAMP }, (_, n) => 0.5 - 0.5 * Math.cos((Math.PI * (n + 0.5)) / RAMP));
 
   // Subcarriers, as a sum of cosines per symbol. About 30 ms of work on a phone.
   const cosTable = Float64Array.from({ length: N }, (_, n) => Math.cos((2 * Math.PI * n) / N));
   for (let frame = 0; frame < LOOP; frame++) {
     const bins = nameBins(frame);
     if (!bins) continue;
+    const before = new Set(nameBins(frame - 1) ?? []);
+    const after = new Set(nameBins(frame + 1) ?? []);
     const base = frame * N;
     for (const k of bins) {
       const p0 = Math.round((phase[k] / (2 * Math.PI)) * N);
-      for (let n = 0; n < N; n++) out[base + n] += tone * cosTable[(k * n + p0) % N];
+      const fadeIn = !before.has(k);
+      const fadeOut = !after.has(k);
+      for (let n = 0; n < N; n++) {
+        let g = tone;
+        if (fadeIn && n < RAMP) g *= rise[n];
+        if (fadeOut && n >= N - RAMP) g *= rise[N - 1 - n];
+        out[base + n] += g * cosTable[(k * n + p0) % N];
+      }
     }
   }
 
-  // Preamble: a linear up-chirp.
+  // Preamble: a linear up-chirp, with the same raised-cosine edges.
   const { start, frames, f0, f1 } = CHIRP;
   const len = frames * N;
   for (let n = 0; n < len; n++) {
     const t = n / FS;
     const T = len / FS;
-    const ramp = Math.min(1, n / 160, (len - n) / 160);
+    const ramp = n < RAMP ? rise[n] : n >= len - RAMP ? rise[len - 1 - n] : 1;
     out[start * N + n] += 0.05 * ramp * Math.cos(2 * Math.PI * (f0 * t + ((f1 - f0) / (2 * T)) * t * t));
   }
 

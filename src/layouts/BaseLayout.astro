@@ -75,13 +75,18 @@ const { bare = false, ...seo } = Astro.props;
     </script>
 
     {
+      // Analytics wait for the load event, so the beacon's third-party connection never competes
+      // with the hero text. It still reads the page's timings from the buffered performance entries.
       site.cloudflareAnalyticsToken && (
-        <script
-          is:inline
-          defer
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          data-cf-beacon={JSON.stringify({ token: site.cloudflareAnalyticsToken })}
-        />
+        <script is:inline define:vars={{ beacon: JSON.stringify({ token: site.cloudflareAnalyticsToken }) }}>
+          addEventListener('load', function () {
+            var s = document.createElement('script');
+            s.defer = true;
+            s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+            s.setAttribute('data-cf-beacon', beacon);
+            document.body.appendChild(s);
+          });
+        </script>
       )
     }
   </body>
