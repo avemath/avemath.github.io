@@ -1,0 +1,126 @@
+---
+// A textbook sound speed profile: Munk's canonical shape, with the axis set at 1,000 m.
+// General ocean physics only. Nothing here comes from the sponsored research.
+const AXIS = 1000;
+const B = 1300;
+const EPS = 0.00737;
+const speed = (z: number) => {
+  const eta = (2 * (z - AXIS)) / B;
+  return 1500 * (1 + EPS * (eta - 1 + Math.exp(-eta)));
+};
+
+const box = { x0: 70, x1: 300, y0: 34, y1: 250 };
+const C0 = 1490;
+const C1 = 1550;
+const Z1 = 4000;
+const x = (c: number) => box.x0 + ((c - C0) / (C1 - C0)) * (box.x1 - box.x0);
+const y = (z: number) => box.y0 + (z / Z1) * (box.y1 - box.y0);
+const curve = Array.from({ length: 81 }, (_, i) => (i / 80) * Z1)
+  .map((z, i) => `${i ? 'L' : 'M'} ${x(speed(z)).toFixed(1)} ${y(z).toFixed(1)}`)
+  .join(' ');
+const depthTicks = [0, 1000, 2000, 3000, 4000];
+const speedTicks = [1500, 1520, 1540];
+---
+
+<figure class="ssp">
+  <svg viewBox="0 0 320 272" role="img" aria-labelledby="ssp-title" focusable="false">
+    <title id="ssp-title">
+      Sound speed against depth. Speed falls from about 1,523 meters per second at the surface to 1,500 at 1,000 meters, the
+      channel axis, then rises to about 1,540 at 4,000 meters.
+    </title>
+    <text x={box.x0} y="16" class="ssp__axis-name">Sound speed (m/s)</text>
+    {
+      speedTicks.map((c) => (
+        <g>
+          <path d={`M ${x(c)} ${box.y0} V ${box.y1}`} class="ssp__grid" />
+          <text x={x(c)} y={box.y0 - 6} class="ssp__tick" text-anchor="middle">
+            {c.toLocaleString('en-US')}
+          </text>
+        </g>
+      ))
+    }
+    {
+      depthTicks.map((z) => (
+        <text x={box.x0 - 8} y={y(z) + 3.5} class="ssp__tick" text-anchor="end">
+          {z.toLocaleString('en-US')}
+        </text>
+      ))
+    }
+    <text x="12" y={box.y1 + 18} class="ssp__axis-name">Depth (m)</text>
+    <path d={`M ${box.x0} ${box.y0} V ${box.y1}`} class="ssp__frame" />
+    <path d={`M ${box.x0} ${y(AXIS)} H ${box.x1}`} class="ssp__channel" />
+    <path d={curve} class="ssp__curve" />
+    <circle cx={x(1500)} cy={y(AXIS)} r="4" class="ssp__min" />
+    <text x={x(1500) + 10} y={y(AXIS) - 7} class="ssp__label">Channel axis</text>
+  </svg>
+  <figcaption>
+    Sound bends toward the slowest water, so near 1,000 m it can carry a very long way. A textbook profile, not project data.
+  </figcaption>
+</figure>
+
+<style>
+  .ssp {
+    margin: 0;
+    padding: 1.1rem 1.35rem 1rem;
+  }
+
+  .ssp svg {
+    width: 100%;
+    max-width: 26rem;
+    height: auto;
+    margin-inline: auto;
+    overflow: visible;
+  }
+
+  .ssp__axis-name,
+  .ssp__tick,
+  .ssp__label {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    fill: var(--muted);
+  }
+
+  .ssp__axis-name {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  .ssp__label {
+    fill: var(--amber-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  .ssp__grid {
+    stroke: var(--line);
+  }
+
+  .ssp__frame {
+    stroke: var(--line-strong);
+  }
+
+  .ssp__channel {
+    stroke: var(--amber-line);
+    stroke-dasharray: 3 5;
+    stroke-opacity: 0.8;
+  }
+
+  .ssp__curve {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .ssp__min {
+    fill: var(--amber-line);
+  }
+
+  figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--text-soft);
+  }
+</style>

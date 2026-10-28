@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import ProjectArt from './ProjectArt.astro';
+import SoundSpeed from './SoundSpeed.astro';
 import { getEntry } from 'astro:content';
 
 const onr = await getEntry('projects', 'onr-intelligent-data-management');
@@ -8,7 +8,7 @@ const v2v = await getEntry('projects', 'v2v-bsm-ofdm');
 const integer = await getEntry('projects', 'integer-internship');
 ---
 
-<section id="research" class="section home-section research" aria-labelledby="research-title" data-section="research">
+<section id="research" class="section home-section zone research" aria-labelledby="research-title" data-section="research">
   <div class="wrap">
     <div class="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
       <div>
@@ -45,7 +45,7 @@ const integer = await getEntry('projects', 'integer-internship');
       </div>
 
       <div class="research__panel card" data-reveal>
-        <div class="research__art"><ProjectArt slug="onr-intelligent-data-management" idPrefix="research-" /></div>
+        <div class="research__art"><SoundSpeed /></div>
         <p class="label research__related">Related work</p>
         <ul class="research__list">
           {
@@ -75,12 +75,6 @@ const integer = await getEntry('projects', 'integer-internship');
 </section>
 
 <style>
-  .research {
-    background:
-      radial-gradient(60rem 30rem at 85% 20%, var(--accent-wash-strong), transparent 70%),
-      var(--bg);
-  }
-
   .facts {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -120,7 +114,6 @@ const integer = await getEntry('projects', 'integer-internship');
   }
 
   .research__art {
-    aspect-ratio: 16 / 9;
     border-bottom: 1px solid var(--line);
   }
 

@@ -64,67 +64,87 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 /* ------------------------------------------------------------------
-   Design tokens. "Signal": naval acoustics meets interface craft, on
-   field-notebook paper. The light theme is warm cream paper rather than
-   blue-white, with no green cast of its own; the dark theme is deep
-   water. Both carry a leaf green for living things only: live-site
-   dots, the fern in the footer, the contour lines on the About page.
-   Every color pair used for text is checked for WCAG AA in both themes
-   (see docs/DESIGN.md for the measured ratios).
+   Design tokens. "Descent": a signal sent down through the ocean. The
+   page is water that gets one shade darker per section, from a pale
+   surface to the seafloor, with sonar teal for lines and signal amber
+   for the one thing that matters on screen. Text tokens stay fixed and
+   pass AA on every shade in both themes (see docs/REDESIGN.md).
+
+   --z-top and --z-floor are the two ends of the descent. A `.zone`
+   picks its shade from them with --slot, and redefines its surfaces
+   and lines from its own shade, so cards always sit one step lighter
+   than the water around them.
    ------------------------------------------------------------------ */
 :root {
-  --bg: #f5f3ee;
-  --bg-deep: #ebe8e0;
-  --surface: #fcfbf8;
-  --surface-2: #edebe4;
-  --line: #d8d5ca;
-  --line-strong: #b9b4a6;
-  --text: #1a1a16;
-  --text-soft: #45463f;
-  --muted: #5d5e56;
-  --accent: #056f88;
-  --accent-ink: #045c71;
-  --accent-wash: rgb(5 111 136 / 0.1);
+  --z-top: #dff1f3;
+  --z-floor: #adcfdb;
+  --bg: #dff1f3;
+  --bg-deep: #c9e2e9;
+  --text: #0b1d29;
+  --text-soft: #223b49;
+  --muted: #334d5a;
+  --accent: #1d6a86;
+  --accent-ink: #0f5168;
+  --accent-wash: rgb(29 106 134 / 0.1);
   /* Stronger wash for staged backgrounds, which go flat on the pale light surface. */
-  --accent-wash-strong: rgb(5 111 136 / 0.18);
-  --amber: #ffb547;
-  --amber-ink: #8a5300;
+  --accent-wash-strong: rgb(29 106 134 / 0.18);
+  --amber: #f0a940;
+  /* Amber for strokes. Light amber is too pale to read as text, so text uses --amber-ink. */
+  --amber-line: #b8700a;
+  --amber-ink: #6f4200;
   --on-amber: #1a1203;
-  --danger: #b42318;
+  --danger: #9f1d13;
   --leaf: #4a7c59;
   --leaf-ink: #2f5e3c;
-  --ok: #2f7a4b;
-  --grid: rgb(26 26 22 / 0.05);
-  --shadow: 0 1px 2px rgb(26 26 22 / 0.06), 0 12px 32px -16px rgb(26 26 22 / 0.25);
-  --shadow-lift: 0 2px 4px rgb(26 26 22 / 0.06), 0 24px 48px -20px rgb(26 26 22 / 0.35);
+  --ok: #24693e;
+  --shadow: 0 1px 2px rgb(11 29 41 / 0.06), 0 12px 32px -16px rgb(11 29 41 / 0.28);
+  --shadow-lift: 0 2px 4px rgb(11 29 41 / 0.06), 0 24px 48px -20px rgb(11 29 41 / 0.38);
+  --gutter: clamp(1rem, 4vw, 2.5rem);
   color-scheme: light;
 }
 
 [data-theme='dark'] {
-  --bg: #0b1220;
-  --bg-deep: #070c16;
-  --surface: #111a2e;
-  --surface-2: #17223a;
-  --line: #22304b;
-  --line-strong: #33466b;
-  --text: #e6edf7;
-  --text-soft: #c3cfe2;
-  --muted: #8a9bb8;
-  --accent: #3ddcff;
-  --accent-ink: #7fe8ff;
-  --accent-wash: rgb(61 220 255 / 0.1);
-  --accent-wash-strong: rgb(61 220 255 / 0.12);
-  --amber: #ffb547;
-  --amber-ink: #ffc670;
+  --z-top: #0e3a51;
+  --z-floor: #03101c;
+  --bg: #061c2b;
+  --bg-deep: #041420;
+  --text: #e4f0f5;
+  --text-soft: #bfd4de;
+  --muted: #9fb9c6;
+  --accent: #56b6d8;
+  --accent-ink: #8fd3ea;
+  --accent-wash: rgb(86 182 216 / 0.1);
+  --accent-wash-strong: rgb(86 182 216 / 0.14);
+  --amber: #f0a940;
+  --amber-line: #f0a940;
+  --amber-ink: #f5c27a;
   --on-amber: #1a1203;
   --danger: #ff8a7a;
   --leaf: #8fd19e;
   --leaf-ink: #a9dfb5;
   --ok: #6fd39a;
-  --grid: rgb(230 237 247 / 0.04);
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
-  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 56px -20px rgb(0 0 0 / 0.75);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.65);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 56px -20px rgb(0 0 0 / 0.8);
   color-scheme: dark;
+}
+
+/* Surfaces and lines follow whatever --bg is in scope: the page's, or a zone's own shade. */
+:root,
+.zone {
+  --surface: color-mix(in oklab, var(--bg), #fff 62%);
+  --surface-2: color-mix(in oklab, var(--bg), #fff 32%);
+  --line: color-mix(in oklab, var(--bg), #0b1d29 13%);
+  --line-strong: color-mix(in oklab, var(--bg), #0b1d29 27%);
+  --grid: rgb(11 29 41 / 0.05);
+}
+
+[data-theme='dark'],
+[data-theme='dark'] .zone {
+  --surface: color-mix(in oklab, var(--bg), #fff 4.5%);
+  --surface-2: color-mix(in oklab, var(--bg), #fff 8%);
+  --line: color-mix(in oklab, var(--bg), #fff 13%);
+  --line-strong: color-mix(in oklab, var(--bg), #fff 24%);
+  --grid: rgb(228 240 245 / 0.04);
 }
 
 @theme {
@@ -141,6 +161,7 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-amber: var(--amber);
+  --color-amber-ink: var(--amber-ink);
   --color-leaf: var(--leaf);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -295,6 +316,41 @@
 }
 
 /* ------------------------------------------------------------------
+   The descent. A zone is a solid band whose shade comes from its slot
+   (0 at the surface, 11 on the seafloor, see src/lib/depth.ts). It
+   opens with a short blend from the shade above, so the edges are soft
+   without one long gradient wash. The zone tag is decorative and hidden
+   from screen readers; the depth gauge carries the same thing as links.
+   ------------------------------------------------------------------ */
+.zone {
+  --slot: 0;
+  --bg: color-mix(in oklab, var(--z-top), var(--z-floor) calc(var(--slot) * 100% / 11));
+  --bg-above: color-mix(in oklab, var(--z-top), var(--z-floor) calc(max(var(--slot) - 1, 0) * 100% / 11));
+  position: relative;
+  background: linear-gradient(var(--bg-above), var(--bg) var(--zone-edge, 4rem)) var(--bg);
+  color: var(--text);
+}
+
+/* Bands meet at a change of shade, so they need no divider line. */
+.section.zone {
+  border-top: 0;
+}
+
+.zone::before {
+  content: var(--tag) / '';
+  position: absolute;
+  top: 1rem;
+  left: max(var(--gutter), calc((100% - 76rem) / 2 + var(--gutter)));
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------
    Type helpers
    ------------------------------------------------------------------ */
 .eyebrow {
@@ -387,7 +443,7 @@
   min-height: 2.875rem;
   padding: 0.7rem 1.25rem;
   border: 1px solid var(--btn-line);
-  border-radius: 999px;
+  border-radius: 0.55rem;
   background: var(--btn-bg);
   color: var(--btn-fg);
   font-weight: 600;
@@ -440,7 +496,7 @@
   gap: 0.35rem;
   padding: 0.25rem 0.6rem;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 0.35rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   line-height: 1.4;
@@ -456,7 +512,7 @@
 }
 
 [data-theme='dark'] .chip--type {
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .chip--limited {
@@ -479,7 +535,7 @@
 .card {
   position: relative;
   border: 1px solid var(--line);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   background: var(--surface);
   box-shadow: var(--shadow);
 }

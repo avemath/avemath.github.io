@@ -1,0 +1,322 @@
+---
+// Depth gauge for the home page. Desktop gets a slim scale on the left whose marks link to the
+// section at each depth; narrower screens get a thin bar across the top. Which section sits at
+// a depth depends on the audience switcher, so each mark carries one link per audience and CSS
+// shows the one for the checked option. That way the links are right without JavaScript; the
+// script only moves the marker, the readout and the signal meter.
+import { slots, orders, audiences, sectionNames } from '@/lib/depth';
+
+const marks = slots.map((s, i) => {
+  const ids = audiences.map((a) => orders[a][i]);
+  const same = ids.every((id) => id === ids[0]);
+  return {
+    slot: s,
+    links: same ? [{ id: ids[0], aud: '' }] : audiences.map((a, j) => ({ id: ids[j], aud: a })),
+  };
+});
+const short = (m: number) => m.toLocaleString('en-US');
+---
+
+<nav class="gauge" aria-label="Depth" data-gauge>
+  <p class="gauge__now" aria-hidden="true">
+    <span class="gauge__label">Depth</span>
+    <span class="gauge__depth" data-gauge-depth>0 m</span>
+    <span class="gauge__zone" data-gauge-zone>Surface</span>
+  </p>
+  <div class="gauge__scale">
+    <span class="gauge__marker" aria-hidden="true" data-gauge-marker></span>
+    <ol>
+      {
+        marks.map((m, i) => (
+          <li class="gauge__mark" style={`--i:${i}`}>
+            {m.links.map((l) => (
+              <a href={`#${l.id}`} class:list={['gauge__link', l.aud && `gauge__link--${l.aud}`]} data-slot={i}>
+                <span class="gauge__tick" aria-hidden="true" />
+                <span class="gauge__m" aria-hidden="true">
+                  {short(m.slot.depth)}
+                </span>
+                <span class="sr-only">
+                  {short(m.slot.depth)} m, {sectionNames[l.id]}
+                </span>
+              </a>
+            ))}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+  <div class="gauge__meter" aria-hidden="true" data-meter>
+    <span class="gauge__bars"><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="gauge__meter-label" data-meter-label>Sig</span>
+  </div>
+</nav>
+
+<div class="depthbar" aria-hidden="true" data-depthbar><span></span></div>
+
+<style>
+  .gauge {
+    display: none;
+  }
+
+  /* Only where the page margin is wide enough to hold it without touching the content. */
+  @media (min-width: 1360px) {
+    .gauge {
+      position: fixed;
+      z-index: 30;
+      left: 1rem;
+      top: 50%;
+      translate: 0 -50%;
+      display: grid;
+      gap: 1rem;
+      width: 4.75rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    .depthbar {
+      display: none;
+    }
+  }
+
+  .gauge__now {
+    display: grid;
+    gap: 0.15rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    color: var(--muted);
+  }
+
+  .gauge__depth {
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gauge__zone {
+    color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .gauge__zone {
+    color: var(--accent);
+  }
+
+  .gauge__scale {
+    position: relative;
+    height: min(52vh, 28rem);
+    margin-left: 0.3rem;
+    border-left: 1px solid var(--line-strong);
+  }
+
+  .gauge__mark {
+    position: absolute;
+    left: 0;
+    top: calc(var(--i) / 11 * 100%);
+    translate: 0 -50%;
+  }
+
+  .gauge__link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 1.5rem;
+    padding-right: 0.35rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gauge__link:hover,
+  .gauge__link[aria-current] {
+    color: var(--text);
+  }
+
+  .gauge__tick {
+    width: 0.45rem;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .gauge__link:hover .gauge__tick,
+  .gauge__link[aria-current] .gauge__tick {
+    width: 0.75rem;
+    background: var(--accent);
+  }
+
+  /* One link per audience on marks whose section changes with the switcher. */
+  .gauge__link--research,
+  .gauge__link--website {
+    display: none;
+  }
+
+  :global(.home:has(#aud-research:checked)) .gauge__link--hire,
+  :global(.home:has(#aud-website:checked)) .gauge__link--hire {
+    display: none;
+  }
+
+  :global(.home:has(#aud-research:checked)) .gauge__link--research,
+  :global(.home:has(#aud-website:checked)) .gauge__link--website {
+    display: flex;
+  }
+
+  .gauge__marker {
+    position: absolute;
+    left: -0.3rem;
+    top: calc(var(--pos, 0) * 100%);
+    width: 0.55rem;
+    height: 0.55rem;
+    border: 1.5px solid var(--amber-line);
+    border-radius: 50%;
+    background: var(--bg);
+    translate: 0 -50%;
+    transition: top 0.25s var(--ease-out-expo);
+  }
+
+  .gauge__meter {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+
+  .gauge__bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 1rem;
+  }
+
+  .gauge__bars i {
+    width: 3px;
+    border-radius: 1px;
+    background: var(--line-strong);
+    transition: background-color 0.3s;
+  }
+
+  .gauge__bars i:nth-child(1) { height: 20%; }
+  .gauge__bars i:nth-child(2) { height: 40%; }
+  .gauge__bars i:nth-child(3) { height: 60%; }
+  .gauge__bars i:nth-child(4) { height: 80%; }
+  .gauge__bars i:nth-child(5) { height: 100%; }
+
+  .gauge__meter[data-bars='1'] i:nth-child(-n + 1),
+  .gauge__meter[data-bars='2'] i:nth-child(-n + 2),
+  .gauge__meter[data-bars='3'] i:nth-child(-n + 3),
+  .gauge__meter[data-bars='4'] i:nth-child(-n + 4),
+  .gauge__meter[data-bars='5'] i {
+    background: var(--accent);
+  }
+
+  .gauge__meter[data-locked] i {
+    background: var(--amber-line);
+  }
+
+  .gauge__meter[data-locked] .gauge__meter-label {
+    color: var(--amber-ink);
+  }
+
+  /* Phones and tablets: depth as a thin bar across the very top. */
+  .depthbar {
+    position: fixed;
+    z-index: 60;
+    inset: 0 0 auto;
+    height: 3px;
+    pointer-events: none;
+  }
+
+  .depthbar span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    transform: scaleX(var(--p, 0));
+    transition: background-color 0.3s;
+  }
+
+  .depthbar[data-locked] span {
+    background: var(--amber-line);
+  }
+</style>
+
+<script>
+  import { orders, slots, formatDepth, type Audience } from '../lib/depth';
+  import { prefersReducedMotion } from '../scripts/preferences';
+
+  const gauge = document.querySelector<HTMLElement>('[data-gauge]');
+  const bar = document.querySelector<HTMLElement>('[data-depthbar]');
+  const marker = gauge?.querySelector<HTMLElement>('[data-gauge-marker]');
+  const depthEl = gauge?.querySelector<HTMLElement>('[data-gauge-depth]');
+  const zoneEl = gauge?.querySelector<HTMLElement>('[data-gauge-zone]');
+  const meter = gauge?.querySelector<HTMLElement>('[data-meter]');
+  const meterLabel = gauge?.querySelector<HTMLElement>('[data-meter-label]');
+  const links = [...(gauge?.querySelectorAll<HTMLAnchorElement>('.gauge__link') ?? [])];
+
+  let tops: number[] = [];
+  let locked = false;
+  let queued = false;
+
+  const audience = () => (document.querySelector<HTMLInputElement>('input[name="audience"]:checked')?.value ?? 'hire') as Audience;
+
+  function measure() {
+    tops = orders[audience()].map((id) => {
+      const el = document.getElementById(id);
+      return el ? el.getBoundingClientRect().top + scrollY : Infinity;
+    });
+    update();
+  }
+
+  function update() {
+    queued = false;
+    const n = slots.length;
+    const probe = scrollY + innerHeight * 0.35;
+    const atEnd = scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+    let i = 0;
+    while (i < n - 1 && tops[i + 1] <= probe) i++;
+    if (atEnd) i = n - 1;
+    // With motion, depth runs smoothly between marks; with reduced motion it jumps per section.
+    const span = i < n - 1 ? tops[i + 1] - tops[i] : 1;
+    const frac = prefersReducedMotion() || i === n - 1 ? 0 : Math.max(0, Math.min(1, (probe - tops[i]) / span));
+    const depth = slots[i].depth + (i < n - 1 ? (slots[i + 1].depth - slots[i].depth) * frac : 0);
+    const pos = (i + frac) / (n - 1);
+
+    marker?.style.setProperty('--pos', String(pos));
+    if (depthEl) depthEl.textContent = formatDepth(Math.round(depth / 10) * 10);
+    if (zoneEl) zoneEl.textContent = slots[i].zone;
+    links.forEach((a) => (Number(a.dataset.slot) === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
+
+    // Signal strength drops with depth until the receiver on the seafloor locks on.
+    const bars = Math.max(1, 5 - Math.floor(pos * 4.6));
+    if (meter) meter.dataset.bars = String(bars);
+
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = prefersReducedMotion() ? pos : max > 0 ? scrollY / max : 0;
+    bar?.style.setProperty('--p', String(p));
+  }
+
+  function setLocked(on: boolean) {
+    locked = on;
+    if (meter) meter.toggleAttribute('data-locked', on);
+    if (meterLabel) meterLabel.textContent = on ? 'Lock' : 'Sig';
+    bar?.toggleAttribute('data-locked', on);
+  }
+
+  if (gauge || bar) {
+    addEventListener('scroll', () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+    new ResizeObserver(measure).observe(document.body);
+    document.querySelectorAll('input[name="audience"]').forEach((r) => r.addEventListener('change', () => requestAnimationFrame(measure)));
+    addEventListener('motionchange', update);
+    addEventListener('rxlock', (e) => setLocked((e as CustomEvent<boolean>).detail));
+    measure();
+    if (locked) setLocked(true);
+  }
+</script>
