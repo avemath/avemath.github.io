@@ -3,6 +3,13 @@ import Icon from './Icon.astro';
 import experience from '@/data/experience.json';
 import { formatRange, formatMonth } from '@/lib/format';
 
+interface Props {
+  /** Band variables from depth.ts, so the section sits in the page's descent. */
+  zoneStyle?: string;
+}
+
+const { zoneStyle } = Astro.props;
+
 const kindLabel: Record<string, string> = {
   research: 'Research',
   engineering: 'Engineering',
@@ -28,7 +35,7 @@ const entries = [
 ].sort((a, b) => b.sort.localeCompare(a.sort) || b.start.localeCompare(a.start));
 ---
 
-<section id="experience" class="section home-section zone" aria-labelledby="experience-title" data-section="experience">
+<section id="experience" class="section zone" style={zoneStyle} aria-labelledby="experience-title" data-section="experience">
   <div class="wrap">
     <div class="tl-layout">
       <div class="tl-intro">

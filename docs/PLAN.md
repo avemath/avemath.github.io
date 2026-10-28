@@ -10,7 +10,7 @@ One person, one story: I engineer systems and I build the web. The research, the
 |---|---|---|
 | Recruiters and hiring managers | current role, degree, dates, skills, shipped work, résumé | hero, Now strip, timeline, résumé in the nav |
 | Research labs and faculty | research area, advisor, methods, outputs | Research section, case studies, résumé |
-| Website clients | live examples, process, how to reach me | Websites section, /services, contact form |
+| Website clients | live examples, process, how to reach me | Client work strip, /services, contact form |
 | Nonprofit partners | mission and credibility | Because of ADAM case study, About |
 
 ## Sitemap

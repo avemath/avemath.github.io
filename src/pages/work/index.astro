@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { slotVars } from '@/lib/depth';
+import { bandVars } from '@/lib/depth';
 import ProjectTile from '@/components/ProjectTile.astro';
 import { getProjects, typeLabels, allTags } from '@/lib/projects';
 import { projectTypes } from '@/content.config';
@@ -13,7 +13,7 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
   title="Work"
   description="Research, engineering, software and client websites by Avery Matherne, each with a case study on what I did and how."
 >
-  <section class="section pb-10 zone sunlit" style={slotVars(0, false)}>
+  <section class="section pb-10 zone sunlit" style={bandVars(0)}>
     <div class="wrap">
       <p class="eyebrow">Work</p>
       <h1 class="section-title" style="font-size: clamp(2.5rem, 6vw, 4.5rem)">Everything I've built since 2024</h1>
@@ -38,7 +38,7 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
     </div>
   </section>
 
-  <section class="pb-16 pt-12 md:pb-24 zone" style={slotVars(1, false)} aria-label="Projects">
+  <section class="pb-16 pt-12 md:pb-24 zone" style={bandVars(1)} aria-label="Projects">
     <div class="wrap">
       <div class="work-grid" data-work-grid>
         {projects.map((p, i) => <ProjectTile project={p} headingLevel="h2" eager={i < 2} />)}

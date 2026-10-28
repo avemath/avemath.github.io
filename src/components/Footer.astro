@@ -23,7 +23,8 @@ const sync = Array.from({ length: 16 }, (_, i) => i % 2);
 const wave = sync.map((b, i) => `${i === 0 ? 'M' : 'L'} ${i * 10} ${b ? 4 : 20} H ${i * 10 + 10}`).join(' ');
 ---
 
-<footer id="footer" class="site-footer zone no-print" style={slotVars(11)}>
+<footer id="footer" class="site-footer zone no-print" style={slotVars(slots.length - 1)}>
+  <span class="spine" aria-hidden="true"></span>
   <div class="wrap py-12 md:py-14">
     <div class="rx__intro">
       <p class="font-display text-2xl font-semibold tracking-tight">Have something in mind?</p>
@@ -31,7 +32,7 @@ const wave = sync.map((b, i) => `${i === 0 ? 'M' : 'L'} ${i * 10} ${b ? 4 : 20} 
     </div>
 
     <div class="rx" data-rx>
-      <p class="rx__title" aria-hidden="true"><span>{formatDepth(slots[11].depth)} · RX · Frame received</span><span class="rx__len">{header.length + payload.length} fields</span></p>
+      <p class="rx__title" aria-hidden="true"><span>{formatDepth(slots[slots.length - 1].depth)} · RX · Frame received</span><span class="rx__len">{header.length + payload.length} fields</span></p>
       <div class="rx__frame">
         <div class="rx__field rx__field--pre">
           <p class="rx__name">Preamble</p>

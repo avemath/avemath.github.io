@@ -2,9 +2,12 @@
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { slotVars } from '@/lib/depth';
+import { bandVars } from '@/lib/depth';
 import Icon from '@/components/Icon.astro';
 import NowStrip from '@/components/NowStrip.astro';
+import Timeline from '@/components/Timeline.astro';
+import Skills from '@/components/Skills.astro';
+import Testimonials from '@/components/Testimonials.astro';
 import site from '@/data/site.json';
 import offclock from '@/data/offclock.json';
 import gradHall from '@/assets/about/grad-taylor-hall.jpg';
@@ -38,7 +41,7 @@ const principles = [
 ---
 
 <BaseLayout title="About" description="About Avery Matherne: computer engineer, graduate researcher at LSU, web designer, land agent and nonprofit co-founder.">
-  <section class="about-hero zone sunlit" style={slotVars(0, false)}>
+  <section class="about-hero zone sunlit" style={bandVars(0)}>
     <svg class="contours" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       {contours.map((d, i) => <path d={d} style={`--i:${i}`} />)}
     </svg>
@@ -75,7 +78,7 @@ const principles = [
 
   <NowStrip />
 
-  <section class="section zone" style={slotVars(2, false)}>
+  <section class="section zone" style={bandVars(2)}>
     <div class="wrap about-grid">
     <div class="prose about-prose">
       <h2>Engineering</h2>
@@ -151,7 +154,12 @@ const principles = [
     </div>
   </section>
 
-  <section id="off-the-clock" class="section section--tight zone" style={slotVars(3, false)} aria-labelledby="offclock-title">
+  {/* Experience, skills and recommendations live here; the home page links to them. */}
+  <Timeline zoneStyle={bandVars(3)} />
+  <Skills zoneStyle={bandVars(4)} />
+  <Testimonials zoneStyle={bandVars(5)} />
+
+  <section id="off-the-clock" class="section section--tight zone" style={bandVars(6)} aria-labelledby="offclock-title">
     <div class="wrap">
       <p class="eyebrow">Off the clock</p>
       <h2 id="offclock-title" class="section-title section-title--sm">When I'm not building something</h2>
@@ -180,7 +188,7 @@ const principles = [
     </div>
   </section>
 
-  <section class="section section--band zone" style={slotVars(4, false)}>
+  <section class="section section--band zone" style={bandVars(7)}>
     <div class="wrap">
       <div class="about-cta card">
         <p class="font-display text-2xl font-semibold tracking-tight">Want to work together, or just talk shop?</p>
