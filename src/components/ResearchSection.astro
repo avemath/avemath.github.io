@@ -44,9 +44,12 @@ const integer = await getEntry('projects', 'integer-internship');
         </a>
       </div>
 
-      <div class="research__panel card" data-reveal>
-        <div class="research__art"><SoundSpeed /></div>
-        <p class="label research__related">Related work</p>
+      <div class="research__figure" data-reveal><SoundSpeed /></div>
+    </div>
+
+    <div class="research__more">
+      <div>
+        <p class="label">Related work</p>
         <ul class="research__list">
           {
             [integer, v2v].filter(Boolean).map((p) => (
@@ -62,14 +65,14 @@ const integer = await getEntry('projects', 'integer-internship');
             ))
           }
         </ul>
-        <p class="note research__note">
-          <Icon name="lock" class="h-4 w-4 flex-none" />
-          <span>
-            This is sponsored research, so I only describe it in the words of the
-            <a class="link" href={onr?.data.links.writeup}>public announcement</a>. Happy to talk about what I can.
-          </span>
-        </p>
       </div>
+      <p class="note research__note">
+        <Icon name="lock" class="h-4 w-4 flex-none" />
+        <span>
+          This is sponsored research, so I only describe it in the words of the
+          <a class="link" href={onr?.data.links.writeup}>public announcement</a>. Happy to talk about what I can.
+        </span>
+      </p>
     </div>
   </div>
 </section>
@@ -100,25 +103,34 @@ const integer = await getEntry('projects', 'integer-internship');
     color: var(--text-soft);
   }
 
+  /* Open layout: no card. The sound speed curve stands on the water at full size. */
+  .research__figure {
+    width: 100%;
+    max-width: 38rem;
+    justify-self: center;
+  }
+
+  .research__more {
+    display: grid;
+    gap: 1.5rem 3rem;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 1024px) {
+    .research__more {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
   .research__note {
-    margin: 1rem 1.35rem 1.35rem;
+    margin: 0;
   }
 
-  .note :global(svg) {
-    margin-top: 0.2rem;
-    color: var(--amber-ink);
-  }
-
-  .research__panel {
-    overflow: hidden;
-  }
-
-  .research__art {
-    border-bottom: 1px solid var(--line);
-  }
-
-  .research__related {
-    padding: 0.9rem 1.35rem 0;
+  .research__list {
+    margin-top: 0.5rem;
   }
 
   .research__list li + li {
@@ -130,19 +142,19 @@ const integer = await getEntry('projects', 'integer-internship');
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 1.1rem 1.35rem;
+    padding: 0.9rem 0;
     text-decoration: none;
-    transition: background-color 0.2s;
   }
 
-  .research__row:hover {
-    background: var(--surface-2);
+  .research__row:hover .research__row-title {
+    color: var(--accent-ink);
   }
 
   .research__row-title {
     display: block;
     font-family: var(--font-display);
     font-weight: 600;
+    transition: color 0.2s;
   }
 
   .research__row-sub {
@@ -150,9 +162,5 @@ const integer = await getEntry('projects', 'integer-internship');
     margin-top: 0.2rem;
     font-size: 0.875rem;
     color: var(--muted);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 </style>

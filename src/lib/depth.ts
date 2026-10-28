@@ -1,7 +1,8 @@
 // The descent: every home page section is a depth zone. Depth belongs to the position on the
 // page (the slot), not to a section, because the audience switcher reorders the sections with
 // CSS. The orders below mirror the `order` rules in pages/index.astro; if those change, change
-// these too. The band colors, the zone tags and the depth gauge are all generated from here.
+// these too. This file is the one source for depth: the band shades, the depth in each section's
+// label, the effects and the depth gauge all come from here, so they always agree.
 
 export type Audience = 'hire' | 'research' | 'website';
 export const audiences: Audience[] = ['hire', 'research', 'website'];
@@ -28,14 +29,14 @@ export const slots: Slot[] = [
 
 // Section names for the gauge's link text, keyed by the id each section already has.
 export const sectionNames: Record<string, string> = {
-  top: 'Top of the page',
+  top: 'Intro',
   now: 'Now',
   featured: 'Featured work',
   experience: 'Experience',
   skills: 'Skills',
   recommendations: 'Recommendations',
   research: 'Research',
-  websites: 'Websites',
+  websites: 'Client work',
   'field-notes': 'Field notes',
   services: 'For clients',
   contact: 'Contact',
@@ -49,23 +50,31 @@ export const orders: Record<Audience, string[]> = {
   website: ['top', 'now', 'websites', 'services', 'featured', 'field-notes', 'recommendations', 'experience', 'skills', 'research', 'contact', 'footer'],
 };
 
+/** From this slot down, the light theme's water is dark too, and text switches to light on dark. */
+export const DEEP_FROM = 6;
+/** Marine snow drifts through the deepest two section bands. */
+export const SNOW_SLOTS = [9, 10];
+
 export const formatDepth = (m: number) => `${m.toLocaleString('en-US')} m`;
-export const zoneTag = (s: Slot) => `${formatDepth(s.depth)} · ${s.zone}`;
 
-const css = (s: string) => `"${s.replace(/"/g, '\\"')}"`;
+/** Everything a zone needs from its slot, as CSS custom properties. */
+export function slotVars(i: number) {
+  const vars = [`--slot:${i}`, `--band:var(--band-${i})`, `--deep:${i >= DEEP_FROM ? 1 : 0}`, `--depth:${css(`${formatDepth(slots[i].depth)} · `)}`];
+  if (SNOW_SLOTS.includes(i)) vars.push('--snow:block');
+  return vars.join(';');
+}
 
-/** Per-section slot and zone tag variables for every audience, as one stylesheet. */
+const css = (text: string) => `"${text.replace(/"/g, '\\"')}"`;
+
+/** Each section's slot variables for every audience order, as one stylesheet. Hire is the default. */
 export function zoneStyles() {
   const ids = Object.keys(sectionNames).filter((id) => id !== 'top' && id !== 'now' && id !== 'footer');
-  return ids
-    .map((id) => {
-      const vars = audiences
-        .map((a) => {
-          const i = orders[a].indexOf(id);
-          return `--slot-${a}:${i};--tag-${a}:${css(zoneTag(slots[i]))}`;
-        })
-        .join(';');
-      return `.home-flow>[data-section='${id}']{${vars}}`;
-    })
+  return audiences
+    .flatMap((a) =>
+      ids.map((id) => {
+        const scope = a === 'hire' ? '' : `.home:has(#aud-${a}:checked) `;
+        return `${scope}.home-flow>[data-section='${id}']{${slotVars(orders[a].indexOf(id))}}`;
+      }),
+    )
     .join('\n');
 }

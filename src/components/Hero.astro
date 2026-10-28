@@ -2,37 +2,22 @@
 import Icon from './Icon.astro';
 import AudienceSwitcher from './AudienceSwitcher.astro';
 import site from '@/data/site.json';
-import { bitmap, BINS, BIN_HZ, BINS_PER_COL, CHIRP, FIRST_BIN, FRAMES_PER_ROW, NAME_START, STILL_TOP, VIEW_ROWS } from '@/lib/tx-signal';
+import { slotVars } from '@/lib/depth';
+import { BINS, BIN_HZ, CHIRP, FRAME_HZ, LEAD, LINES, STILL, TEXT_BINS, VIEW_ROWS, holdFrame } from '@/lib/tx-signal';
 
-// The still picture that shows until the live display takes over (and without JavaScript). It
-// is laid out from the same plan the signal is built from, at the same place the live display
-// opens on, so the swap is a cross-fade and nothing moves.
-const rows = bitmap();
-const still: { x: number; y: number; w: number }[] = [];
-rows.forEach((row, r) => {
-  const sent = rows.length - 1 - r;
-  const y = STILL_TOP - (NAME_START + sent * FRAMES_PER_ROW + FRAMES_PER_ROW - 1);
-  let c = 0;
-  while (c < row.length) {
-    if (!row[c]) {
-      c++;
-      continue;
-    }
-    const from = c;
-    while (row[c]) c++;
-    still.push({ x: FIRST_BIN + from * BINS_PER_COL, y, w: (c - from) * BINS_PER_COL });
-  }
-});
-const chirp = {
-  x1: CHIRP.f0 / BIN_HZ,
-  y1: STILL_TOP - CHIRP.start,
-  x2: CHIRP.f1 / BIN_HZ,
-  y2: STILL_TOP - (CHIRP.start + CHIRP.frames),
-};
-const ticks = [0, 2, 4, 6, 8];
+// The still picture that shows until the live display takes over (and without JavaScript): the
+// name where the live display holds it, centered, with the sweep below it. It uses the build-time
+// estimate of the raster, so the cross-fade to the computed picture barely moves.
+const hold = holdFrame(STILL.rows);
+const top = VIEW_ROWS / 2 - STILL.rows / 2;
+const lines = LINES.map((text, i) => ({ text, y: top + 1 + STILL.cap + i * (STILL.cap + STILL.gap) }));
+const chirp = { x1: CHIRP.f0 / BIN_HZ, y1: hold - LEAD, x2: CHIRP.f1 / BIN_HZ, y2: hold - (LEAD + CHIRP.frames) };
+const kHz = [0, 2, 4, 6, 8];
+const seconds = [0, 1, 2, 3, 4, 5, 6];
+const rowsPerSecond = FRAME_HZ;
 ---
 
-<section id="top" class="hero zone" aria-labelledby="hero-title" style={`--tag:"0 m · Surface"`}>
+<section id="top" class="hero zone sunlit" aria-labelledby="hero-title" style={slotVars(0)}>
   <div class="wrap hero__grid">
     <div class="hero__text">
       <p class="eyebrow" data-hero-eyebrow>{site.eyebrow}</p>
@@ -63,35 +48,42 @@ const ticks = [0, 2, 4, 6, 8];
           <span data-tx-play-label>Hear it</span>
         </button>
       </div>
-      <div class="tx__screen" data-tx-screen>
-        <svg class="tx__still" viewBox={`0 0 ${BINS} ${VIEW_ROWS}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
-          {still.map((s) => <rect x={s.x} y={s.y} width={s.w} height={FRAMES_PER_ROW} />)}
-          <line x1={chirp.x1} y1={chirp.y1} x2={chirp.x2} y2={chirp.y2} />
-        </svg>
-        <canvas class="tx__canvas" width={BINS} height={VIEW_ROWS} aria-hidden="true"></canvas>
-        <span class="tx__cross" data-tx-cross aria-hidden="true" hidden></span>
-      </div>
-      <div class="tx__axis" aria-hidden="true">
-        {ticks.map((t) => <span style={`--at:${t / 8}`}>{t === 8 ? '8 kHz' : t}</span>)}
+      <div class="tx__plot">
+        <div class="tx__time" aria-hidden="true">
+          {seconds.map((t) => <span style={`--at:${(t * rowsPerSecond) / VIEW_ROWS}`}>{t === 6 ? '6 s' : t}</span>)}
+        </div>
+        <div class="tx__screen" data-tx-screen>
+          <svg class="tx__still" viewBox={`0 0 ${BINS} ${VIEW_ROWS}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            {
+              lines.map((l, i) => (
+                <text x={BINS / 2} y={l.y} font-size={STILL.font} text-anchor="middle" {...(i === 1 ? { textLength: TEXT_BINS - 2, lengthAdjust: 'spacingAndGlyphs' } : {})}>
+                  {l.text}
+                </text>
+              ))
+            }
+            <line x1={chirp.x1} y1={chirp.y1} x2={chirp.x2} y2={chirp.y2} />
+          </svg>
+          <canvas class="tx__canvas" width={BINS} height={VIEW_ROWS} aria-hidden="true"></canvas>
+          <span class="tx__grid" aria-hidden="true"></span>
+          <span class="tx__cross" data-tx-cross aria-hidden="true" hidden></span>
+        </div>
+        <div class="tx__axis" aria-hidden="true">
+          {kHz.map((t) => <span style={`--at:${t / 8}`}>{t === 8 ? '8 kHz' : t}</span>)}
+        </div>
       </div>
       <div class="tx__foot">
         <p class="tx__readout" data-tx-readout aria-hidden="true">Point at the display to read it</p>
         <p class="sr-only" aria-live="polite" data-tx-live></p>
       </div>
-      <figcaption class="tx__caption">
-        My name, sent as sound. Each row of the letters is one OFDM symbol, after a chirp to sync on, and the display is an FFT of
-        that signal as it plays.
-      </figcaption>
+      <figcaption class="tx__caption">My name, sent as a real signal and drawn by an FFT as it arrives.</figcaption>
     </figure>
   </div>
 
-  <svg class="hero__wave" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-    <path d="M0 26C180 10 300 10 480 24S780 42 960 28 1260 8 1440 22V48H0Z"></path>
-  </svg>
 </section>
 
 <style>
   .hero {
+    isolation: isolate;
     overflow: hidden;
     padding-block: clamp(3.25rem, 7vw, 5.5rem) clamp(4.5rem, 8vw, 6.5rem);
   }
@@ -142,22 +134,11 @@ const ticks = [0, 2, 4, 6, 8];
     margin-top: 2.25rem;
   }
 
-  /* The soft wave into the Now strip, in the next band's shade. */
-  .hero__wave {
-    position: absolute;
-    left: 0;
-    bottom: -1px;
-    width: 100%;
-    height: clamp(1.5rem, 3vw, 3rem);
-    fill: color-mix(in oklab, var(--z-top), var(--z-floor) calc(100% / 11));
-    pointer-events: none;
-  }
-
   /* ---- The transmitter's display ---- */
   .tx {
     --tx-ink: var(--accent);
     --tx-hot: var(--amber-line);
-    --tx-screen: var(--surface);
+    --tx-screen: #061523;
     margin: 0;
     padding: 0.85rem 0.85rem 1rem;
     border: 1px solid var(--line);
@@ -167,9 +148,6 @@ const ticks = [0, 2, 4, 6, 8];
     min-width: 0;
   }
 
-  :global([data-theme='dark']) .tx {
-    --tx-screen: color-mix(in oklab, var(--bg), #000 45%);
-  }
 
   .tx__bar {
     display: flex;
@@ -182,7 +160,6 @@ const ticks = [0, 2, 4, 6, 8];
   }
 
   .tx__title,
-  .tx__axis,
   .tx__readout {
     font-family: var(--font-mono);
     font-size: 0.7rem;
@@ -249,13 +226,21 @@ const ticks = [0, 2, 4, 6, 8];
     display: block;
   }
 
+  /* Time down the left (newest at the top), frequency along the bottom. */
+  .tx__plot {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr);
+    grid-template-areas: 'time screen' '. freq';
+  }
+
   /* 256 bins by 160 frames, scaled up: square pixels at this aspect ratio. */
   .tx__screen {
+    grid-area: screen;
     position: relative;
     aspect-ratio: 256 / 160;
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 0.5rem;
+    border: 1px solid color-mix(in oklab, #56b6d8 30%, transparent);
+    border-radius: 0.4rem;
     background: var(--tx-screen);
     touch-action: pan-y;
     cursor: crosshair;
@@ -266,7 +251,8 @@ const ticks = [0, 2, 4, 6, 8];
   }
 
   .tx__still,
-  .tx__canvas {
+  .tx__canvas,
+  .tx__grid {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -274,17 +260,23 @@ const ticks = [0, 2, 4, 6, 8];
   }
 
   .tx__still {
-    fill: var(--tx-ink);
-    fill-opacity: 0.85;
-    stroke: var(--tx-ink);
-    stroke-opacity: 0.7;
-    stroke-width: 1.2;
+    font-family: var(--font-display);
+    font-weight: 600;
+    fill: #4fb3c9;
+    stroke: #f0a940;
+    stroke-opacity: 0.8;
+    stroke-width: 0.8;
+    paint-order: stroke;
     transition: opacity 0.6s ease;
+  }
+
+  .tx__still text {
+    stroke: none;
   }
 
   .tx__canvas {
     opacity: 0;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.7s ease;
   }
 
   [data-live] .tx__canvas {
@@ -295,44 +287,67 @@ const ticks = [0, 2, 4, 6, 8];
     opacity: 0;
   }
 
+  /* Between cycles the picture fades out, then the next transmission starts on quiet water. */
+  .tx__screen[data-fade] .tx__canvas {
+    opacity: 0;
+  }
+
+  /* A faint grid: one line per kilohertz, one per second. */
+  .tx__grid {
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(90deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px 12.5%),
+      repeating-linear-gradient(180deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px calc(100% * 16000 / 608 / 160));
+  }
+
   .tx__cross {
     position: absolute;
     inset: 0;
     pointer-events: none;
     background:
-      linear-gradient(var(--text), var(--text)) var(--x) 0 / 1px 100% no-repeat,
-      linear-gradient(var(--text), var(--text)) 0 var(--y) / 100% 1px no-repeat;
-    opacity: 0.35;
+      linear-gradient(#e4f0f5, #e4f0f5) var(--x) 0 / 1px 100% no-repeat,
+      linear-gradient(#e4f0f5, #e4f0f5) 0 var(--y) / 100% 1px no-repeat;
+    opacity: 0.45;
   }
 
   .tx__axis {
+    grid-area: freq;
     position: relative;
     height: 1.4rem;
     margin-top: 0.35rem;
   }
 
-  .tx__axis span {
+  .tx__axis span,
+  .tx__time span {
     position: absolute;
+    white-space: nowrap;
+    text-transform: none;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tx__axis span {
     top: 0.2rem;
     left: calc(var(--at) * 100%);
     translate: calc(var(--at) * -100%) 0;
-    white-space: nowrap;
-    text-transform: none;
-    font-size: 0.66rem;
-    letter-spacing: 0.06em;
   }
 
-  .tx__axis span::before {
-    content: '';
-    position: absolute;
-    top: -0.3rem;
-    left: calc(var(--at) * 100%);
-    width: 1px;
-    height: 0.25rem;
-    background: var(--line-strong);
+  .tx__time {
+    grid-area: time;
+    position: relative;
+  }
+
+  .tx__time span {
+    right: 0.4rem;
+    top: calc(var(--at) * 100%);
+    translate: 0 calc(var(--at) * -100%);
   }
 
   .tx__foot {
+    padding-left: 1.6rem;
     min-height: 1.3rem;
     margin-top: 0.15rem;
   }

@@ -9,14 +9,14 @@ The home page is one transmission. My name goes out at the surface as a real sig
 Rules for the concept:
 
 - Every piece is real or honestly labeled. The spectrogram is computed from a synthesized signal, the CRC is computed from the footer text, and the sound speed curve is textbook physics with no project data.
-- Less is better. Six pieces (below), nothing else.
+- Less is better. The pieces below, nothing else.
 - Content is unchanged. Only section labels and small UI text are new.
 
 ## Zone map
 
-Each home page section is an ocean depth zone. The background steps one shade darker per section: solid bands with a short soft edge from the shade above, not one long gradient wash.
+Each home page section is an ocean depth zone. The background steps one clear shade darker per section: solid bands, each rising over the one above with a soft wave edge, not one long gradient wash.
 
-The "I'm here to..." switcher reorders the sections with CSS, so depth belongs to the **position** on the page, not to a section. Whatever sits third is always at 200 m. The table lives in `src/lib/depth.ts`, and both the band colors and the depth gauge are generated from it, so they cannot drift apart.
+The "I'm here to..." switcher reorders the sections with CSS, so depth belongs to the **position** on the page, not to a section. Whatever sits third is always at 200 m. The table lives in `src/lib/depth.ts`, and everything about depth is generated from it: the band shade, the light or dark inks, the depth in each section's label, where the marine snow falls, and the depth gauge. The gauge and the labels cannot disagree.
 
 | Slot | Depth | Zone | Hire (default) | Research | Website |
 |---|---|---|---|---|---|
@@ -37,35 +37,37 @@ In the default order the research section lands on the sound channel axis at 1,0
 
 ## Palette
 
-Two endpoints per theme. Band shades are mixed between them in OKLab (`color-mix`), one step per slot. Surfaces, lines and wells are derived from each band's own shade, so cards always sit one step lighter than the water around them.
+Twelve band shades per theme, one per slot, as `--band-0` to `--band-11` in `global.css`. A zone redefines its surfaces and lines from its own shade, so cards always sit one step lighter than the water around them.
 
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| `--z-top` | `#dff1f3` | `#0e3a51` | surface shade (slot 0) |
-| `--z-floor` | `#adcfdb` | `#03101c` | seafloor shade (slot 11) |
-| `--text` | `#0b1d29` | `#e4f0f5` | headings, body |
-| `--text-soft` | `#223b49` | `#bfd4de` | long-form body |
-| `--muted` | `#334d5a` | `#9fb9c6` | labels, meta, zone names |
-| `--accent` | `#1d6a86` (sonar teal) | `#56b6d8` | lines, focus, active states |
-| `--accent-ink` | `#0f5168` | `#8fd3ea` | teal text |
-| `--amber` | `#f0a940` | `#f0a940` | primary buttons, lock state |
-| `--amber-line` | `#b8700a` | `#f0a940` | amber strokes in art and readouts |
-| `--amber-ink` | `#6f4200` | `#f5c27a` | amber text |
-| `--leaf` | `#4a7c59` | `#8fd19e` | live-site dots and About contours only |
-
-Measured contrast, worst case over all twelve shades and the cards on them (WCAG AA needs 4.5 for text):
-
-| Pair | Light (worst) | Dark (worst) |
+| Slot | Light | Dark |
 |---|---|---|
-| text | 10.4 | 9.2 |
-| text-soft | 7.1 | 7.0 |
-| muted | 5.4 | 5.2 |
-| accent-ink | 5.3 | 6.5 |
-| accent as text | not used | 4.6 |
-| amber-ink | 5.2 | 6.6 |
-| button text on amber | 9.2 | 9.2 |
+| 0 | `#e4f8fd` | `#0f4955` |
+| 1 | `#d9f0f7` | `#0a424f` |
+| 2 | `#cee8f1` | `#083a48` |
+| 3 | `#c4e0ec` | `#083442` |
+| 4 | `#bad8e6` | `#062f3d` |
+| 5 | `#b1d0e0` | `#062938` |
+| 6 | `#1d4357` | `#062432` |
+| 7 | `#18384a` | `#06202d` |
+| 8 | `#142e3f` | `#061c29` |
+| 9 | `#102534` | `#061824` |
+| 10 | `#0b1c2a` | `#061420` |
+| 11 | `#07141f` | `#05111c` |
 
-Light `--accent` (3.7 on the floor) and `--amber-line` are for strokes only, never text.
+The light theme starts at a bright pale surface and stays light through the twilight zone, then drops into dark water at the sound channel (slot 6), the way sunlight is gone by about 1,000 m. Mid-tone bands are skipped on purpose: neither dark nor light text reads well on them. From slot 6 down, zones set `--deep: 1` and switch to the light-on-dark inks. The dark theme starts at a clearly lighter teal and steps down to near-black navy.
+
+| Ink | On light water | On dark water | Use |
+|---|---|---|---|
+| `--text` | `#0b1d29` | `#e4f0f5` | headings, body |
+| `--text-soft` | `#223b49` | `#c3d6df` | long-form body |
+| `--muted` | `#334d5a` | `#adc6d2` | labels, meta |
+| `--accent` | `#1d6a86` | `#7ccbe6` | lines, focus, active states |
+| `--accent-ink` | `#0f5168` | `#93d5ec` | teal text |
+| `--amber` | `#f0a940` | `#f0a940` | primary buttons, lock state |
+| `--amber-line` | `#b8700a` | `#f0a940` | amber strokes |
+| `--amber-ink` | `#6f4200` | `#f5c27a` | amber text |
+
+Every text ink passes AA (4.5:1) on every band, and on the cards and wells drawn on it, in both themes. The worst cases are about 4.6:1, for muted text on the wells of the first dark band. axe scans the home page in all three audience orders, so every section is checked on every band it can land on. Light `--accent` and `--amber-line` are for strokes only.
 
 ## Type
 
@@ -75,27 +77,35 @@ Unchanged faces, all self-hosted and preloaded: Space Grotesk for headings, Inte
 
 ### 1. Surface hero: the transmission
 
-A waterfall spectrogram where AVERY MATHERNE scrolls down through the frequency display.
+A waterfall spectrogram that receives my name once.
 
-- **The signal is real.** Each row of a 5 by 7 bitmap font is one OFDM symbol: 512 point inverse FFT, 16 kHz sample rate, each lit column of the letter is three subcarriers switched on, every subcarrier keeps its phase so the tones are continuous. A short up-chirp goes out before the name as a preamble, over a low noise floor.
-- **The display is computed.** A 512 point FFT with a Hann window runs over that signal as it plays, one row per 32 ms frame, newest at the top. Nothing is drawn from the font directly. The canvas is 256 by 160 internal pixels (one per bin, one per frame) and the browser scales it.
-- **Cursor readout.** Frequency and level (dBFS) under the pointer. The panel is focusable, and arrow keys move the same cursor.
-- **Hear it.** Plays the same buffer through Web Audio at low volume, looped, only after a click, with a Stop state on the same button. The display follows the audio clock while it plays.
-- **Name, role, "See my work" and "Résumé" stay HTML**, left of the panel on desktop and above it on phones, so a recruiter gets all four in the first screen.
-- **Lazy.** The signal code loads with a dynamic import after the page is idle. Until then, and without JavaScript, the panel shows a still drawn at build time from the same font table.
-- **Reduced motion and low power:** one still frame with the name centered. Hear it still works, since sound you start yourself is not motion.
-- The hero band is the light surface, with a soft wave edge into the Now strip.
+- **The signal is real.** The browser draws AVERY / MATHERNE into a small raster in the heading font, 228 pixels wide. Each raster row becomes one OFDM symbol: a 512 point inverse FFT at 16 kHz, with one subcarrier per raster column, so the letters are drawn by 228 subcarriers from about 440 Hz to 7.6 kHz. Each subcarrier's amplitude is that pixel's coverage, so anti-aliased edges come out smooth. Every symbol carries a 6 ms cyclic prefix, and neighboring symbols crossfade inside it with a raised cosine, so nothing starts or stops instantly and there are no clicks. One linear up-chirp goes out first as the sync sweep.
+- **The display is computed.** The receiver runs a 512 point FFT over each symbol's body, skipping the prefix, just as an OFDM receiver does. So every subcarrier reads its own level with no leakage from its neighbors. One row per symbol, newest at the top, about 6 seconds on screen.
+- **One copy, then a pause.** Each cycle starts on quiet water, sends the sweep and the name, holds for about 4 seconds with the full name centered, fades, and starts again.
+- **Instrument look.** A perceptual colormap mixed in OKLab, from deep navy through teal to amber. A faint grid at every kilohertz and every second. Frequency runs along the bottom (0 to 8 kHz) and time down the left (0 to 6 s ago). The screen is navy in both themes.
+- **Cursor readout.** Frequency, level (dBFS) and time under the pointer. The screen is focusable, and arrow keys move the same cursor.
+- **Hear it.** Plays one transmission per cycle at low volume, only after a click. The display restarts with it so the sound and the picture arrive together, and the same button stops it.
+- **Name, role, "See my work" and "Résumé" stay HTML** and fit in the first screen at 390px.
+- **Lazy.** The signal code loads with a dynamic import after the page is idle. Until then, and without JavaScript, a still drawn at build time shows the name where the live display holds it.
+- **Reduced motion and low power:** the held frame, with the full name centered. Hear it still works.
+- **Light rays.** Soft rays fan down from the surface in the hero and the Now strip, fading with depth and swaying slowly.
 
 ### 2. The descent
 
-Solid bands per slot (table above). Each band starts with a 4rem blend from the shade above, so the edges are soft without one big wash. A small mono zone tag sits at the top of each band ("200 M · TWILIGHT ZONE"). It is decorative and hidden from screen readers; the depth gauge carries the same information as links.
+Solid bands per slot (tables above), each rising over the band above with a soft wave edge. Each band overlaps the one above it, and a mask cuts the overlap into a wave, so the shade above shows in the troughs. The wave's phase shifts per slot, so no two edges match.
+
+**Marine snow:** faint specks drift down through the two deepest section bands (slots 9 and 10).
+
+Both effects are CSS only. They animate only `transform`, run only while their band is on screen, and stop completely under reduced motion. Without JavaScript they stay still.
 
 ### 3. Depth gauge and signal meter
 
-- **Desktop (1360px and up):** a slim vertical gauge fixed on the left. Twelve marks, evenly spaced and labeled in meters. Each mark is a link to the section at that depth (one link per audience mode, the others are `display: none`, so it works without JavaScript). A marker slides to the current depth, and the current depth and zone name show beside it.
-- **Signal meter:** five bars under the gauge. Strength drops one bar every few slots as you go deeper. When the footer frame is in view, the meter locks: all bars amber, label LOCK.
+- **One label per section.** The depth leads each section's eyebrow: "200 m · Featured work". Zone names (Twilight, Midnight) appear only in the gauge.
+- **Desktop (1440px and up):** a gauge on its own panel, 1.75rem from the edge, so it reads the same over every band. It shows the current depth large, then the zone name, then the section name. Twelve marks are labeled in meters, and each is a link to the section at that depth: one link per audience mode, with the others set to `display: none`, so it works without JavaScript.
+- **One source of truth.** The current section is whichever band crosses 40% of the viewport. The gauge shows exactly that slot's depth, zone and name from `depth.ts`, which is the same slot the section's own label comes from. The marker still glides between marks with motion.
+- **Signal meter:** five bars that drop as you go deeper. They lock (all amber, LOCK) when the footer frame is in view.
 - **Narrower screens:** a 3px progress bar fixed at the very top, teal, turning amber on lock.
-- **Reduced motion:** the marker, bar and meter jump to each section's value with no transitions.
+- **Reduced motion:** the marker, bar and meter jump per section.
 
 ### 4. Seafloor packet footer: the reception
 
@@ -129,14 +139,20 @@ Gentle animation on hover or keyboard focus of the tile only (clusters tighten, 
 
 ### 6. Sound speed curve
 
-In the research section's side panel, a small sound speed profile: depth from 0 to 4,000 m down the side, speed from about 1,490 to 1,550 m/s across. It is a Munk-style canonical profile with its minimum at 1,000 m, labeled "channel axis". The caption says it is textbook physics and not project data. It replaces the duplicate ONR art in that panel (the ONR tile in the bento still shows it).
+The research section has an open layout with no card. The sound speed profile sits beside the text at full column width: depth from 0 to 4,000 m down the side, speed from about 1,490 to 1,550 m/s across. It is a Munk-style canonical profile with its minimum at 1,000 m, labeled "channel axis". The caption says it is textbook physics and not project data. Related work and the confidentiality note run underneath.
+
+### 7. Variety
+
+- **Header:** solid, in the surface shade, so page text never shows through.
+- **Field notes:** tiles that glow softly like bioluminescence, with a slow breathing glow (opacity only, out of step tile to tile, only while on screen). Tap to decode works exactly as before.
+- **Research:** open, as above. The packet footer is unchanged apart from its depth label.
 
 ## Deliberately not borrowed
 
 Nicholas's site (`/nmdomke/`) was checked only to stay clear of it. Not used here:
 
 - the Doto dot-matrix font
-- the drafting-table dot grid (the old grid-paper texture on this site is removed too, so there is no dot or grid paper anywhere)
+- the drafting-table dot grid (the old grid-paper texture on this site is removed too; the only grid left is the faint plot grid inside the spectrogram, which is part of the instrument)
 - alternating light, grey, black and blue panes; this page only ever gets darker
 - the engineering title-block footer; mine is a data frame, not a drawing sheet
 - the scroll gear, the CAD crosshair cursor, blueprint blue sections and the exploded 3D model
@@ -149,6 +165,5 @@ Tokens, hero, descent, gauge and meter, packet footer, project signatures, sound
 
 ## Open questions
 
-- Dark theme starts at a dark teal surface (`#0e3a51`), not the pale `#dff1f3`, so dark mode stays dark from the top. The pale surface is the light theme's hero.
 - Space Grotesk is shared with Nicholas's site. Swapping the display face would make the two sites more distinct, but it means new fallback metrics and a font download change.
 - Later, not now: a sonar ping button on the gauge, bioluminescent specks near the cursor in the deep zones, case studies starting at their section's depth color.

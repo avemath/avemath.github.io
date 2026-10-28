@@ -162,27 +162,16 @@ const tileStyle = (b: (typeof bento)[number]) =>
   </div>
 </BaseLayout>
 
+<script>
+  // The light rays and marine snow only move while their band is on screen.
+  const io = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('fx-live', e.isIntersecting)));
+  document.querySelectorAll('.home .zone').forEach((z) => io.observe(z));
+</script>
+
 <style>
   .home-flow {
     display: flex;
     flex-direction: column;
-  }
-
-  /* The descent: each section takes the shade and zone tag of the slot it lands in, whatever
-     order the audience switcher picks. The per-section values come from src/lib/depth.ts. */
-  .home-flow > :global(.home-section) {
-    --slot: var(--slot-hire);
-    --tag: var(--tag-hire);
-  }
-
-  .home:has(#aud-research:checked) .home-flow > :global(.home-section) {
-    --slot: var(--slot-research);
-    --tag: var(--tag-research);
-  }
-
-  .home:has(#aud-website:checked) .home-flow > :global(.home-section) {
-    --slot: var(--slot-website);
-    --tag: var(--tag-website);
   }
 
   /* Audience ordering. Pure CSS, driven by the checked radio in the hero. Sections without a
