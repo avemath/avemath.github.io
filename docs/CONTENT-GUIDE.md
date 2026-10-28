@@ -28,6 +28,7 @@ How to add work and keep the site current, plus the rules every page follows.
    links:
      live: https://example.com
      repo: https://github.com/avemath/example
+   linkLabel: Visit Example Co.'s site  # optional, replaces "Visit <host>" when the host doesn't say whose site it is
    cover: ../../assets/projects/<slug>/desktop.png
    mobile: ../../assets/projects/<slug>/mobile.png
    coverAlt: Describe what the screenshot shows.

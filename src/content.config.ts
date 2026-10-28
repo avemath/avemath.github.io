@@ -33,6 +33,9 @@ const projects = defineCollection({
           writeup: z.url().optional(),
         })
         .default({}),
+      // Link text for the live site where it would otherwise be "Visit <host>", for a site whose
+      // host doesn't say whose it is.
+      linkLabel: z.string().optional(),
       cover: image().optional(),
       mobile: image().optional(),
       coverAlt: z.string().optional(),
