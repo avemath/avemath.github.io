@@ -11,7 +11,7 @@ import { FS, N, CP, SYMBOL, BINS, BIN_HZ, FRAME_HZ, VIEW_ROWS, TEXT_BINS, LINES,
 import { prefersReducedMotion } from './preferences';
 
 const DB_LO = -84;
-const DB_HI = -32;
+const DB_HI = -27;
 const HOLD_MS = 4200;
 const FADE_MS = 700;
 

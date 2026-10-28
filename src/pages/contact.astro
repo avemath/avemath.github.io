@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { slotVars } from '@/lib/depth';
 import ContactForm from '@/components/ContactForm.astro';
 import Icon from '@/components/Icon.astro';
 import site from '@/data/site.json';
 ---
 
 <BaseLayout title="Contact" description="Get in touch with Avery Matherne about a role, a research question or a website project.">
-  <section class="section">
+  <section class="section zone" style={slotVars(2, false)}>
     <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.4fr]">
       <div>
         <p class="eyebrow">Contact</p>

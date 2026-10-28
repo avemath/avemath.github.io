@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { slotVars } from '@/lib/depth';
 import Icon from '@/components/Icon.astro';
 import experience from '@/data/experience.json';
 import skills from '@/data/skills.json';
@@ -15,6 +16,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
   title="Résumé"
   description="Résumé for Avery Matherne: M.S. ECE student and graduate research assistant at LSU, with embedded, communications and web work."
 >
+  <div class="zone resume-zone" style={slotVars(1, false)}>
   <div class="wrap resume-tools no-print">
     <div class="flex flex-wrap items-center justify-between gap-4 py-8">
       <div>
@@ -151,6 +153,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
         <a class="btn" href="/work/">All work</a>
       </div>
     </div>
+  </div>
   </div>
 </BaseLayout>
 

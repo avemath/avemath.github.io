@@ -162,11 +162,6 @@ const tileStyle = (b: (typeof bento)[number]) =>
   </div>
 </BaseLayout>
 
-<script>
-  // The light rays and marine snow only move while their band is on screen.
-  const io = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('fx-live', e.isIntersecting)));
-  document.querySelectorAll('.home .zone').forEach((z) => io.observe(z));
-</script>
 
 <style>
   .home-flow {
