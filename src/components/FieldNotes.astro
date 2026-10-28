@@ -101,7 +101,7 @@ const notes = facts;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    :global(html:not([data-motion='reduce']) .fx-live) .note-card::before {
+    :global(html.fx-ready:not([data-motion='reduce']) .fx-live) .note-card::before {
       animation: glow 6s ease-in-out infinite alternate;
     }
   }
@@ -263,15 +263,17 @@ const notes = facts;
     });
     const io = new IntersectionObserver(
       (entries) => {
-        const entering = entries.filter((e) => e.isIntersecting).map((e) => e.target as HTMLButtonElement);
-        const rows = new Map<number, HTMLButtonElement[]>();
-        for (const card of entering) {
-          const top = Math.round(card.getBoundingClientRect().top / 8);
-          rows.set(top, [...(rows.get(top) ?? []), card]);
+        // The entries carry their rectangles, so grouping into rows reads no layout of its own.
+        const rows = new Map<number, { card: HTMLButtonElement; left: number }[]>();
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const top = Math.round(e.boundingClientRect.top / 8);
+          rows.set(top, [...(rows.get(top) ?? []), { card: e.target as HTMLButtonElement, left: e.boundingClientRect.left }]);
         }
         for (const row of rows.values()) {
           row
-            .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
+            .sort((a, b) => a.left - b.left)
+            .map((r) => r.card)
             .forEach((card, i) => {
               io.unobserve(card);
               setTimeout(() => card.dataset.masked !== undefined && reveal(card), i * 160);

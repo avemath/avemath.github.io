@@ -298,10 +298,16 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
 </style>
 
 <script>
+  // The divider shows once the page has scrolled. A marker 8px tall at the top of the page tells
+  // us without reading the scroll position, so nothing forces a layout while the page loads.
   const header = document.querySelector<HTMLElement>('[data-header]');
-  const onScroll = () => header?.toggleAttribute('data-scrolled', window.scrollY > 8);
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
+  if (header && 'IntersectionObserver' in window) {
+    const mark = document.createElement('div');
+    mark.setAttribute('aria-hidden', 'true');
+    mark.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:8px;pointer-events:none';
+    document.body.prepend(mark);
+    new IntersectionObserver(([e]) => header.toggleAttribute('data-scrolled', !e.isIntersecting)).observe(mark);
+  }
 
   if (/Mac|iPhone|iPad/.test(navigator.userAgent)) {
     document.querySelectorAll('[data-kbd-hint]').forEach((el) => (el.textContent = '⌘ K'));

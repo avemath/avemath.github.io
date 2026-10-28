@@ -323,8 +323,10 @@ const short = (m: number) => m.toLocaleString('en-US');
   function update() {
     queued = false;
     const n = slots.length;
+    // All reads first, then only writes, so updating never forces a layout.
+    const max = document.documentElement.scrollHeight - innerHeight;
     const probe = scrollY + innerHeight * 0.4;
-    const atEnd = scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+    const atEnd = scrollY + innerHeight >= max + innerHeight - 2;
     let i = 0;
     while (i < n - 1 && tops[i + 1] <= probe) i++;
     if (atEnd) i = n - 1;
@@ -352,7 +354,6 @@ const short = (m: number) => m.toLocaleString('en-US');
     const bars = Math.max(1, 5 - Math.floor(pos * 4.6));
     if (meter) meter.dataset.bars = String(bars);
 
-    const max = document.documentElement.scrollHeight - innerHeight;
     const p = prefersReducedMotion() ? pos : max > 0 ? scrollY / max : 0;
     bar?.style.setProperty('--p', String(p));
   }
@@ -371,11 +372,11 @@ const short = (m: number) => m.toLocaleString('en-US');
         requestAnimationFrame(update);
       }
     }, { passive: true });
+    // The observer's first callback comes after the first layout, so that is the first measure.
     new ResizeObserver(measure).observe(document.body);
     document.querySelectorAll('input[name="audience"]').forEach((r) => r.addEventListener('change', () => requestAnimationFrame(measure)));
     addEventListener('motionchange', update);
     addEventListener('rxlock', (e) => setLocked((e as CustomEvent<boolean>).detail));
-    measure();
     if (locked) setLocked(true);
   }
 </script>

@@ -137,6 +137,7 @@ export async function mountSpectrogram(root: HTMLElement) {
   }
 
   function restart(now: number) {
+    root.dataset.live = '';
     screen!.removeAttribute('data-fade');
     phase = 'send';
     fillTo(-1);
@@ -339,6 +340,7 @@ export async function mountSpectrogram(root: HTMLElement) {
       screen!.removeAttribute('data-fade');
       phase = 'hold';
       fillTo(HOLD);
+      root.dataset.live = '';
     }
   }
 
@@ -349,12 +351,14 @@ export async function mountSpectrogram(root: HTMLElement) {
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
   window.addEventListener('motionchange', refresh);
 
-  // Open on the held frame, so the name is on screen at once, then begin the next cycle.
+  // The still frame from the build is already on screen, showing the held name. With motion, it
+  // stays through the first hold and then fades into the first live transmission, so loading this
+  // code changes nothing on screen. Without motion the computed held frame replaces it at once.
   phase = 'hold';
   fillTo(HOLD);
   phaseEnd = performance.now() + HOLD_MS;
-  root.dataset.live = '';
-  start();
+  if (animated()) start();
+  else root.dataset.live = '';
 }
 
 function toLab(hex: string): [number, number, number] {

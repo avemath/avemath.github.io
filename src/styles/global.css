@@ -475,7 +475,8 @@
   }
 }
 
-/* Only while in view (scripts set fx-live), and never with reduced motion. */
+/* Only once the page has settled and while in view (scripts set fx-ready and fx-live), and
+   never with reduced motion. */
 .zone.fx-live::before,
 .sunlit.fx-live::after {
   animation-play-state: running;

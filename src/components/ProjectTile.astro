@@ -34,19 +34,19 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
             alt=""
             url={d.links.live}
             eager={eager}
-            widths={[640, 960, 1280]}
-            sizes="(min-width: 1100px) 760px, 100vw"
+            widths={[400, 480, 600, 720, 960, 1280]}
+            sizes="(min-width: 1100px) 760px, (min-width: 720px) 88vw, calc(100vw - 4.5rem)"
           />
         </div>
       ) : d.cover ? (
         <Image
           src={d.cover}
           alt=""
-          widths={[400, 640, 800, 960, 1280]}
+          widths={[360, 480, 560, 680, 800, 960, 1280]}
           sizes={
             size === 'xl'
-              ? '(min-width: 1216px) 800px, (min-width: 1100px) 62vw, (min-width: 720px) 92vw, 100vw'
-              : '(min-width: 1216px) 400px, (min-width: 1100px) 31vw, (min-width: 720px) 46vw, 100vw'
+              ? '(min-width: 1216px) 800px, (min-width: 1100px) 62vw, (min-width: 720px) 92vw, calc(100vw - 2rem)'
+              : '(min-width: 1216px) 400px, (min-width: 1100px) 31vw, (min-width: 720px) 46vw, calc(100vw - 2rem)'
           }
           format="webp"
           quality={76}

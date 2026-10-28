@@ -408,14 +408,12 @@ const rowsPerSecond = FRAME_HZ;
 <script>
   import { prefersReducedMotion } from '../scripts/preferences';
   import { decode } from '../scripts/decode';
+  import { whenSettled } from '../scripts/motion';
 
-  // The live display is decorative, so its code loads only once the page has done its real work.
+  // The first screen shows the still frame (the name centered) and stays still. The live display
+  // is decorative, so its code loads only once the page has settled after the load event.
   const tx = document.querySelector<HTMLElement>('[data-tx]');
-  if (tx) {
-    const mount = () => import('../scripts/spectrogram').then((m) => m.mountSpectrogram(tx));
-    if ('requestIdleCallback' in window) requestIdleCallback(mount, { timeout: 2000 });
-    else setTimeout(mount, 400);
-  }
+  if (tx) whenSettled(() => import('../scripts/spectrogram').then((m) => m.mountSpectrogram(tx)));
 
   // The eyebrow "acquires signal" once the page is idle.
   const eyebrow = document.querySelector<HTMLElement>('[data-hero-eyebrow]');
