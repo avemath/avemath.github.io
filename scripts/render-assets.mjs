@@ -39,7 +39,13 @@ const LABELS = { research: 'Research', engineering: 'Engineering', 'client-site'
 const projects = [];
 for (const f of (await readdir('src/content/projects')).filter((f) => f.endsWith('.md'))) {
   const front = (await readFile(join('src/content/projects', f), 'utf8')).split('---')[1];
-  const field = (k) => front.match(new RegExp(`^${k}:\\s*(.+)$`, 'm'))?.[1].trim();
+  // YAML quotes are syntax, not text: strip them, with '' inside single quotes and \" inside double quotes.
+  const unquote = (v) =>
+    /^'.*'$/.test(v) ? v.slice(1, -1).replaceAll("''", "'") : /^".*"$/.test(v) ? v.slice(1, -1).replace(/\\(["\\])/g, '$1') : v;
+  const field = (k) => {
+    const v = front.match(new RegExp(`^${k}:\\s*(.+)$`, 'm'))?.[1].trim();
+    return v === undefined ? v : unquote(v);
+  };
   if (field('draft') === 'true') continue;
   projects.push({ id: f.replace(/\.md$/, ''), title: field('title'), type: LABELS[field('type')] ?? '', summary: field('summary') });
 }
