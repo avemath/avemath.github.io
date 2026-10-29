@@ -1,0 +1,77 @@
+---
+// The Signals playground live tile: a small version of the FH-BFSK chip visualizer, on the same
+// band plan, tone grid and seeded hops as the full demo (src/lib/fhbfsk.ts). Click a chip to flip
+// its bit. Sound only plays from the Play button.
+import LiveShell from './LiveShell.astro';
+---
+
+<LiveShell
+  kind="signals"
+  description="A small version of my frequency-hopping BFSK visualizer. Eight chips each hop to one of 13 tone pairs and send the low tone for a 0 or the high tone for a 1. Flip a chip's bit, draw a new hop pattern, or play it slowed down."
+  href="/work/signals-playground/#demo"
+  hrefLabel="Full visualizer, with every setting"
+>
+  <p slot="title" class="sl__title mono">Signals · FH-BFSK, 13 pairs</p>
+  <svg class="sl__plot" viewBox="0 0 320 210" data-sl-plot aria-label="Chips over time against frequency" role="group"></svg>
+  <p class="sl__read mono" data-sl-read aria-live="polite"></p>
+  <div class="sl__controls">
+    <button type="button" class="btn btn--small btn--primary" data-sl-play>Play</button>
+    <button type="button" class="btn btn--small" data-sl-stop>Stop</button>
+    <button type="button" class="btn btn--small" data-sl-hop>New hop pattern</button>
+  </div>
+  <p class="sl__note">Plays in an exaggerated pitch, each chip stretched from 6.25 ms to 260 ms so you can hear it.</p>
+</LiveShell>
+
+<style>
+  .sl__title {
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .sl__plot {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .sl__plot :global(text) {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    fill: var(--text-soft);
+  }
+
+  .sl__plot :global(.sl-col) {
+    cursor: pointer;
+    outline: none;
+  }
+
+  .sl__plot :global(.sl-col:hover .sl-bg),
+  .sl__plot :global(.sl-col:focus-visible .sl-bg) {
+    fill: var(--accent-wash);
+  }
+
+  .sl__plot :global(.sl-col:focus-visible .sl-bg) {
+    stroke: var(--amber-line);
+    stroke-width: 2;
+  }
+
+  .sl__read {
+    min-height: 1.4em;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+  }
+
+  .sl__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .sl__note {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+</style>
