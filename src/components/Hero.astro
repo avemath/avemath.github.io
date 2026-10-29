@@ -3,16 +3,18 @@ import Icon from './Icon.astro';
 import AudienceSwitcher from './AudienceSwitcher.astro';
 import site from '@/data/site.json';
 import { slotVars } from '@/lib/depth';
-import { BINS, BIN_HZ, CHIRP, FRAME_HZ, LEAD, LINES, STILL, TEXT_BINS, VIEW_ROWS, holdFrame } from '@/lib/tx-signal';
+import { BIN_HZ, CHIRP, FIRST_BIN, FRAME_HZ, LEAD, LINES, SHOW_BINS, STILL, STRETCH, TEXT_BINS, VIEW_ROWS, holdFrame } from '@/lib/tx-signal';
 
 // The still picture that shows until the live display takes over (and without JavaScript): the
 // name where the live display holds it, centered, with the sweep below it. It uses the build-time
 // estimate of the raster, so the cross-fade to the computed picture barely moves.
 const hold = holdFrame(STILL.rows);
 const top = VIEW_ROWS / 2 - STILL.rows / 2;
-const lines = LINES.map((text, i) => ({ text, y: top + 1 + STILL.cap + i * (STILL.cap + STILL.gap) }));
+const mid = FIRST_BIN + TEXT_BINS / 2;
+// Raster units: the group below stretches them by STRETCH in rows, as the live raster is.
+const lines = LINES.map((text, i) => ({ text, y: 1 + STILL.cap + i * (STILL.cap + STILL.gap) }));
 const chirp = { x1: CHIRP.f0 / BIN_HZ, y1: hold - LEAD, x2: CHIRP.f1 / BIN_HZ, y2: hold - (LEAD + CHIRP.frames) };
-const kHz = [0, 2, 4, 6, 8];
+const kHz = [0, 1, 2, 3, 4];
 const seconds = [0, 1, 2, 3, 4, 5, 6];
 const rowsPerSecond = FRAME_HZ;
 ---
@@ -54,22 +56,24 @@ const rowsPerSecond = FRAME_HZ;
           {seconds.map((t) => <span style={`--at:${(t * rowsPerSecond) / VIEW_ROWS}`}>{t === 6 ? '6 s' : t}</span>)}
         </div>
         <div class="tx__screen" data-tx-screen>
-          <svg class="tx__still" viewBox={`0 0 ${BINS} ${VIEW_ROWS}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            {
-              lines.map((l, i) => (
-                <text x={BINS / 2} y={l.y} font-size={STILL.font} text-anchor="middle" {...(i === 1 ? { textLength: TEXT_BINS - 2, lengthAdjust: 'spacingAndGlyphs' } : {})}>
-                  {l.text}
-                </text>
-              ))
-            }
+          <svg class="tx__still" viewBox={`0 0 ${SHOW_BINS} ${VIEW_ROWS}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <g transform={`translate(0 ${top}) scale(1 ${STRETCH})`}>
+              {
+                lines.map((l, i) => (
+                  <text x={mid} y={l.y} font-size={STILL.font} text-anchor="middle" {...(i === 1 ? { textLength: TEXT_BINS - 2, lengthAdjust: 'spacingAndGlyphs' } : {})}>
+                    {l.text}
+                  </text>
+                ))
+              }
+            </g>
             <line x1={chirp.x1} y1={chirp.y1} x2={chirp.x2} y2={chirp.y2} />
           </svg>
-          <canvas class="tx__canvas" width={BINS} height={VIEW_ROWS} aria-hidden="true"></canvas>
+          <canvas class="tx__canvas" width={SHOW_BINS} height={VIEW_ROWS} aria-hidden="true"></canvas>
           <span class="tx__grid" aria-hidden="true"></span>
           <span class="tx__cross" data-tx-cross aria-hidden="true" hidden></span>
         </div>
         <div class="tx__axis" aria-hidden="true">
-          {kHz.map((t) => <span style={`--at:${t / 8}`}>{t === 8 ? '8 kHz' : t}</span>)}
+          {kHz.map((t) => <span style={`--at:${t / 4}`}>{t === 4 ? '4 kHz' : t}</span>)}
         </div>
       </div>
       <div class="tx__foot">
@@ -297,7 +301,7 @@ const rowsPerSecond = FRAME_HZ;
   .tx__grid {
     pointer-events: none;
     background:
-      repeating-linear-gradient(90deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px 12.5%),
+      repeating-linear-gradient(90deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px 25%),
       repeating-linear-gradient(180deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px calc(100% * 16000 / 608 / 160));
   }
 

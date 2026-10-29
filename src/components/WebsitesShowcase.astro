@@ -1,0 +1,165 @@
+---
+import BrowserFrame from './BrowserFrame.astro';
+import Icon from './Icon.astro';
+import { getProjects, isWebsite, projectHref } from '@/lib/projects';
+
+const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live);
+---
+
+<section id="websites" class="section home-section zone" aria-labelledby="websites-title" data-section="websites">
+  <span class="spine" aria-hidden="true"></span>
+  <div class="wrap">
+    <p class="eyebrow">Client work</p>
+    <h2 id="websites-title" class="section-title">Live sites built for real clients</h2>
+    <p class="section-lede">Each entry has what the business needed, what I did, and a few numbers. The case study has the rest.</p>
+
+    <ol class="sites">
+      {
+        sites.map((p, i) => (
+          <li class="site" data-reveal>
+            <div class="site__media">
+              <BrowserFrame src={p.data.cover!} mobile={p.data.mobile} alt={p.data.coverAlt ?? ''} url={p.data.links.live} />
+            </div>
+            <div class="site__copy">
+              <p class="label">
+                <span class="mono text-accent">{String(i + 1).padStart(2, '0')}</span> · {p.data.client?.kind}
+              </p>
+              <h3 class="site__title">{p.data.title}</h3>
+              <p class="site__summary">{p.data.summary}</p>
+              <div class="site__facts">
+                <dl>
+                  <dt class="label">What I did</dt>
+                  <dd>{p.data.role}</dd>
+                </dl>
+                {p.data.metrics && (
+                  <dl class="site__metrics">
+                    {p.data.metrics.map((m) => (
+                      <div>
+                        <dt class="label">{m.label}</dt>
+                        <dd class="site__metric">{m.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+              </div>
+              <div class="mt-6 flex flex-wrap gap-3">
+                <a class="btn btn--small" href={projectHref(p)}>
+                  Read the case study <Icon name="arrow-right" />
+                </a>
+                <a class="link inline-flex items-center gap-1 text-sm" href={p.data.links.live}>
+                  {p.data.linkLabel ?? `Visit ${new URL(p.data.links.live!).host}`} <Icon name="arrow-up-right" class="h-[0.9em] w-[0.9em]" />
+                </a>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="sites__how">
+      <p>
+        Five steps from the first conversation to the written guide, with a quote before I start and a preview link while I build. The
+        services page has the details and the questions people ask.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a class="btn btn--primary" href="/services/">See how I work <Icon name="arrow-right" /></a>
+        <a class="btn" href="/contact/?topic=website">Start a project</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sites {
+    display: grid;
+    gap: clamp(4rem, 8vw, 6.5rem);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .site {
+    display: grid;
+    gap: 2.25rem;
+    align-items: center;
+  }
+
+  @media (min-width: 960px) {
+    .site {
+      grid-template-columns: 1.25fr 1fr;
+      gap: 4rem;
+    }
+
+    .site:nth-child(even) .site__media {
+      order: 2;
+    }
+  }
+
+  .site__title {
+    margin-top: 0.6rem;
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    font-weight: 600;
+  }
+
+  .site__summary {
+    margin-top: 0.85rem;
+    color: var(--text-soft);
+  }
+
+  .site__facts {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .site__facts dd {
+    margin-top: 0.25rem;
+    font-size: 0.95rem;
+  }
+
+  .site__metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .site__metrics > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .site__metrics .site__metric {
+    margin-top: auto;
+    padding-top: 0.25rem;
+  }
+
+  .site__metric {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 2.6vw, 2.25rem) !important;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sites__how {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .sites__how p {
+    max-width: 44rem;
+    color: var(--text-soft);
+  }
+
+  @media (min-width: 960px) {
+    .sites__how {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 2rem;
+    }
+  }
+</style>

@@ -65,7 +65,6 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
         />
       ) : (
         <ProjectArt slug={project.id} fit="meet" />
-        <span class="tile__noise" aria-hidden="true" />
       )
     }
     {d.links.live && !(size === 'xl' && d.cover) && <span class="tile__live mono"><span class="status-dot" aria-hidden="true" />{displayUrl(d.links.live)}</span>}
@@ -136,51 +135,6 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
     flex: 1;
     flex-direction: column;
     min-width: 0;
-  }
-
-  /* Projects tune in: a drawn signature starts with a little noise over it and resolves clean
-     while the tile is hovered or focused. With reduced motion, and on touch screens with no hover,
-     it is always clean. */
-  .tile__noise {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: var(--accent);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 18 -12.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 160px;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 18 -12.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 160px;
-    opacity: 0.4;
-    transition: opacity 0.6s var(--ease-out-expo);
-  }
-
-  .tile__media > :global(.art) {
-    opacity: 0.82;
-    transition: opacity 0.6s var(--ease-out-expo);
-  }
-
-  .tile:is(:hover, :focus-within) .tile__noise {
-    opacity: 0;
-  }
-
-  .tile:is(:hover, :focus-within) .tile__media > :global(.art) {
-    opacity: 1;
-  }
-
-  @media (hover: none), (prefers-reduced-motion: reduce) {
-    .tile__noise {
-      display: none;
-    }
-
-    .tile__media > :global(.art) {
-      opacity: 1;
-    }
-  }
-
-  :global(html[data-motion='reduce']) .tile__noise {
-    display: none;
-  }
-
-  :global(html[data-motion='reduce']) .tile__media > :global(.art) {
-    opacity: 1;
   }
 
   /* A measured number from the case study, set large. */
