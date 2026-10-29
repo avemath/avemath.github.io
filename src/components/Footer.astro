@@ -120,6 +120,15 @@ const wave = sync.map((b, i) => `${i === 0 ? 'M' : 'L'} ${i * 10} ${b ? 4 : 20} 
     max-width: 40rem;
   }
 
+  /* The home page ends with its own contact section, so the footer skips the repeat. */
+  :global(body:has(.home)) .rx__intro {
+    display: none;
+  }
+
+  :global(body:has(.home)) .rx {
+    margin-top: 0.5rem;
+  }
+
   .rx {
     margin-top: 2rem;
     font-family: var(--font-mono);
