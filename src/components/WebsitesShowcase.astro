@@ -2,9 +2,12 @@
 import BrowserFrame from './BrowserFrame.astro';
 import Icon from './Icon.astro';
 import AdamLive from './live/AdamLive.astro';
+import GraceLive from './live/GraceLive.astro';
 import { getProjects, isWebsite, projectHref } from '@/lib/projects';
 
 const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live);
+// Sites with a working piece of them that runs here, from their real code (see src/components/live).
+const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
 ---
 
 <section id="websites" class="section home-section zone" aria-labelledby="websites-title" data-section="websites">
@@ -16,8 +19,10 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 
     <ol class="sites">
       {
-        sites.map((p, i) => (
-          <li class="site" data-reveal data-live-host={p.id === 'because-of-adam' ? '' : undefined}>
+        sites.map((p, i) => {
+          const Live = live[p.id];
+          return (
+          <li class="site" data-reveal data-live-host={Live ? '' : undefined}>
             <div class="site__media">
               <BrowserFrame
                 src={p.data.cover!}
@@ -26,9 +31,9 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
                 url={p.data.links.live}
                 widths={[240, 480, 680, 960, 1280]}
                 sizes="(min-width: 960px) 40vw, (min-width: 720px) calc(100vw - 5rem), 8rem"
-                live={p.id === 'because-of-adam'}
+                live={!!Live}
               >
-                {p.id === 'because-of-adam' && <AdamLive />}
+                {Live && <Live />}
               </BrowserFrame>
             </div>
             <div class="site__copy">
@@ -63,7 +68,8 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
               </div>
             </div>
           </li>
-        ))
+          );
+        })
       }
     </ol>
 

@@ -5,7 +5,7 @@
 // it. The panel's markup waits in a <template> until then, so it costs the page nothing.
 interface Props {
   /** Which live tile this is: the key of its script in the loader below. */
-  kind: 'rampage' | 'v2v' | 'led' | 'adam';
+  kind: 'rampage' | 'v2v' | 'led' | 'adam' | 'grace';
   /** What the live version is, for screen readers, read before they press Try it. */
   description: string;
   /** The case study section with the full version. */
@@ -144,6 +144,7 @@ const descId = `live-${kind}-desc`;
     v2v: () => import('../../scripts/live/v2v'),
     led: () => import('../../scripts/live/led'),
     adam: () => import('../../scripts/live/adam'),
+    grace: () => import('../../scripts/live/grace'),
   };
   type Kind = keyof typeof loaders;
   type Mod = { mount: (panel: HTMLElement) => () => void };
@@ -177,7 +178,7 @@ const descId = `live-${kind}-desc`;
       tile?.setAttribute('data-live-on', '');
       media?.setAttribute('data-live-on', '');
       unmount = m.mount(panel);
-      panel.querySelector<HTMLElement>('button:not([data-live-close]), input')?.focus();
+      panel.querySelector<HTMLElement>('button:not([data-live-close], [hidden]), input')?.focus();
       panel.querySelector('[data-live-close]')!.addEventListener('click', () => {
         unmount?.();
         panel.remove();
