@@ -68,6 +68,8 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
       )
     }
     {d.links.live && !(size === 'xl' && d.cover) && <span class="tile__live mono"><span class="status-dot" aria-hidden="true" />{displayUrl(d.links.live)}</span>}
+    {/* A live tile: a small working version of the project over its picture (see LiveShell). */}
+    <slot name="live" />
   </div>
 
   <div class="tile__body">

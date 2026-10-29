@@ -1,0 +1,193 @@
+---
+// A live tile: a small working version of a project, built from its real code, placed over the
+// tile's picture. At first paint only the picture shows, with a "Try it" button. The tile's script
+// loads when the tile comes near the screen, and the version only starts when someone presses Try
+// it. The panel's markup waits in a <template> until then, so it costs the page nothing.
+interface Props {
+  /** Which live tile this is: the key of its script in the loader below. */
+  kind: 'rampage' | 'v2v' | 'led' | 'adam' | 'grace' | 'landspace' | 'signals';
+  /** What the live version is, for screen readers, read before they press Try it. */
+  description: string;
+  /** The case study section with the full version. */
+  href: string;
+  hrefLabel: string;
+}
+
+const { kind, description, href, hrefLabel } = Astro.props;
+const descId = `live-${kind}-desc`;
+---
+
+<div class="live" data-live={kind}>
+  <p class="sr-only" id={descId}>{description}</p>
+  <button type="button" class="live__try" data-live-try aria-describedby={descId}>
+    <span class="live__dot" aria-hidden="true"></span>Try it
+  </button>
+  <template data-live-ui>
+    <div class="live__panel" data-live-panel role="group" aria-label={`Live version: ${description}`}>
+      <div class="live__top">
+        <slot name="title" />
+        <button type="button" class="live__close" data-live-close>Close</button>
+      </div>
+      <slot />
+      <a class="link live__more" href={href}>{hrefLabel}</a>
+    </div>
+  </template>
+</div>
+
+<style>
+  /* At rest: only the button, in a corner of the picture. It needs JavaScript, so it shows only
+     once the head script has marked the page. */
+  .live__try {
+    position: absolute;
+    z-index: 3;
+    right: 0.7rem;
+    bottom: 0.7rem;
+    display: none;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid color-mix(in oklab, var(--amber-line) 70%, transparent);
+    border-radius: 0.45rem;
+    background: color-mix(in oklab, var(--surface) 92%, transparent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  :global(html.js) .live__try {
+    display: inline-flex;
+  }
+
+  .live__try:hover {
+    border-color: var(--amber-line);
+  }
+
+  .live__try:focus-visible,
+  .live__panel :global(button:focus-visible),
+  .live__panel :global(input:focus-visible),
+  .live__panel :global(a:focus-visible) {
+    outline: 2px solid var(--amber-line);
+    outline-offset: 2px;
+  }
+
+  .live__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  :global(html [data-live-on]) .live__try,
+  :global(html.js [data-live-on]) .live__try {
+    display: none;
+  }
+
+  /* Running: the panel takes the place of the picture, above the card's stretched link. */
+  :global([data-live-media][data-live-on]) .live {
+    height: 100%;
+  }
+
+  .live__panel {
+    container-type: inline-size;
+    position: relative;
+    z-index: 3;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    align-content: start;
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    background: var(--surface);
+    font-size: 0.86rem;
+    color: var(--text);
+    cursor: auto;
+  }
+
+  .live__panel > :global(*) {
+    min-width: 0;
+  }
+
+  .live__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .live__close {
+    min-height: 2rem;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    cursor: pointer;
+  }
+
+  .live__more {
+    justify-self: start;
+    font-size: 0.84rem;
+  }
+</style>
+
+<script>
+  // Loads each live tile's script once its tile is near the screen, and starts it on Try it.
+  const loaders = {
+    rampage: () => import('../../scripts/live/rampage'),
+    v2v: () => import('../../scripts/live/v2v'),
+    led: () => import('../../scripts/live/led'),
+    adam: () => import('../../scripts/live/adam'),
+    grace: () => import('../../scripts/live/grace'),
+    landspace: () => import('../../scripts/live/landspace'),
+    signals: () => import('../../scripts/live/signals'),
+  };
+  type Kind = keyof typeof loaders;
+  type Mod = { mount: (panel: HTMLElement) => () => void };
+
+  document.querySelectorAll<HTMLElement>('[data-live]').forEach((root) => {
+    const kind = root.dataset.live as Kind;
+    // The element that holds the live version (a spotlight's demo side, or a tile), and the
+    // frame whose picture it replaces while it runs.
+    const tile = root.closest<HTMLElement>('[data-live-host], .tile');
+    const media = root.closest<HTMLElement>('[data-live-media], .tile__media');
+    const tryBtn = root.querySelector<HTMLButtonElement>('[data-live-try]')!;
+    const tpl = root.querySelector<HTMLTemplateElement>('[data-live-ui]')!;
+    let mod: Promise<Mod> | null = null;
+    let unmount: (() => void) | null = null;
+    const load = () => (mod ??= loaders[kind]() as Promise<Mod>);
+
+    new IntersectionObserver(
+      ([e], io) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        load();
+      },
+      { rootMargin: '400px 0px' },
+    ).observe(root);
+
+    tryBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const m = await load();
+      const panel = (tpl.content.firstElementChild as HTMLElement).cloneNode(true) as HTMLElement;
+      root.append(panel);
+      tile?.setAttribute('data-live-on', '');
+      media?.setAttribute('data-live-on', '');
+      unmount = m.mount(panel);
+      panel.querySelector<HTMLElement>('button:not([data-live-close], [hidden]), input')?.focus();
+      panel.querySelector('[data-live-close]')!.addEventListener('click', () => {
+        unmount?.();
+        panel.remove();
+        tile?.removeAttribute('data-live-on');
+        media?.removeAttribute('data-live-on');
+        tryBtn.focus();
+      });
+    });
+  });
+</script>
