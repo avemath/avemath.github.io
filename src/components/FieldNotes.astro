@@ -7,8 +7,8 @@ const notes = facts;
 
 <section id="field-notes" class="section section--tight home-section zone" aria-labelledby="notes-title" data-section="field-notes">
   <span class="spine" aria-hidden="true"></span>
-  <div class="wrap notes-split">
-    <div class="notes-head">
+  <div class="wrap pinned">
+    <div class="pinned__head">
       <p class="eyebrow">Field notes</p>
       <h2 id="notes-title" class="section-title section-title--sm">A few things that are true</h2>
       <p class="section-lede">Facts from the work above, and the stories behind them.</p>
@@ -59,43 +59,9 @@ const notes = facts;
     }
   }
 
-  .corner {
-    display: none;
-  }
-
-  /* On wide screens the heading stays pinned in a left column while the notes scroll on the
-     right, two to a row. Phones and tablets stack normally. */
   @media (min-width: 1100px) {
-    .notes-split {
-      display: grid;
-      grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
-      gap: clamp(2.5rem, 4vw, 4rem);
-      align-items: start;
-    }
-
-    .notes-head {
-      position: sticky;
-      top: 6.5rem;
-      padding-left: 1.1rem;
-      /* The same fine tick ruler as Featured work. */
-      background:
-        repeating-linear-gradient(180deg, var(--line-strong) 0 1px, transparent 1px 40px) 0 0 / 9px 100% no-repeat,
-        repeating-linear-gradient(180deg, var(--line) 0 1px, transparent 1px 8px) 0 0 / 5px 100% no-repeat;
-      border-left: 1px solid var(--line);
-    }
-
     .notes {
       margin-top: 0;
-    }
-
-    .corner {
-      display: block;
-      margin-top: 2rem;
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
     }
   }
 

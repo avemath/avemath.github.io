@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Icon from './Icon.astro';
 import ProjectArt from './ProjectArt.astro';
 import BrowserFrame from './BrowserFrame.astro';
@@ -14,9 +15,13 @@ interface Props {
   eager?: boolean;
   /** Show the project's first metric as a large numeral, where it has real ones. */
   metric?: boolean;
+  /** A different photo for this tile, such as a portrait shot for a tall slot. */
+  photo?: ImageMetadata;
+  /** Where the photo is anchored when it is cropped to the tile. */
+  focus?: string;
 }
 
-const { project, size = 'md', headingLevel: H = 'h3', style, eager = false, metric = false } = Astro.props;
+const { project, size = 'md', headingLevel: H = 'h3', style, eager = false, metric = false, photo, focus } = Astro.props;
 const d = project.data;
 const href = projectHref(project);
 const chips = d.stack.slice(0, size === 'xl' ? 4 : 3);
@@ -42,9 +47,9 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
             sizes="(min-width: 1100px) 760px, (min-width: 720px) 88vw, calc(100vw - 4.5rem)"
           />
         </div>
-      ) : d.cover ? (
+      ) : photo || d.cover ? (
         <Image
-          src={d.cover}
+          src={photo ?? d.cover!}
           alt=""
           widths={[360, 480, 560, 680, 800, 960, 1280]}
           sizes={
@@ -56,6 +61,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
           quality={76}
           loading={eager ? 'eager' : 'lazy'}
           class="tile__img"
+          style={focus ? `object-position:${focus}` : undefined}
         />
       ) : (
         <ProjectArt slug={project.id} fit="meet" />

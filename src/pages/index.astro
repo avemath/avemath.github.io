@@ -1,4 +1,5 @@
 ---
+import type { ImageMetadata } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
 import NowStrip from '@/components/NowStrip.astro';
@@ -12,6 +13,8 @@ import DepthGauge from '@/components/DepthGauge.astro';
 import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
+// The tall tile needs a tall photo: the whole robot on the bench, from its gallery.
+import rampageBench from '@/assets/projects/rampage/shop-lid.jpg';
 
 const projects = await getProjects();
 const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
@@ -31,11 +34,11 @@ const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
 //             tablet: land land | ram v2v | ram led | onr bell
 // Every area appears once per layout and every row is full. If you add or remove a tile, add its
 // area to all six layouts.
-const bento = [
+const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string }[] = [
   { slug: 'onr-intelligent-data-management', area: 'onr' },
   { slug: 'v2v-bsm-ofdm', area: 'v2v' },
   { slug: 'led-audio-spectrum', area: 'led' },
-  { slug: 'rampage', area: 'ram' },
+  { slug: 'rampage', area: 'ram', photo: rampageBench, focus: '50% 45%' },
   { slug: 'landspace', area: 'land' },
   { slug: 'bellhop-sim', area: 'bell' },
 ];
@@ -50,10 +53,14 @@ const bento = [
     <div class="home-flow">
       <section id="featured" class="section home-section zone" aria-labelledby="featured-title" data-section="featured">
         <span class="spine" aria-hidden="true"></span>
-        <div class="wrap split">
-          <div class="split__head">
+        <div class="wrap pinned">
+          <div class="pinned__head">
             <p class="eyebrow">Featured work</p>
-            <h2 id="featured-title" class="section-title split__title">A combat robot, a radio link, a title app and sponsored research</h2>
+            <h2 id="featured-title" class="section-title">
+              <span class="aud aud--hire">Radio, sound, a combat robot, a title app and my research</span>
+              <span class="aud aud--research">My research, then radio, sound, a robot and a title app</span>
+              <span class="aud aud--website">The engineering behind the sites: radio, sound, a robot, a title app and research</span>
+            </h2>
             <p class="section-lede split__lede">
               <span class="aud aud--hire">Every tile opens a case study with what I did and how.</span>
               <span class="aud aud--research">Research and communications work first, then the engineering and software behind it. Three tiles open live demos.</span>
@@ -72,7 +79,7 @@ const bento = [
             {
               bento.map((b) => {
                 const p = bySlug[b.slug];
-                return p ? <ProjectTile project={p} size="lg" metric style={`grid-area:${b.area}`} /> : null;
+                return p ? <ProjectTile project={p} size="lg" metric photo={b.photo} focus={b.focus} style={`grid-area:${b.area}`} /> : null;
               })
             }
           </div>
@@ -128,53 +135,15 @@ const bento = [
   /* Section order for each audience comes from src/lib/depth.ts (zoneStyles), together with each
      section's depth, so the order and the depth labels cannot drift apart. */
 
-  /* A pinned side heading: on wide screens the label and heading stay in the left column while
-     the work scrolls past on the right. Phones and tablets stack normally. */
   .split__more {
     margin-top: 1.25rem;
     font-size: 0.92rem;
     color: var(--text-soft);
   }
 
-  .corner {
-    display: none;
-  }
-
   @media (min-width: 1100px) {
-    .split {
-      display: grid;
-      grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
-      gap: clamp(2.5rem, 4vw, 4rem);
-      align-items: start;
-    }
-
-    .split__head {
-      position: sticky;
-      top: 6.5rem;
-      padding-left: 1.1rem;
-      /* A fine tick ruler down the pinned column: a short tick every 8px, a longer one every 40px. */
-      background:
-        repeating-linear-gradient(180deg, var(--line-strong) 0 1px, transparent 1px 40px) 0 0 / 9px 100% no-repeat,
-        repeating-linear-gradient(180deg, var(--line) 0 1px, transparent 1px 8px) 0 0 / 5px 100% no-repeat;
-      border-left: 1px solid var(--line);
-    }
-
-    .split__title {
-      font-size: clamp(1.75rem, 2.4vw, 2.25rem);
-    }
-
     .split__lede {
       font-size: 1rem;
-    }
-
-    .corner {
-      display: block;
-      margin-top: 2rem;
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
     }
   }
 
@@ -223,9 +192,20 @@ const bento = [
     }
   }
 
-  /* A tile that spans two rows lets its picture take the extra height. */
+  /* A tile that spans two rows lets its picture take the extra height, so the text sits at the
+     bottom with no gap under it. In the tall slot the picture also grows past its usual ratio. */
   .bento > :global(.tile) :global(.tile__media) {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+    min-height: 12rem;
+  }
+
+  .bento > :global(.tile) :global(.tile__body) {
+    flex: 0 0 auto;
+  }
+
+  .bento > :global(.tile) :global(.tile__img) {
+    position: absolute;
+    inset: 0;
   }
 
   /* Audience-specific intro lines. */
