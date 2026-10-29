@@ -4,7 +4,7 @@ short: Nicholas's portfolio
 type: client-site
 tags: [client-site]
 featured: false
-order: 6
+order: 9
 period: { start: "2026-10" }
 status: live
 summary: A portfolio and long-form résumé for a mechanical engineering student, styled like an engineering drawing, with his real CAD as a 3D model.

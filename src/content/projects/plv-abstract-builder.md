@@ -4,7 +4,7 @@ short: Abstract Builder
 type: software
 tags: [software, client-site]
 featured: false
-order: 7
+order: 11
 period: { start: "2026-10" }
 status: live
 summary: A private tool that turns a parcel's recorded documents into a run sheet, an Ownership Report and one finished abstract PDF with every document attached and linked.

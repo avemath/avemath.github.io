@@ -4,7 +4,7 @@ short: plvinc.com
 type: client-site
 tags: [client-site]
 featured: true
-order: 4
+order: 7
 period: { start: "2026-06", end: "2026-09" }
 status: live
 summary: A site for a two-person firm of Certified Professional Landmen that speaks to oil companies and confused landowners at the same time.

@@ -4,7 +4,7 @@ short: Swim intake system
 type: software
 tags: [software]
 featured: false
-order: 7
+order: 12
 period: { start: "2026-06" }
 status: live
 summary: A daily health intake and auto-generated lesson reports for my dad's Infant Swim Resource instruction business, built entirely on free Google tools.

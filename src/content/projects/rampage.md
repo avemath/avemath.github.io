@@ -4,7 +4,7 @@ short: RAMpage
 type: engineering
 tags: [engineering]
 featured: true
-order: 6
+order: 1
 period: { start: "2024-08", end: "2025-05" }
 status: complete
 summary: Senior design capstone. I wrote the control software for a 30 lb pneumatic combat robot, splitting weapon safety and live video across two controllers so neither could stall the other.

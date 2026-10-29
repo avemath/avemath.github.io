@@ -4,7 +4,7 @@ short: ONR research
 type: research
 tags: [research, engineering]
 featured: true
-order: 1
+order: 13
 period: { start: "2026" }
 status: ongoing
 summary: Graduate research on an Office of Naval Research project with Integer Technologies, helping distributed autonomous maritime systems decide which data matters and how to share it.

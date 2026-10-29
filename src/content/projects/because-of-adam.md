@@ -4,7 +4,7 @@ short: becauseofadam.org
 type: nonprofit
 tags: [nonprofit, client-site]
 featured: true
-order: 2
+order: 3
 period: { start: "2026-09" }
 status: live
 summary: The website for my family's drowning awareness nonprofit, built so a scared parent can find the facts fast and act on them tonight.

@@ -4,7 +4,7 @@ short: gracemaealterations.com
 type: client-site
 tags: [client-site, software]
 featured: true
-order: 5
+order: 8
 period: { start: "2026-04", end: "2026-09" }
 status: live
 summary: A bridal alterations studio site with interactive guides that explain bustles and hems better than words can, and inquiry forms that arrive ready to quote.

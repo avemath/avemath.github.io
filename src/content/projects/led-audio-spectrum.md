@@ -4,7 +4,7 @@ short: LED spectrum
 type: engineering
 tags: [engineering]
 featured: false
-order: 10
+order: 6
 period: { start: "2025", end: "2025" }
 status: complete
 summary: ESP32 firmware that turns a microphone into a 16-band spectrum on a 256-LED matrix, tuned by ear until quiet music across the room still reads.
