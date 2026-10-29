@@ -4,7 +4,7 @@ short: Landspace
 type: software
 tags: [software]
 featured: true
-order: 3
+order: 4
 period: { start: "2025" }
 status: live
 summary: A local-first workspace for mineral title work that maps parcels, imports messy runsheets, and flags problems in the chain of title on its own.

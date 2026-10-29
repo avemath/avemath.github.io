@@ -4,7 +4,7 @@ short: V2V over OFDM
 type: engineering
 tags: [engineering, research]
 featured: false
-order: 9
+order: 2
 period: { start: "2026-01", end: "2026-05" }
 status: complete
 summary: Two cars' safety messages sent through an 802.11p-style OFDM radio link I built in MATLAB and ran over real software-defined radios, ending in a time-to-collision brake warning.

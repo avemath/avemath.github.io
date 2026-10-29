@@ -4,7 +4,7 @@ short: Integer internship
 type: engineering
 tags: [engineering, research]
 featured: false
-order: 8
+order: 14
 period: { start: "2026-05", end: "2026-08" }
 status: complete
 summary: Acoustic characterization and underwater network simulation in support of autonomous maritime systems.

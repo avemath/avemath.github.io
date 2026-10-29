@@ -4,7 +4,7 @@ short: Signals
 type: engineering
 tags: [engineering, software]
 featured: false
-order: 11
+order: 10
 period: { start: "2026-10" }
 status: ongoing
 summary: "Interactive demos of the ideas behind my comms work: frequency hopping, constellations, bit error rates, matched filters and multipath."

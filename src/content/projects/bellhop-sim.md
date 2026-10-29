@@ -3,7 +3,7 @@ title: "BELLHOP Underwater Acoustic Simulator"
 short: "bellhopSim"
 type: engineering
 tags: [engineering, research]
-order: 12
+order: 5
 period: { start: "2026-05" }
 status: complete
 summary: Jupyter notebooks that drive the BELLHOP ray model from Python, to show how sound bends, fades and echoes underwater and what that does to a BPSK link.
