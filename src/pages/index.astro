@@ -10,6 +10,8 @@ import FieldNotes from '@/components/FieldNotes.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import Icon from '@/components/Icon.astro';
 import DepthGauge from '@/components/DepthGauge.astro';
+import RampageLive from '@/components/live/RampageLive.astro';
+import V2vLive from '@/components/live/V2vLive.astro';
 import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
@@ -81,7 +83,12 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
             {
               bento.map((b) => {
                 const p = bySlug[b.slug];
-                return p ? <ProjectTile project={p} size="lg" metric photo={b.photo} focus={b.focus} style={`grid-area:${b.area}`} /> : null;
+                return p ? (
+                  <ProjectTile project={p} size="lg" metric photo={b.photo} focus={b.focus} style={`grid-area:${b.area}`}>
+                    {b.slug === 'rampage' && <RampageLive slot="live" />}
+                    {b.slug === 'v2v-bsm-ofdm' && <V2vLive slot="live" />}
+                  </ProjectTile>
+                ) : null;
               })
             }
           </div>
@@ -382,6 +389,35 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
 
     .home-flow > :global(.section--tight) {
       padding-block: 1.9rem;
+    }
+  }
+
+  /* A live tile while it runs: its panel replaces the picture, and the tile grows to fit it. */
+  .bento :global(.tile__media[data-live-on]) {
+    aspect-ratio: auto;
+  }
+
+  .bento :global(.tile__media[data-live-on] > :not(.live)) {
+    display: none;
+  }
+
+  @media (max-width: 719px) {
+    .bento :global(.tile[data-live-on] .tile__inner) {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bento :global(.tile__media[data-live-on]) {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* At rest on a phone, the button sits under the small picture. */
+    .bento :global(.live__try) {
+      right: 0.4rem;
+      bottom: 0.4rem;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.66rem;
     }
   }
 

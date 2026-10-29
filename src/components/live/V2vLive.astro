@@ -1,0 +1,204 @@
+---
+// The V2V live tile: the case study's scenario (car 1 at 30 m/s, 20 m behind car 2 at 25 m/s)
+// with a closing-speed slider, the brake rule from V2V_TXRXf.m (warn when time to collision is
+// under 5.0 s), and the demo's receiver (src/lib/ofdm-rx.ts) cleaning up the packet's payload as
+// its four stages lock in order.
+import LiveShell from './LiveShell.astro';
+import { GAP_M, LEAD_V, TTC_WARN } from '@/lib/v2v-scenario';
+---
+
+<LiveShell
+  kind="v2v"
+  description={`A small version of my V2V link. Car 1 trails car 2 by ${GAP_M} m. Set how fast it closes, and the receiver computes the time to collision and recommends braking under ${TTC_WARN.toFixed(1)} s. A constellation shows the packet's payload cleaning up as each receiver stage locks.`}
+  href="/work/v2v-bsm-ofdm/#demo"
+  hrefLabel="Full receiver demo, stage by stage"
+>
+  <p slot="title" class="vl__title mono">V2V · BSM over OFDM</p>
+
+  <svg class="vl__road" viewBox="0 0 320 64" aria-hidden="true" data-vl-road>
+    <path d="M 0 40 H 320" class="vl__lane" />
+    <path d="M 0 58 H 320" class="vl__edge" />
+    <g data-vl-car1>
+      <rect x="-26" y="26" width="26" height="12" rx="3" class="vl__car vl__car--1" />
+      <text x="-13" y="20" text-anchor="middle" class="vl__lbl" data-vl-v1>30 m/s</text>
+    </g>
+    <g data-vl-car2>
+      <rect x="0" y="26" width="26" height="12" rx="3" class="vl__car" />
+      <text x="13" y="20" text-anchor="middle" class="vl__lbl">{LEAD_V} m/s</text>
+    </g>
+    <path d="" class="vl__gap" data-vl-gapline />
+    <text x="160" y="54" text-anchor="middle" class="vl__lbl" data-vl-gaplbl>{GAP_M} m</text>
+    <circle r="2.6" class="vl__pkt" data-vl-pkt cx="-10" cy="32" />
+  </svg>
+
+  <label class="vl__slider">
+    <span>Closing speed <output data-vl-out>5.0 m/s</output></span>
+    <input type="range" min="0" max="10" step="0.5" value="5" data-vl-closing aria-describedby="vl-ttc" />
+  </label>
+
+  <div class="vl__ttc" id="vl-ttc">
+    <p class="mono">TTC <b data-vl-ttc>4.0 s</b></p>
+    <p class="vl__warn" data-vl-warn aria-live="polite">Brake recommended</p>
+  </div>
+
+  <div class="vl__rx">
+    <canvas width="240" height="240" aria-hidden="true" data-vl-plot></canvas>
+    <div>
+      <p class="vl__label mono">Receiver stages</p>
+      <ol class="vl__stages" data-vl-stages>
+        <li data-st="cfo">Coarse CFO correction</li>
+        <li data-st="lin">Linear phase fit and polarity</li>
+        <li data-st="pll">Costas loop</li>
+        <li data-st="mmse">MMSE equalizer</li>
+      </ol>
+      <p class="vl__ber mono" data-vl-ber aria-live="polite"></p>
+      <button type="button" class="btn btn--small" data-vl-again>Receive again</button>
+    </div>
+  </div>
+  <p class="vl__note">A browser model of my MATLAB receiver at 5 kHz of carrier offset and 18 dB SNR, the same defaults as the case study's demo.</p>
+</LiveShell>
+
+<style>
+  .vl__title,
+  .vl__label {
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .vl__road {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .vl__lane {
+    stroke: var(--line-strong);
+    stroke-dasharray: 8 8;
+  }
+
+  .vl__edge {
+    stroke: var(--line-strong);
+  }
+
+  .vl__car {
+    fill: var(--accent);
+  }
+
+  .vl__car--1 {
+    fill: var(--amber-line);
+  }
+
+  .vl__lbl {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--text-soft);
+  }
+
+  .vl__gap {
+    stroke: var(--muted);
+    stroke-dasharray: 2 3;
+  }
+
+  .vl__pkt {
+    fill: var(--accent-ink);
+  }
+
+  .vl__slider {
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.84rem;
+  }
+
+  .vl__slider span {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .vl__slider output {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  .vl__slider input {
+    accent-color: var(--accent-ink);
+  }
+
+  .vl__ttc {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .vl__ttc b {
+    font-size: 1.2rem;
+    color: var(--text);
+  }
+
+  .vl__warn {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.4rem;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--text-soft);
+  }
+
+  /* Red text on the panel itself, with a heavier red border; a red tint behind it would cost
+     contrast in the dark theme. */
+  .vl__warn[data-on] {
+    border: 2px solid var(--danger);
+    color: var(--danger);
+  }
+
+  .vl__rx {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .vl__rx canvas {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    border-radius: 0.4rem;
+  }
+
+  .vl__stages {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0.35rem 0 0.4rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .vl__stages li::before {
+    content: '\25CB  ';
+  }
+
+  .vl__stages li[data-on] {
+    color: var(--text);
+  }
+
+  .vl__stages li[data-on]::before {
+    content: '\25CF  ';
+    color: var(--accent-ink);
+  }
+
+  .vl__ber {
+    margin-bottom: 0.45rem;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+  }
+
+  .vl__note {
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+</style>
