@@ -173,6 +173,15 @@ The research section has an open layout with no card. The sound speed profile si
 - **Signatures play once:** hovering or focusing a tile plays a short animation on its drawn art (the constellation settles in, bars rise, rays grow out from the source, the hop pattern steps through, ripples spread). Transform and opacity only, under a second, nothing at rest, none on touch screens or with reduced motion. The noise effect is gone.
 - **Hero sound:** the name now uses 80 subcarriers from 500 Hz to 3 kHz (at most 57 tones at once), the sweep runs 400 Hz to 3.2 kHz, a second-order low-pass at 3.4 kHz and 30 ms raised-cosine fades shape the buffer, and it plays at a lower level. The waterfall shows 0 to 4 kHz and is still the FFT of exactly the buffer that plays. Hear it restarts the cycle from quiet water, so the sweep and the name are heard and seen together.
 
+### 11. How it works
+
+The hero panel has two tabs, Display and How it works (arrow keys, Home and End). The tab row shows only once the head script has marked the page as running JavaScript, before first paint, so it never shifts the layout. The walkthrough's code and styles load the first time its tab opens.
+
+- **Five steps** of the real pipeline: the bitmap, one OFDM symbol per row, the cyclic prefix and its fade, the sync chirp, and the receiver FFT. Each has two sentences, an excerpt of the code that runs, and a small live view of that step's output.
+- **The excerpts are the running code.** They are cut at build time from `src/lib/tx-raster.ts` and `src/lib/tx-signal.ts`, between `#region how:` markers, with their real line numbers. The hero and the walkthrough call the same `synthesize()` and `receive()`; the hero uses the defaults, and its output is bit for bit what it was.
+- **Break it on purpose:** turn off the cyclic prefix (the echo smears each row into the next), turn off the fade (the spectrum at a join jumps up, and Hear it plays the clicks), or raise the noise until the name fades into static. A small received waterfall shows the result, and Reset puts everything back.
+- **One honest difference:** the walkthrough gives the water a second path, 1 ms late, so the prefix has an echo to absorb. The display tab sends the signal without it, and the walkthrough says so.
+
 ## Deliberately not borrowed
 
 Nicholas's site (`/nmdomke/`) was checked only to stay clear of it. Not used here:
