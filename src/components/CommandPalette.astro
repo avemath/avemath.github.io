@@ -12,16 +12,21 @@ type Item = { id: string; group: string; label: string; hint?: string; href?: st
 
 const homeSections: Item[] = [
   ['featured', 'Featured work'],
-  ['websites', "Websites I've built"],
   ['research', 'Research'],
-  ['experience', 'Experience'],
-  ['recommendations', 'Recommendations'],
-  ['skills', 'Skills'],
+  ['websites', "Websites I've built"],
   ['field-notes', 'Field notes'],
   ['contact', 'Contact'],
+].map(([id, label]) => ({ id: `s-${id}`, group: 'On this page', label, href: onHome ? `#${id}` : `/#${id}` }));
+
+// Experience, skills and recommendations are sections of the About page.
+const onAbout = Astro.url.pathname.replace(/\/$/, '') === '/about';
+const aboutSections: Item[] = [
+  ['experience', 'Experience'],
+  ['skills', 'Skills'],
+  ['recommendations', 'Recommendations'],
 ]
   .filter(([id]) => id !== 'recommendations' || hasRecommendations)
-  .map(([id, label]) => ({ id: `s-${id}`, group: 'On this page', label, href: onHome ? `#${id}` : `/#${id}` }));
+  .map(([id, label]) => ({ id: `a-${id}`, group: onAbout ? 'On this page' : 'About', label, href: onAbout ? `#${id}` : `/about/#${id}` }));
 
 const items: Item[] = [
   { id: 'p-home', group: 'Pages', label: 'Home', href: '/' },
@@ -31,6 +36,7 @@ const items: Item[] = [
   { id: 'p-resume', group: 'Pages', label: 'Résumé', href: '/resume/', keywords: 'resume cv' },
   { id: 'p-contact', group: 'Pages', label: 'Contact', href: '/contact/', keywords: 'email message' },
   ...homeSections,
+  ...aboutSections,
   ...projects.map((p) => ({
     id: `w-${p.id}`,
     group: 'Projects',

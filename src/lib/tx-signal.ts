@@ -16,13 +16,18 @@ export const FRAME_HZ = FS / SYMBOL; // waterfall rows per second
 export const VIEW_ROWS = 160; // frames on screen, newest at the top, about 6 s
 
 export const LINES = ['AVERY', 'MATHERNE'];
-/** Subcarriers the name spans, centered in the band (about 440 Hz to 7.6 kHz). */
-export const TEXT_BINS = 228;
-export const FIRST_BIN = (BINS - TEXT_BINS) / 2;
+/** Subcarriers the name spans: 80 of them, from 500 Hz to just under 3 kHz, where tones are easy
+ *  on the ear. Fewer, wider letter pixels also mean fewer tones sound at once. */
+export const TEXT_BINS = 80;
+export const FIRST_BIN = 16;
+/** The display shows 0 to 4 kHz, the lower half of the band, so the name fills most of it. */
+export const SHOW_BINS = 128;
+/** A display column is twice as wide as a row is tall, so the name is drawn twice as tall in rows. */
+export const STRETCH = 2;
 
 // Frame layout of one transmission.
 export const LEAD = 8; // quiet water before the sweep
-export const CHIRP = { frames: 24, f0: 300, f1: 7500 };
+export const CHIRP = { frames: 24, f0: 400, f1: 3200 };
 export const GAP = 5;
 export const NAME_START = LEAD + CHIRP.frames + GAP;
 
@@ -31,7 +36,7 @@ export const NAME_START = LEAD + CHIRP.frames + GAP;
 export const holdFrame = (rows: number) => NAME_START + Math.floor(rows / 2) + VIEW_ROWS / 2;
 
 // Build-time estimate of the raster, used to place the still picture where the live name lands.
-export const STILL = { font: 41, cap: 29, gap: 13, rows: 72 };
+export const STILL = { font: 15.26, cap: 10.68, gap: 4.88, rows: 55 };
 
 /** Radix-2 FFT in place. Pass sign -1 for the forward transform and +1 for the inverse (unscaled). */
 export function makeFft(size: number) {
@@ -168,11 +173,48 @@ export async function synthesize(mask: Float32Array, rows: number, pause: () => 
     addNoise(out, rand, from, Math.min(out.length, from + 16384));
     await pause();
   }
+
+  // A gentle low-pass (second-order Butterworth at 3.4 kHz) softens the edges of the tones, then
+  // 30 ms raised-cosine fades at both ends, so the sound starts and stops without a click. This is
+  // the buffer that plays and the one the waterfall analyzes, so the picture shows exactly this.
+  lowPass(out, 3400);
+  const fadeLen = Math.round(0.03 * FS);
+  for (let n = 0; n < fadeLen; n++) {
+    const g = 0.5 - 0.5 * Math.cos((Math.PI * n) / fadeLen);
+    out[n] *= g;
+    out[out.length - 1 - n] *= g;
+  }
+
   let peak = 0;
   for (const v of out) peak = Math.max(peak, Math.abs(v));
   const g = 0.9 / peak;
   for (let n = 0; n < out.length; n++) out[n] *= g;
   return out;
+}
+
+/** Second-order Butterworth low-pass, in place (a standard biquad). */
+function lowPass(x: Float32Array, fc: number) {
+  const w = (2 * Math.PI * fc) / FS;
+  const alpha = Math.sin(w) / Math.SQRT2;
+  const cw = Math.cos(w);
+  const a0 = 1 + alpha;
+  const b0 = (1 - cw) / 2 / a0;
+  const b1 = (1 - cw) / a0;
+  const a1 = (-2 * cw) / a0;
+  const a2 = (1 - alpha) / a0;
+  let x1 = 0;
+  let x2 = 0;
+  let y1 = 0;
+  let y2 = 0;
+  for (let n = 0; n < x.length; n++) {
+    const x0 = x[n];
+    const y0 = b0 * x0 + b1 * x1 + b0 * x2 - a1 * y1 - a2 * y2;
+    x2 = x1;
+    x1 = x0;
+    y2 = y1;
+    y1 = y0;
+    x[n] = y0;
+  }
 }
 
 /** A low noise floor, so the water is never perfectly quiet. Adds to out[from] up to out[to]. */

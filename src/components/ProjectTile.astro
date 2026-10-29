@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Icon from './Icon.astro';
 import ProjectArt from './ProjectArt.astro';
 import BrowserFrame from './BrowserFrame.astro';
@@ -12,14 +13,22 @@ interface Props {
   headingLevel?: 'h2' | 'h3';
   style?: string;
   eager?: boolean;
+  /** Show the project's first metric as a large numeral, where it has real ones. */
+  metric?: boolean;
+  /** A different photo for this tile, such as a portrait shot for a tall slot. */
+  photo?: ImageMetadata;
+  /** Where the photo is anchored when it is cropped to the tile. */
+  focus?: string;
 }
 
-const { project, size = 'md', headingLevel: H = 'h3', style, eager = false } = Astro.props;
+const { project, size = 'md', headingLevel: H = 'h3', style, eager = false, metric = false, photo, focus } = Astro.props;
 const d = project.data;
 const href = projectHref(project);
 const chips = d.stack.slice(0, size === 'xl' ? 4 : 3);
 const finished = d.status === 'complete' || d.status === 'archived';
 const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.start : null));
+// Only measured numbers from the case study, and never for limited-detail work.
+const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefined;
 ---
 
 <article class={`tile tile--${size} card card--lift`} style={style} data-reveal data-tags={[d.type, ...d.tags].join(' ')}>
@@ -38,9 +47,9 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
             sizes="(min-width: 1100px) 760px, (min-width: 720px) 88vw, calc(100vw - 4.5rem)"
           />
         </div>
-      ) : d.cover ? (
+      ) : photo || d.cover ? (
         <Image
-          src={d.cover}
+          src={photo ?? d.cover!}
           alt=""
           widths={[360, 480, 560, 680, 800, 960, 1280]}
           sizes={
@@ -52,9 +61,10 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
           quality={76}
           loading={eager ? 'eager' : 'lazy'}
           class="tile__img"
+          style={focus ? `object-position:${focus}` : undefined}
         />
       ) : (
-        <ProjectArt slug={project.id} />
+        <ProjectArt slug={project.id} fit="meet" />
       )
     }
     {d.links.live && !(size === 'xl' && d.cover) && <span class="tile__live mono"><span class="status-dot" aria-hidden="true" />{displayUrl(d.links.live)}</span>}
@@ -76,6 +86,14 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
       <a href={href} class="stretched">{d.title}</a>
     </H>
     <p class="tile__summary">{size === 'md' ? (d.outcome ?? d.summary) : d.summary}</p>
+    {
+      lead && (
+        <p class="tile__metric">
+          <span class="tile__metric-v">{lead.value}</span>
+          <span class="label">{lead.label}</span>
+        </p>
+      )
+    }
     {size !== 'md' && d.outcome && <p class="tile__outcome mono">→ {d.outcome}</p>}
 
     <ul class="tile__chips" aria-label="Built with">
@@ -117,6 +135,29 @@ const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.star
     flex: 1;
     flex-direction: column;
     min-width: 0;
+  }
+
+  /* A measured number from the case study, set large. */
+  .tile__metric {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .tile__metric-v {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 3vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Drawn art is shown whole, on its own background color, however tall the tile grows. */
+  .tile__media:has(> :global(.art)) {
+    background: color-mix(in oklab, var(--surface-2) 70%, var(--bg));
   }
 
   .tile__media {

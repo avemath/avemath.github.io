@@ -24,7 +24,7 @@ const short = (m: number) => m.toLocaleString('en-US');
     <span class="gauge__zone" data-gauge-zone data-ink>{slots[0].zone}</span>
     <span class="gauge__section" data-gauge-section data-ink>{sectionNames.top}</span>
   </p>
-  <div class="gauge__scale">
+  <div class="gauge__scale" style={`--n:${slots.length}`}>
     <span class="gauge__marker" aria-hidden="true" data-gauge-marker></span>
     <ol>
       {
@@ -59,14 +59,15 @@ const short = (m: number) => m.toLocaleString('en-US');
     display: none;
   }
 
-  /* Only where the page margin can hold it. At 1440px the content column starts at 152px; the
-     gauge ends at 112px, so there are 40px between them. No panel: it sits on the water and
-     takes its ink from the band under it (the script sets data-deep over dark water). */
+  /* Only where the page margin can hold it. It sits on the right edge, since the signal trace
+     runs down the left gutter: at 1440px the content column ends 152px from the edge and the
+     gauge takes the outer 112px, so there are 40px between them. No panel: it sits on the water
+     and takes its ink from the band under it (the script sets data-deep over dark water). */
   @media (min-width: 1440px) {
     .gauge {
       position: fixed;
       z-index: 30;
-      left: 1rem;
+      right: 1rem;
       top: 50%;
       translate: 0 -50%;
       display: grid;
@@ -121,16 +122,47 @@ const short = (m: number) => m.toLocaleString('en-US');
   }
 
   .gauge__scale {
+    --scale-h: min(44vh, 22rem);
     position: relative;
-    height: min(44vh, 22rem);
+    height: var(--scale-h);
     margin-left: 0.3rem;
-    border-left: 1px solid var(--line-strong);
+  }
+
+  /* The scale line is drawn one segment per mark, so each segment takes the ink of the band
+     behind it, like the text. Ticks and line use the muted ink, which passes on every band. */
+  .gauge__mark::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1px;
+    height: calc(var(--scale-h) / (var(--n) - 1));
+    background: var(--muted);
+  }
+
+  .gauge__mark:last-child::before {
+    display: none;
+  }
+
+  /* Every line of the gauge carries a soft halo in the color of its own water, so it stays
+     legible for the moment it crosses a band's wave edge. */
+  .gauge [data-ink] {
+    --halo: var(--band-2);
+    text-shadow:
+      0 0 2px var(--halo),
+      0 0 5px var(--halo),
+      0 0 9px var(--halo);
+  }
+
+  :global([data-theme='dark']) .gauge [data-ink],
+  :global(:root:not([data-theme='dark'])) .gauge [data-deep] {
+    --halo: var(--band-9);
   }
 
   .gauge__mark {
     position: absolute;
     left: 0;
-    top: calc(var(--i) / 11 * 100%);
+    top: calc(var(--i) / (var(--n) - 1) * 100%);
     translate: 0 -50%;
   }
 
@@ -155,7 +187,7 @@ const short = (m: number) => m.toLocaleString('en-US');
   .gauge__tick {
     width: 0.45rem;
     height: 1px;
-    background: var(--line-strong);
+    background: var(--muted);
   }
 
   .gauge__link:hover .gauge__tick,
@@ -300,22 +332,47 @@ const short = (m: number) => m.toLocaleString('en-US');
   const audience = () => (document.querySelector<HTMLInputElement>('input[name="audience"]:checked')?.value ?? 'hire') as Audience;
 
   // The gauge is fixed, so where its parts sit in the viewport only changes on resize.
-  let inked: { el: HTMLElement; y: number }[] = [];
-  let inkTops: number[] = [];
+  let inked: { el: HTMLElement; x: number; y: number }[] = [];
+  let edges: { top: number; wave: number; shift: number }[] = [];
+
+  // The wave edge each band rises with (the mask in global.css): this curve across a 1440 by 40
+  // tile, shifted 317px per band. waveAt gives the edge's depth into the band at a page x, so
+  // each line of the gauge can take the ink of the water that is really behind it.
+  const WAVE: [number, number][][] = [
+    [[0, 22], [160, 8], [300, 6], [470, 18]],
+    [[470, 18], [640, 30], [760, 38], [960, 26]],
+    [[960, 26], [1160, 14], [1280, 8], [1440, 22]],
+  ];
+  const waveLut = (() => {
+    const pts: [number, number][] = [];
+    for (const [a, b, c, d] of WAVE)
+      for (let i = 0; i <= 48; i++) {
+        const t = i / 48, u = 1 - t;
+        const f = (k: 0 | 1) => u * u * u * a[k] + 3 * u * u * t * b[k] + 3 * u * t * t * c[k] + t * t * t * d[k];
+        pts.push([f(0), f(1)]);
+      }
+    return pts;
+  })();
+  const waveAt = (x: number) => {
+    const tx = ((x % 1440) + 1440) % 1440;
+    let i = 1;
+    while (i < waveLut.length - 1 && waveLut[i][0] < tx) i++;
+    const [x0, y0] = waveLut[i - 1], [x1, y1] = waveLut[i];
+    return (y0 + ((y1 - y0) * (tx - x0)) / (x1 - x0 || 1)) / 40;
+  };
 
   function measure() {
     inked = [...(gauge?.querySelectorAll<HTMLElement>('[data-ink]') ?? [])].map((el) => {
       const r = el.getBoundingClientRect();
-      return { el, y: r.top + r.height / 2 };
+      return { el, x: r.left + r.width / 2, y: r.top + r.height / 2 };
     });
     tops = orders[audience()].map((id) => {
       const el = document.getElementById(id);
       return el ? el.getBoundingClientRect().top + scrollY : Infinity;
     });
-    // For ink, a band begins below its wave edge: above the crest the band before still shows.
-    inkTops = orders[audience()].map((id, k) => {
+    edges = orders[audience()].map((id, k) => {
       const el = document.getElementById(id);
-      return el ? tops[k] + parseFloat(getComputedStyle(el).borderTopWidth || '0') : Infinity;
+      return { top: tops[k], wave: el ? parseFloat(getComputedStyle(el).borderTopWidth || '0') : 0, shift: -317 * slots[k].band };
     });
     update();
   }
@@ -343,11 +400,14 @@ const short = (m: number) => m.toLocaleString('en-US');
     links.forEach((a) => (Number(a.dataset.slot) === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
 
     // Each part of the gauge takes the ink of the band under its own center.
-    inked.forEach(({ el, y }) => {
+    inked.forEach(({ el, x, y }) => {
       const at = scrollY + y;
       let j = 0;
-      while (j < n - 1 && inkTops[j + 1] <= at) j++;
-      el.toggleAttribute('data-deep', j >= DEEP_FROM);
+      while (j < n - 1 && edges[j + 1].top <= at) j++;
+      // Inside a band's wave edge, the band above still shows wherever the wave has not reached.
+      const e = edges[j];
+      if (j > 0 && at - e.top < e.wave * waveAt(x - e.shift)) j--;
+      el.toggleAttribute('data-deep', slots[j].band >= DEEP_FROM);
     });
 
     // Signal strength drops with depth until the receiver on the seafloor locks on.

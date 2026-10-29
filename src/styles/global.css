@@ -383,7 +383,7 @@
 }
 
 .home-flow > .zone,
-.descent > .zone + .zone,
+.descent > .zone ~ .zone,
 .now.zone,
 .site-footer.zone {
   --wave: clamp(1.25rem, 2.6vw, 2.5rem);
@@ -404,6 +404,188 @@
 .site-footer.zone {
   content-visibility: auto;
   contain-intrinsic-size: auto 1100px;
+}
+
+/* ------------------------------------------------------------------
+   Pinned side headings. From 1100px a section's label and heading stay
+   in a left column, with a fine tick ruler, while its content scrolls
+   on the right. Phones and tablets stack normally.
+   ------------------------------------------------------------------ */
+.corner {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (min-width: 1100px) {
+  .pinned {
+    display: grid;
+    grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+    gap: clamp(2.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  .pinned__head {
+    position: sticky;
+    top: 6.5rem;
+    padding-left: 1.1rem;
+    /* A short tick every 8px and a longer one every 40px. */
+    background:
+      repeating-linear-gradient(180deg, var(--line-strong) 0 1px, transparent 1px 40px) 0 0 / 9px 100% no-repeat,
+      repeating-linear-gradient(180deg, var(--line) 0 1px, transparent 1px 8px) 0 0 / 5px 100% no-repeat;
+    border-left: 1px solid var(--line);
+  }
+
+  .pinned__head .section-title {
+    font-size: clamp(1.75rem, 2.4vw, 2.25rem);
+  }
+
+  .pinned__head .corner {
+    display: block;
+    margin-top: 2rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   The signal trace: the page's spine. A thin waveform runs down the
+   left gutter of the home page from the transmitter in the hero to the
+   receiver in the footer, with a node at each section. Each section
+   draws its own segment from its slot's trace (src/lib/depth.ts), so
+   the noise grows with depth and the trace follows any audience order
+   without measuring anything. It is decorative and hidden from screen
+   readers; the depth gauge carries the same depths as links.
+   ------------------------------------------------------------------ */
+.spine {
+  display: none;
+}
+
+.home .spine,
+body:has(.home) .site-footer .spine {
+  --spine-x: max(calc(var(--gutter) / 2 - 7px), calc((100% - 76rem) / 4 + var(--gutter) / 2 - 7px));
+  display: block;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: var(--spine-x);
+  width: 14px;
+  pointer-events: none;
+  /* The node: a small ring on the trace, level with the section's label. */
+  background: radial-gradient(circle at 7px var(--node-top), var(--accent) 0 3px, var(--bg) 3.5px 4.5px, transparent 5px) no-repeat;
+}
+
+.spine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  -webkit-mask: var(--trace) 0 0 / 14px 128px repeat-y;
+  mask: var(--trace) 0 0 / 14px 128px repeat-y;
+  opacity: 0.6;
+}
+
+/* The depth beside each node, on the outside of the trace, where the margin has room for it. */
+.spine::after {
+  content: var(--node, '') / '';
+  position: absolute;
+  top: calc(var(--node-top) - 0.5rem);
+  right: calc(100% + 0.3rem);
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  line-height: 1rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+@media (min-width: 1440px) {
+  .spine::after {
+    display: block;
+  }
+}
+
+.home-flow > .section {
+  --node-top: calc(var(--wave, 0px) + clamp(3rem, 7vw, 6rem) + 0.45rem);
+}
+
+.home-flow > .section--tight {
+  --node-top: calc(var(--wave, 0px) + clamp(2.25rem, 5vw, 4rem) + 0.45rem);
+}
+
+/* TX: the trace starts at the transmitter, level with the hero's eyebrow. */
+.hero .spine {
+  --node-top: calc(clamp(3.25rem, 7vw, 5.5rem) + 0.45rem);
+}
+
+.hero .spine::before {
+  top: var(--node-top);
+}
+
+.hero .spine::after {
+  content: 'TX' / '';
+}
+
+.now .spine {
+  --node-top: calc(var(--wave, 0px) + 3.8rem);
+}
+
+/* RX: the trace ends at the receiver, level with the received frame. */
+.site-footer .spine {
+  --node-top: calc(var(--wave, 0px) + 11.2rem);
+}
+
+.site-footer .spine::before {
+  bottom: auto;
+  height: var(--node-top);
+}
+
+.site-footer .spine::after {
+  content: 'RX' / '';
+}
+
+/* Phones: just a faint straight line at the very edge, so it never crowds the text. */
+@media (max-width: 719px) {
+  .home .spine,
+  body:has(.home) .site-footer .spine {
+    left: 0;
+    width: 7px;
+    background: none;
+  }
+
+  .spine::before {
+    left: 5px;
+    width: 1px;
+    -webkit-mask: none;
+    mask: none;
+    opacity: 0.35;
+  }
+}
+
+/* It draws itself down each section as the section scrolls into view. Static under reduced
+   motion and where scroll-driven animation is not supported. The hero's segment is on screen
+   from the start, so it is always drawn. */
+@keyframes spine-draw {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    html:not([data-motion='reduce']) .home-flow .spine,
+    html:not([data-motion='reduce']) body:has(.home) .site-footer .spine {
+      animation: spine-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
 }
 
 /* Soft light rays from the surface, in the top two bands. They fade with depth and sway slowly. */
