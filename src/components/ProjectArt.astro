@@ -97,7 +97,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
           const h = b * 16;
           return (
             <g>
-              <rect x={x} y={310 - h} width="17" height={h} rx="2" class="art-line m-bar" style={`animation-delay:${(i % 5) * -0.37}s`} />
+              <rect x={x} y={310 - h} width="17" height={h} rx="2" class="art-line m-bar" style={`animation-delay:${i * 30}ms`} />
               <path d={`M ${x} ${300 - h} H ${x + 17}`} class="art-hot" />
             </g>
           );
@@ -118,7 +118,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
             const per = 150 + a * 70;
             let d = `M 70 188`;
             for (let x = 70; x <= W; x += 6) d += ` L ${x} ${(188 - s * amp * Math.sin(((x - 70) / per) * Math.PI)).toFixed(1)}`;
-            return <path d={d} class={i === 2 && s === 1 ? 'art-hot m-draw' : 'art-line m-draw'} stroke-opacity={i === 2 && s === 1 ? 1 : 0.9 - i * 0.13} />;
+            return <path d={d} class={i === 2 && s === 1 ? 'art-hot m-draw' : 'art-line m-draw'} stroke-opacity={i === 2 && s === 1 ? 1 : 0.9 - i * 0.13} style={`transform-origin:70px 188px;animation-delay:${i * 50}ms`} />;
           }),
         )}
         <circle cx="70" cy="188" r="5" class="art-dot" />
@@ -135,11 +135,11 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
           <path d={`M 60 ${86 + p * 18} H 540`} class="art-faint" />
         ))}
         {hops.map((h, t) => (
-          <rect x={64 + t * 34} y={80 + h.pair * 18 + (h.bit ? 0 : 7)} width="26" height="6" rx="1.5" class="art-line" />
+          <rect x={64 + t * 34} y={80 + h.pair * 18 + (h.bit ? 0 : 7)} width="26" height="6" rx="1.5" class="art-line m-step" style={`animation-delay:${t * 45}ms`} />
         ))}
         <path
           d={hops.map((h, t) => `${t ? 'L' : 'M'} ${77 + t * 34} ${83 + h.pair * 18 + (h.bit ? 0 : 7)}`).join(' ')}
-          class="art-hot m-dash"
+          class="art-hot m-fade"
           stroke-dasharray="4 5"
         />
         <text x="24" y="40" class="art-label">FH-BFSK · 13 TONE PAIRS</text>
@@ -173,7 +173,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
           <path d={surface(80 + i * 110, 8 + i * 3, i * 0.9)} class="art-faint" />
         ))}
         {links.map(([a, b]) => (
-          <line x1={nodes[a].x} y1={nodes[a].y} x2={nodes[b].x} y2={nodes[b].y} class="art-line m-dash" stroke-opacity=".6" stroke-dasharray="3 6" />
+          <line x1={nodes[a].x} y1={nodes[a].y} x2={nodes[b].x} y2={nodes[b].y} class="art-line m-fade" stroke-opacity=".6" stroke-dasharray="3 6" />
         ))}
         {nodes.map((n, i) => (
           <g>
@@ -190,7 +190,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
     slug === 'integer-internship' && (
       <g>
         {[0, 1, 2, 3, 4, 5].map((i) => (
-          <path d={`M 60 300 Q ${200 + i * 40} ${40 + i * 18} 560 ${120 + i * 34}`} class="art-line m-draw" stroke-opacity={0.25 + (i % 3) * 0.2} />
+          <path d={`M 60 300 Q ${200 + i * 40} ${40 + i * 18} 560 ${120 + i * 34}`} class="art-line m-draw" stroke-opacity={0.25 + (i % 3) * 0.2} style={`transform-origin:60px 300px;animation-delay:${i * 50}ms`} />
         ))}
         <path d={burst(300, 40, 9)} class="art-hot" />
         <circle cx="60" cy="300" r="5" class="art-dot" />
@@ -213,7 +213,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
           <rect x="70" y="50" width="70" height="44" rx="3" />
           <rect x="160" y="50" width="70" height="44" rx="3" />
           <rect x="95" y="140" width="110" height="60" rx="30" stroke-opacity=".7" />
-          <path d="M 105 94 V 140 M 195 94 V 120" class="m-dash" stroke-dasharray="3 4" stroke-opacity=".7" />
+          <path d="M 105 94 V 140 M 195 94 V 120" class="m-fade" stroke-dasharray="3 4" stroke-opacity=".7" />
         </g>
         <text x="255" y="128" class="art-chip">PICO W</text>
         <text x="345" y="128" class="art-chip">PI 4B</text>
@@ -236,7 +236,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
             </g>
           ))}
         </g>
-        <path d="M 196 190 H 236" class="art-hot m-dash" stroke-dasharray="4 5" />
+        <path d="M 196 190 H 236" class="art-hot m-fade" stroke-dasharray="4 5" />
         <g transform="translate(240 110)">
           <rect width="120" height="160" rx="8" />
           {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -246,7 +246,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
             <path d={`M ${40 + i * 27} 0 V 160`} stroke-opacity=".3" />
           ))}
         </g>
-        <path d="M 376 190 H 416" class="art-hot m-dash" stroke-dasharray="4 5" />
+        <path d="M 376 190 H 416" class="art-hot m-fade" stroke-dasharray="4 5" />
         <g transform="translate(420 110)">
           <path d="M 0 10 Q 0 0 10 0 H 92 L 120 28 V 150 Q 120 160 110 160 H 10 Q 0 160 0 150 Z" />
           <path d="M 92 0 V 28 H 120" />
@@ -273,7 +273,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
             <path d={`M 14 ${24 + i * 20} H ${90 - (i % 3) * 14}`} stroke-opacity=".5" />
           ))}
         </g>
-        <path d="M 196 190 H 236" class="art-hot m-dash" stroke-dasharray="4 5" />
+        <path d="M 196 190 H 236" class="art-hot m-fade" stroke-dasharray="4 5" />
         <g transform="translate(240 110)">
           <rect width="120" height="160" rx="6" />
           {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -284,7 +284,7 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
           <circle cx="10" cy="80" r="3" class="art-dot" />
           <circle cx="10" cy="124" r="3" class="art-dot" opacity=".5" />
         </g>
-        <path d="M 376 190 H 416" class="art-hot m-dash" stroke-dasharray="4 5" />
+        <path d="M 376 190 H 416" class="art-hot m-fade" stroke-dasharray="4 5" />
         <g transform="translate(420 110)">
           <path d="M 0 10 Q 0 0 10 0 H 92 L 120 28 V 150 Q 120 160 110 160 H 10 Q 0 160 0 150 Z" />
           <path d="M 92 0 V 28 H 120" />
@@ -388,10 +388,14 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
     fill: var(--accent);
   }
 
+  /* Each signature plays a short animation once while its tile is hovered or focused: the
+     constellation settles in, bars rise, rays grow out along their paths, the hop pattern steps
+     through, ripples spread. Transform and opacity only, under a second, nothing at rest, and
+     none on touch screens or with reduced motion. */
   .m-tight,
-  .m-ripple {
+  .m-ripple,
+  .m-draw {
     transform-box: view-box;
-    transition: scale 1.2s var(--ease-out-expo);
   }
 
   .m-bar {
@@ -399,49 +403,68 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
     transform-origin: 50% 100%;
   }
 
-  .m-draw {
-    stroke-dasharray: 900;
-    stroke-dashoffset: 0;
-  }
-
-  /* Gentle motion only while the tile or panel around the art is hovered or focused. */
-  @media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-tight {
-      scale: 0.62;
-    }
-
-    :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-ripple {
-      scale: 1.12;
+      animation: art-settle 0.8s var(--ease-out-expo) both;
     }
 
     :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-bar {
-      animation: art-bar 1.6s ease-in-out infinite alternate;
-    }
-
-    :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-dash {
-      animation: art-dash 1.2s linear infinite;
+      animation: art-rise 0.5s var(--ease-out-expo) both;
     }
 
     :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-draw {
-      animation: art-draw 1.8s var(--ease-out-expo) both;
+      animation: art-grow 0.6s var(--ease-out-expo) both;
+    }
+
+    :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-step {
+      animation: art-step 0.25s ease-out both;
+    }
+
+    :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-ripple {
+      animation: art-spread 0.9s var(--ease-out-expo) both;
+    }
+
+    :global(html:not([data-motion='reduce']) :is(.tile, .case__art):is(:hover, :focus-within)) .m-fade {
+      animation: art-fade 0.6s ease-out both;
     }
   }
 
-  @keyframes art-bar {
-    to {
-      scale: 1 0.82;
-    }
-  }
-
-  @keyframes art-dash {
-    to {
-      stroke-dashoffset: -18;
-    }
-  }
-
-  @keyframes art-draw {
+  @keyframes art-settle {
     from {
-      stroke-dashoffset: 900;
+      opacity: 0.35;
+      scale: 1.9;
+    }
+  }
+
+  @keyframes art-rise {
+    from {
+      scale: 1 0.15;
+    }
+  }
+
+  @keyframes art-grow {
+    from {
+      opacity: 0;
+      scale: 0.05 1;
+    }
+  }
+
+  @keyframes art-step {
+    from {
+      opacity: 0.15;
+    }
+  }
+
+  @keyframes art-spread {
+    from {
+      opacity: 0.3;
+      scale: 0.5;
+    }
+  }
+
+  @keyframes art-fade {
+    from {
+      opacity: 0.1;
     }
   }
 </style>

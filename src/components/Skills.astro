@@ -1,12 +1,11 @@
 ---
-// Skills as a constellation: each skill is a point in its area's cluster. "Know well" skills sit
-// tight around the area's ideal point and "Have built with" skills scatter further out, so the
-// spread shows confidence honestly. Picking a skill lights up the projects whose stack lists it
-// (see src/lib/skills.ts). The plain list below carries the same information and links, for
-// screen readers, phones and readers without JavaScript.
+// Skills as grouped chips: one row of chips per area. Filled chips are "Know well", outlined
+// chips are "Have built with". Each chip is a native disclosure, so tapping it, or Enter or Space
+// on it, shows the projects whose stack lists it (see src/lib/skills.ts), with no script at all.
+// A small script adds opening on hover and focus, and keeps one open at a time.
 import skills from '@/data/skills.json';
 import { getProjects, projectHref } from '@/lib/projects';
-import { areas, skillMap, place, FIELD, centers } from '@/lib/skills';
+import { areas, skillMap } from '@/lib/skills';
 
 interface Props {
   /** Band variables from depth.ts, so the section sits in the page's descent. */
@@ -18,19 +17,16 @@ const { zoneStyle } = Astro.props;
 const projects = await getProjects();
 const usedIn = (skill: string) => {
   const terms = skillMap[skill]?.terms ?? [];
-  return projects.filter((p) => p.data.stack.some((s) => terms.includes(s))).map((p) => ({ id: p.id, title: p.data.title, href: projectHref(p) }));
+  return projects.filter((p) => p.data.stack.some((s) => terms.includes(s))).map((p) => ({ title: p.data.title, href: projectHref(p) }));
 };
 
 const [known, built] = skills;
-const all = [
-  ...known.items.map((skill) => ({ skill, known: true, group: known.group })),
-  ...built.items.map((skill) => ({ skill, known: false, group: built.group })),
-].map((s) => ({ ...s, projects: usedIn(s.skill) }));
-
-const points = place(all).map((p) => ({ ...p, projects: all.find((s) => s.skill === p.skill)!.projects.map((x) => x.id) }));
-// Projects any skill links to, for the strip that lights up under the constellation.
-const linked = projects.filter((p) => all.some((s) => s.projects.some((x) => x.id === p.id)));
-const byArea = areas.map((a) => ({ ...a, skills: all.filter((s) => skillMap[s.skill]?.area === a.id) }));
+const all = [...known.items.map((skill) => ({ skill, known: true })), ...built.items.map((skill) => ({ skill, known: false }))].map((s) => ({
+  ...s,
+  projects: usedIn(s.skill),
+}));
+// Within an area, the skills I know well come first.
+const byArea = areas.map((a) => ({ ...a, skills: all.filter((s) => skillMap[s.skill]?.area === a.id) })).filter((a) => a.skills.length);
 ---
 
 <section id="skills" class="section section--tight zone" style={zoneStyle} aria-labelledby="skills-title" data-section="skills">
@@ -39,320 +35,98 @@ const byArea = areas.map((a) => ({ ...a, skills: all.filter((s) => skillMap[s.sk
     <h2 id="skills-title" class="section-title section-title--sm">What I know and what I've built with</h2>
     <p class="section-lede">Two groups. The first I can explain without notes. The second I've used to ship real projects and am still learning.</p>
 
-    <div class="cst" data-cst data-points={JSON.stringify(points)}>
-      <div class="cst__field">
-        <svg viewBox={`0 0 ${FIELD.w} ${FIELD.h}`} aria-hidden="true" focusable="false">
-          {
-            areas.map((a) => {
-              const [cx, cy] = centers[a.id];
-              return (
-                <g class="cst__area">
-                  <ellipse cx={cx} cy={cy} rx="128" ry="104" class="cst__halo" />
-                  <path d={`M ${cx - 9} ${cy} H ${cx + 9} M ${cx} ${cy - 9} V ${cy + 9}`} class="cst__ideal" />
-                  <text x={cx} y={cy - 116} text-anchor="middle" class="cst__area-label">
-                    {a.label}
-                  </text>
-                </g>
-              );
-            })
-          }
-          {
-            points.map((p, i) => {
-              const [cx, cy] = centers[p.area];
-              return (
-                <g class:list={['cst__pt', p.known ? 'cst__pt--known' : 'cst__pt--built']} data-pt={i}>
-                  <path d={`M ${cx} ${cy} L ${p.x} ${p.y}`} class="cst__spoke" />
-                  <circle cx={p.x} cy={p.y} r={p.known ? 6 : 5} class="cst__dot" />
-                </g>
-              );
-            })
-          }
-        </svg>
-        <div class="cst__hits" role="group" aria-label="Skills constellation. Use the arrow keys to move between skills." data-cst-hits></div>
-      </div>
+    <p class="sk-legend">
+      <span><i class="sk-key sk-key--known" aria-hidden="true"></i>Filled: {known.group.toLowerCase()}</span>
+      <span><i class="sk-key" aria-hidden="true"></i>Outlined: {built.group.toLowerCase()}</span>
+      <span class="sk-legend__hint">Open a skill to see the projects that use it.</span>
+    </p>
 
-      <div class="cst__foot">
-        <p class="cst__legend" aria-hidden="true">
-          <span><i class="cst__key cst__key--known"></i>{known.group}: close to the ideal point</span>
-          <span><i class="cst__key cst__key--built"></i>{built.group}: a looser cloud</span>
-        </p>
-        <p class="cst__panel" aria-live="polite" data-cst-panel>Pick a skill to see the projects that list it.</p>
-        <ul class="cst__projects" aria-label="Projects">
-          {
-            linked.map((p) => (
-              <li>
-                <a href={projectHref(p)} class="cst__proj" data-proj={p.id}>
-                  {p.data.title}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+    <div class="sk-areas" data-skills>
+      {
+        byArea.map((a) => (
+          <div class="sk-area">
+            <h3 class="sk-area__name">{a.label}</h3>
+            <ul class="sk-chips">
+              {a.skills.map((s) => (
+                <li>
+                  <details class:list={['skc', s.known ? 'skc--known' : 'skc--built']}>
+                    <summary>
+                      {s.skill}
+                      <span class="sr-only">, {s.known ? known.group.toLowerCase() : built.group.toLowerCase()}</span>
+                    </summary>
+                    <div class="skc__pop">
+                      {s.projects.length ? (
+                        <>
+                          <p class="skc__label">Used in:</p>
+                          <ul>
+                            {s.projects.map((p) => (
+                              <li>
+                                <a class="link" href={p.href}>{p.title}</a>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      ) : (
+                        <p class="skc__none">Not on a project page yet.</p>
+                      )}
+                    </div>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
     </div>
-
-    <details class="sk-list" open data-cst-list>
-      <summary>All skills as a list, with the projects that use them</summary>
-      <div class="sk-list__areas">
-        {
-          byArea.map((a) => (
-            <div class="sk-area">
-              <h3 class="sk-area__name">{a.label}</h3>
-              <ul>
-                {a.skills.map((s) => (
-                  <li>
-                    <span class="sk-name">{s.skill}</span>
-                    <span class="sk-group mono">{s.group}</span>
-                    {s.projects.length ? (
-                      <span class="sk-used">
-                        Used in{' '}
-                        {s.projects.map((p, i) => (
-                          <>{i > 0 && (i === s.projects.length - 1 ? ' and ' : ', ')}<a class="link" href={p.href}>{p.title}</a></>
-                        ))}
-                      </span>
-                    ) : (
-                      <span class="sk-used sk-used--none">No project on this site lists it in its stack.</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        }
-      </div>
-    </details>
   </div>
 </section>
 
 <style>
-  /* The constellation needs room for clear targets, so it shows from 1024px. Below that, and
-     without JavaScript, the list is the whole section. */
-  .cst {
-    display: none;
-    margin-top: 2rem;
-  }
-
-  @media (min-width: 1024px) {
-    .cst {
-      display: block;
-    }
-  }
-
-  .cst__field {
-    position: relative;
-    aspect-ratio: 1000 / 560;
-  }
-
-  .cst__field svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  .cst__halo {
-    fill: color-mix(in oklab, var(--accent) 5%, transparent);
-    stroke: var(--line);
-    stroke-dasharray: 2 5;
-  }
-
-  .cst__ideal {
-    stroke: var(--amber-line);
-    stroke-width: 1.5;
-  }
-
-  .cst__area-label {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    fill: var(--muted);
-  }
-
-  .cst__spoke {
-    stroke: var(--accent);
-    stroke-opacity: 0.16;
-  }
-
-  .cst__dot {
-    stroke: var(--accent);
-    stroke-width: 1.6;
-    transition:
-      r 0.25s var(--ease-out-expo),
-      opacity 0.25s;
-  }
-
-  .cst__pt--known .cst__dot {
-    fill: var(--accent);
-  }
-
-  .cst__pt--built .cst__dot {
-    fill: var(--bg);
-  }
-
-  /* While a skill is picked, it and the skills it shares a project with stand out. */
-  .cst[data-active] .cst__pt {
-    opacity: 0.3;
-  }
-
-  .cst[data-active] .cst__pt[data-on] {
-    opacity: 1;
-  }
-
-  .cst__pt[data-current] .cst__dot {
-    r: 9;
-    stroke: var(--amber-line);
-    stroke-width: 2.5;
-  }
-
-  .cst__pt[data-current] .cst__spoke {
-    stroke: var(--amber-line);
-    stroke-opacity: 0.8;
-  }
-
-  .cst__hits {
-    position: absolute;
-    inset: 0;
-  }
-
-  .cst__hits :global(.cst__hit) {
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    translate: -50% -50%;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-
-  .cst__hits :global(.cst__hit:focus-visible) {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
-
-  /* The name of the skill under the pointer or focus, next to its point. */
-  .cst__hits :global(.cst__tip) {
-    position: absolute;
-    translate: -50% calc(-100% - 16px);
-    padding: 0.2rem 0.5rem;
-    border: 1px solid var(--line);
-    border-radius: 0.35rem;
-    background: var(--surface);
-    font-size: 0.78rem;
-    white-space: nowrap;
-    color: var(--text);
-    pointer-events: none;
-    box-shadow: var(--shadow);
-  }
-
-  .cst__foot {
-    display: grid;
-    gap: 0.9rem;
-    margin-top: 1.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .cst__legend {
+  .sk-legend {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem 1.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-  }
-
-  .cst__legend span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
-
-  .cst__key {
-    width: 0.65rem;
-    height: 0.65rem;
-    border: 1.6px solid var(--accent);
-    border-radius: 50%;
-  }
-
-  .cst__key--known {
-    background: var(--accent);
-  }
-
-  .cst__panel {
-    min-height: 1.6em;
+    margin-top: 1.75rem;
+    font-size: 0.88rem;
     color: var(--text-soft);
   }
 
-  .cst__panel :global(strong) {
-    color: var(--text);
-  }
-
-  .cst__projects {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-  }
-
-  .cst__proj {
+  .sk-legend span {
     display: inline-flex;
     align-items: center;
-    min-height: 2rem;
-    padding: 0.25rem 0.65rem;
-    border: 1px solid var(--line);
-    border-radius: 0.4rem;
-    font-size: 0.82rem;
-    color: var(--text-soft);
-    text-decoration: none;
-    transition:
-      border-color 0.2s,
-      background-color 0.2s,
-      opacity 0.2s;
+    gap: 0.5rem;
   }
 
-  .cst__proj:hover {
-    border-color: var(--accent);
-  }
-
-  /* Dimmed by color, not opacity, so the names still pass contrast. */
-  .cst[data-active] .cst__proj {
+  .sk-legend__hint {
     color: var(--muted);
   }
 
-  .cst[data-active] .cst__proj[data-on] {
-    border-color: var(--amber-line);
-    background: color-mix(in oklab, var(--amber) 14%, transparent);
-    color: var(--text);
+  .sk-key {
+    width: 1.1rem;
+    height: 0.75rem;
+    border: 1.5px solid var(--accent);
+    border-radius: 0.25rem;
   }
 
-  /* The plain list. Open by default; the script folds it away on wide screens once the
-     constellation is ready, and it stays one click away. */
-  .sk-list {
-    margin-top: 2rem;
-    border-top: 1px solid var(--line);
+  .sk-key--known {
+    border-color: var(--accent-ink);
+    background: var(--accent-ink);
   }
 
-  .sk-list > summary {
-    padding: 0.9rem 0;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .sk-list__areas {
+  .sk-areas {
     display: grid;
-    gap: 1.5rem 2.5rem;
-    padding-bottom: 0.5rem;
+    gap: 1.5rem 3rem;
+    margin-top: 1.75rem;
   }
 
-  @media (min-width: 720px) {
-    .sk-list__areas {
+  @media (min-width: 900px) {
+    .sk-areas {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   .sk-area__name {
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.55rem;
     border-bottom: 1px solid var(--line);
     font-family: var(--font-mono);
     font-size: 0.74rem;
@@ -362,47 +136,158 @@ const byArea = areas.map((a) => ({ ...a, skills: all.filter((s) => skillMap[s.sk
     color: var(--accent-ink);
   }
 
-  .sk-area li {
-    display: grid;
-    gap: 0.1rem;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid var(--line);
+  .sk-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
   }
 
-  .sk-name {
-    font-weight: 500;
+  .skc {
+    position: relative;
+  }
+
+  .skc > summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.1rem;
+    padding: 0.3rem 0.75rem;
+    border: 1.5px solid var(--accent);
+    border-radius: 0.45rem;
+    font-size: 0.88rem;
+    line-height: 1.3;
     color: var(--text);
+    cursor: pointer;
+    list-style: none;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
   }
 
-  .sk-group {
+  .skc > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Filled: know well. Text on the fill uses the band's own shade, which passes on both. */
+  .skc--known > summary {
+    border-color: var(--accent-ink);
+    background: var(--accent-ink);
+    color: var(--bg);
+    font-weight: 500;
+  }
+
+  .skc--built > summary:hover {
+    background: var(--accent-wash);
+  }
+
+  .skc[open] > summary {
+    border-color: var(--amber-line);
+  }
+
+  .skc > summary:focus-visible {
+    outline: 2px solid var(--amber-line);
+    outline-offset: 2px;
+  }
+
+  /* The projects, in a small card under the chip. */
+  .skc__pop {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    width: max-content;
+    max-width: min(20rem, calc(100vw - 2rem));
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.6rem;
+    background: var(--surface);
+    box-shadow: var(--shadow-lift);
+    font-size: 0.86rem;
+    translate: var(--shift, 0) 0;
+  }
+
+  .skc__label {
+    font-family: var(--font-mono);
     font-size: 0.68rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
   }
 
-  .sk-used {
-    font-size: 0.88rem;
-    color: var(--text-soft);
+  .skc__pop ul {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 0.35rem;
   }
 
-  .sk-used--none {
-    color: var(--muted);
+  .skc__pop a {
+    display: inline-block;
+    padding-block: 0.15rem;
+  }
+
+  .skc__none {
+    color: var(--text-soft);
   }
 </style>
 
 <script>
-  // The interactive layer loads only when the constellation nears the screen.
-  const cst = document.querySelector<HTMLElement>('[data-cst]');
-  if (cst && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        import('../scripts/constellation').then((m) => m.mountConstellation(cst));
-      },
-      { rootMargin: '300px 0px' },
-    );
-    io.observe(cst);
+  // Hover and focus open a chip as well as a tap or Enter. One chip is open at a time, Escape
+  // closes it, and the card shifts left if it would run off the right edge of the screen.
+  const root = document.querySelector<HTMLElement>('[data-skills]');
+  if (root) {
+    const chips = [...root.querySelectorAll<HTMLDetailsElement>('details.skc')];
+    let pinned: HTMLDetailsElement | null = null;
+    // Set while Escape hands focus back to a chip, so that focus does not open it again.
+    let quiet = false;
+
+    const fit = (d: HTMLDetailsElement) => {
+      const pop = d.querySelector<HTMLElement>('.skc__pop');
+      if (!pop) return;
+      pop.style.removeProperty('--shift');
+      const r = pop.getBoundingClientRect();
+      const over = r.right - (document.documentElement.clientWidth - 16);
+      if (over > 0) pop.style.setProperty('--shift', `${-over}px`);
+    };
+    const open = (d: HTMLDetailsElement) => {
+      chips.forEach((c) => c !== d && c !== pinned && (c.open = false));
+      if (!d.open) d.open = true;
+      fit(d);
+    };
+
+    chips.forEach((d) => {
+      d.addEventListener('toggle', () => {
+        if (d.open) {
+          chips.forEach((c) => c !== d && (c.open = false));
+          fit(d);
+        } else if (pinned === d) pinned = null;
+      });
+      // Hover and focus have usually opened the chip already, so a click (or Enter) pins it open
+      // instead of toggling it shut, and a second click closes it.
+      d.querySelector('summary')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (pinned === d) {
+          pinned = null;
+          d.open = false;
+        } else {
+          if (pinned) pinned.open = false;
+          pinned = d;
+          open(d);
+        }
+      });
+      d.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && open(d));
+      d.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && pinned !== d && (d.open = false));
+      d.addEventListener('focusin', () => !quiet && open(d));
+      d.addEventListener('focusout', (e) => {
+        if (!d.contains(e.relatedTarget as Node) && pinned !== d) d.open = false;
+      });
+      d.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape' || !d.open) return;
+        d.open = false;
+        pinned = null;
+        quiet = true;
+        d.querySelector<HTMLElement>('summary')?.focus();
+        quiet = false;
+      });
+    });
   }
 </script>

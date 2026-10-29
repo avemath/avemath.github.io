@@ -77,7 +77,7 @@ Unchanged faces, all self-hosted and preloaded: Space Grotesk for headings, Inte
 
 ### 1. Surface hero: the transmission
 
-A waterfall spectrogram that receives my name once.
+A waterfall spectrogram that receives my name once. (Band and display updated in the third pass, below.)
 
 - **The signal is real.** The browser draws AVERY / MATHERNE into a small raster in the heading font, 228 pixels wide. Each raster row becomes one OFDM symbol: a 512 point inverse FFT at 16 kHz, with one subcarrier per raster column, so the letters are drawn by 228 subcarriers from about 440 Hz to 7.6 kHz. Each subcarrier's amplitude is that pixel's coverage, so anti-aliased edges come out smooth. Every symbol carries a 6 ms cyclic prefix, and neighboring symbols crossfade inside it with a raised cosine, so nothing starts or stops instantly and there are no clicks. One linear up-chirp goes out first as the sync sweep.
 - **The water is the channel.** The signal passes through a gentle frequency-selective fade, as two paths would make, with a little level jitter per subcarrier and some noise. So the letters show real measured texture, while staying within a few dB of full level and clearly readable.
@@ -165,6 +165,13 @@ The research section has an open layout with no card. The sound speed profile si
 - **About:** Experience, Skills and Recommendations sit between the story and Off the clock. Experience and Recommendations use the shared pinned heading (`.pinned`, `.pinned__head` in `global.css`, also used by Featured work and Field notes). The bands stop at slot 5, so the closing sections stay on light water in the light theme.
 - **Gauge ink:** each gauge line reads the band behind it from the real wave curve, so it switches ink exactly where the edge crosses it, and carries a soft halo in its own water's color for the moment it straddles an edge. Measured at 12 scroll stops in both themes: every text line passes 4.5:1 and every tick and scale segment 3:1.
 - **Spectrogram:** whenever the display comes back into view or the tab is shown again, it opens on the held frame with the full name centered, then continues the cycle.
+
+### 10. Third pass
+
+- **Client work** is the full showcase again: large browser and phone frames in alternating rows, with the kind line, what I did, the metrics as large numerals, and the case study and live site links. The services line and buttons sit under it. Client sites appear only here on the home page.
+- **Skills** on /about/ are grouped chips by area. Filled chips are know well, outlined chips are have built with. Each chip is a native disclosure, so a tap, Enter or Space shows "Used in:" with the project links from `src/lib/skills.ts`, or "Not on a project page yet", with no script. The script adds opening on hover and focus, one open at a time, Escape to close, and keeps the card on screen. The constellation is gone.
+- **Signatures play once:** hovering or focusing a tile plays a short animation on its drawn art (the constellation settles in, bars rise, rays grow out from the source, the hop pattern steps through, ripples spread). Transform and opacity only, under a second, nothing at rest, none on touch screens or with reduced motion. The noise effect is gone.
+- **Hero sound:** the name now uses 80 subcarriers from 500 Hz to 3 kHz (at most 57 tones at once), the sweep runs 400 Hz to 3.2 kHz, a second-order low-pass at 3.4 kHz and 30 ms raised-cosine fades shape the buffer, and it plays at a lower level. The waterfall shows 0 to 4 kHz and is still the FFT of exactly the buffer that plays. Hear it restarts the cycle from quiet water, so the sweep and the name are heard and seen together.
 
 ## Deliberately not borrowed
 
