@@ -34,13 +34,15 @@ const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
 //             tablet: land land | ram v2v | ram led | onr bell
 // Every area appears once per layout and every row is full. If you add or remove a tile, add its
 // area to all six layouts.
+// On phones the tiles stack in this order, so a project with a photo, a demo or a number leads,
+// and the limited-detail research comes last.
 const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string }[] = [
-  { slug: 'onr-intelligent-data-management', area: 'onr' },
+  { slug: 'rampage', area: 'ram', photo: rampageBench, focus: '50% 45%' },
   { slug: 'v2v-bsm-ofdm', area: 'v2v' },
   { slug: 'led-audio-spectrum', area: 'led' },
-  { slug: 'rampage', area: 'ram', photo: rampageBench, focus: '50% 45%' },
   { slug: 'landspace', area: 'land' },
   { slug: 'bellhop-sim', area: 'bell' },
+  { slug: 'onr-intelligent-data-management', area: 'onr' },
 ];
 ---
 
@@ -155,9 +157,83 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* Phones: each tile is a compact row, a cropped picture on the left and the title, a short
+     summary and its number on the right. The outcome line and the tech chips stay on wider
+     screens and in the case study, so six tiles fit in about a screen and a half. */
   @media (max-width: 719px) {
+    .bento {
+      gap: 0.75rem;
+    }
+
     .bento > :global(.tile) {
       grid-area: auto !important;
+    }
+
+    .bento :global(.tile__inner) {
+      display: grid;
+      grid-template-columns: 6.75rem minmax(0, 1fr);
+    }
+
+    .bento :global(.tile__media) {
+      aspect-ratio: auto;
+      min-height: 0 !important;
+      border-bottom: 0;
+      border-right: 1px solid var(--line);
+    }
+
+    /* Drawn art: show its middle, at the full height of the row. */
+    .bento :global(.tile__media > .art) {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: auto;
+      height: 100%;
+      aspect-ratio: 600 / 375;
+      max-width: none;
+      translate: -50% 0;
+    }
+
+    .bento :global(.tile__live) {
+      display: none;
+    }
+
+    .bento :global(.tile__body) {
+      gap: 0.4rem;
+      padding: 0.8rem 0.9rem 0.85rem;
+    }
+
+    .bento :global(.tile__body .chip--type) {
+      padding: 0.1rem 0.45rem;
+      font-size: 0.66rem;
+    }
+
+    .bento :global(.tile__title) {
+      font-size: 1.05rem;
+      line-height: 1.25;
+    }
+
+    .bento :global(.tile__summary) {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      -webkit-line-clamp: 2 !important;
+    }
+
+    .bento :global(.tile__metric-v) {
+      font-size: 1.35rem;
+    }
+
+    .bento :global(.tile__outcome),
+    .bento :global(.tile__chips) {
+      display: none;
+    }
+
+    .bento :global(.tile__links) {
+      padding-top: 0.5rem;
+      font-size: 0.84rem;
+    }
+
+    .split__lede {
+      display: none;
     }
   }
 
