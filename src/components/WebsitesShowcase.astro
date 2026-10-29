@@ -11,14 +11,21 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
   <div class="wrap">
     <p class="eyebrow">Client work</p>
     <h2 id="websites-title" class="section-title">Live sites built for real clients</h2>
-    <p class="section-lede">Each entry has what the business needed, what I did, and a few numbers. The case study has the rest.</p>
+    <p class="section-lede sites-lede">Each entry has what the business needed, what I did, and a few numbers. The case study has the rest.</p>
 
     <ol class="sites">
       {
         sites.map((p, i) => (
           <li class="site" data-reveal>
             <div class="site__media">
-              <BrowserFrame src={p.data.cover!} mobile={p.data.mobile} alt={p.data.coverAlt ?? ''} url={p.data.links.live} />
+              <BrowserFrame
+                src={p.data.cover!}
+                mobile={p.data.mobile}
+                alt={p.data.coverAlt ?? ''}
+                url={p.data.links.live}
+                widths={[240, 480, 680, 960, 1280]}
+                sizes="(min-width: 960px) 40vw, (min-width: 720px) calc(100vw - 5rem), 8rem"
+              />
             </div>
             <div class="site__copy">
               <p class="label">
@@ -27,7 +34,7 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
               <h3 class="site__title">{p.data.title}</h3>
               <p class="site__summary">{p.data.summary}</p>
               <div class="site__facts">
-                <dl>
+                <dl class="site__did">
                   <dt class="label">What I did</dt>
                   <dd>{p.data.role}</dd>
                 </dl>
@@ -42,7 +49,7 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
                   </dl>
                 )}
               </div>
-              <div class="mt-6 flex flex-wrap gap-3">
+              <div class="site__links mt-6 flex flex-wrap gap-3">
                 <a class="btn btn--small" href={projectHref(p)}>
                   Read the case study <Icon name="arrow-right" />
                 </a>
@@ -90,6 +97,77 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 
     .site:nth-child(even) .site__media {
       order: 2;
+    }
+  }
+
+  /* Phones: each site is a compact row. A small screenshot sits beside the name and the kind of
+     business, the numbers run underneath, then the two links. The summary and "What I did" stay
+     on wider screens and in the case study. */
+  @media (max-width: 719px) {
+    .sites {
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .site {
+      grid-template-columns: 8rem minmax(0, 1fr);
+      gap: 0.9rem;
+      align-items: start;
+      padding: 0.8rem;
+      border: 1px solid var(--line);
+      border-radius: 0.8rem;
+      background: var(--surface);
+    }
+
+    .sites-lede,
+    .site__media :global(.frame__bar),
+    .site__media :global(.frame__phone),
+    .site__summary,
+    .site__did {
+      display: none;
+    }
+
+    .site__media :global(.frame__window) {
+      border-radius: 0.45rem;
+    }
+
+    .site__copy {
+      display: contents;
+    }
+
+    .site__media {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      order: 0 !important;
+    }
+
+    .site__copy > .label {
+      grid-column: 2;
+      grid-row: 1;
+      font-size: 0.64rem;
+      line-height: 1.45;
+    }
+
+    .site__title {
+      grid-column: 2;
+      grid-row: 2;
+      margin-top: 0;
+      font-size: 1.15rem;
+    }
+
+    .site__facts {
+      grid-column: 1 / -1;
+      margin-top: 0;
+      padding-top: 0.7rem;
+    }
+
+    .site__metric {
+      font-size: 1.35rem !important;
+    }
+
+    .site__links {
+      grid-column: 1 / -1;
+      margin-top: 0;
     }
   }
 
