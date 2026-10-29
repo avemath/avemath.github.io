@@ -10,7 +10,7 @@ import { CHIRP, CP, FIRST_BIN, FS, LEAD, N, NAME_START, SHOW_BINS, TEXT_BINS, VI
 import { rasterName } from '../lib/tx-raster';
 import { waterfallLut } from './spectrogram';
 
-const SOURCE = 'https://github.com/avemath/avemath.github.io/blob/main/src/scripts/spectrogram.ts';
+const SOURCE = 'https://github.com/avemath/avemath.github.io/blob/main/src/lib/tx-signal.ts';
 const DB_LO = -84;
 const DB_HI = -27;
 // In this walkthrough the water also adds a second path, 1 ms late, so the prefix has a job to do.
