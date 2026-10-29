@@ -7,7 +7,8 @@
 //
 // It pauses off-screen and in background tabs, and shows the held frame under reduced motion or
 // on low-power devices. Sound only ever starts from a click.
-import { FS, N, CP, SYMBOL, SHOW_BINS, STRETCH, BIN_HZ, FRAME_HZ, VIEW_ROWS, TEXT_BINS, LINES, holdFrame, makeFft, synthesize, addNoise } from '../lib/tx-signal';
+import { FS, N, SYMBOL, SHOW_BINS, BIN_HZ, FRAME_HZ, VIEW_ROWS, holdFrame, makeFft, synthesize, addNoise, receive } from '../lib/tx-signal';
+import { rasterName } from '../lib/tx-raster';
 import { prefersReducedMotion } from './preferences';
 
 const DB_LO = -84;
@@ -31,31 +32,21 @@ const STOPS: [number, string][] = [
   [1, '#f0a940'],
 ];
 
-/** The name as a coverage raster TEXT_BINS wide: two lines, each fitted to the width of the longer. */
-function rasterName() {
-  const family = getComputedStyle(document.documentElement).getPropertyValue('--font-display').trim() || 'sans-serif';
-  const probe = document.createElement('canvas').getContext('2d')!;
-  probe.font = `600 100px ${family}`;
-  const wide = Math.max(...LINES.map((l) => probe.measureText(l).width));
-  const capH = probe.measureText('M').actualBoundingBoxAscent || 70;
-  const size = (100 * (TEXT_BINS - 2)) / wide;
-  const cap = (capH * size) / 100;
-  const gap = size * 0.32;
-  const rows = Math.ceil((cap * LINES.length + gap * (LINES.length - 1)) * STRETCH) + 2;
-  const c = document.createElement('canvas');
-  c.width = TEXT_BINS;
-  c.height = rows;
-  const x = c.getContext('2d', { willReadFrequently: true })!;
-  x.font = `600 ${size}px ${family}`;
-  x.fillStyle = '#fff';
-  x.textAlign = 'center';
-  x.textBaseline = 'alphabetic';
-  x.setTransform(1, 0, 0, STRETCH, 0, 0);
-  LINES.forEach((line, i) => x.fillText(line, TEXT_BINS / 2, 1 + cap + i * (cap + gap)));
-  const px = x.getImageData(0, 0, TEXT_BINS, rows).data;
-  const mask = new Float32Array(TEXT_BINS * rows);
-  for (let i = 0; i < mask.length; i++) mask[i] = px[i * 4 + 3] / 255;
-  return { mask, rows, font: size, cap, gap };
+/** The waterfall colormap as 256 RGBA entries, low level to high. */
+export function waterfallLut() {
+  const lab = STOPS.map(([t, hex]) => [t, toLab(hex)] as const);
+  const out = new Uint8ClampedArray(256 * 4);
+  for (let i = 0; i < 256; i++) {
+    const t = i / 255;
+    let j = 0;
+    while (j < lab.length - 2 && t > lab[j + 1][0]) j++;
+    const [t0, a] = lab[j];
+    const [t1, b] = lab[j + 1];
+    const u = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
+    const rgb = fromLab(a.map((v, c) => v + (b[c] - v) * u) as [number, number, number]);
+    out.set([...rgb, 255], i * 4);
+  }
+  return out;
 }
 
 export async function mountSpectrogram(root: HTMLElement) {
@@ -90,21 +81,15 @@ export async function mountSpectrogram(root: HTMLElement) {
   const lut = buildLut();
 
   /** Analyze one symbol into row 0: a frame of the transmission, or quiet water before it starts. */
+  const row = new Float32Array(SHOW_BINS);
   function analyze(frame: number) {
-    const src = frame >= 0 && frame <= HOLD ? signal : quiet;
-    const base = (frame >= 0 && frame <= HOLD ? frame : ((frame % 16) + 16) % 16) * SYMBOL + CP;
-    for (let n = 0; n < N; n++) {
-      re[n] = src[base + n];
-      im[n] = 0;
-    }
-    fft(re, im, -1);
+    const inSignal = frame >= 0 && frame <= HOLD;
+    receive(inSignal ? signal : quiet, inSignal ? frame : ((frame % 16) + 16) % 16, row, fft, re, im);
     levels.copyWithin(SHOW_BINS, 0, levels.length - SHOW_BINS);
     px.copyWithin(SHOW_BINS * 4, 0, px.length - SHOW_BINS * 4);
-    const scale = 2 / N;
     for (let k = 0; k < SHOW_BINS; k++) {
-      const db = 20 * Math.log10(Math.hypot(re[k], im[k]) * scale + 1e-9);
-      levels[k] = db;
-      paint(k, db);
+      levels[k] = row[k];
+      paint(k, row[k]);
     }
   }
 
@@ -114,19 +99,7 @@ export async function mountSpectrogram(root: HTMLElement) {
   }
 
   function buildLut() {
-    const lab = STOPS.map(([t, hex]) => [t, toLab(hex)] as const);
-    const out = new Uint8ClampedArray(256 * 4);
-    for (let i = 0; i < 256; i++) {
-      const t = i / 255;
-      let j = 0;
-      while (j < lab.length - 2 && t > lab[j + 1][0]) j++;
-      const [t0, a] = lab[j];
-      const [t1, b] = lab[j + 1];
-      const u = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
-      const rgb = fromLab(a.map((v, c) => v + (b[c] - v) * u) as [number, number, number]);
-      out.set([...rgb, 255], i * 4);
-    }
-    return out;
+    return waterfallLut();
   }
 
   // ---- The cycle: send, hold with the name centered, fade, start again ----

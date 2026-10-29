@@ -45,6 +45,8 @@ const { bare = false, ...seo } = Astro.props;
           theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
         d.dataset.theme = theme;
+        // Lets CSS show controls that only work with JavaScript, before first paint, so they never shift the page.
+        d.classList.add('js');
         if (motion === 'reduce') d.dataset.motion = 'reduce';
         var meta = document.querySelector('meta[name="theme-color"]');
         if (meta) meta.setAttribute('content', theme === 'dark' ? '#061c2b' : '#dff1f3');

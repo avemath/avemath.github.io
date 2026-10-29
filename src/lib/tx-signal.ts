@@ -100,10 +100,28 @@ export function rng(seed: number) {
  * this runs. The batches run in the same order with the same random stream, so the result is the
  * same with or without pauses.
  */
-export async function synthesize(mask: Float32Array, rows: number, pause: () => Promise<unknown> = async () => {}): Promise<Float32Array<ArrayBuffer>> {
+export interface Channel {
+  /** Send each symbol with its cyclic prefix. Off: bodies back to back, so an echo smears rows. */
+  prefix?: boolean;
+  /** Crossfade neighboring symbols across the prefix. Off: they switch in one sample. */
+  ramp?: boolean;
+  /** Noise floor, as a multiple of the usual level. */
+  noise?: number;
+  /** A second path through the water: the same signal again, `delay` samples later. */
+  echo?: { delay: number; gain: number };
+}
+
+export async function synthesize(
+  mask: Float32Array,
+  rows: number,
+  pause: () => Promise<unknown> = async () => {},
+  { prefix = true, ramp: crossfade = true, noise = 1, echo }: Channel = {},
+): Promise<Float32Array<ArrayBuffer>> {
   const rand = rng(1979);
   const frames = holdFrame(rows) + 1;
-  const out = new Float32Array(frames * SYMBOL);
+  const cp = prefix ? CP : 0;
+  const step = N + cp;
+  const out = new Float32Array(frames * step);
   const phase = Float64Array.from({ length: BINS }, () => rand() * 2 * Math.PI);
   const tone = 0.03;
   const ifft = makeFft(N);
@@ -125,6 +143,7 @@ export async function synthesize(mask: Float32Array, rows: number, pause: () => 
     const re = new Float64Array(N);
     const im = new Float64Array(N);
     let any = false;
+    // #region how:symbol
     for (let c = 0; c < TEXT_BINS; c++) {
       const a = mask[row * TEXT_BINS + c];
       if (a < 0.02) continue;
@@ -138,6 +157,7 @@ export async function synthesize(mask: Float32Array, rows: number, pause: () => 
     }
     if (!any) return null;
     ifft(re, im, 1);
+    // #endregion
     return re;
   };
   const symbols: (Float64Array | null)[] = [];
@@ -147,30 +167,37 @@ export async function synthesize(mask: Float32Array, rows: number, pause: () => 
   }
 
   const w = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * u);
+  // #region how:prefix
   for (let f = 0; f < frames; f++) {
     const cur = symbols[f];
     const prev = symbols[f - 1] ?? null;
-    const base = f * SYMBOL;
+    const base = f * step;
     // Prefix: the end of this symbol's period, faded in over the tail of the one before.
-    for (let j = 0; j < CP; j++) {
-      const g = w((j + 0.5) / CP);
-      out[base + j] = (cur ? g * cur[N - CP + j] : 0) + (prev ? (1 - g) * prev[j] : 0);
+    for (let j = 0; j < cp; j++) {
+      const g = crossfade ? w((j + 0.5) / cp) : 1;
+      out[base + j] = (cur ? g * cur[N - cp + j] : 0) + (prev ? (1 - g) * prev[j] : 0);
     }
-    if (cur) out.set(cur, base + CP);
+    if (cur) out.set(cur, base + cp);
   }
+  // #endregion
 
   // The sync sweep: one linear up-chirp with raised-cosine edges.
-  const len = CHIRP.frames * SYMBOL;
+  // #region how:chirp
+  const len = CHIRP.frames * step;
   const ramp = 96;
   const T = len / FS;
   for (let n = 0; n < len; n++) {
     const t = n / FS;
     const edge = n < ramp ? w(n / ramp) : n >= len - ramp ? w((len - 1 - n) / ramp) : 1;
-    out[LEAD * SYMBOL + n] += 0.05 * edge * Math.cos(2 * Math.PI * (CHIRP.f0 * t + ((CHIRP.f1 - CHIRP.f0) / (2 * T)) * t * t));
+    out[LEAD * step + n] += 0.05 * edge * Math.cos(2 * Math.PI * (CHIRP.f0 * t + ((CHIRP.f1 - CHIRP.f0) / (2 * T)) * t * t));
   }
+  // #endregion
+
+  // A second path through the water, if there is one: the signal again, later and weaker.
+  if (echo) for (let n = out.length - 1; n >= echo.delay; n--) out[n] += echo.gain * out[n - echo.delay];
 
   for (let from = 0; from < out.length; from += 16384) {
-    addNoise(out, rand, from, Math.min(out.length, from + 16384));
+    addNoise(out, rand, from, Math.min(out.length, from + 16384), noise);
     await pause();
   }
 
@@ -218,10 +245,29 @@ function lowPass(x: Float32Array, fc: number) {
 }
 
 /** A low noise floor, so the water is never perfectly quiet. Adds to out[from] up to out[to]. */
-export function addNoise(out: Float32Array, rand = rng(7), from = 0, to = out.length) {
+export function addNoise(out: Float32Array, rand = rng(7), from = 0, to = out.length, level = 1) {
   for (let n = from; n < to; n++) {
     let u = 0;
     while (u === 0) u = rand();
-    out[n] += 0.0021 * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
+    out[n] += level * 0.0021 * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
   }
+}
+
+/**
+ * The receiver for one symbol: an FFT over the symbol's body, skipping its prefix, like an OFDM
+ * receiver. No window is needed, because each subcarrier fits whole cycles in the body. Writes the
+ * level of the first `out.length` bins, in dBFS, where a full-scale tone reads 0. `cp` is the
+ * prefix length the signal was sent with.
+ */
+export function receive(signal: Float32Array, frame: number, out: Float32Array, fft: ReturnType<typeof makeFft>, re: Float64Array, im: Float64Array, cp = CP) {
+  // #region how:receive
+  const base = frame * (N + cp) + cp;
+  for (let n = 0; n < N; n++) {
+    re[n] = signal[base + n] ?? 0;
+    im[n] = 0;
+  }
+  fft(re, im, -1);
+  const scale = 2 / N;
+  for (let k = 0; k < out.length; k++) out[k] = 20 * Math.log10(Math.hypot(re[k], im[k]) * scale + 1e-9);
+  // #endregion
 }
