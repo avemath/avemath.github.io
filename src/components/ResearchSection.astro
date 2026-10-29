@@ -6,6 +6,7 @@ import { getEntry } from 'astro:content';
 const onr = await getEntry('projects', 'onr-intelligent-data-management');
 const v2v = await getEntry('projects', 'v2v-bsm-ofdm');
 const integer = await getEntry('projects', 'integer-internship');
+const bellhop = await getEntry('projects', 'bellhop-sim');
 ---
 
 <section id="research" class="section home-section zone research" aria-labelledby="research-title" data-section="research">
@@ -53,7 +54,7 @@ const integer = await getEntry('projects', 'integer-internship');
         <p class="label">Related work</p>
         <ul class="research__list">
           {
-            [integer, v2v].filter(Boolean).map((p) => (
+            [integer, v2v, bellhop].filter(Boolean).map((p) => (
               <li>
                 <a href={`/work/${p!.id}/`} class="research__row">
                   <span>
