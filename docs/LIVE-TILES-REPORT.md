@@ -2,9 +2,9 @@
 
 Branch `live-tiles`. Nothing is merged or pushed. Each step is its own commit.
 
-## Needs your answer first
+## The LED boot message
 
-**The LED boot scroll shows "LEA".** You asked for the board's real boot scroll of a sister's first name. The firmware's message is her full name (`LEA MARIE`). I used only the first word, `LEA`, drawn with the firmware's own font, and left the middle name out of the page and out of the vendored excerpt. This conflicts with the children and family rule in the project rules (no names of Lea). I followed your newer, specific request and am flagging it here. It is one constant: `BOOT_MESSAGE` in `src/lib/led-firmware.ts`. If you'd rather keep her name off the site, change it before merging. Any word built from the firmware's letters (G R A C E M L I) will work.
+The LED boot scroll shows "LEA", the first word of the firmware's message, drawn with the firmware's own font. The middle name stays off the page and out of the vendored excerpt. Ave approved showing her sisters' first names, and the content guide now says so. The message is one constant, `BOOT_MESSAGE` in `src/lib/led-firmware.ts`.
 
 ## What I built
 
