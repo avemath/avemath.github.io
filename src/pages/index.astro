@@ -1,13 +1,11 @@
 ---
+import type { ImageMetadata } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
 import NowStrip from '@/components/NowStrip.astro';
 import ProjectTile from '@/components/ProjectTile.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import ResearchSection from '@/components/ResearchSection.astro';
-import Timeline from '@/components/Timeline.astro';
-import Testimonials from '@/components/Testimonials.astro';
-import Skills from '@/components/Skills.astro';
 import FieldNotes from '@/components/FieldNotes.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import Icon from '@/components/Icon.astro';
@@ -15,39 +13,35 @@ import DepthGauge from '@/components/DepthGauge.astro';
 import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
+// The tall tile needs a tall photo: the whole robot on the bench, from its gallery.
+import rampageBench from '@/assets/projects/rampage/shop-lid.jpg';
 
 const projects = await getProjects();
 const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
 
-// Featured tiles. Each audience gets its own order, and its own column spans so every row
-// of the bento is full: `cols` is [tablet span of 2, desktop span of 6] per audience. The
-// large tile always takes a whole row. The client sites also have their own section below.
-// The bento shows two of them (the nonprofit and plvinc.com) next to the engineering work,
-// including the two projects with in-browser demos. In website mode the client-site tiles
-// are hidden (see the CSS), so their website spans never render.
+// Featured work shows each project once. The client sites have their own strip below, so the
+// bento is the research, engineering and software work: one tall tile, one wide tile and four
+// smaller ones. Each tile names its grid area, and each audience lays the areas out (see the
+// CSS), so a row can never have a hole.
 //
-// Row check, per audience (desktop 6 columns / tablet 2 columns):
-//   hire:     ADAM 6 | ONR 2, PLV 2, LandSpace 2 | RAMpage 2, V2V 2, LED 2
-//             tablet: ADAM | ONR, PLV | LandSpace, RAMpage | V2V, LED
-//   research: ONR 2, V2V 2, RAMpage 2 | ADAM 6 | LandSpace 2, LED 2, PLV 2
-//             tablet: ONR, V2V | RAMpage | ADAM | LandSpace, LED | PLV
-//   website:  LandSpace 3, RAMpage 3 | ONR 2, V2V 2, LED 2 (ADAM and PLV hidden)
-//             tablet: LandSpace | RAMpage, ONR | V2V, LED
-// If you add or remove a tile, redo this check so no row has a hole.
-const bento = [
-  { slug: 'because-of-adam', size: 'xl', order: { hire: 1, research: 4, website: 1 }, cols: { hire: [2, 6], research: [2, 6], website: [2, 6] } },
-  { slug: 'onr-intelligent-data-management', size: 'lg', order: { hire: 2, research: 1, website: 4 }, cols: { hire: [1, 2], research: [1, 2], website: [1, 2] } },
-  { slug: 'petro-land-ventures', size: 'lg', order: { hire: 3, research: 7, website: 7 }, cols: { hire: [1, 2], research: [2, 2], website: [1, 2] } },
-  { slug: 'landspace', size: 'lg', order: { hire: 4, research: 5, website: 2 }, cols: { hire: [1, 2], research: [1, 2], website: [2, 3] } },
-  { slug: 'rampage', size: 'lg', order: { hire: 5, research: 3, website: 3 }, cols: { hire: [1, 2], research: [2, 2], website: [1, 3] } },
-  { slug: 'v2v-bsm-ofdm', size: 'lg', order: { hire: 6, research: 2, website: 5 }, cols: { hire: [1, 2], research: [1, 2], website: [1, 2] } },
-  { slug: 'led-audio-spectrum', size: 'lg', order: { hire: 7, research: 6, website: 6 }, cols: { hire: [1, 2], research: [1, 2], website: [1, 2] } },
-] as const;
-
-const tileStyle = (b: (typeof bento)[number]) =>
-  (['hire', 'research', 'website'] as const)
-    .map((a) => `--o-${a}:${b.order[a]};--t-${a}:${b.cols[a][0]};--d-${a}:${b.cols[a][1]}`)
-    .join(';');
+// Area check, per audience (desktop 4 columns / tablet 2 columns). RAMpage's photo takes the
+// tall slot; the research drawing reads best wide.
+//   hire:     ram ram v2v v2v | ram ram led led | onr onr onr onr | land land bell bell
+//             tablet: ram v2v | ram led | onr onr | land bell
+//   research: onr onr onr onr | ram ram v2v v2v | ram ram bell bell | led led land land
+//             tablet: onr onr | ram v2v | ram bell | led land
+//   website:  land land land land | ram ram v2v v2v | ram ram led led | onr onr bell bell
+//             tablet: land land | ram v2v | ram led | onr bell
+// Every area appears once per layout and every row is full. If you add or remove a tile, add its
+// area to all six layouts.
+const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string }[] = [
+  { slug: 'onr-intelligent-data-management', area: 'onr' },
+  { slug: 'v2v-bsm-ofdm', area: 'v2v' },
+  { slug: 'led-audio-spectrum', area: 'led' },
+  { slug: 'rampage', area: 'ram', photo: rampageBench, focus: '50% 45%' },
+  { slug: 'landspace', area: 'land' },
+  { slug: 'bellhop-sim', area: 'bell' },
+];
 ---
 
 <BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
@@ -58,22 +52,25 @@ const tileStyle = (b: (typeof bento)[number]) =>
 
     <div class="home-flow">
       <section id="featured" class="section home-section zone" aria-labelledby="featured-title" data-section="featured">
-        <div class="wrap">
-          <div class="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <p class="eyebrow">Featured work</p>
-              <h2 id="featured-title" class="section-title">
-                <span class="aud aud--hire">A combat robot, a radio link, a title app, a land firm's site and my family's nonprofit</span>
-                <span class="aud aud--research">A combat robot, a radio link, a title app, a land firm's site and my family's nonprofit</span>
-                <span class="aud aud--website">A combat robot, a radio link, a title app and sponsored research</span>
-              </h2>
-              <p class="section-lede">
-                <span class="aud aud--hire">Every tile opens a case study with what I did and how.</span>
-                <span class="aud aud--research">Research and communications work first, then the engineering and software behind it. Two tiles open live demos.</span>
-                <span class="aud aud--website">After the client sites above, the engineering behind how I work. Every tile opens a case study.</span>
-              </p>
-            </div>
-            <a class="btn" href="/work/">All work <Icon name="arrow-right" /></a>
+        <span class="spine" aria-hidden="true"></span>
+        <div class="wrap pinned">
+          <div class="pinned__head">
+            <p class="eyebrow">Featured work</p>
+            <h2 id="featured-title" class="section-title">
+              <span class="aud aud--hire">Radio, sound, a combat robot, a title app and my research</span>
+              <span class="aud aud--research">My research, then radio, sound, a robot and a title app</span>
+              <span class="aud aud--website">The engineering behind the sites: radio, sound, a robot, a title app and research</span>
+            </h2>
+            <p class="section-lede split__lede">
+              <span class="aud aud--hire">Every tile opens a case study with what I did and how.</span>
+              <span class="aud aud--research">Research and communications work first, then the engineering and software behind it. Three tiles open live demos.</span>
+              <span class="aud aud--website">After the client sites above, the engineering behind how I work. Every tile opens a case study.</span>
+            </p>
+            <a class="btn mt-6" href="/work/">All work <Icon name="arrow-right" /></a>
+            <p class="split__more">
+              <a class="link" href="/about/#experience">Experience, skills and recommendations</a> are on the About page.
+            </p>
+            <p class="corner" aria-hidden="true">{String(bento.length).padStart(2, '0')} projects</p>
           </div>
 
           {/* Every tile image loads lazily: the hero fills the first screen on phones and desktops,
@@ -82,53 +79,19 @@ const tileStyle = (b: (typeof bento)[number]) =>
             {
               bento.map((b) => {
                 const p = bySlug[b.slug];
-                return p ? (
-                  <ProjectTile
-                    project={p}
-                    size={b.size}
-                    style={tileStyle(b)}
-                  />
-                ) : null;
+                return p ? <ProjectTile project={p} size="lg" metric photo={b.photo} focus={b.focus} style={`grid-area:${b.area}`} /> : null;
               })
             }
           </div>
         </div>
       </section>
 
-      <WebsitesShowcase />
       <ResearchSection />
-      <Timeline />
-      <Testimonials />
-      <Skills />
+      <WebsitesShowcase />
       <FieldNotes />
 
-      <section id="services" class="section section--tight home-section zone" aria-labelledby="services-title" data-section="services">
-        <div class="wrap">
-          <div class="services-teaser card">
-            <div>
-              <p class="eyebrow">For clients</p>
-              <h2 id="services-title" class="section-title">A website you can run yourself</h2>
-              <p class="section-lede">
-                Five steps from the first conversation to the written guide, with a quote before I start and a preview link while I
-                build. The services page has the details and the questions people ask.
-              </p>
-              <div class="mt-8 flex flex-wrap gap-3">
-                <a class="btn btn--primary" href="/services/">See how I work <Icon name="arrow-right" /></a>
-                <a class="btn" href="/contact/?topic=website">Start a project</a>
-              </div>
-            </div>
-            <ul class="services-teaser__list">
-              <li><span class="mono">01</span> Marketing and service business sites</li>
-              <li><span class="mono">02</span> Nonprofit sites with donation and volunteer paths</li>
-              <li><span class="mono">03</span> Intake, booking and inquiry forms</li>
-              <li><span class="mono">04</span> Redesigns of sites that stopped working for you</li>
-              <li><span class="mono">05</span> An editor so you can update it yourself</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
       <section id="contact" class="section section--tight home-section zone" aria-labelledby="contact-title" data-section="contact">
+        <span class="spine" aria-hidden="true"></span>
         <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:items-center">
           <div>
             <p class="eyebrow">Contact</p>
@@ -169,135 +132,80 @@ const tileStyle = (b: (typeof bento)[number]) =>
     flex-direction: column;
   }
 
-  /* Audience ordering. Pure CSS, driven by the checked radio in the hero. Sections without a
-     rule keep their document order (websites, field notes, services); contact is always last. */
+  /* Section order for each audience comes from src/lib/depth.ts (zoneStyles), together with each
+     section's depth, so the order and the depth labels cannot drift apart. */
 
-  /* Hire: work, then experience, skills and the people who vouch for it, then research. */
-  .home:has(#aud-hire:checked) .home-flow > :global([data-section='featured']) {
-    order: -5;
-  }
-  .home:has(#aud-hire:checked) .home-flow > :global([data-section='experience']) {
-    order: -4;
-  }
-  .home:has(#aud-hire:checked) .home-flow > :global([data-section='skills']) {
-    order: -3;
-  }
-  .home:has(#aud-hire:checked) .home-flow > :global([data-section='recommendations']) {
-    order: -2;
-  }
-  .home:has(#aud-hire:checked) .home-flow > :global([data-section='research']) {
-    order: -1;
+  .split__more {
+    margin-top: 1.25rem;
+    font-size: 0.92rem;
+    color: var(--text-soft);
   }
 
-  /* Research: the project first, then the work and the advisors, websites last. */
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='research']) {
-    order: -5;
-  }
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='featured']) {
-    order: -4;
-  }
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='recommendations']) {
-    order: -3;
-  }
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='experience']) {
-    order: -2;
-  }
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='skills']) {
-    order: -1;
-  }
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='websites']) {
-    order: 2;
-  }
-  .home:has(#aud-research:checked) .home-flow > :global([data-section='services']) {
-    order: 3;
+  @media (min-width: 1100px) {
+    .split__lede {
+      font-size: 1rem;
+    }
   }
 
-  /* Website: the sites and how a project runs, then the rest of the work, research last. */
-  .home:has(#aud-website:checked) .home-flow > :global([data-section='websites']) {
-    order: -5;
-  }
-  .home:has(#aud-website:checked) .home-flow > :global([data-section='services']) {
-    order: -4;
-  }
-  .home:has(#aud-website:checked) .home-flow > :global([data-section='featured']) {
-    order: -3;
-  }
-  .home:has(#aud-website:checked) .home-flow > :global([data-section='field-notes']) {
-    order: -2;
-  }
-  .home:has(#aud-website:checked) .home-flow > :global([data-section='recommendations']) {
-    order: -1;
-  }
-  .home:has(#aud-website:checked) .home-flow > :global([data-section='research']) {
-    order: 2;
-  }
-
-  .home-flow > :global([data-section='contact']) {
-    order: 10;
-  }
-
-  /* In website mode the client sites already had their own section above, so the bento
-     drops them; the per-audience spans below give the title app the wide slot instead. */
-  .home:has(#aud-website:checked) .bento > :global(.tile[data-tags~='client-site']) {
-    display: none;
-  }
-
-  /* Featured bento. */
+  /* Featured bento: named areas, laid out per audience, so every row is full. */
   .bento {
     display: grid;
     gap: 1.1rem;
     margin-top: clamp(2rem, 4vw, 3rem);
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .bento > :global(.tile) {
-    order: var(--o-hire);
+  @media (max-width: 719px) {
+    .bento > :global(.tile) {
+      grid-area: auto !important;
+    }
   }
 
-  .home:has(#aud-research:checked) .bento > :global(.tile) {
-    order: var(--o-research);
-  }
-
-  .home:has(#aud-website:checked) .bento > :global(.tile) {
-    order: var(--o-website);
-  }
-
-  /* Column spans come from the per-audience variables each tile carries, so every row is
-     full in every audience mode and no tile is left alone beside a hole. */
   @media (min-width: 720px) {
     .bento {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas: 'ram v2v' 'ram led' 'onr onr' 'land bell';
     }
 
-    .bento > :global(.tile) {
-      grid-column: span var(--t-hire);
+    .home:has(#aud-research:checked) .bento {
+      grid-template-areas: 'onr onr' 'ram v2v' 'ram bell' 'led land';
     }
 
-    .home:has(#aud-research:checked) .bento > :global(.tile) {
-      grid-column: span var(--t-research);
-    }
-
-    .home:has(#aud-website:checked) .bento > :global(.tile) {
-      grid-column: span var(--t-website);
+    .home:has(#aud-website:checked) .bento {
+      grid-template-areas: 'land land' 'ram v2v' 'ram led' 'onr bell';
     }
   }
 
   @media (min-width: 1100px) {
     .bento {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      margin-top: 0;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-areas: 'ram ram v2v v2v' 'ram ram led led' 'onr onr onr onr' 'land land bell bell';
     }
 
-    .bento > :global(.tile) {
-      grid-column: span var(--d-hire);
+    .home:has(#aud-research:checked) .bento {
+      grid-template-areas: 'onr onr onr onr' 'ram ram v2v v2v' 'ram ram bell bell' 'led led land land';
     }
 
-    .home:has(#aud-research:checked) .bento > :global(.tile) {
-      grid-column: span var(--d-research);
+    .home:has(#aud-website:checked) .bento {
+      grid-template-areas: 'land land land land' 'ram ram v2v v2v' 'ram ram led led' 'onr onr bell bell';
     }
+  }
 
-    .home:has(#aud-website:checked) .bento > :global(.tile) {
-      grid-column: span var(--d-website);
-    }
+  /* A tile that spans two rows lets its picture take the extra height, so the text sits at the
+     bottom with no gap under it. In the tall slot the picture also grows past its usual ratio. */
+  .bento > :global(.tile) :global(.tile__media) {
+    flex: 1 1 auto;
+    min-height: 12rem;
+  }
+
+  .bento > :global(.tile) :global(.tile__body) {
+    flex: 0 0 auto;
+  }
+
+  .bento > :global(.tile) :global(.tile__img) {
+    position: absolute;
+    inset: 0;
   }
 
   /* Audience-specific intro lines. */
@@ -311,55 +219,5 @@ const tileStyle = (b: (typeof bento)[number]) =>
   }
   .home:not(:has(input[name='audience']:checked)) .aud--hire {
     display: inline;
-  }
-
-  .services-teaser {
-    --amber-wash: color-mix(in oklab, var(--amber) 14%, transparent);
-    display: grid;
-    gap: 2.5rem;
-    padding: clamp(1.75rem, 4vw, 3.5rem);
-    background:
-      radial-gradient(40rem 20rem at 100% 0%, var(--amber-wash), transparent 70%),
-      var(--surface);
-  }
-
-  @media (max-width: 959px) {
-    .services-teaser {
-      gap: 2rem;
-    }
-  }
-
-  /* The amber wash goes brown over navy, so dark gets a lighter hand. */
-  :global([data-theme='dark']) .services-teaser {
-    --amber-wash: color-mix(in oklab, var(--amber) 6%, transparent);
-  }
-
-  @media (min-width: 960px) {
-    .services-teaser {
-      grid-template-columns: 1.3fr 1fr;
-      align-items: center;
-    }
-  }
-
-  .services-teaser__list li {
-    display: flex;
-    gap: 1rem;
-    padding-block: 0.85rem;
-    border-bottom: 1px solid var(--line);
-    font-size: 1.02rem;
-  }
-
-  .services-teaser__list li:first-child {
-    border-top: 1px solid var(--line);
-  }
-
-  .services-teaser__list .mono {
-    font-size: 0.75rem;
-    color: var(--accent-ink);
-    padding-top: 0.25rem;
-  }
-
-  :global([data-theme='dark']) .services-teaser__list .mono {
-    color: var(--accent);
   }
 </style>

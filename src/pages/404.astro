@@ -1,11 +1,11 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { slotVars } from '@/lib/depth';
+import { bandVars } from '@/lib/depth';
 import Icon from '@/components/Icon.astro';
 ---
 
 <BaseLayout title="Page not found" description="That page doesn't exist." noindex>
-  <section class="section nf zone" style={slotVars(3, false)}>
+  <section class="section nf zone" style={bandVars(3)}>
     <div class="wrap-narrow text-center">
       <div class="nf__scope" aria-hidden="true">
         <svg viewBox="0 0 200 200">

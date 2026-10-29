@@ -18,20 +18,20 @@ Each home page section is an ocean depth zone. The background steps one clear sh
 
 The "I'm here to..." switcher reorders the sections with CSS, so depth belongs to the **position** on the page, not to a section. Whatever sits third is always at 200 m. The table lives in `src/lib/depth.ts`, and everything about depth is generated from it: the band shade, the light or dark inks, the depth in each section's label, where the marine snow falls, and the depth gauge. The gauge and the labels cannot disagree.
 
-| Slot | Depth | Zone | Hire (default) | Research | Website |
-|---|---|---|---|---|---|
-| 0 | 0 m | Surface | hero | hero | hero |
-| 1 | 50 m | Sunlight zone | Now strip | Now strip | Now strip |
-| 2 | 200 m | Twilight zone | Featured work | Research | Websites |
-| 3 | 400 m | Twilight zone | Experience | Featured work | Services |
-| 4 | 600 m | Twilight zone | Skills | Recommendations | Featured work |
-| 5 | 800 m | Twilight zone | Recommendations | Experience | Field notes |
-| 6 | 1,000 m | Sound channel | Research | Skills | Recommendations |
-| 7 | 1,500 m | Midnight zone | Websites | Field notes | Experience |
-| 8 | 2,000 m | Midnight zone | Field notes | Websites | Skills |
-| 9 | 3,000 m | Midnight zone | Services | Services | Research |
-| 10 | 4,000 m | Abyss | Contact | Contact | Contact |
-| 11 | 4,500 m | Seafloor | Footer | Footer | Footer |
+The home page has eight slots. Each slot names one of the twelve band shades, so the water still steps clearly darker and drops into dark water at the sound channel.
+
+| Slot | Depth | Zone | Band | Hire (default) | Research | Website |
+|---|---|---|---|---|---|---|
+| 0 | 0 m | Surface | 0 | hero | hero | hero |
+| 1 | 50 m | Sunlight zone | 1 | Now strip | Now strip | Now strip |
+| 2 | 200 m | Twilight zone | 3 | Featured work | Research | Client work |
+| 3 | 1,000 m | Sound channel | 6 | Research | Featured work | Featured work |
+| 4 | 2,000 m | Midnight zone | 8 | Client work | Field notes | Field notes |
+| 5 | 3,000 m | Midnight zone | 9 | Field notes | Client work | Research |
+| 6 | 4,000 m | Abyss | 10 | Contact | Contact | Contact |
+| 7 | 4,500 m | Seafloor | 11 | Footer | Footer | Footer |
+
+The section order for each audience is generated from the same table (`zoneStyles` in `depth.ts`), so the order, the depths and the gauge cannot drift apart. Experience, Skills and Recommendations live on /about/; the home page links to them from Featured work.
 
 In the default order the research section lands on the sound channel axis at 1,000 m, which is where its sound speed curve puts the minimum.
 
@@ -77,7 +77,7 @@ Unchanged faces, all self-hosted and preloaded: Space Grotesk for headings, Inte
 
 ### 1. Surface hero: the transmission
 
-A waterfall spectrogram that receives my name once.
+A waterfall spectrogram that receives my name once. (Band and display updated in the third pass, below.)
 
 - **The signal is real.** The browser draws AVERY / MATHERNE into a small raster in the heading font, 228 pixels wide. Each raster row becomes one OFDM symbol: a 512 point inverse FFT at 16 kHz, with one subcarrier per raster column, so the letters are drawn by 228 subcarriers from about 440 Hz to 7.6 kHz. Each subcarrier's amplitude is that pixel's coverage, so anti-aliased edges come out smooth. Every symbol carries a 6 ms cyclic prefix, and neighboring symbols crossfade inside it with a raised cosine, so nothing starts or stops instantly and there are no clicks. One linear up-chirp goes out first as the sync sweep.
 - **The water is the channel.** The signal passes through a gentle frequency-selective fade, as two paths would make, with a little level jitter per subcarrier and some noise. So the letters show real measured texture, while staying within a few dB of full level and clearly readable.
@@ -147,6 +147,31 @@ The research section has an open layout with no card. The sound speed profile si
 - **Header:** solid, in the surface shade, so page text never shows through.
 - **Field notes:** tiles that glow softly like bioluminescence, with a slow breathing glow (opacity only, out of step tile to tile, only while on screen). Tap to decode works exactly as before.
 - **Research:** open, as above. The packet footer is unchanged apart from its depth label.
+
+### 8. Home layout, second pass
+
+- **A shorter page:** hero, Now, featured work, research, a compact strip of the client sites, field notes, contact. Featured work shows each project once: the research, engineering and software work, with the client sites in their own strip. The services pitch sits under the strip.
+- **The signal trace:** a thin waveform down the left gutter from TX in the hero to RX in the footer, with a node and a depth at each section. Each section draws its own segment from its slot's trace (`traceMask` in `depth.ts`), so the noise grows with depth and the trace follows any audience order with no script. It draws in as each section scrolls into view, and is static under reduced motion. On phones it is a faint straight line at the very edge.
+- **Trace and gauge stay separate.** The trace scrolls with the page and shows the path; the gauge stays fixed and reads where you are. One element cannot do both, so the gauge moved to the right edge (from 1440px) and the trace has the left gutter.
+- **Pinned side headings** for Featured work and Field notes from 1100px: the label, heading and links stay in a left column with a fine tick ruler while the content scrolls on the right.
+- **A varied bento:** one tall tile (RAMpage's photo), one wide (the research drawing) and four smaller ones, placed by named grid areas per audience, so no row can have a hole. Tiles with real metrics show the first one as a large numeral; limited-detail work never does.
+- **Projects tune in:** a drawn signature has a light speckle of noise at rest and resolves clean while its tile is hovered or focused. Always clean under reduced motion and on touch screens.
+- **Instrument details, sparingly:** the tick rulers on the pinned columns, and a mono count in one corner of Featured work, Client work and Field notes.
+
+### 9. Interactions, second pass
+
+- **Sound channel (home, research):** the textbook profile beside ten rays traced through it, from 0 to 100 km of range. The source on the depth axis is a slider: drag it, or focus it and use the arrow keys (Shift for bigger steps, Page Up and Down, Home and End). Rays that stay in the channel are teal; rays that reach the surface or the floor fade back, and a readout counts them. The tracer (`src/lib/sound-channel.ts`) steps the ray equations through Munk's profile and reflects at the surface and a flat floor at 4,000 m. The build draws the rays for a source on the axis; the script loads only as the figure nears the screen. Nothing moves on its own.
+- **Skills constellation (/about/):** every skill is a point in one of five clusters (comms and DSP, embedded, web, tools, professional) around an ideal point. Know well skills sit close in; have built with skills scatter further out. Picking a skill (click, or focus and arrow keys, one tab stop for the whole field) names it and lights up the projects whose `stack` lists it, from the table in `src/lib/skills.ts`. When no project lists it, it says so. The plain list below has every skill, its group and its project links; it is the whole section on phones and without JavaScript, and folds away on wide screens.
+- **About:** Experience, Skills and Recommendations sit between the story and Off the clock. Experience and Recommendations use the shared pinned heading (`.pinned`, `.pinned__head` in `global.css`, also used by Featured work and Field notes). The bands stop at slot 5, so the closing sections stay on light water in the light theme.
+- **Gauge ink:** each gauge line reads the band behind it from the real wave curve, so it switches ink exactly where the edge crosses it, and carries a soft halo in its own water's color for the moment it straddles an edge. Measured at 12 scroll stops in both themes: every text line passes 4.5:1 and every tick and scale segment 3:1.
+- **Spectrogram:** whenever the display comes back into view or the tab is shown again, it opens on the held frame with the full name centered, then continues the cycle.
+
+### 10. Third pass
+
+- **Client work** is the full showcase again: large browser and phone frames in alternating rows, with the kind line, what I did, the metrics as large numerals, and the case study and live site links. The services line and buttons sit under it. Client sites appear only here on the home page.
+- **Skills** on /about/ are grouped chips by area. Filled chips are know well, outlined chips are have built with. Each chip is a native disclosure, so a tap, Enter or Space shows "Used in:" with the project links from `src/lib/skills.ts`, or "Not on a project page yet", with no script. The script adds opening on hover and focus, one open at a time, Escape to close, and keeps the card on screen. The constellation is gone.
+- **Signatures play once:** hovering or focusing a tile plays a short animation on its drawn art (the constellation settles in, bars rise, rays grow out from the source, the hop pattern steps through, ripples spread). Transform and opacity only, under a second, nothing at rest, none on touch screens or with reduced motion. The noise effect is gone.
+- **Hero sound:** the name now uses 80 subcarriers from 500 Hz to 3 kHz (at most 57 tones at once), the sweep runs 400 Hz to 3.2 kHz, a second-order low-pass at 3.4 kHz and 30 ms raised-cosine fades shape the buffer, and it plays at a lower level. The waterfall shows 0 to 4 kHz and is still the FFT of exactly the buffer that plays. Hear it restarts the cycle from quiet water, so the sweep and the name are heard and seen together.
 
 ## Deliberately not borrowed
 

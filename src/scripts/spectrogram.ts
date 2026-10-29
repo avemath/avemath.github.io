@@ -7,7 +7,7 @@
 //
 // It pauses off-screen and in background tabs, and shows the held frame under reduced motion or
 // on low-power devices. Sound only ever starts from a click.
-import { FS, N, CP, SYMBOL, BINS, BIN_HZ, FRAME_HZ, VIEW_ROWS, TEXT_BINS, LINES, holdFrame, makeFft, synthesize, addNoise } from '../lib/tx-signal';
+import { FS, N, CP, SYMBOL, SHOW_BINS, STRETCH, BIN_HZ, FRAME_HZ, VIEW_ROWS, TEXT_BINS, LINES, holdFrame, makeFft, synthesize, addNoise } from '../lib/tx-signal';
 import { prefersReducedMotion } from './preferences';
 
 const DB_LO = -84;
@@ -41,7 +41,7 @@ function rasterName() {
   const size = (100 * (TEXT_BINS - 2)) / wide;
   const cap = (capH * size) / 100;
   const gap = size * 0.32;
-  const rows = Math.ceil(cap * LINES.length + gap * (LINES.length - 1)) + 2;
+  const rows = Math.ceil((cap * LINES.length + gap * (LINES.length - 1)) * STRETCH) + 2;
   const c = document.createElement('canvas');
   c.width = TEXT_BINS;
   c.height = rows;
@@ -50,11 +50,12 @@ function rasterName() {
   x.fillStyle = '#fff';
   x.textAlign = 'center';
   x.textBaseline = 'alphabetic';
+  x.setTransform(1, 0, 0, STRETCH, 0, 0);
   LINES.forEach((line, i) => x.fillText(line, TEXT_BINS / 2, 1 + cap + i * (cap + gap)));
   const px = x.getImageData(0, 0, TEXT_BINS, rows).data;
   const mask = new Float32Array(TEXT_BINS * rows);
   for (let i = 0; i < mask.length; i++) mask[i] = px[i * 4 + 3] / 255;
-  return { mask, rows };
+  return { mask, rows, font: size, cap, gap };
 }
 
 export async function mountSpectrogram(root: HTMLElement) {
@@ -83,8 +84,8 @@ export async function mountSpectrogram(root: HTMLElement) {
   const im = new Float64Array(N);
 
   // Levels in dBFS, screen order: row 0 is the newest frame.
-  const levels = new Float32Array(VIEW_ROWS * BINS).fill(DB_LO);
-  const image = ctx.createImageData(BINS, VIEW_ROWS);
+  const levels = new Float32Array(VIEW_ROWS * SHOW_BINS).fill(DB_LO);
+  const image = ctx.createImageData(SHOW_BINS, VIEW_ROWS);
   const px = image.data;
   const lut = buildLut();
 
@@ -97,10 +98,10 @@ export async function mountSpectrogram(root: HTMLElement) {
       im[n] = 0;
     }
     fft(re, im, -1);
-    levels.copyWithin(BINS, 0, levels.length - BINS);
-    px.copyWithin(BINS * 4, 0, px.length - BINS * 4);
+    levels.copyWithin(SHOW_BINS, 0, levels.length - SHOW_BINS);
+    px.copyWithin(SHOW_BINS * 4, 0, px.length - SHOW_BINS * 4);
     const scale = 2 / N;
-    for (let k = 0; k < BINS; k++) {
+    for (let k = 0; k < SHOW_BINS; k++) {
       const db = 20 * Math.log10(Math.hypot(re[k], im[k]) * scale + 1e-9);
       levels[k] = db;
       paint(k, db);
@@ -161,6 +162,9 @@ export async function mountSpectrogram(root: HTMLElement) {
   const calm = await compute(-1);
 
   function restart(now: number) {
+    // Hear it, and every new cycle while it plays, starts from quiet water: the sweep, then the
+    // name, with the picture and the sound starting on the same sample.
+    if (audio) stopAudio();
     root.dataset.live = '';
     screen!.removeAttribute('data-fade');
     phase = 'send';
@@ -215,7 +219,7 @@ export async function mountSpectrogram(root: HTMLElement) {
   let cursor: { bin: number; row: number } | null = null;
 
   const fmtHz = (hz: number) => (hz >= 1000 ? `${(hz / 1000).toFixed(2)} kHz` : `${Math.round(hz)} Hz`);
-  const level = () => (cursor ? levels[cursor.row * BINS + cursor.bin] : DB_LO);
+  const level = () => (cursor ? levels[cursor.row * SHOW_BINS + cursor.bin] : DB_LO);
   const fmtDb = (db: number) => (db <= -99 ? 'below -99 dBFS' : `${Math.round(db)} dBFS`.replace('-', '−'));
   const fmtT = (row: number) => `${(row / FRAME_HZ).toFixed(1)} s ago`;
 
@@ -224,7 +228,7 @@ export async function mountSpectrogram(root: HTMLElement) {
     readout.textContent = `${fmtHz((cursor.bin + 0.5) * BIN_HZ)}  ${fmtDb(level())}  ${fmtT(cursor.row)}`;
     if (cross) {
       cross.hidden = false;
-      cross.style.setProperty('--x', `${((cursor.bin + 0.5) / BINS) * 100}%`);
+      cross.style.setProperty('--x', `${((cursor.bin + 0.5) / SHOW_BINS) * 100}%`);
       cross.style.setProperty('--y', `${((cursor.row + 0.5) / VIEW_ROWS) * 100}%`);
     }
   }
@@ -237,9 +241,9 @@ export async function mountSpectrogram(root: HTMLElement) {
 
   function pointAt(e: PointerEvent) {
     const r = screen!.getBoundingClientRect();
-    const bin = Math.floor(((e.clientX - r.left) / r.width) * BINS);
+    const bin = Math.floor(((e.clientX - r.left) / r.width) * SHOW_BINS);
     const row = Math.floor(((e.clientY - r.top) / r.height) * VIEW_ROWS);
-    if (bin < 0 || bin >= BINS || row < 0 || row >= VIEW_ROWS) return clearReadout();
+    if (bin < 0 || bin >= SHOW_BINS || row < 0 || row >= VIEW_ROWS) return clearReadout();
     cursor = { bin, row };
     showReadout();
   }
@@ -253,7 +257,7 @@ export async function mountSpectrogram(root: HTMLElement) {
   screen.setAttribute('aria-roledescription', 'spectrogram');
   screen.setAttribute('aria-label', 'Spectrogram. Use the arrow keys to read frequency and level.');
   screen.addEventListener('focus', () => {
-    cursor ??= { bin: Math.floor(BINS / 2), row: Math.floor(VIEW_ROWS / 2) };
+    cursor ??= { bin: Math.floor(SHOW_BINS / 2), row: Math.floor(VIEW_ROWS / 2) };
     showReadout();
   });
   screen.addEventListener('blur', clearReadout);
@@ -265,7 +269,7 @@ export async function mountSpectrogram(root: HTMLElement) {
     if (!move) return;
     e.preventDefault();
     cursor = {
-      bin: Math.max(0, Math.min(BINS - 1, cursor.bin + move[0])),
+      bin: Math.max(0, Math.min(SHOW_BINS - 1, cursor.bin + move[0])),
       row: Math.max(0, Math.min(VIEW_ROWS - 1, cursor.row + move[1])),
     };
     showReadout();
@@ -309,7 +313,7 @@ export async function mountSpectrogram(root: HTMLElement) {
     source.buffer = buffer;
     const gain = audioCtx.createGain();
     const t0 = audioCtx.currentTime + 0.03;
-    gain.gain.setValueAtTime(0.2, t0);
+    gain.gain.setValueAtTime(0.12, t0);
     source.connect(gain).connect(audioCtx.destination);
     source.start(t0);
     source.addEventListener('ended', () => audio?.source === source && (audio = null));
@@ -368,11 +372,28 @@ export async function mountSpectrogram(root: HTMLElement) {
     }
   }
 
+  /** Whenever the display comes back into view, it opens on the held frame with the full name
+   *  centered and goes on from there, so nobody lands on a screen of empty water. While the
+   *  sound is playing, the picture keeps following the sound instead. */
+  function resumeHeld() {
+    if (!animated() || audio) return;
+    screen!.removeAttribute('data-fade');
+    phase = 'hold';
+    show(held, HOLD);
+    phaseEnd = performance.now() + HOLD_MS;
+  }
+
   new IntersectionObserver(([entry]) => {
+    const was = visible;
     visible = entry.isIntersecting;
+    if (visible && !was) resumeHeld();
     visible ? start() : stop();
   }).observe(root);
-  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return stop();
+    if (visible) resumeHeld();
+    start();
+  });
   window.addEventListener('motionchange', refresh);
 
   // The still frame from the build is already on screen, showing the held name. With motion, it

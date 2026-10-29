@@ -1,6 +1,13 @@
 ---
 import testimonials from '@/data/testimonials.json';
 
+interface Props {
+  /** Band variables from depth.ts, so the section sits in the page's descent. */
+  zoneStyle?: string;
+}
+
+const { zoneStyle } = Astro.props;
+
 // Only quotes their writers have approved are rendered (see docs/CONTENT-GUIDE.md).
 const quotes = testimonials.filter((t) => t.approved);
 ---
@@ -9,14 +16,18 @@ const quotes = testimonials.filter((t) => t.approved);
   quotes.length > 0 && (
     <section
       id="recommendations"
-      class="section section--tight home-section zone"
+      class="section section--tight zone"
+      style={zoneStyle}
       aria-labelledby="recommendations-title"
       data-section="recommendations"
     >
-      <div class="wrap">
-        <p class="eyebrow">Recommendations</p>
-        <h2 id="recommendations-title" class="section-title section-title--sm">Two professors, in their own words</h2>
-        <p class="section-lede">My senior design advisor and my communications design professor, quoted with their permission.</p>
+      <div class="wrap pinned">
+        <div class="pinned__head">
+          <p class="eyebrow">Recommendations</p>
+          <h2 id="recommendations-title" class="section-title section-title--sm">Two professors, in their own words</h2>
+          <p class="section-lede">My senior design advisor and my communications design professor, quoted with their permission.</p>
+          <p class="corner" aria-hidden="true">{String(quotes.length).padStart(2, '0')} quotes</p>
+        </div>
 
         <ul class="quotes">
           {quotes.map((t) => (
@@ -48,6 +59,13 @@ const quotes = testimonials.filter((t) => t.approved);
     gap: 1rem;
     margin-top: 2.5rem;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+
+  @media (min-width: 1100px) {
+    .quotes {
+      margin-top: 0;
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .quote {

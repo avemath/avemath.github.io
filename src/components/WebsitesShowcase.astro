@@ -7,6 +7,7 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 ---
 
 <section id="websites" class="section home-section zone" aria-labelledby="websites-title" data-section="websites">
+  <span class="spine" aria-hidden="true"></span>
   <div class="wrap">
     <p class="eyebrow">Client work</p>
     <h2 id="websites-title" class="section-title">Live sites built for real clients</h2>
@@ -54,6 +55,17 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
         ))
       }
     </ol>
+
+    <div class="sites__how">
+      <p>
+        Five steps from the first conversation to the written guide, with a quote before I start and a preview link while I build. The
+        services page has the details and the questions people ask.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a class="btn btn--primary" href="/services/">See how I work <Icon name="arrow-right" /></a>
+        <a class="btn" href="/contact/?topic=website">Start a project</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -123,8 +135,31 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 
   .site__metric {
     font-family: var(--font-display);
-    font-size: 1.6rem !important;
+    font-size: clamp(1.75rem, 2.6vw, 2.25rem) !important;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sites__how {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .sites__how p {
+    max-width: 44rem;
+    color: var(--text-soft);
+  }
+
+  @media (min-width: 960px) {
+    .sites__how {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 2rem;
+    }
   }
 </style>

@@ -6,10 +6,14 @@ const notes = facts;
 ---
 
 <section id="field-notes" class="section section--tight home-section zone" aria-labelledby="notes-title" data-section="field-notes">
-  <div class="wrap">
-    <p class="eyebrow">Field notes</p>
-    <h2 id="notes-title" class="section-title section-title--sm">A few things that are true</h2>
-    <p class="section-lede">Facts from the work above, and the stories behind them.</p>
+  <span class="spine" aria-hidden="true"></span>
+  <div class="wrap pinned">
+    <div class="pinned__head">
+      <p class="eyebrow">Field notes</p>
+      <h2 id="notes-title" class="section-title section-title--sm">A few things that are true</h2>
+      <p class="section-lede">Facts from the work above, and the stories behind them.</p>
+      <p class="corner" aria-hidden="true">{String(notes.length).padStart(2, '0')} notes</p>
+    </div>
 
     <ul class="notes">
       {
@@ -57,7 +61,7 @@ const notes = facts;
 
   @media (min-width: 1100px) {
     .notes {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 0;
     }
   }
 
