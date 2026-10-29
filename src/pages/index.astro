@@ -13,6 +13,7 @@ import DepthGauge from '@/components/DepthGauge.astro';
 import RampageLive from '@/components/live/RampageLive.astro';
 import V2vLive from '@/components/live/V2vLive.astro';
 import LedLive from '@/components/live/LedLive.astro';
+import LandspaceLive from '@/components/live/LandspaceLive.astro';
 import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
@@ -114,7 +115,13 @@ const grid = ['landspace', 'bellhop-sim', 'onr-intelligent-data-management'].map
           {/* Every tile image loads lazily: the hero fills the first screen on phones and desktops,
               so even the first tile is below the fold and should not compete with the hero text. */}
           <div class="bento">
-            {grid.map((p) => <ProjectTile project={p!} size="lg" metric />)}
+            {
+              grid.map((p) => (
+                <ProjectTile project={p!} size="lg" metric>
+                  {p!.id === 'landspace' && <LandspaceLive slot="live" />}
+                </ProjectTile>
+              ))
+            }
           </div>
         </div>
       </section>
@@ -432,6 +439,35 @@ const grid = ['landspace', 'bellhop-sim', 'onr-intelligent-data-management'].map
 
     .home-flow > :global(.section--tight) {
       padding-block: 1.9rem;
+    }
+  }
+
+  /* A live tile while it runs: its panel replaces the picture, and the tile grows to fit it. */
+  .bento :global(.tile__media[data-live-on]) {
+    aspect-ratio: auto;
+  }
+
+  .bento :global(.tile__media[data-live-on] > :not(.live)) {
+    display: none;
+  }
+
+  @media (max-width: 719px) {
+    .bento :global(.tile[data-live-on] .tile__inner) {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bento :global(.tile__media[data-live-on]) {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* At rest on a phone, the button sits under the small picture. */
+    .bento :global(.live__try) {
+      right: 0.4rem;
+      bottom: 0.4rem;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.66rem;
     }
   }
 
