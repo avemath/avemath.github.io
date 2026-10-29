@@ -99,7 +99,7 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
             <p class="eyebrow">Contact</p>
             <h2 id="contact-title" class="section-title section-title--sm">Send a note</h2>
             <p class="section-lede">Have a role, a research question or a website in mind? {site.replyTime}</p>
-            <ul class="mt-8 space-y-4">
+            <ul class="mt-8 space-y-4 contact-list">
               <li>
                 <p class="label">Email</p>
                 <a class="link mt-1 inline-flex items-center gap-2 text-lg" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
@@ -282,6 +282,107 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
   .bento > :global(.tile) :global(.tile__img) {
     position: absolute;
     inset: 0;
+  }
+
+  /* Phones: the rest of the page tightens too, so the whole descent is a short read. Content is
+     the same; only the layout changes, and every link and control stays in the page. */
+  @media (max-width: 719px) {
+    /* Now strip: two columns. */
+    .home :global(.now__grid) {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      column-gap: 1rem;
+    }
+
+    .home :global(.now__item) {
+      padding: 0.8rem 0 0.9rem !important;
+      border-left: 0 !important;
+    }
+
+    .home :global(.now__item:nth-child(-n + 2)) {
+      border-top: 0 !important;
+    }
+
+    .home :global(.now__item dd) {
+      font-size: 0.84rem;
+    }
+
+    /* Research: the related work lists titles only; each case study has the summary. */
+    .home :global(.research__row-sub) {
+      display: none !important;
+    }
+
+    .home :global(.research__row) {
+      padding-block: 0.7rem;
+    }
+
+    /* Client sites and field notes: rows you swipe through, with the next card peeking in. */
+    .home :global(.sites),
+    .home :global(.notes) {
+      display: flex !important;
+      gap: 0.75rem !important;
+      margin-inline: calc(-1 * var(--gutter));
+      padding: 0.25rem var(--gutter) 0.75rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      overscroll-behavior-x: contain;
+    }
+
+    .home :global(.sites > .site),
+    .home :global(.notes > .note) {
+      flex: 0 0 84%;
+      scroll-snap-align: start;
+    }
+
+    /* Contact: the form keeps every field, a little tighter. */
+    .home :global(.cform__row) {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .home :global(.cform textarea) {
+      min-height: 0;
+      height: 6.5rem;
+    }
+
+    #contact :global(.card) {
+      padding: 1.1rem;
+    }
+
+    /* The footer frame right below lists GitHub, LinkedIn and Baton Rouge, so on a phone the
+       contact section keeps only the email line. */
+    .contact-list > li:not(:first-child) {
+      display: none;
+    }
+
+    .contact-list {
+      margin-top: 1.25rem;
+    }
+
+    /* Featured tiles: the whole tile is the link, so the decorative "Case study" row goes. A tile
+       with a live site keeps the row, for that link. */
+    .bento :global(.tile__links:not(:has(.tile__ext))) {
+      display: none;
+    }
+
+    /* The sound speed profile a little narrower, so the figure takes less of the screen. */
+    .home :global(.ssp svg.ssp__profile) {
+      width: 76%;
+      margin-inline: auto;
+    }
+
+    .home :global(.hero) {
+      padding-bottom: 3.25rem;
+    }
+
+    /* Less water between sections: the bands and waves still mark each step down. */
+    .home-flow > :global(.section) {
+      padding-block: 2.25rem;
+    }
+
+    .home-flow > :global(.section--tight) {
+      padding-block: 1.9rem;
+    }
   }
 
   /* Audience-specific intro lines. */
