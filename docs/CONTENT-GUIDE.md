@@ -74,7 +74,7 @@ After changing experience data, run `npm run build && npm run assets` so the PDF
 - Every claim gets a concrete noun: a site, a number, a tool, a result.
 - Never invent facts. If a number wasn't measured, don't print one.
 - **Research and the Integer internship:** use only wording from the public announcements until I have written clearance. That means no methods, results, figures, code, vehicle or sensor details.
-- **Children and families:** no real names, photos or health details from Because of ADAM or Little Explorer Swim. Use site screenshots or drawn art instead.
+- **Children and families:** no real names, photos or health details of other families, or of children from Because of ADAM or Little Explorer Swim. Use site screenshots or drawn art instead. The one exception is my own family's story, which I share on purpose: my brother Adam drowned in our backyard pool at 14 months old and survived. That sentence, and the name Adam, may appear in my words. Still no photos of him.
 - Client sites need the owner's OK before they're named or quoted.
 
 ## Upkeep checklist
