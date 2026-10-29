@@ -1,0 +1,402 @@
+---
+// The Because of ADAM live version: a port of the site's "layers of protection" builder
+// (src/components/LayersBuilder.astro in github.com/avemath/BcofADAM at commit f3a96b3). The
+// drawing, the switches, their wording and the messages are the site's; only the styling is
+// fitted to this window. The layer names come from the site's src/data/layers.ts.
+import LiveShell from './LiveShell.astro';
+
+const LAYERS = ['Supervision', 'Barriers', 'Alarms', 'Covers & drains', 'Swim skills', 'Life jackets', 'Emergency ready'];
+const layerName = { supervision: 'Supervision', barriers: 'Barriers', alarms: 'Alarms', covers: 'Covers & drains' };
+const toggles = [
+  { id: 'door', layer: 'alarms', label: 'Door alarm', note: 'Sounds the moment the back door opens.' },
+  { id: 'fence', layer: 'barriers', label: 'Four-sided pool fence', note: 'Separates the pool from the house and yard.' },
+  { id: 'gate', layer: 'barriers', label: 'Self-latching gate', note: 'Closes and latches on its own, out of reach.' },
+  { id: 'poolalarm', layer: 'alarms', label: 'Pool alarm', note: 'Alerts you if something enters the water.' },
+  { id: 'cover', layer: 'covers', label: 'Safety cover', note: 'Closes off the water when the pool isn’t in use.' },
+  { id: 'watcher', layer: 'supervision', label: 'Water Watcher', note: 'One adult, eyes on the water, no phone.' },
+] as const;
+const shown = Object.values(layerName);
+const others = LAYERS.filter((l) => !shown.includes(l)).map((l) => l.toLowerCase());
+const list = (items: string[]) => items.slice(0, -1).join(', ') + ' and ' + items.at(-1);
+const note = `This backyard shows ${shown.length} of the ${LAYERS.length} layers of protection. The other ${others.length} (${list(others)}) go with your family everywhere, not just at home.`;
+---
+
+<LiveShell
+  kind="adam"
+  description="The layers of protection builder from becauseofadam.org, working here. Turn on each protection to draw it into a backyard and put a stop between the back door and the pool."
+  href="/work/because-of-adam/"
+  hrefLabel="How I built the site"
+>
+  <p slot="title" class="ab__title mono">becauseofadam.org · Build your layers</p>
+
+  <div class="ab" data-builder>
+    <div class="ab__scene">
+      <svg viewBox="0 0 640 400" role="img" aria-labelledby="ab-title ab-desc">
+        <title id="ab-title">A backyard seen from above</title>
+        <desc id="ab-desc">
+          A house on the left and a pool on the right, with a child’s footprints leading from the back door to the water. Protective
+          layers appear as you turn them on.
+        </desc>
+        <defs>
+          <linearGradient id="ab-water" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#7fd6e0"></stop>
+            <stop offset="1" stop-color="#1aa6b7"></stop>
+          </linearGradient>
+          <pattern id="ab-hatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="12" height="12" fill="#35536a"></rect>
+            <line x1="0" y1="0" x2="0" y2="12" stroke="#4b6a82" stroke-width="5"></line>
+          </pattern>
+          <pattern id="ab-grass" width="18" height="18" patternUnits="userSpaceOnUse">
+            <rect width="18" height="18" fill="#d6ebcf"></rect>
+            <path d="M4 12 l2-5 M12 6 l1-4 M14 16 l2-4" stroke="#bcdcb2" stroke-width="1.5"></path>
+          </pattern>
+        </defs>
+
+        <rect width="640" height="400" fill="url(#ab-grass)"></rect>
+
+        <rect x="16" y="40" width="160" height="320" rx="6" fill="#f6efe4" stroke="#083349" stroke-width="3"></rect>
+        <text x="96" y="92" text-anchor="middle" class="ab__svg-label">HOUSE</text>
+        <rect x="172" y="176" width="8" height="48" fill="#f6efe4"></rect>
+        <path d="M176 176 A 44 44 0 0 1 216 214" fill="none" stroke="#083349" stroke-width="1.5" stroke-dasharray="4 4"></path>
+        <line x1="176" y1="176" x2="212" y2="190" stroke="#083349" stroke-width="3"></line>
+
+        <rect x="356" y="96" width="232" height="208" rx="18" fill="#efe4d2"></rect>
+        <rect x="380" y="120" width="184" height="160" rx="14" fill="url(#ab-water)"></rect>
+        <path class="ab__ripple" d="M400 170 q 20 -10 40 0 t 40 0 t 40 0 t 40 0" fill="none" stroke="#fff" stroke-opacity="0.6" stroke-width="2"></path>
+        <path class="ab__ripple ab__ripple--2" d="M400 230 q 20 -10 40 0 t 40 0 t 40 0 t 40 0" fill="none" stroke="#fff" stroke-opacity="0.45" stroke-width="2"></path>
+
+        <g class="ab__steps" fill="#e85d4f">
+          {
+            Array.from({ length: 11 }, (_, i) => {
+              const x = 196 + i * 17;
+              const y = 200 + (i % 2 === 0 ? -5 : 5);
+              return <ellipse cx={x} cy={y} rx="5" ry="3.2" />;
+            })
+          }
+        </g>
+
+        <g class="ab__layer" data-layer="cover">
+          <rect x="380" y="120" width="184" height="160" rx="14" fill="url(#ab-hatch)" opacity="0.92"></rect>
+          <rect x="380" y="120" width="184" height="160" rx="14" fill="none" stroke="#ffb703" stroke-width="3"></rect>
+        </g>
+
+        <g class="ab__layer" data-layer="poolalarm">
+          <circle cx="530" cy="146" r="16" fill="none" stroke="#ffb703" stroke-width="2" class="ab__pulse"></circle>
+          <circle cx="530" cy="146" r="9" fill="#ffb703" stroke="#083349" stroke-width="2"></circle>
+        </g>
+
+        <g class="ab__layer" data-layer="fence">
+          <path d="M332 176 V72 H612 V328 H332 V224" fill="none" stroke="#6b4f3a" stroke-width="7" stroke-linejoin="round"></path>
+          <path d="M332 176 V72 H612 V328 H332 V224" fill="none" stroke="#f6efe4" stroke-width="3" stroke-dasharray="3 9"></path>
+        </g>
+
+        <g class="ab__layer" data-layer="gate">
+          <line x1="332" y1="176" x2="332" y2="224" stroke="#ffb703" stroke-width="8" stroke-linecap="round"></line>
+          <circle cx="332" cy="182" r="5" fill="#083349"></circle>
+        </g>
+
+        <g class="ab__layer" data-layer="door">
+          <rect x="170" y="172" width="14" height="56" rx="4" fill="#ffb703"></rect>
+          <g transform="translate(198 150)">
+            <path d="M0 -12 a 9 9 0 0 1 9 9 v 7 l 4 5 h -26 l 4 -5 v -7 a 9 9 0 0 1 9 -9 z" fill="#ffb703" stroke="#083349" stroke-width="2"></path>
+            <circle cx="0" cy="12" r="3" fill="#083349"></circle>
+          </g>
+        </g>
+
+        <g class="ab__layer" data-layer="watcher">
+          <circle cx="380" cy="334" r="26" fill="#fff" stroke="#ffb703" stroke-width="3"></circle>
+          <circle cx="380" cy="326" r="7" fill="#083349"></circle>
+          <path d="M367 348 q 13 -16 26 0" fill="#083349"></path>
+          <rect x="376" y="336" width="8" height="10" rx="2" fill="#ffb703"></rect>
+          <path d="M392 322 L 452 244" stroke="#ffb703" stroke-width="2" stroke-dasharray="4 5"></path>
+        </g>
+
+        <g class="ab__stop" data-stop="door"><circle cx="190" cy="200" r="11"></circle><path d="M185 195 l10 10 M195 195 l-10 10"></path></g>
+        <g class="ab__stop" data-stop="gate"><circle cx="332" cy="200" r="11"></circle><path d="M327 195 l10 10 M337 195 l-10 10"></path></g>
+        <g class="ab__stop" data-stop="cover"><circle cx="386" cy="200" r="11"></circle><path d="M381 195 l10 10 M391 195 l-10 10"></path></g>
+      </svg>
+    </div>
+
+    <fieldset class="ab__controls">
+      <legend>Add layers of protection</legend>
+      <ul>
+        {
+          toggles.map((t) => (
+            <li>
+              <label class="ab__toggle">
+                <input type="checkbox" value={t.id} />
+                <span class="ab__switch" aria-hidden="true" />
+                <span class="ab__text">
+                  <strong>{t.label}</strong>
+                  <small>
+                    <span class="ab__layer-name">{layerName[t.layer]}:</span> {t.note}
+                  </small>
+                </span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <div class="ab__meter" aria-hidden="true"><span class="ab__fill" data-ab-fill></span></div>
+    <p class="ab__status" role="status" aria-live="polite" data-ab-status>
+      <strong>0 of 6 turned on.</strong> Nothing stands between a curious toddler and the water.
+    </p>
+    <p class="ab__note">{note}</p>
+  </div>
+</LiveShell>
+
+<style>
+  .ab__title {
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* The site's own look: deep navy, sun yellow and aqua, in both of this site's themes. */
+  .ab {
+    --ab-deep: #083349;
+    --ab-sun: #ffb703;
+    --ab-aqua: #1aa6b7;
+    --ab-soft: #a9c9d4;
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+    background: var(--ab-deep);
+    color: #fff;
+  }
+
+  .ab__scene {
+    padding: 6px;
+    border-radius: 0.6rem;
+    background: #fff;
+  }
+
+  .ab__scene svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.35rem;
+  }
+
+  .ab__svg-label {
+    font: 700 13px var(--font-sans);
+    letter-spacing: 0.2em;
+    fill: #083349;
+    opacity: 0.55;
+  }
+
+  .ab__layer,
+  .ab__stop {
+    opacity: 0;
+    transition:
+      opacity 0.45s ease,
+      transform 0.45s ease;
+  }
+
+  .ab__layer {
+    transform: translateY(-6px);
+  }
+
+  .ab__layer.is-on,
+  .ab__stop.is-on {
+    opacity: 1;
+    transform: none;
+  }
+
+  .ab__stop circle {
+    fill: #fff;
+    stroke: #083349;
+    stroke-width: 3;
+  }
+
+  .ab__stop path {
+    stroke: #e85d4f;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .ab__steps {
+    transition: opacity 0.4s ease;
+  }
+
+  .ab.is-complete .ab__steps {
+    opacity: 0.35;
+  }
+
+  .ab__pulse {
+    transform-origin: 530px 146px;
+    animation: ab-pulse 1.8s ease-out infinite;
+  }
+
+  @keyframes ab-pulse {
+    from {
+      transform: scale(0.6);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+
+  .ab__ripple {
+    animation: ab-ripple 5s ease-in-out infinite alternate;
+  }
+
+  .ab__ripple--2 {
+    animation-delay: -2.5s;
+  }
+
+  @keyframes ab-ripple {
+    to {
+      transform: translateX(-12px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ab *,
+    .ab__layer,
+    .ab__stop {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  :global(html[data-motion='reduce']) .ab *,
+  :global(html[data-motion='reduce']) .ab__layer,
+  :global(html[data-motion='reduce']) .ab__stop {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .ab__controls {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .ab__controls legend {
+    margin-bottom: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .ab__controls ul {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  @container (min-width: 32rem) {
+    .ab__controls ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .ab__toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    height: 100%;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    border-radius: 0.6rem;
+    background: rgb(255 255 255 / 0.06);
+    cursor: pointer;
+  }
+
+  .ab__toggle:hover {
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  .ab__toggle input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .ab__switch {
+    position: relative;
+    flex: none;
+    width: 38px;
+    height: 22px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.25);
+    transition: background 0.2s ease;
+  }
+
+  .ab__switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s ease;
+  }
+
+  .ab__toggle input:checked + .ab__switch {
+    background: var(--ab-sun);
+  }
+
+  .ab__toggle input:checked + .ab__switch::after {
+    transform: translateX(16px);
+  }
+
+  .ab__toggle input:focus-visible + .ab__switch {
+    outline: 3px solid var(--ab-sun);
+    outline-offset: 3px;
+  }
+
+  .ab__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-size: 0.84rem;
+    line-height: 1.3;
+  }
+
+  .ab__text small {
+    font-size: 0.74rem;
+    color: var(--ab-soft);
+  }
+
+  .ab__layer-name {
+    font-weight: 700;
+  }
+
+  .ab__meter {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.15);
+  }
+
+  .ab__fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--ab-aqua), var(--ab-sun));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+
+  .ab__status {
+    min-height: 2.6em;
+    font-size: 0.86rem;
+  }
+
+  .ab__note {
+    font-size: 0.76rem;
+    color: var(--ab-soft);
+  }
+</style>
