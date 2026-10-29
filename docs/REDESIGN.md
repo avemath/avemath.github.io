@@ -182,6 +182,14 @@ The hero panel has two tabs, Display and How it works (arrow keys, Home and End)
 - **Break it on purpose:** turn off the cyclic prefix (the echo smears each row into the next), turn off the fade (the spectrum at a join jumps up, and Hear it plays the clicks), or raise the noise until the name fades into static. A small received waterfall shows the result, and Reset puts everything back.
 - **One honest difference:** the walkthrough gives the water a second path, 1 ms late, so the prefix has an echo to absorb. The display tab sends the signal without it, and the walkthrough says so.
 
+### 12. Live tiles
+
+A live tile is a small working version of a project over its picture in Featured work, built from the project's real code (`src/components/live/`). At first paint only the picture shows, with a Try it button; the tile's script loads when the tile nears the screen, and the version starts only when someone presses Try it. Nothing plays sound. Close puts the picture back. Each tile has a screen-reader description and a link to the full version on its case study. On phones the compact row opens to the full width.
+
+- **RAMpage:** the weapon and safety firmware (`src/lib/rampage-firmware.ts`, the same module the case study's simulator now uses) behind Fire, E-stop and Reset. Air counts down from 17 and locks out at zero; E-stop holds the kill switch on; Reset reboots, which refills the count as a power cycle does on the robot. The system as built (FlySky receiver, ESCs, Pico W, Pi 4B) has one button per block, each showing the code that runs there, cut at build time from the vendored firmware in `vendor/rampage/` with real line numbers. The ESCs run no code, and the tile says so.
+- **V2V:** the MATLAB scenario (car 1 at 30 m/s, 20 m behind car 2 at 25 m/s) with a closing-speed slider, and the brake rule from `V2V_TXRXf.m`: warn when time to collision is under 5.0 s (`src/lib/v2v-scenario.ts`). At the default it reads 4.0 s and recommends braking. The receiver (`src/lib/ofdm-rx.ts`, shared with the case study's demo) cleans up a packet's payload as its four stages lock in order.
+- **Reduced motion:** the stages lock at once, the packet dot is hidden and the status light holds steady. The firmware's own timing (boot, cooldown) still runs, since that is behavior, not animation.
+
 ## Deliberately not borrowed
 
 Nicholas's site (`/nmdomke/`) was checked only to stay clear of it. Not used here:
