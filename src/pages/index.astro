@@ -451,6 +451,11 @@ const grid = ['landspace', 'bellhop-sim', 'signals-playground', 'onr-intelligent
   }
 
   /* A live tile while it runs: its panel replaces the picture, and the tile grows to fit it. */
+  /* Its neighbors in the row keep their own height instead of stretching to match. */
+  .bento:has(:global([data-live-on])) {
+    align-items: start;
+  }
+
   .bento :global(.tile__media[data-live-on]) {
     aspect-ratio: auto;
   }
