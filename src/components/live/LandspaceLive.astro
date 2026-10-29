@@ -1,0 +1,156 @@
+---
+// The Landspace live tile: draw a parcel on a made-up section grid and see its acreage, computed
+// with the app's own area and formatting code (vendor/landspace). See src/scripts/live/landspace.ts.
+import LiveShell from './LiveShell.astro';
+
+// Grid lines every eighth of a mile over a 1 by 0.75 mile area, drawn in a 320 by 240 box.
+const lines = Array.from({ length: 9 }, (_, i) => i * 40);
+const rows = Array.from({ length: 7 }, (_, j) => j * 40);
+---
+
+<LiveShell
+  kind="landspace"
+  description="A small version of Landspace's parcel drawing. Click or use the keyboard to place the corners of a parcel on a made-up grid, and the app's own code computes its acreage and perimeter."
+  href="/work/landspace/"
+  hrefLabel="Read the Landspace case study"
+>
+  <p slot="title" class="ls__title mono">Landspace · Parcel acreage</p>
+
+  <svg
+    class="ls__map"
+    viewBox="0 0 320 240"
+    tabindex="0"
+    role="application"
+    aria-label="Made-up parcel grid. Arrow keys move the crosshair an eighth of a mile, Shift for less. Enter adds a corner, Backspace removes the last one."
+    aria-describedby="ls-out"
+    data-ls-map
+  >
+    <rect width="320" height="240" class="ls__ground"></rect>
+    {lines.map((x) => <path d={`M ${x} 0 V 240`} class:list={['ls__grid', x % 80 === 0 && 'ls__grid--qq']} />)}
+    {rows.map((y) => <path d={`M 0 ${y} H 320`} class:list={['ls__grid', y % 80 === 0 && 'ls__grid--qq']} />)}
+    <polygon class="ls__shape" points="" data-ls-shape></polygon>
+    <g class="ls__dots" data-ls-dots></g>
+    <circle class="ls__cursor" r="5" cx="160" cy="120" data-ls-cursor></circle>
+  </svg>
+  <p class="ls__legend">Made-up grid and coordinates. Squares are an eighth of a mile, 10 acres; bold lines every quarter mile, 40 acres.</p>
+
+  <div class="ls__out" id="ls-out">
+    <p><span class="ls__k mono">Area</span> <b data-ls-area>Add 3 corners</b></p>
+    <p><span class="ls__k mono">Perimeter</span> <b data-ls-perim>0 ft</b></p>
+    <p class="ls__count mono" data-ls-count>0 corners</p>
+  </div>
+  <p class="sr-only" aria-live="polite" data-ls-live></p>
+
+  <div class="ls__controls">
+    <button type="button" class="btn btn--small" data-ls-sample>Sample parcel</button>
+    <button type="button" class="btn btn--small" data-ls-undo>Undo corner</button>
+    <button type="button" class="btn btn--small" data-ls-clear>Clear</button>
+    <label class="ls__snap"><input type="checkbox" checked data-ls-snap /> Snap to grid</label>
+  </div>
+</LiveShell>
+
+<style>
+  .ls__title,
+  .ls__k {
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .ls__map {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.45rem;
+    cursor: crosshair;
+    touch-action: manipulation;
+  }
+
+  .ls__map:focus-visible {
+    outline: 2px solid var(--amber-line);
+    outline-offset: 2px;
+  }
+
+  .ls__ground {
+    fill: color-mix(in oklab, var(--surface-2) 80%, var(--bg));
+  }
+
+  .ls__grid {
+    stroke: var(--line);
+    stroke-width: 0.6;
+  }
+
+  .ls__grid--qq {
+    stroke: var(--line-strong);
+    stroke-width: 1.1;
+  }
+
+  .ls__shape {
+    fill: color-mix(in oklab, var(--amber) 28%, transparent);
+    stroke: var(--amber-line);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .ls__dots :global(circle) {
+    fill: var(--surface);
+    stroke: var(--amber-line);
+    stroke-width: 1.6;
+  }
+
+  .ls__cursor {
+    fill: none;
+    stroke: var(--accent-ink);
+    stroke-width: 1.4;
+    stroke-dasharray: 2 2;
+  }
+
+  .ls__map:not(:focus-visible) .ls__cursor {
+    display: none;
+  }
+
+  .ls__legend {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .ls__out {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 1.1rem;
+  }
+
+  .ls__out b {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ls__count {
+    font-size: 0.72rem;
+    color: var(--text-soft);
+  }
+
+  .ls__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem 0.6rem;
+  }
+
+  .ls__snap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+  }
+
+  .ls__snap input {
+    accent-color: var(--accent-ink);
+  }
+</style>
