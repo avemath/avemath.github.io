@@ -1,6 +1,7 @@
 ---
 import BrowserFrame from './BrowserFrame.astro';
 import Icon from './Icon.astro';
+import AdamLive from './live/AdamLive.astro';
 import { getProjects, isWebsite, projectHref } from '@/lib/projects';
 
 const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live);
@@ -16,7 +17,7 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
     <ol class="sites">
       {
         sites.map((p, i) => (
-          <li class="site" data-reveal>
+          <li class="site" data-reveal data-live-host={p.id === 'because-of-adam' ? '' : undefined}>
             <div class="site__media">
               <BrowserFrame
                 src={p.data.cover!}
@@ -25,7 +26,10 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
                 url={p.data.links.live}
                 widths={[240, 480, 680, 960, 1280]}
                 sizes="(min-width: 960px) 40vw, (min-width: 720px) calc(100vw - 5rem), 8rem"
-              />
+                live={p.id === 'because-of-adam'}
+              >
+                {p.id === 'because-of-adam' && <AdamLive />}
+              </BrowserFrame>
             </div>
             <div class="site__copy">
               <p class="label">
@@ -168,6 +172,33 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
     .site__links {
       grid-column: 1 / -1;
       margin-top: 0;
+    }
+
+    /* A live version needs the card's full width: it moves below the title while it runs. */
+    .site[data-live-on] .site__media {
+      grid-column: 1 / -1;
+      grid-row: 3;
+    }
+
+    .site[data-live-on] .site__copy > .label,
+    .site[data-live-on] .site__title {
+      grid-column: 1 / -1;
+    }
+
+    /* At rest the small screenshot is the button's whole frame. */
+    .site__media :global(.live__try) {
+      right: 0.3rem;
+      bottom: 0.3rem;
+      padding-inline: 0.5rem;
+      font-size: 0.64rem;
+    }
+  }
+
+  /* The phone mockup covers the bottom right corner, so Try it sits bottom left. */
+  @media (min-width: 720px) {
+    .site__media :global(.live__try) {
+      right: auto;
+      left: 0.7rem;
     }
   }
 

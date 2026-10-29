@@ -11,14 +11,16 @@ interface Props {
   widths?: number[];
   sizes?: string;
   eager?: boolean;
+  /** The window can hold a live version of the site (see LiveShell), passed in the slot. */
+  live?: boolean;
 }
 
-const { src, mobile, alt, url, widths = [480, 680, 960, 1280], sizes = '(min-width: 1024px) 44vw, calc(100vw - 2rem)', eager = false } = Astro.props;
+const { src, mobile, alt, url, widths = [480, 680, 960, 1280], sizes = '(min-width: 1024px) 44vw, calc(100vw - 2rem)', eager = false, live = false } = Astro.props;
 const host = url ? displayUrl(url) : '';
 ---
 
 <figure class="frame">
-  <div class="frame__window">
+  <div class="frame__window" data-live-media={live ? '' : undefined}>
     <div class="frame__bar" aria-hidden="true">
       <span class="frame__dots"><i></i><i></i><i></i></span>
       {host && <span class="frame__url">{host}</span>}
@@ -34,6 +36,7 @@ const host = url ? displayUrl(url) : '';
       fetchpriority={eager ? 'high' : 'auto'}
       class="frame__shot"
     />
+    <slot />
   </div>
   {
     mobile && (
@@ -51,6 +54,7 @@ const host = url ? displayUrl(url) : '';
   }
 
   .frame__window {
+    position: relative;
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 0.85rem;
@@ -104,6 +108,12 @@ const host = url ? displayUrl(url) : '';
     aspect-ratio: 16 / 10;
     object-fit: cover;
     object-position: top center;
+  }
+
+  /* While a live version runs, it takes the screenshot's place, and the phone steps aside. */
+  .frame__window[data-live-on] .frame__shot,
+  .frame:has([data-live-on]) .frame__phone {
+    display: none;
   }
 
   .frame__phone {
