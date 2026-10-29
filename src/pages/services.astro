@@ -367,7 +367,9 @@ const faqLd = {
     font-size: 0.95rem;
   }
 
-  /* Three tiles: a row of two closes with a wide sideways tile on tablets, three across on desktop. */
+  /* Balanced rows for any number of sites. Tablets: two across, and an odd last tile runs wide.
+     Desktop: three across when the count divides by three; otherwise it stays two across, so a
+     count like four is two full rows instead of three plus one alone. */
   .recent {
     display: grid;
     gap: 1.1rem;
@@ -386,11 +388,11 @@ const faqLd = {
   }
 
   @media (min-width: 1100px) {
-    .recent {
+    .recent:has(> :global(.tile:nth-child(3n):last-child)) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .recent > :global(.tile:nth-child(odd):last-child) {
+    .recent:has(> :global(.tile:nth-child(3n):last-child)) > :global(.tile:nth-child(odd):last-child) {
       grid-column: auto;
     }
   }
