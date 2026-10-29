@@ -16,6 +16,11 @@ keywords: ["radio", "SDR", "software-defined radio", "wireless", "802.11p", "car
 stack: [MATLAB, Communications Toolbox, ADALM-PLUTO SDR, OFDM, Viterbi decoding]
 links:
   repo: https://github.com/avemath/v2v-bsm-ofdm
+metrics:
+  - { label: Message size, value: "10 bytes" }
+  - { label: Data subcarriers, value: "48" }
+  - { label: Radio link, value: "2.9 GHz" }
+  - { label: Time to impact in the test scenario, value: "4 s" }
 demo: ofdm
 ---
 
