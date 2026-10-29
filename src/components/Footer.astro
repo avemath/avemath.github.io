@@ -129,6 +129,32 @@ const wave = sync.map((b, i) => `${i === 0 ? 'M' : 'L'} ${i * 10} ${b ? 4 : 20} 
     margin-top: 0.5rem;
   }
 
+  /* On a phone at the end of the home page, the frame packs into two columns: preamble and CRC
+     side by side, then the header and the payload across the width. */
+  @media (max-width: 719px) {
+    :global(body:has(.home)) .rx__frame {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    :global(body:has(.home)) .rx__field--hdr,
+    :global(body:has(.home)) .rx__field--payload {
+      grid-column: 1 / -1;
+    }
+
+    :global(body:has(.home)) .rx__field--crc {
+      grid-row: 1;
+      grid-column: 2;
+    }
+
+    :global(body:has(.home)) .rx__field {
+      padding: 0.8rem 0.9rem 0.9rem;
+    }
+
+    :global(body:has(.home)) .rx__links {
+      grid-template-columns: repeat(2, minmax(0, max-content));
+    }
+  }
+
   .rx {
     margin-top: 2rem;
     font-family: var(--font-mono);
