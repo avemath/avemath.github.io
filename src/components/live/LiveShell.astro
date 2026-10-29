@@ -82,16 +82,18 @@ const descId = `live-${kind}-desc`;
     background: var(--amber);
   }
 
-  :global(.tile[data-live-on]) .live__try {
+  :global(html [data-live-on]) .live__try,
+  :global(html.js [data-live-on]) .live__try {
     display: none;
   }
 
   /* Running: the panel takes the place of the picture, above the card's stretched link. */
-  :global(.tile__media[data-live-on]) .live {
+  :global([data-live-media][data-live-on]) .live {
     height: 100%;
   }
 
   .live__panel {
+    container-type: inline-size;
     position: relative;
     z-index: 3;
     box-sizing: border-box;
@@ -146,8 +148,10 @@ const descId = `live-${kind}-desc`;
 
   document.querySelectorAll<HTMLElement>('[data-live]').forEach((root) => {
     const kind = root.dataset.live as Kind;
-    const tile = root.closest<HTMLElement>('.tile');
-    const media = root.closest<HTMLElement>('.tile__media');
+    // The element that holds the live version (a spotlight's demo side, or a tile), and the
+    // frame whose picture it replaces while it runs.
+    const tile = root.closest<HTMLElement>('[data-live-host], .tile');
+    const media = root.closest<HTMLElement>('[data-live-media], .tile__media');
     const tryBtn = root.querySelector<HTMLButtonElement>('[data-live-try]')!;
     const tpl = root.querySelector<HTMLTemplateElement>('[data-live-ui]')!;
     let mod: Promise<Mod> | null = null;

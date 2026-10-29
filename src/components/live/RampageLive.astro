@@ -271,6 +271,13 @@ const blocks = [
     gap: 0.4rem;
   }
 
+  /* With room, the four blocks sit in one row and the code opens full width below them. */
+  @container (min-width: 34rem) {
+    .rl__blocks {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   .rl__block {
     display: grid;
     gap: 0.1rem;
