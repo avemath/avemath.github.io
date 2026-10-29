@@ -180,6 +180,11 @@ const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': Adam
       margin-top: 0;
     }
 
+    /* The other cards in the row keep their own height while one runs a live version. */
+    .sites:has([data-live-on]) {
+      align-items: flex-start;
+    }
+
     /* A live version needs the card's full width: it moves below the title while it runs. */
     .site[data-live-on] .site__media {
       grid-column: 1 / -1;
