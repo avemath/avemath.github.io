@@ -1,0 +1,270 @@
+---
+// A spotlight row in Featured work: a live version of the project on one side, big enough to use,
+// and what it is and how to try it on the other. Rows alternate sides; phones stack the demo on
+// top. The demo side shows the project's picture until someone presses Try it (see LiveShell).
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon from './Icon.astro';
+import ProjectArt from './ProjectArt.astro';
+import { type Project, typeLabels, projectHref } from '@/lib/projects';
+import { yearRange } from '@/lib/format';
+
+interface Props {
+  project: Project;
+  /** Demo on the right instead of the left, from tablet width up. */
+  flip?: boolean;
+  /** A picture for the poster instead of the cover or drawn art. */
+  photo?: ImageMetadata;
+  focus?: string;
+  what: string;
+  tryThis: string[];
+  why: string;
+  /** Which of the case study's metrics to show as the numeral. */
+  metricLabel?: string;
+}
+
+const { project, flip = false, photo, focus, what, tryThis, why, metricLabel } = Astro.props;
+const d = project.data;
+const finished = d.status === 'complete' || d.status === 'archived';
+const when = yearRange(d.period.start, d.period.end ?? (finished ? d.period.start : null));
+const metric = d.confidentiality === 'limited' ? undefined : (d.metrics?.find((m) => m.label === metricLabel) ?? d.metrics?.[0]);
+const poster = photo ?? d.cover;
+const id = `sp-${project.id}`;
+---
+
+<article class:list={['sp', flip && 'sp--flip']} aria-labelledby={`${id}-title`} data-reveal>
+  <div class="sp__demo" data-live-host>
+    <div class="sp__stage" data-live-media>
+      {
+        poster ? (
+          <Image
+            src={poster}
+            alt=""
+            widths={[480, 720, 960, 1280]}
+            sizes="(min-width: 1100px) 40rem, (min-width: 720px) 56vw, calc(100vw - 2rem)"
+            format="webp"
+            quality={76}
+            loading="lazy"
+            class="sp__poster"
+            style={focus ? `object-position:${focus}` : undefined}
+          />
+        ) : (
+          <ProjectArt slug={project.id} fit="meet" />
+        )
+      }
+      <slot />
+    </div>
+  </div>
+
+  <div class="sp__text">
+    <p class="sp__kind">
+      <span class="chip chip--type">{typeLabels[d.type]}</span>
+      <span class="label">{when}</span>
+    </p>
+    <h3 id={`${id}-title`} class="sp__title">{d.title}</h3>
+
+    {/* Open on wide screens (set before paint below), folded on phones to keep the page short. */}
+    <details class="sp__more" data-sp-more>
+      <summary class="sp__label">What it is and how to try it</summary>
+      <p class="sp__label">What you're looking at</p>
+      <p class="sp__what">{what}</p>
+      <p class="sp__label">Try this</p>
+      <ol class="sp__try">
+        {tryThis.map((t) => <li>{t}</li>)}
+      </ol>
+      <p class="sp__label">Why it matters</p>
+      <p class="sp__why">{why}</p>
+    </details>
+
+    <div class="sp__end">
+      {
+        metric && (
+          <p class="sp__metric">
+            <span class="sp__metric-v">{metric.value}</span>
+            <span class="label">{metric.label}</span>
+          </p>
+        )
+      }
+      <a class="btn btn--small sp__link" href={projectHref(project)}>
+        Read the case study <Icon name="arrow-right" />
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .sp {
+    display: grid;
+    gap: 1.25rem 2.5rem;
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .sp {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .sp--flip .sp__demo {
+      order: 2;
+    }
+  }
+
+  .sp__demo {
+    min-width: 0;
+  }
+
+  /* The demo's frame: the poster at rest, the live panel while it runs. */
+  .sp__stage {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--surface-2) 70%, var(--bg));
+    box-shadow: var(--shadow);
+  }
+
+  .sp__stage[data-live-on] {
+    aspect-ratio: auto;
+    overflow: visible;
+  }
+
+  .sp__stage[data-live-on] > :not(:global(.live)) {
+    display: none;
+  }
+
+  .sp__poster,
+  .sp__stage > :global(.art) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sp__text {
+    min-width: 0;
+  }
+
+  .sp__kind {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .sp__title {
+    margin-top: 0.6rem;
+    font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .sp__label {
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  .sp__what,
+  .sp__why {
+    margin-top: 0.25rem;
+    color: var(--text-soft);
+  }
+
+  .sp__more > summary {
+    cursor: pointer;
+    list-style-position: inside;
+  }
+
+  /* Wide screens: always open, so the toggle itself is not needed. */
+  @media (min-width: 720px) {
+    .sp__more > summary {
+      display: none;
+    }
+  }
+
+  .sp__try {
+    display: grid;
+    gap: 0.3rem;
+    margin-top: 0.35rem;
+    padding-left: 1.25rem;
+    list-style: decimal;
+    color: var(--text-soft);
+  }
+
+  .sp__try > li::marker {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    color: var(--accent-ink);
+  }
+
+  .sp__end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: 1.1rem;
+  }
+
+  .sp__metric {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .sp__metric-v {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+
+
+  /* Phones: the demo's frame is shorter at rest, and the text is tighter. */
+  @media (max-width: 719px) {
+    .sp {
+      gap: 0.75rem;
+    }
+
+    .sp__stage {
+      aspect-ratio: 2 / 1;
+    }
+
+    /* The type and years are on the case study; the title leads here. */
+    .sp__kind {
+      display: none;
+    }
+
+    .sp__title {
+      margin-top: 0;
+    }
+
+    .sp__label {
+      margin-top: 0.7rem;
+    }
+
+    .sp__what,
+    .sp__why,
+    .sp__try {
+      font-size: 0.92rem;
+    }
+
+    .sp__end {
+      margin-top: 0.8rem;
+    }
+
+    .sp__metric-v {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  // The explanation starts open on wide screens and folded on phones, set before the row paints.
+  if (matchMedia('(min-width: 720px)').matches) document.querySelectorAll('[data-sp-more]').forEach((d) => (d.open = true));
+</script>

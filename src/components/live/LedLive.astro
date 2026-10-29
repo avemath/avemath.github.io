@@ -1,0 +1,191 @@
+---
+// The LED spectrum live version: the firmware's port (src/lib/led-firmware.ts) on a 16x16 matrix.
+// Power on plays setup()'s boot scroll with the firmware's font, then loop() runs on the generated
+// demo track or, if asked, the microphone. The excerpt is the firmware's adaptive noise baseline,
+// vendored unmodified (vendor/led-audio-spectrum) with its real line numbers.
+import LiveShell from './LiveShell.astro';
+import Icon from '../Icon.astro';
+import { dedent, highlight } from '@/lib/highlight';
+import baseline from '../../../vendor/led-audio-spectrum/baseline.cpp?raw';
+
+const FROM = 195;
+const lines = baseline.replace(/\n$/, '').split('\n');
+const TO = FROM + lines.length - 1;
+const URL = `https://github.com/avemath/led-audio-spectrum/blob/a21c77d/Spectrum%20Analyzer%20Code%20(LEA).txt#L${FROM}-L${TO}`;
+---
+
+<LiveShell
+  kind="led"
+  description="A small version of my LED spectrum visualizer, running its firmware's logic. Power on to watch the boot scroll, then the matrix follows a generated demo track, or your microphone if you allow it. Microphone audio stays on your device."
+  href="/work/led-audio-spectrum/#demo"
+  hrefLabel="Full demo, with the detector's numbers"
+>
+  <p slot="title" class="ll__title mono">LED spectrum · ESP32 firmware</p>
+
+  <div class="ll__main">
+    <div class="ll__matrix">
+      <canvas width="384" height="384" role="img" aria-label="16 by 16 LED matrix, off" data-ll-canvas></canvas>
+      <span class="ll__mode mono" data-ll-mode>OFF</span>
+    </div>
+
+    <div class="ll__side">
+      <div class="ll__controls">
+        <button type="button" class="btn btn--small btn--primary" data-ll-power aria-pressed="false">Power on</button>
+        <button type="button" class="btn btn--small" data-ll-play aria-pressed="false" disabled>
+          <Icon name="play" /> <span data-ll-play-label>Play demo track</span>
+        </button>
+        <button type="button" class="btn btn--small" data-ll-mic aria-pressed="false" disabled>
+          <Icon name="mic" /> <span data-ll-mic-label>Try my mic</span>
+        </button>
+      </div>
+      <p class="ll__msg" data-ll-msg role="status" aria-live="polite">The board is off.</p>
+      <p class="ll__read mono" aria-hidden="true" data-ll-read>Level 0.0 · enter above 25.0 · exit below 18.0</p>
+      <p class="ll__note">The demo track is generated in your browser. Microphone audio is processed in memory and never leaves your device.</p>
+    </div>
+  </div>
+
+  <div class="ll__code">
+    <p class="ll__text">
+      The board learns the room's noise floor, but only while it's quiet, so music can't raise the floor and hide itself.
+    </p>
+    <pre tabindex="0" aria-label={`Firmware code, lines ${FROM} to ${TO}`}><code set:html={highlight(dedent(lines), 'cpp')} /></pre>
+    <a class="ll__src mono" href={URL}>led-audio-spectrum firmware · lines {FROM} to {TO}</a>
+  </div>
+</LiveShell>
+
+<style>
+  .ll__title {
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .ll__main {
+    display: grid;
+    gap: 0.85rem;
+    align-items: start;
+  }
+
+  /* With room, the matrix sits beside its controls. */
+  @container (min-width: 30rem) {
+    .ll__main {
+      grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    }
+  }
+
+  .ll__matrix {
+    position: relative;
+    max-width: 17rem;
+    padding: 0.55rem;
+    border-radius: 0.7rem;
+    background: #05070c;
+    border: 1px solid #1d2638;
+    box-shadow: inset 0 0 30px rgb(0 0 0 / 0.6);
+  }
+
+  .ll__matrix canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .ll__mode {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    padding: 0.05rem 0.35rem;
+    border-radius: 0.25rem;
+    background: rgb(5 7 12 / 0.8);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: #9fb4c0;
+  }
+
+  .ll__side {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .ll__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .ll__controls button[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .ll__msg {
+    font-size: 0.84rem;
+    color: var(--text);
+  }
+
+  .ll__read {
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-soft);
+  }
+
+  .ll__note,
+  .ll__text {
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .ll__text {
+    color: var(--text-soft);
+  }
+
+  .ll__code {
+    min-width: 0;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .ll__code pre {
+    margin-top: 0.45rem;
+    max-height: 12rem;
+    overflow: auto;
+    padding: 0.55rem 0.65rem;
+    border-radius: 0.4rem;
+    background: #061523;
+    color: #d6e6ee;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    line-height: 1.5;
+    font-variant-ligatures: none;
+  }
+
+  .ll__code code {
+    white-space: pre;
+  }
+
+  .ll__code :global(.hl-k) {
+    color: #8fd3ea;
+  }
+
+  .ll__code :global(.hl-n) {
+    color: #f5c27a;
+  }
+
+  .ll__code :global(.hl-s) {
+    color: #a9dfb5;
+  }
+
+  .ll__code :global(.hl-c) {
+    color: #9fb4c0;
+    font-style: italic;
+  }
+
+  .ll__src {
+    display: inline-block;
+    margin-top: 0.3rem;
+    font-size: 0.66rem;
+    color: var(--muted);
+  }
+</style>

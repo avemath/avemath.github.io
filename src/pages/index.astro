@@ -1,49 +1,39 @@
 ---
-import type { ImageMetadata } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
 import NowStrip from '@/components/NowStrip.astro';
 import ProjectTile from '@/components/ProjectTile.astro';
+import Spotlight from '@/components/Spotlight.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import ResearchSection from '@/components/ResearchSection.astro';
 import FieldNotes from '@/components/FieldNotes.astro';
 import ContactForm from '@/components/ContactForm.astro';
 import Icon from '@/components/Icon.astro';
 import DepthGauge from '@/components/DepthGauge.astro';
+import RampageLive from '@/components/live/RampageLive.astro';
+import V2vLive from '@/components/live/V2vLive.astro';
+import LedLive from '@/components/live/LedLive.astro';
+import LandspaceLive from '@/components/live/LandspaceLive.astro';
+import SignalsLive from '@/components/live/SignalsLive.astro';
 import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
 // The tall tile needs a tall photo: the whole robot on the bench, from its gallery.
 import rampageBench from '@/assets/projects/rampage/shop-lid.jpg';
+import ledMatrix from '@/assets/projects/led-audio-spectrum/matrix-poster.jpg';
 
 const projects = await getProjects();
 const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
 
-// Featured work shows each project once. The client sites have their own strip below, so the
-// bento is the research, engineering and software work: one tall tile, one wide tile and four
-// smaller ones. Each tile names its grid area, and each audience lays the areas out (see the
-// CSS), so a row can never have a hole.
-//
-// Area check, per audience (desktop 4 columns / tablet 2 columns). RAMpage's photo takes the
-// tall slot; the research drawing reads best wide.
-//   hire:     ram ram v2v v2v | ram ram led led | onr onr onr onr | land land bell bell
-//             tablet: ram v2v | ram led | onr onr | land bell
-//   research: onr onr onr onr | ram ram v2v v2v | ram ram bell bell | led led land land
-//             tablet: onr onr | ram v2v | ram bell | led land
-//   website:  land land land land | ram ram v2v v2v | ram ram led led | onr onr bell bell
-//             tablet: land land | ram v2v | ram led | onr bell
-// Every area appears once per layout and every row is full. If you add or remove a tile, add its
-// area to all six layouts.
-// On phones the tiles stack in this order, so a project with a photo, a demo or a number leads,
-// and the limited-detail research comes last.
-const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string }[] = [
-  { slug: 'rampage', area: 'ram', photo: rampageBench, focus: '50% 45%' },
-  { slug: 'v2v-bsm-ofdm', area: 'v2v' },
-  { slug: 'led-audio-spectrum', area: 'led' },
-  { slug: 'landspace', area: 'land' },
-  { slug: 'bellhop-sim', area: 'bell' },
-  { slug: 'onr-intelligent-data-management', area: 'onr' },
-];
+// Featured work shows each project once, the client sites having their own section below. Three
+// spotlight rows come first, each with a live version of the project built from its real code;
+// then a compact grid of the rest, with the limited-detail research last.
+const spotlit = {
+  rampage: bySlug['rampage'],
+  v2v: bySlug['v2v-bsm-ofdm'],
+  led: bySlug['led-audio-spectrum'],
+};
+const grid = ['landspace', 'bellhop-sim', 'signals-playground', 'onr-intelligent-data-management'].map((slug) => bySlug[slug]).filter(Boolean);
 ---
 
 <BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
@@ -55,34 +45,84 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
     <div class="home-flow">
       <section id="featured" class="section home-section zone" aria-labelledby="featured-title" data-section="featured">
         <span class="spine" aria-hidden="true"></span>
-        <div class="wrap pinned">
-          <div class="pinned__head">
-            <p class="eyebrow">Featured work</p>
-            <h2 id="featured-title" class="section-title">
-              <span class="aud aud--hire">Radio, sound, a combat robot, a title app and my research</span>
-              <span class="aud aud--research">My research, then radio, sound, a robot and a title app</span>
-              <span class="aud aud--website">The engineering behind the sites: radio, sound, a robot, a title app and research</span>
-            </h2>
-            <p class="section-lede split__lede">
-              <span class="aud aud--hire">Every tile opens a case study with what I did and how.</span>
-              <span class="aud aud--research">Research and communications work first, then the engineering and software behind it. Three tiles open live demos.</span>
-              <span class="aud aud--website">After the client sites above, the engineering behind how I work. Every tile opens a case study.</span>
-            </p>
-            <a class="btn mt-6" href="/work/">All work <Icon name="arrow-right" /></a>
-            <p class="split__more">
-              <a class="link" href="/about/#experience">Experience, skills and recommendations</a> are on the About page.
-            </p>
-            <p class="corner" aria-hidden="true">{String(bento.length).padStart(2, '0')} projects</p>
+        <div class="wrap">
+          <div class="fw__head">
+            <div>
+              <p class="eyebrow">Featured work</p>
+              <h2 id="featured-title" class="section-title">
+                <span class="aud aud--hire">Radio, sound, a combat robot, a title app and my research</span>
+                <span class="aud aud--research">My research, then radio, sound, a robot and a title app</span>
+                <span class="aud aud--website">The engineering behind the sites: radio, sound, a robot, a title app and research</span>
+              </h2>
+              <p class="section-lede split__lede">
+                <span class="aud aud--hire">The first projects run right here, from their real code. Every one opens a case study with what I did and how.</span>
+                <span class="aud aud--research">Research and communications work, then the engineering and software behind it. The first projects run right here, from their real code.</span>
+                <span class="aud aud--website">After the client sites above, the engineering behind how I work. The first projects run right here, from their real code.</span>
+              </p>
+            </div>
+            <div class="fw__links">
+              <a class="btn" href="/work/">All work <Icon name="arrow-right" /></a>
+              <p class="split__more">
+                <a class="link" href="/about/#experience">Experience, skills and recommendations</a> are on the About page.
+              </p>
+            </div>
           </div>
 
+          <div class="spotlights">
+            {
+              spotlit.rampage && (
+                <Spotlight
+                  project={spotlit.rampage}
+                  photo={rampageBench}
+                  focus="50% 45%"
+                  what="The weapon and safety firmware from the robot's Pico W, running in your browser on the same logic, step for step."
+                  tryThis={['Press Fire a few times and watch the air count drop from 17.', 'Hit E-stop, then try to fire.', 'Press Reset to reboot the Pico and refill the count.']}
+                  why="Weapon safety and video run on separate controllers, a Pico W and a Pi 4B, so neither one can stall the other."
+                >
+                  <RampageLive />
+                </Spotlight>
+              )
+            }
+            {
+              spotlit.v2v && (
+                <Spotlight
+                  project={spotlit.v2v}
+                  flip
+                  what="Two cars sharing safety messages over my OFDM link, with the receiver that decodes them and the brake rule from my MATLAB code."
+                  tryThis={['Drag the closing speed and watch the time to collision change.', 'Find the speed where Brake recommended appears.', 'Press Receive again and watch the four receiver stages lock.']}
+                  why="It ran as a real radio link on two ADALM-PLUTO software-defined radios at 2.9 GHz, not only in simulation."
+                  metricLabel="Radio link"
+                >
+                  <V2vLive />
+                </Spotlight>
+              )
+            }
+            {
+              spotlit.led && (
+                <Spotlight
+                  project={spotlit.led}
+                  photo={ledMatrix}
+                  what="The 16 by 16 matrix from my ESP32 build, running the firmware's boot scroll, FFT and silence detection in your browser."
+                  tryThis={['Press Power on and watch the boot scroll.', 'Let the demo track play and watch it switch from the glow to the spectrum.', 'Press Try my mic with music playing nearby.']}
+                  why="It reads quiet music from across the room and fades to a glow in silence."
+                >
+                  <LedLive />
+                </Spotlight>
+              )
+            }
+          </div>
+
+          <p class="fw__more-label mono">More work</p>
           {/* Every tile image loads lazily: the hero fills the first screen on phones and desktops,
               so even the first tile is below the fold and should not compete with the hero text. */}
           <div class="bento">
             {
-              bento.map((b) => {
-                const p = bySlug[b.slug];
-                return p ? <ProjectTile project={p} size="lg" metric photo={b.photo} focus={b.focus} style={`grid-area:${b.area}`} /> : null;
-              })
+              grid.map((p) => (
+                <ProjectTile project={p!} size="lg" metric>
+                  {p!.id === 'landspace' && <LandspaceLive slot="live" />}
+                  {p!.id === 'signals-playground' && <SignalsLive slot="live" />}
+                </ProjectTile>
+              ))
             }
           </div>
         </div>
@@ -137,29 +177,68 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
   /* Section order for each audience comes from src/lib/depth.ts (zoneStyles), together with each
      section's depth, so the order and the depth labels cannot drift apart. */
 
+  .fw__head {
+    display: grid;
+    gap: 1rem 3rem;
+  }
+
+  @media (min-width: 1100px) {
+    .fw__head {
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      align-items: end;
+    }
+  }
+
+  .fw__links {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+
   .split__more {
-    margin-top: 1.25rem;
     font-size: 0.92rem;
     color: var(--text-soft);
   }
 
-  @media (min-width: 1100px) {
-    .split__lede {
-      font-size: 1rem;
-    }
+  .spotlights {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
 
-  /* Featured bento: named areas, laid out per audience, so every row is full. */
+  .fw__more-label {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* The rest of the work: a compact grid, one row of four on wide screens. */
   .bento {
     display: grid;
     gap: 1.1rem;
-    margin-top: clamp(2rem, 4vw, 3rem);
+    margin-top: 1rem;
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 720px) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .bento {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   /* Phones: each tile is a compact row, a cropped picture on the left and the title, a short
      summary and its number on the right. The outcome line and the tech chips stay on wider
-     screens and in the case study, so six tiles fit in about a screen and a half. */
+     screens and in the case study, so the four tiles fit in about a screen. */
   @media (max-width: 719px) {
     .bento {
       gap: 0.75rem;
@@ -194,6 +273,12 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
     }
 
     .bento :global(.tile__live) {
+      display: none;
+    }
+
+    /* The research tile repeats the Research section that comes right after Featured work, so
+       phones skip it to keep the page short. Wider screens keep it in the grid. */
+    .bento > :global(.tile[data-tags^='research']) {
       display: none;
     }
 
@@ -237,37 +322,6 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
     }
   }
 
-  @media (min-width: 720px) {
-    .bento {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-areas: 'ram v2v' 'ram led' 'onr onr' 'land bell';
-    }
-
-    .home:has(#aud-research:checked) .bento {
-      grid-template-areas: 'onr onr' 'ram v2v' 'ram bell' 'led land';
-    }
-
-    .home:has(#aud-website:checked) .bento {
-      grid-template-areas: 'land land' 'ram v2v' 'ram led' 'onr bell';
-    }
-  }
-
-  @media (min-width: 1100px) {
-    .bento {
-      margin-top: 0;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-template-areas: 'ram ram v2v v2v' 'ram ram led led' 'onr onr onr onr' 'land land bell bell';
-    }
-
-    .home:has(#aud-research:checked) .bento {
-      grid-template-areas: 'onr onr onr onr' 'ram ram v2v v2v' 'ram ram bell bell' 'led led land land';
-    }
-
-    .home:has(#aud-website:checked) .bento {
-      grid-template-areas: 'land land land land' 'ram ram v2v v2v' 'ram ram led led' 'onr onr bell bell';
-    }
-  }
-
   /* A tile that spans two rows lets its picture take the extra height, so the text sits at the
      bottom with no gap under it. In the tall slot the picture also grows past its usual ratio. */
   .bento > :global(.tile) :global(.tile__media) {
@@ -304,6 +358,17 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
 
     .home :global(.now__item dd) {
       font-size: 0.84rem;
+    }
+
+    /* Featured: the spotlights sit closer together. */
+    .spotlights {
+      gap: 2.25rem;
+    }
+
+    /* Research: a smaller sound speed chart. */
+    .home :global(.ssp__profile) {
+      max-width: 12.5rem;
+      margin-inline: auto;
     }
 
     /* Research: the related work lists titles only; each case study has the summary. */
@@ -382,6 +447,40 @@ const bento: { slug: string; area: string; photo?: ImageMetadata; focus?: string
 
     .home-flow > :global(.section--tight) {
       padding-block: 1.9rem;
+    }
+  }
+
+  /* A live tile while it runs: its panel replaces the picture, and the tile grows to fit it. */
+  /* Its neighbors in the row keep their own height instead of stretching to match. */
+  .bento:has(:global([data-live-on])) {
+    align-items: start;
+  }
+
+  .bento :global(.tile__media[data-live-on]) {
+    aspect-ratio: auto;
+  }
+
+  .bento :global(.tile__media[data-live-on] > :not(.live)) {
+    display: none;
+  }
+
+  @media (max-width: 719px) {
+    .bento :global(.tile[data-live-on] .tile__inner) {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bento :global(.tile__media[data-live-on]) {
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    /* At rest on a phone, the button sits under the small picture. */
+    .bento :global(.live__try) {
+      right: 0.4rem;
+      bottom: 0.4rem;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.66rem;
     }
   }
 

@@ -1,16 +1,10 @@
 // FH-BFSK chip visualizer, ported from my standalone study tool. Each chip hops to a tone pair
 // and sends the low tone for a 0 or the high tone for a 1. Audio only starts from a button press.
-import { mulberry32 } from '../../../lib/comms';
+import { audioHz, hopSequence, toneHz, DF, F_HIGH, F_LOW, PAIRS, type Mode } from '../../../lib/fhbfsk';
 import { q } from './util';
 
-// JANUS band plan, from the public papers cited on this page.
-const F_LOW = 9440;
-const F_HIGH = 13600;
-const PAIRS = 13;
-const DF = (F_HIGH - F_LOW) / (2 * PAIRS); // 160 Hz
 const STORE_KEY = 'fhbfsk-v1';
 
-type Mode = 'exag' | 'prop' | 'true';
 type Saved = Partial<Record<'n' | 'seed' | 'hop' | 'pitch' | 'slow' | 'vol' | 'bits', string>>;
 
 const store = {
@@ -29,19 +23,6 @@ const store = {
     }
   },
 };
-
-// Simplified tone grid: 26 equal slots across the band, tone at each slot center, and pair p
-// uses tones 2p (bit 0) and 2p + 1 (bit 1). The standard's real pair layout may differ.
-const toneHz = (p: number, bit: number) => F_LOW + (2 * p + bit + 0.5) * DF;
-
-function audioHz(mode: Mode, p: number, bit: number) {
-  if (mode === 'true') return toneHz(p, bit);
-  const base = 165;
-  const oct = 3;
-  if (mode === 'prop') return base * 2 ** ((oct * (toneHz(p, bit) - F_LOW)) / (F_HIGH - F_LOW));
-  const center = base * 2 ** ((oct * (p + 0.5)) / PAIRS);
-  return center * 2 ** ((bit ? 2 : -2) / 12);
-}
 
 const pitchNotes: Record<Mode, string> = {
   exag: 'The band maps to about 165 to 1320 Hz. Within each pair, 0 sits 2 semitones below the pair center and 1 sits 2 above.',
@@ -92,16 +73,7 @@ export function init(panel: HTMLElement) {
       return Array.from({ length: n }, (_, i) => clean[i % clean.length]);
     }
     hopMsg.textContent = 'Pair numbers separated by commas (0 is the lowest pair). Overrides the seed and repeats if shorter than the chip count.';
-    const rand = mulberry32(seed);
-    const out: number[] = [];
-    let prev = -1;
-    for (let i = 0; i < n; i++) {
-      let s: number;
-      do s = Math.floor(rand() * PAIRS);
-      while (s === prev);
-      out.push((prev = s));
-    }
-    return out;
+    return hopSequence(n, seed);
   }
 
   function syncBits(n: number) {
