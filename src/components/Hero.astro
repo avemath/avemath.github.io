@@ -51,6 +51,11 @@ const rowsPerSecond = FRAME_HZ;
           <span data-tx-play-label>Hear it</span>
         </button>
       </div>
+      <div class="tx__tabs" role="tablist" aria-label="Spectrogram view" data-tx-tabs>
+        <button type="button" role="tab" id="tx-tab-display" aria-controls="tx-view-display" aria-selected="true" tabindex="0">Display</button>
+        <button type="button" role="tab" id="tx-tab-how" aria-controls="tx-view-how" aria-selected="false" tabindex="-1">How it works</button>
+      </div>
+      <div class="tx__view" id="tx-view-display" role="tabpanel" aria-labelledby="tx-tab-display">
       <div class="tx__plot">
         <div class="tx__time" aria-hidden="true">
           {seconds.map((t) => <span style={`--at:${(t * rowsPerSecond) / VIEW_ROWS}`}>{t === 6 ? '6 s' : t}</span>)}
@@ -79,6 +84,11 @@ const rowsPerSecond = FRAME_HZ;
       <div class="tx__foot">
         <p class="tx__readout" data-tx-readout aria-hidden="true">Point at the display to read it</p>
         <p class="sr-only" aria-live="polite" data-tx-live></p>
+      </div>
+      </div>
+      {/* Filled in from src/scripts/how-it-works.ts the first time the tab opens. */}
+      <div class="tx__view tx__how" id="tx-view-how" role="tabpanel" aria-labelledby="tx-tab-how" tabindex="0" hidden data-tx-how>
+        <p class="tx__how-loading">Loading the walkthrough.</p>
       </div>
       <figcaption class="tx__caption">My name, sent as a real signal and drawn by an FFT as it arrives.</figcaption>
     </figure>
@@ -229,6 +239,61 @@ const rowsPerSecond = FRAME_HZ;
 
   .tx__play[aria-pressed='true'] :global(.tx__icon--off) {
     display: block;
+  }
+
+  /* Display and How it works, as tabs. They need JavaScript, so they only show once the head
+     script has marked the page, before first paint. */
+  .tx__tabs {
+    display: none;
+    gap: 0.25rem;
+    margin: -0.1rem 0 0.75rem;
+    padding: 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: 0.55rem;
+    width: max-content;
+    max-width: 100%;
+  }
+
+  :global(html.js) .tx__tabs {
+    display: flex;
+  }
+
+  .tx__tabs button {
+    min-height: 2rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    cursor: pointer;
+  }
+
+  .tx__tabs button[aria-selected='true'] {
+    background: var(--accent-ink);
+    color: var(--bg);
+  }
+
+  .tx__tabs button:focus-visible {
+    outline: 2px solid var(--amber-line);
+    outline-offset: 1px;
+  }
+
+  .tx__view[hidden] {
+    display: none;
+  }
+
+  .tx__how:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .tx__how-loading {
+    padding: 2rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
   }
 
   /* Time down the left (newest at the top), frequency along the bottom. */
@@ -384,6 +449,36 @@ const rowsPerSecond = FRAME_HZ;
   import { prefersReducedMotion } from '../scripts/preferences';
   import { decode } from '../scripts/decode';
   import { whenSettled } from '../scripts/motion';
+
+  // Tabs: Display and How it works, with arrow keys, Home and End. The walkthrough and its code
+  // load only the first time its tab opens.
+  const tablist = document.querySelector<HTMLElement>('[data-tx-tabs]');
+  if (tablist) {
+    const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    let loaded = false;
+    const select = (i: number, focus = false) => {
+      tabs.forEach((t, j) => {
+        const on = i === j;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+      });
+      if (focus) tabs[i].focus();
+      const how = document.querySelector<HTMLElement>('[data-tx-how]');
+      if (i === 1 && how && !loaded) {
+        loaded = true;
+        import('../scripts/how-it-works').then((m) => m.mountHowItWorks(how));
+      }
+    };
+    tabs.forEach((t, i) => t.addEventListener('click', () => select(i)));
+    tablist.addEventListener('keydown', (e) => {
+      const at = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      const to = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[e.key];
+      if (to === undefined || at < 0) return;
+      e.preventDefault();
+      select((to + tabs.length) % tabs.length, true);
+    });
+  }
 
   // The first screen shows the still frame (the name centered) and stays still. The live display
   // is decorative, so its code loads only once the page has settled after the load event.
