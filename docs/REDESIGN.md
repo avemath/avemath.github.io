@@ -158,6 +158,14 @@ The research section has an open layout with no card. The sound speed profile si
 - **Projects tune in:** a drawn signature has a light speckle of noise at rest and resolves clean while its tile is hovered or focused. Always clean under reduced motion and on touch screens.
 - **Instrument details, sparingly:** the tick rulers on the pinned columns, and a mono count in one corner of Featured work, Client work and Field notes.
 
+### 9. Interactions, second pass
+
+- **Sound channel (home, research):** the textbook profile beside ten rays traced through it, from 0 to 100 km of range. The source on the depth axis is a slider: drag it, or focus it and use the arrow keys (Shift for bigger steps, Page Up and Down, Home and End). Rays that stay in the channel are teal; rays that reach the surface or the floor fade back, and a readout counts them. The tracer (`src/lib/sound-channel.ts`) steps the ray equations through Munk's profile and reflects at the surface and a flat floor at 4,000 m. The build draws the rays for a source on the axis; the script loads only as the figure nears the screen. Nothing moves on its own.
+- **Skills constellation (/about/):** every skill is a point in one of five clusters (comms and DSP, embedded, web, tools, professional) around an ideal point. Know well skills sit close in; have built with skills scatter further out. Picking a skill (click, or focus and arrow keys, one tab stop for the whole field) names it and lights up the projects whose `stack` lists it, from the table in `src/lib/skills.ts`. When no project lists it, it says so. The plain list below has every skill, its group and its project links; it is the whole section on phones and without JavaScript, and folds away on wide screens.
+- **About:** Experience, Skills and Recommendations sit between the story and Off the clock. Experience and Recommendations use the shared pinned heading (`.pinned`, `.pinned__head` in `global.css`, also used by Featured work and Field notes). The bands stop at slot 5, so the closing sections stay on light water in the light theme.
+- **Gauge ink:** each gauge line reads the band behind it from the real wave curve, so it switches ink exactly where the edge crosses it, and carries a soft halo in its own water's color for the moment it straddles an edge. Measured at 12 scroll stops in both themes: every text line passes 4.5:1 and every tick and scale segment 3:1.
+- **Spectrogram:** whenever the display comes back into view or the tab is shown again, it opens on the held frame with the full name centered, then continues the cycle.
+
 ## Deliberately not borrowed
 
 Nicholas's site (`/nmdomke/`) was checked only to stay clear of it. Not used here:

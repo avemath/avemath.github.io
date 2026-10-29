@@ -368,11 +368,28 @@ export async function mountSpectrogram(root: HTMLElement) {
     }
   }
 
+  /** Whenever the display comes back into view, it opens on the held frame with the full name
+   *  centered and goes on from there, so nobody lands on a screen of empty water. While the
+   *  sound is playing, the picture keeps following the sound instead. */
+  function resumeHeld() {
+    if (!animated() || audio) return;
+    screen!.removeAttribute('data-fade');
+    phase = 'hold';
+    show(held, HOLD);
+    phaseEnd = performance.now() + HOLD_MS;
+  }
+
   new IntersectionObserver(([entry]) => {
+    const was = visible;
     visible = entry.isIntersecting;
+    if (visible && !was) resumeHeld();
     visible ? start() : stop();
   }).observe(root);
-  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return stop();
+    if (visible) resumeHeld();
+    start();
+  });
   window.addEventListener('motionchange', refresh);
 
   // The still frame from the build is already on screen, showing the held name. With motion, it

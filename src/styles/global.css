@@ -383,7 +383,7 @@
 }
 
 .home-flow > .zone,
-.descent > .zone + .zone,
+.descent > .zone ~ .zone,
 .now.zone,
 .site-footer.zone {
   --wave: clamp(1.25rem, 2.6vw, 2.5rem);
@@ -404,6 +404,49 @@
 .site-footer.zone {
   content-visibility: auto;
   contain-intrinsic-size: auto 1100px;
+}
+
+/* ------------------------------------------------------------------
+   Pinned side headings. From 1100px a section's label and heading stay
+   in a left column, with a fine tick ruler, while its content scrolls
+   on the right. Phones and tablets stack normally.
+   ------------------------------------------------------------------ */
+.corner {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (min-width: 1100px) {
+  .pinned {
+    display: grid;
+    grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+    gap: clamp(2.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  .pinned__head {
+    position: sticky;
+    top: 6.5rem;
+    padding-left: 1.1rem;
+    /* A short tick every 8px and a longer one every 40px. */
+    background:
+      repeating-linear-gradient(180deg, var(--line-strong) 0 1px, transparent 1px 40px) 0 0 / 9px 100% no-repeat,
+      repeating-linear-gradient(180deg, var(--line) 0 1px, transparent 1px 8px) 0 0 / 5px 100% no-repeat;
+    border-left: 1px solid var(--line);
+  }
+
+  .pinned__head .section-title {
+    font-size: clamp(1.75rem, 2.4vw, 2.25rem);
+  }
+
+  .pinned__head .corner {
+    display: block;
+    margin-top: 2rem;
+  }
 }
 
 /* ------------------------------------------------------------------
