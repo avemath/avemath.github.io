@@ -12,11 +12,13 @@ import Icon from '@/components/Icon.astro';
 import DepthGauge from '@/components/DepthGauge.astro';
 import RampageLive from '@/components/live/RampageLive.astro';
 import V2vLive from '@/components/live/V2vLive.astro';
+import LedLive from '@/components/live/LedLive.astro';
 import { zoneStyles } from '@/lib/depth';
 import { getProjects } from '@/lib/projects';
 import site from '@/data/site.json';
 // The tall tile needs a tall photo: the whole robot on the bench, from its gallery.
 import rampageBench from '@/assets/projects/rampage/shop-lid.jpg';
+import ledMatrix from '@/assets/projects/led-audio-spectrum/matrix-poster.jpg';
 
 const projects = await getProjects();
 const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
@@ -27,8 +29,9 @@ const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
 const spotlit = {
   rampage: bySlug['rampage'],
   v2v: bySlug['v2v-bsm-ofdm'],
+  led: bySlug['led-audio-spectrum'],
 };
-const grid = ['led-audio-spectrum', 'landspace', 'bellhop-sim', 'onr-intelligent-data-management'].map((slug) => bySlug[slug]).filter(Boolean);
+const grid = ['landspace', 'bellhop-sim', 'onr-intelligent-data-management'].map((slug) => bySlug[slug]).filter(Boolean);
 ---
 
 <BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
@@ -89,6 +92,19 @@ const grid = ['led-audio-spectrum', 'landspace', 'bellhop-sim', 'onr-intelligent
                   metricLabel="Radio link"
                 >
                   <V2vLive />
+                </Spotlight>
+              )
+            }
+            {
+              spotlit.led && (
+                <Spotlight
+                  project={spotlit.led}
+                  photo={ledMatrix}
+                  what="The 16 by 16 matrix from my ESP32 build, running the firmware's boot scroll, FFT and silence detection in your browser."
+                  tryThis={['Press Power on and watch the boot scroll.', 'Let the demo track play and watch it switch from the glow to the spectrum.', 'Press Try my mic with music playing nearby.']}
+                  why="It reads quiet music from across the room and fades to a glow in silence."
+                >
+                  <LedLive />
                 </Spotlight>
               )
             }
@@ -191,7 +207,7 @@ const grid = ['led-audio-spectrum', 'landspace', 'bellhop-sim', 'onr-intelligent
     color: var(--muted);
   }
 
-  /* The rest of the work: a compact grid, one row of four on wide screens. */
+  /* The rest of the work: a compact grid, one row of three on wide screens. */
   .bento {
     display: grid;
     gap: 1.1rem;
@@ -207,7 +223,7 @@ const grid = ['led-audio-spectrum', 'landspace', 'bellhop-sim', 'onr-intelligent
 
   @media (min-width: 1100px) {
     .bento {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
@@ -327,6 +343,17 @@ const grid = ['led-audio-spectrum', 'landspace', 'bellhop-sim', 'onr-intelligent
 
     .home :global(.now__item dd) {
       font-size: 0.84rem;
+    }
+
+    /* Featured: the spotlights sit closer together. */
+    .spotlights {
+      gap: 2.25rem;
+    }
+
+    /* Research: a smaller sound speed chart. */
+    .home :global(.ssp__profile) {
+      max-width: 12.5rem;
+      margin-inline: auto;
     }
 
     /* Research: the related work lists titles only; each case study has the summary. */

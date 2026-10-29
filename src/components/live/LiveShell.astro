@@ -5,7 +5,7 @@
 // it. The panel's markup waits in a <template> until then, so it costs the page nothing.
 interface Props {
   /** Which live tile this is: the key of its script in the loader below. */
-  kind: 'rampage' | 'v2v';
+  kind: 'rampage' | 'v2v' | 'led';
   /** What the live version is, for screen readers, read before they press Try it. */
   description: string;
   /** The case study section with the full version. */
@@ -142,6 +142,7 @@ const descId = `live-${kind}-desc`;
   const loaders = {
     rampage: () => import('../../scripts/live/rampage'),
     v2v: () => import('../../scripts/live/v2v'),
+    led: () => import('../../scripts/live/led'),
   };
   type Kind = keyof typeof loaders;
   type Mod = { mount: (panel: HTMLElement) => () => void };

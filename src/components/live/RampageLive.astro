@@ -4,6 +4,7 @@
 // on it, cut at build time from the vendored firmware (vendor/rampage), with its real line numbers.
 import LiveShell from './LiveShell.astro';
 import { MAX_WEAPON_ACTIVATIONS } from '@/lib/rampage-firmware';
+import { dedent, highlight } from '@/lib/highlight';
 import pico from '../../../vendor/rampage/pico_direct.py?raw';
 import pi4 from '../../../vendor/rampage/pi4_direct.py?raw';
 
@@ -14,29 +15,7 @@ function cut(source: string, file: string, from: string, count: number) {
   const lines = source.split('\n');
   const start = lines.findIndex((l) => l.includes(from));
   if (start < 0) throw new Error(`RAMpage excerpt not found: ${from}`);
-  const body = lines.slice(start, start + count);
-  const indent = Math.min(...body.filter((l) => l.trim()).map((l) => l.match(/^ */)![0].length));
-  return { code: body.map((l) => l.slice(indent)).join('\n'), file, from: start + 1, to: start + count, url: `${REPO}/${file}#L${start + 1}-L${start + count}` };
-}
-
-const KW = /^(def|if|else|elif|return|for|in|not|and|or|global|try|except|break|continue|True|False|None|pass|while)$/;
-/** A small Python highlighter: comments, strings, numbers and keywords. */
-function highlight(code: string) {
-  const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const token = /(#[^\n]*)|(f?"(?:[^"\\\n]|\\.)*"|f?'(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
-  let out = '';
-  let last = 0;
-  for (const m of code.matchAll(token)) {
-    out += esc(code.slice(last, m.index));
-    const [t, com, str, num, word] = m;
-    if (com) out += `<span class="hl-c">${esc(t)}</span>`;
-    else if (str) out += `<span class="hl-s">${esc(t)}</span>`;
-    else if (num) out += `<span class="hl-n">${esc(t)}</span>`;
-    else if (word && KW.test(word)) out += `<span class="hl-k">${esc(t)}</span>`;
-    else out += esc(t);
-    last = m.index! + t.length;
-  }
-  return out + esc(code.slice(last));
+  return { code: dedent(lines.slice(start, start + count)), file, from: start + 1, to: start + count, url: `${REPO}/${file}#L${start + 1}-L${start + count}` };
 }
 
 const blocks = [
