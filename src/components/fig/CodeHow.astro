@@ -16,7 +16,7 @@ const { excerpt, file, url, notes } = Astro.props;
 <div class="how" data-how>
   <div class="how__code">
     <p class="how__file mono">{file}, lines {excerpt.from} to {excerpt.from + excerpt.lines.length - 1}</p>
-    <pre class="code" tabindex="0" aria-label={`Code from ${file}`}><code class="code__inner">{excerpt.lines.map((html, i) => <span class="code__line" data-n={excerpt.from + i} set:html={html} />)}</code></pre>
+    <pre class="code" tabindex="0" aria-label={`Code from ${file}`}><code class="code__inner">{excerpt.lines.map((html, i) => <span class="code__line" data-n={excerpt.from + i}><span class="code__txt" set:html={html} /></span>)}</code></pre>
   </div>
   <ol class="how__notes">
     {

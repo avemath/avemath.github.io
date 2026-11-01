@@ -73,7 +73,9 @@ export function mountSignalPanel(fig: HTMLElement) {
     ctx.fillStyle = 'rgba(169,182,204,0.9)';
     ctx.font = '11px "IBM Plex Mono", monospace';
     ctx.textBaseline = 'middle';
-    for (const f of GRID_HZ.slice(1, -1)) ctx.fillText(`${f / 1000} kHz`, b.x0 + 4, yOf(f) - 8);
+    ctx.textAlign = 'right';
+    for (const f of GRID_HZ.slice(1, -1)) ctx.fillText(`${f / 1000} kHz`, b.x1 - 4, yOf(f) - 8);
+    ctx.textAlign = 'left';
 
     // The tones: one bar per chip, at its hop frequency.
     const shift = drift * (b.x1 - b.x0);
