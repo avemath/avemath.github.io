@@ -337,7 +337,13 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       padding: 0;
       border: 0;
       box-shadow: none;
-      font-family: 'Inter Variable', Arial, sans-serif;
+      font-family: var(--font-sans);
+      /* Archivo a touch narrower than on screen, so the page holds to one sheet. */
+      font-variation-settings: 'wdth' 90;
+    }
+
+    .resume :is(h1, h2, h3) {
+      font-variation-settings: 'wdth' 96;
     }
 
     .r-head {
