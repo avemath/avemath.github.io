@@ -11,11 +11,9 @@ const hasRecommendations = testimonials.some((t) => t.approved);
 type Item = { id: string; group: string; label: string; hint?: string; href?: string; action?: string; keywords?: string };
 
 const homeSections: Item[] = [
-  ['featured', 'Featured work'],
-  ['research', 'Research'],
+  ['projects', 'Projects'],
   ['websites', "Websites I've built"],
-  ['field-notes', 'Field notes'],
-  ['contact', 'Contact'],
+  ['skills', 'Skills'],
 ].map(([id, label]) => ({ id: `s-${id}`, group: 'On this page', label, href: onHome ? `#${id}` : `/#${id}` }));
 
 // Experience, skills and recommendations are sections of the About page.
@@ -31,6 +29,7 @@ const aboutSections: Item[] = [
 const items: Item[] = [
   { id: 'p-home', group: 'Pages', label: 'Home', href: '/' },
   { id: 'p-work', group: 'Pages', label: 'All work', href: '/work/', keywords: 'projects portfolio' },
+  { id: 'p-research', group: 'Pages', label: 'Research', href: '/research/', keywords: 'underwater acoustics onr bellhop pool alarm field notes' },
   { id: 'p-services', group: 'Pages', label: 'Services', href: '/services/', keywords: 'hire website freelance pricing' },
   { id: 'p-about', group: 'Pages', label: 'About', href: '/about/' },
   { id: 'p-resume', group: 'Pages', label: 'Résumé', href: '/resume/', keywords: 'resume cv' },

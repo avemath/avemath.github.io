@@ -2,33 +2,30 @@
 import Icon from './Icon.astro';
 import site from '@/data/site.json';
 
+interface Props {
+  /** The small muted label at the right: "surface" on home, the live depth on /research/. */
+  label?: string;
+}
+
+const { label } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+// Projects, Websites and Skills are sections of the home page; Research and Contact are pages.
 const nav = [
-  { href: '/work/', label: 'Work' },
-  { href: '/services/', label: 'Services' },
-  { href: '/about/', label: 'About' },
-  { href: '/resume/', label: 'Résumé' },
+  { href: '/#projects', label: 'Projects' },
+  { href: '/research/', label: 'Research' },
+  { href: '/#websites', label: 'Websites' },
+  { href: '/#skills', label: 'Skills' },
   { href: '/contact/', label: 'Contact' },
 ];
-const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.startsWith(href.replace(/\/$/, '') + '/');
+const isCurrent = (href: string) => !href.includes('#') && (path === href.replace(/\/$/, '') || path.startsWith(href.replace(/\/$/, '') + '/'));
 ---
 
-<header class="site-header no-print" data-header>
-  <div class="wrap flex h-16 items-center justify-between gap-3">
-    <a href="/" class="brand" aria-label={`${site.name}, home`}>
-      <span class="brand__mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" fill="none">
-          <circle cx="16" cy="16" r="14.5" stroke="currentColor" stroke-opacity=".35" />
-          <circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity=".55" />
-          <circle cx="16" cy="16" r="3.2" fill="currentColor" />
-          <path d="M16 16 27 6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-        </svg>
-      </span>
-      <span class="brand__name">Avery Matherne</span>
-    </a>
+<header class="site-header on-navy no-print" data-header>
+  <div class="wrap site-header__row">
+    <a href="/" class="brand" aria-label={`${site.name}, home`}>{site.name}</a>
 
-    <nav aria-label="Main" class="hidden md:block">
-      <ul class="flex items-center gap-1">
+    <nav aria-label="Main" class="site-nav">
+      <ul>
         {
           nav.map((item) => (
             <li>
@@ -41,11 +38,10 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
       </ul>
     </nav>
 
-    <div class="flex items-center gap-2">
-      <button type="button" class="icon-btn kbd-btn" data-palette-open aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K">
+    <div class="site-header__end">
+      {label && <p class="nav-label mono" data-nav-label>{label}</p>}
+      <button type="button" class="icon-btn kbd-btn" data-palette-open aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K" aria-label="Jump to a page or project" title="Jump to (Ctrl K)">
         <Icon name="search" />
-        <span>Jump to</span>
-        <kbd class="hidden lg:inline-flex" data-kbd-hint>Ctrl K</kbd>
       </button>
       <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
         <Icon name="sun" class="theme-icon theme-icon--sun h-[1.15em] w-[1.15em]" />
@@ -83,12 +79,11 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
 </header>
 
 <style>
+  /* The nav sits on navy on every page, so the hero and the header read as one ground. */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 40;
-    /* Solid, so page text never shows through while scrolling. It matches the surface band. */
-    background: var(--band-0);
     border-bottom: 1px solid transparent;
     transition: border-color 0.3s;
   }
@@ -98,124 +93,99 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     border-bottom-color: var(--line);
   }
 
-  .brand {
-    display: inline-flex;
+  .site-header__row {
+    display: flex;
     align-items: center;
-    gap: 0.65rem;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 4rem;
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: 0.9375rem;
     text-decoration: none;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.05rem;
-    letter-spacing: -0.01em;
+    white-space: nowrap;
   }
 
-  .brand__mark {
-    display: grid;
-    place-items: center;
-    width: 2rem;
-    height: 2rem;
-    color: var(--accent);
+  .site-nav {
+    display: none;
   }
 
-  .brand__mark svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .brand__mark path {
-    transform-origin: 16px 16px;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    html:not([data-motion='reduce']) .brand:hover .brand__mark path {
-      animation: sweep 1.6s linear infinite;
+  @media (min-width: 860px) {
+    .site-nav {
+      display: block;
     }
   }
 
-  @keyframes sweep {
-    to {
-      rotate: 360deg;
-    }
+  .site-nav ul {
+    display: flex;
+    gap: 0.25rem;
   }
 
   .nav-link {
-    position: relative;
     display: inline-block;
-    padding: 0.5rem 0.8rem;
-    border-radius: 999px;
-    font-size: 0.94rem;
-    color: var(--text-soft);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
     text-decoration: none;
-    transition:
-      color 0.2s,
-      background-color 0.2s;
+    color: var(--text);
   }
 
   .nav-link:hover {
-    color: var(--text);
-    background: var(--surface-2);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
   }
 
   .nav-link[aria-current='page'] {
-    color: var(--text);
+    color: var(--accent-ink);
   }
 
-  .nav-link[aria-current='page']::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 0.2rem;
-    width: 4px;
-    height: 4px;
-    margin-left: -2px;
-    border-radius: 50%;
-    background: var(--accent);
+  .site-header__end {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-label {
+    min-width: 8ch;
+    margin-right: 0.5rem;
+    font-size: 0.75rem;
+    text-align: right;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .icon-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     min-width: 2.5rem;
     height: 2.5rem;
-    padding-inline: 0.7rem;
-    justify-content: center;
+    padding-inline: 0.65rem;
     border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface);
-    color: var(--text-soft);
+    background: transparent;
+    color: var(--text);
     font-size: 0.875rem;
+    font-weight: 600;
     cursor: pointer;
-    transition:
-      color 0.2s,
-      border-color 0.2s;
+    transition: border-color 0.2s;
   }
 
   .icon-btn:hover {
-    color: var(--text);
-    border-color: var(--accent);
+    border-color: var(--text);
   }
 
-  /* The search button lives in the phone menu below the md breakpoint. */
   .kbd-btn {
     display: none;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 860px) {
     .kbd-btn {
       display: inline-flex;
     }
-  }
-
-  kbd {
-    align-items: center;
-    padding: 0.05rem 0.4rem;
-    border: 1px solid var(--line);
-    border-radius: 0.35rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--muted);
-    background: var(--surface-2);
   }
 
   :global([data-theme='dark']) .theme-icon--sun,
@@ -224,7 +194,7 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
   }
 
   /* Phone menu */
-  @media (min-width: 768px) {
+  @media (min-width: 860px) {
     .mnav {
       display: none;
     }
@@ -232,7 +202,6 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
 
   .mnav__button {
     list-style: none;
-    font-weight: 500;
   }
 
   .mnav__button::-webkit-details-marker {
@@ -240,8 +209,7 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
   }
 
   .mnav[open] .mnav__button {
-    color: var(--text);
-    border-color: var(--accent);
+    border-color: var(--text);
   }
 
   .mnav[open] .mnav__icon--open,
@@ -253,10 +221,9 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     position: absolute;
     inset-inline: 0;
     top: 100%;
-    padding: 0.25rem clamp(1rem, 4vw, 2.5rem) 1rem;
+    padding: 0.25rem var(--gutter) 1rem;
     border-bottom: 1px solid var(--line);
-    background: var(--bg);
-    box-shadow: var(--shadow-lift);
+    background: var(--navy);
   }
 
   .mnav__link {
@@ -266,9 +233,8 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     width: 100%;
     padding: 0.85rem 0.25rem;
     border-bottom: 1px solid var(--line);
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--text);
     text-align: left;
     text-decoration: none;
@@ -279,13 +245,8 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     color: var(--accent-ink);
   }
 
-  :global([data-theme='dark']) .mnav__link[aria-current='page'] {
-    color: var(--accent);
-  }
-
   .mnav__search {
     border-bottom: 0;
-    font-family: var(--font-sans);
     font-size: 1rem;
     font-weight: 500;
     color: var(--text-soft);
@@ -294,6 +255,13 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
   .mnav__search :global(svg) {
     width: 1.1em;
     height: 1.1em;
+  }
+
+  /* Small phones: the label gives way so the menu button always fits. */
+  @media (max-width: 379px) {
+    .nav-label {
+      display: none;
+    }
   }
 </style>
 
@@ -307,10 +275,6 @@ const isCurrent = (href: string) => path === href.replace(/\/$/, '') || path.sta
     mark.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:8px;pointer-events:none';
     document.body.prepend(mark);
     new IntersectionObserver(([e]) => header.toggleAttribute('data-scrolled', !e.isIntersecting)).observe(mark);
-  }
-
-  if (/Mac|iPhone|iPad/.test(navigator.userAgent)) {
-    document.querySelectorAll('[data-kbd-hint]').forEach((el) => (el.textContent = '⌘ K'));
   }
 
   // Phone menu: close on Escape, on a tap outside, and once a link or the search button is chosen.
