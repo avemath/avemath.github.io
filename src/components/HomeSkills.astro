@@ -1,0 +1,74 @@
+---
+// Skills on the home page: the two groups from src/data/skills.json, as plain stacked text, one
+// line per area from src/lib/skills.ts.
+import skills from '@/data/skills.json';
+import { areas, skillMap } from '@/lib/skills';
+
+const groups = skills.map((g) => ({
+  name: g.group,
+  lines: areas.map((a) => g.items.filter((s) => skillMap[s]?.area === a.id)).filter((l) => l.length),
+}));
+---
+
+<section id="skills" class="section skills" aria-labelledby="skills-title">
+  <div class="wrap skills__grid">
+    <div>
+      <h2 id="skills-title" class="section-title skills__title" data-decode>Skills</h2>
+      <p class="skills__lede">Two groups. Nothing here I could not talk through at a whiteboard.</p>
+    </div>
+    {
+      groups.map((g) => (
+        <div class="skills__col">
+          <h3 class="eyebrow skills__group">{g.name}</h3>
+          <ul class="skills__list">
+            {g.lines.map((l) => (
+              <li>{l.join(', ')}</li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .skills__grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 860px) {
+    .skills__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2.5rem;
+    }
+  }
+
+  .skills__title {
+    margin-top: 0;
+    font-size: clamp(2.3rem, 4vw, 3rem);
+  }
+
+  .skills__lede {
+    margin-top: 0.6rem;
+    max-width: 22rem;
+    color: var(--muted);
+  }
+
+  .skills__col {
+    padding-top: 0.9rem;
+    border-top: 2px solid var(--text);
+  }
+
+  .skills__group {
+    font-family: var(--font-sans);
+    font-variation-settings: normal;
+    letter-spacing: 0;
+  }
+
+  .skills__list {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+</style>

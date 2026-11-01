@@ -1,499 +1,348 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
-import NowStrip from '@/components/NowStrip.astro';
-import ProjectTile from '@/components/ProjectTile.astro';
-import Spotlight from '@/components/Spotlight.astro';
-import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
-import ResearchSection from '@/components/ResearchSection.astro';
-import FieldNotes from '@/components/FieldNotes.astro';
-import ContactForm from '@/components/ContactForm.astro';
-import Icon from '@/components/Icon.astro';
-import DepthGauge from '@/components/DepthGauge.astro';
-import RampageLive from '@/components/live/RampageLive.astro';
-import V2vLive from '@/components/live/V2vLive.astro';
-import LedLive from '@/components/live/LedLive.astro';
-import LandspaceLive from '@/components/live/LandspaceLive.astro';
+import Marquee from '@/components/Marquee.astro';
+import StatusStrip from '@/components/StatusStrip.astro';
+import FigureCard from '@/components/fig/FigureCard.astro';
+import TimingFig from '@/components/fig/TimingFig.astro';
+import ChainFig from '@/components/fig/ChainFig.astro';
+import MatrixFig from '@/components/fig/MatrixFig.astro';
+import CodeHow from '@/components/fig/CodeHow.astro';
+import CodeFile from '@/components/fig/CodeFile.astro';
 import SignalsLive from '@/components/live/SignalsLive.astro';
-import { zoneStyles } from '@/lib/depth';
-import { getProjects } from '@/lib/projects';
+import BelowSurface from '@/components/BelowSurface.astro';
+import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
+import HomeSkills from '@/components/HomeSkills.astro';
 import site from '@/data/site.json';
-// The tall tile needs a tall photo: the whole robot on the bench, from its gallery.
-import rampageBench from '@/assets/projects/rampage/shop-lid.jpg';
-import ledMatrix from '@/assets/projects/led-audio-spectrum/matrix-poster.jpg';
+import { cut, lineOf, region } from '@/lib/excerpt';
+import { hopSequence, toneHz, F_HIGH, F_LOW } from '@/lib/fhbfsk';
+import eigenrays from '@/assets/projects/bellhop-sim/ssp_and_rays.png';
+import pico from '../../vendor/rampage/pico_direct.py?raw';
+import ofdmRx from '../lib/ofdm-rx.ts?raw';
+import ledFw from '../lib/led-firmware.ts?raw';
 
-const projects = await getProjects();
-const bySlug = Object.fromEntries(projects.map((p) => [p.id, p]));
+const SELF = 'https://github.com/avemath/avemath.github.io/blob/main';
+const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/929c280/pico_direct.py';
 
-// Featured work shows each project once, the client sites having their own section below. Three
-// spotlight rows come first, each with a live version of the project built from its real code;
-// then a compact grid of the rest, with the limited-detail research last.
-const spotlit = {
-  rampage: bySlug['rampage'],
-  v2v: bySlug['v2v-bsm-ofdm'],
-  led: bySlug['led-audio-spectrum'],
-};
-const grid = ['landspace', 'bellhop-sim', 'signals-playground', 'onr-intelligent-data-management'].map((slug) => bySlug[slug]).filter(Boolean);
+// Fig. 01, How it works: the strike itself, straight from the Pico's firmware.
+const picoHow = cut(pico, '# Increment activation counter', 45, 'py');
+const picoNotes: { text: string; lines: [number, number] }[] = [
+  { text: 'Count the shot, start the 500 ms cooldown, and lock out once all 17 are used.', lines: [lineOf(pico, '# Increment activation counter'), lineOf(pico, 'weapon_depleted = True') + 1] },
+  { text: 'Fill: the main valve opens for 50 ms to build pressure, then closes.', lines: [lineOf(pico, '# 1. Open main valve'), lineOf(pico, '# 4. Dweel time') - 1] },
+  { text: 'Extend: the piston valve opens for 400 ms, full extension.', lines: [lineOf(pico, '# 5. Open piston valves'), lineOf(pico, 'utime.sleep_ms(SOLENOID_ACTIVATION_TIME)')] },
+  { text: 'Close the piston valve and open the main valve again to vent.', lines: [lineOf(pico, '# 7. Close valves'), lineOf(pico, '# 8. Re-open main valve') + 1] },
+];
+
+// Fig. 02, How it works: the receiver stages in the port of the MATLAB receiver.
+const rxHow = region(ofdmRx, 'rx', 'ts');
+const rxNotes: { text: string; lines: [number, number] }[] = [
+  { text: 'CFO: the phase step between known preamble symbols, averaged, gives the frequency offset to remove.', lines: [lineOf(ofdmRx, '// 1. Coarse CFO'), lineOf(ofdmRx, 'rx = rx.map((z, n) => rot(z, -step * n));')] },
+  { text: 'A line fit to the leftover phase on the training symbols, then the polarity is fixed.', lines: [lineOf(ofdmRx, '// 2. Fit a line'), lineOf(ofdmRx, 'if (corr < 0)')] },
+  { text: 'Costas loop: each decision steers the phase estimate a little.', lines: [lineOf(ofdmRx, '// 3. Decision-directed Costas'), lineOf(ofdmRx, 'return y;', lineOf(ofdmRx, '// 3. Decision-directed Costas'))] },
+  { text: 'MMSE: divide out the channel estimate on each subcarrier, weighted by the noise.', lines: [lineOf(ofdmRx, 'if (on.mmse) {'), lineOf(ofdmRx, 'y = [num[0] / den, num[1] / den];')] },
+];
+
+// Fig. 03, How it works: FFT bins into 16 bands, AGC and smoothing, as in loop().
+const ledHow = region(ledFw, 'bands', 'ts');
+const bandStart = lineOf(ledFw, '#region how:bands');
+const ledNotes: { text: string; lines: [number, number] }[] = [
+  { text: 'Average the FFT bins inside each of the 16 log-spaced bands, and gate out the noise.', lines: [lineOf(ledFw, 'for (let b = 0; b < 16; b++) {', bandStart), lineOf(ledFw, 'if (val > peak) peak = val;', bandStart) + 1] },
+  { text: 'AGC: the full-scale level rises fast with loud music and falls slowly back.', lines: [lineOf(ledFw, 'if (peak > s.levelMax)', bandStart), lineOf(ledFw, 'else s.levelMax = Math.max(LEVELMAX_FLOOR', bandStart)] },
+  { text: 'Scale each band to the 16 rows, smooth it, and let the peak dots hold and fall.', lines: [lineOf(ledFw, 'const h = Math.min(H', bandStart), lineOf(ledFw, 'else peakValues[b] = Math.max(0, peakValues[b] - PEAK_FALL_RATE);', bandStart)] },
+];
+
+// Fig. 05: the first eight chips of the Signals playground's hop pattern (seed 87).
+const bits = [1, 0, 1, 1, 0, 0, 1, 1];
+const hops = hopSequence(8, 87);
+const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 ---
 
-<BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
-  <style is:inline slot="head" set:html={zoneStyles()} />
-  <div class="home">
-    <Hero />
-    <NowStrip />
+<BaseLayout navLabel="surface" jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
+  <Hero />
+  <Marquee />
+  <StatusStrip />
 
-    <div class="home-flow">
-      <section id="featured" class="section home-section zone" aria-labelledby="featured-title" data-section="featured">
-        <span class="spine" aria-hidden="true"></span>
-        <div class="wrap">
-          <div class="fw__head">
-            <div>
-              <p class="eyebrow">Featured work</p>
-              <h2 id="featured-title" class="section-title">
-                <span class="aud aud--hire">Radio, sound, a combat robot, a title app and my research</span>
-                <span class="aud aud--research">My research, then radio, sound, a robot and a title app</span>
-                <span class="aud aud--website">The engineering behind the sites: radio, sound, a robot, a title app and research</span>
-              </h2>
-              <p class="section-lede split__lede">
-                <span class="aud aud--hire">The first projects run right here, from their real code. Every one opens a case study with what I did and how.</span>
-                <span class="aud aud--research">Research and communications work, then the engineering and software behind it. The first projects run right here, from their real code.</span>
-                <span class="aud aud--website">After the client sites above, the engineering behind how I work. The first projects run right here, from their real code.</span>
-              </p>
-            </div>
-            <div class="fw__links">
-              <a class="btn" href="/work/">All work <Icon name="arrow-right" /></a>
-              <p class="split__more">
-                <a class="link" href="/about/#experience">Experience, skills and recommendations</a> are on the About page.
-              </p>
-            </div>
-          </div>
+  <section id="projects" class="section projects" aria-labelledby="projects-title">
+    <div class="wrap">
+      <div class="projects__head">
+        <h2 id="projects-title" class="section-title projects__title" data-decode>Projects</h2>
+        <p class="projects__note">every figure is live and built from the real code</p>
+      </div>
 
-          <div class="spotlights">
-            {
-              spotlit.rampage && (
-                <Spotlight
-                  project={spotlit.rampage}
-                  photo={rampageBench}
-                  focus="50% 45%"
-                  what="The weapon and safety firmware from the robot's Pico W, running in your browser on the same logic, step for step."
-                  tryThis={['Press Fire a few times and watch the air count drop from 17.', 'Hit E-stop, then try to fire.', 'Press Reset to reboot the Pico and refill the count.']}
-                  why="Weapon safety and video run on separate controllers, a Pico W and a Pi 4B, so neither one can stall the other."
-                >
-                  <RampageLive />
-                </Spotlight>
-              )
-            }
-            {
-              spotlit.v2v && (
-                <Spotlight
-                  project={spotlit.v2v}
-                  flip
-                  what="Two cars sharing safety messages over my OFDM link, with the receiver that decodes them and the brake rule from my MATLAB code."
-                  tryThis={['Drag the closing speed and watch the time to collision change.', 'Find the speed where Brake recommended appears.', 'Press Receive again and watch the four receiver stages lock.']}
-                  why="It ran as a real radio link on two ADALM-PLUTO software-defined radios at 2.9 GHz, not only in simulation."
-                  metricLabel="Radio link"
-                >
-                  <V2vLive />
-                </Spotlight>
-              )
-            }
-            {
-              spotlit.led && (
-                <Spotlight
-                  project={spotlit.led}
-                  photo={ledMatrix}
-                  what="The 16 by 16 matrix from my ESP32 build, running the firmware's boot scroll, FFT and silence detection in your browser."
-                  tryThis={['Press Power on and watch the boot scroll.', 'Let the demo track play and watch it switch from the glow to the spectrum.', 'Press Try my mic with music playing nearby.']}
-                  why="It reads quiet music from across the room and fades to a glow in silence."
-                >
-                  <LedLive />
-                </Spotlight>
-              )
-            }
-          </div>
+      <div class="projects__cards">
+        <FigureCard id="rampage" fig="01" kind="Timing diagram" eyebrow="Senior design capstone, 1st place" title="RAMpage">
+          <TimingFig />
+          <CodeHow slot="how" excerpt={picoHow} file="pico_direct.py" url={`${RAMPAGE}#L${picoHow.from}-L${picoHow.from + 44}`} notes={picoNotes} />
+          <CodeFile
+            slot="code"
+            source={pico}
+            lang="py"
+            file="pico_direct.py"
+            url={RAMPAGE}
+            note="The Pico W firmware as it ran on the robot, vendored unmodified. The figure runs src/lib/rampage-firmware.ts, a line for line port of it."
+          />
+          <Fragment slot="text">
+            <p>
+              A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the RC receiver with hardware
+              interrupts, sequences two valves, enforces a 17 shot air budget and stops on signal loss. A Pi 4B streams video over UDP on its
+              own, so a video crash never touches the weapon.
+            </p>
+          </Fragment>
+          <Fragment slot="actions">
+            <button type="button" class="btn btn--solid" data-fire>Fire the plow</button>
+            <a class="btn" href="/work/rampage/">Case study</a>
+          </Fragment>
+        </FigureCard>
 
-          <p class="fw__more-label mono">More work</p>
-          {/* Every tile image loads lazily: the hero fills the first screen on phones and desktops,
-              so even the first tile is below the fold and should not compete with the hero text. */}
-          <div class="bento">
-            {
-              grid.map((p) => (
-                <ProjectTile project={p!} size="lg" metric>
-                  {p!.id === 'landspace' && <LandspaceLive slot="live" />}
-                  {p!.id === 'signals-playground' && <SignalsLive slot="live" />}
-                </ProjectTile>
-              ))
-            }
-          </div>
-        </div>
-      </section>
+        <FigureCard id="v2v" fig="02" kind="Receiver chain" flip eyebrow="EE 4003, with Jason Phan" title="V2V collision warning over OFDM">
+          <ChainFig />
+          <CodeHow slot="how" excerpt={rxHow} file="src/lib/ofdm-rx.ts" url={`${SELF}/src/lib/ofdm-rx.ts#L${rxHow.from}`} notes={rxNotes} />
+          <CodeFile
+            slot="code"
+            source={ofdmRx}
+            lang="ts"
+            file="src/lib/ofdm-rx.ts"
+            url={`${SELF}/src/lib/ofdm-rx.ts`}
+            note="The receiver from V2V_TXRXf.m (github.com/avemath/v2v-bsm-ofdm), ported to run in the browser. The figure runs this file."
+          />
+          <Fragment slot="text">
+            <p>
+              A BPSK-OFDM link modeled on 802.11p, running between two PlutoSDRs. I built the receiver: packet detection, timing recovery,
+              CFO correction, a Costas loop, MMSE equalization and Viterbi decoding. Two cars trade safety messages and the receiver
+              computes time to collision.
+            </p>
+          </Fragment>
+          <Fragment slot="actions">
+            <button type="button" class="btn btn--solid" data-step>Step through the receiver</button>
+            <a class="btn" href="/work/v2v-bsm-ofdm/">Case study</a>
+          </Fragment>
+        </FigureCard>
 
-      <ResearchSection />
-      <WebsitesShowcase />
-      <FieldNotes />
+        <FigureCard id="led" fig="03" kind="16 by 16 matrix" eyebrow="Personal project, one built for each sister" title="LED audio spectrum">
+          <MatrixFig />
+          <CodeHow slot="how" excerpt={ledHow} file="src/lib/led-firmware.ts" url={`${SELF}/src/lib/led-firmware.ts#L${ledHow.from}`} notes={ledNotes} />
+          <CodeFile
+            slot="code"
+            source={ledFw}
+            lang="ts"
+            file="src/lib/led-firmware.ts"
+            url={`${SELF}/src/lib/led-firmware.ts`}
+            note="The ESP32 firmware (github.com/avemath/led-audio-spectrum), ported to the browser. The figure runs this file."
+          />
+          <Fragment slot="text">
+            <p>
+              An ESP32 drives a 16 by 16 matrix from a microphone: 128 point FFT into 16 log spaced bands, an adaptive noise floor, AGC and
+              debounced switching between the spectrum and an idle glow. Tuned so quiet, distant music still reads.
+            </p>
+          </Fragment>
+          <Fragment slot="actions">
+            <button type="button" class="btn btn--solid" data-mic>Try it with your mic</button>
+            <a class="btn" href="https://github.com/avemath/led-audio-spectrum">Firmware</a>
+            <a class="link projects__cs" href="/work/led-audio-spectrum/">Case study</a>
+          </Fragment>
+        </FigureCard>
+      </div>
 
-      <section id="contact" class="section section--tight home-section zone" aria-labelledby="contact-title" data-section="contact">
-        <span class="spine" aria-hidden="true"></span>
-        <div class="wrap grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:items-center">
-          <div>
-            <p class="eyebrow">Contact</p>
-            <h2 id="contact-title" class="section-title section-title--sm">Send a note</h2>
-            <p class="section-lede">Have a role, a research question or a website in mind? {site.replyTime}</p>
-            <ul class="mt-8 space-y-4 contact-list">
-              <li>
-                <p class="label">Email</p>
-                <a class="link mt-1 inline-flex items-center gap-2 text-lg" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
-              </li>
-              <li>
-                <p class="label">Elsewhere</p>
-                <div class="mt-1 flex flex-wrap gap-4">
-                  <a class="link inline-flex items-center gap-2" href={site.socials.linkedin}><Icon name="linkedin" /> LinkedIn</a>
-                  <a class="link inline-flex items-center gap-2" href={site.socials.github}><Icon name="github" /> GitHub</a>
-                </div>
-              </li>
-              <li>
-                <p class="label">Based in</p>
-                <p class="mt-1 inline-flex items-center gap-2 text-soft"><Icon name="pin" /> {site.location}. Happy to work remotely.</p>
-              </li>
-            </ul>
+      <ul class="minis">
+        <li class="mini paper">
+          <div class="fig__bar mini__bar">
+            <p class="fig__label">Fig. 04 / Eigenrays</p>
+            <p class="fig__label">Figures</p>
           </div>
-          <div class="card p-6 sm:p-8">
-            <ContactForm idPrefix="home" emailLine={false} />
+          <div class="mini__fig" data-draw>
+            <Image src={eigenrays} alt="BELLHOP output: the Munk sound speed profile beside 50 rays leaving a source at 1300 m and bending back toward the channel axis over 100 km." widths={[400, 640]} sizes="(min-width: 960px) 24rem, calc(100vw - 2rem)" format="webp" quality={76} loading="lazy" class="mini__img" />
           </div>
-        </div>
-      </section>
+          <div class="mini__body">
+            <h3 class="mini__title"><a href="/work/bellhop-sim/" class="stretched">bellhopSim</a></h3>
+            <p class="mini__text">BELLHOP ray tracing for shallow water, with the three physics bugs I found and fixed.</p>
+          </div>
+        </li>
+
+        <li class="mini paper" data-live-host>
+          <div class="fig__bar mini__bar">
+            <p class="fig__label">Fig. 05 / Hop pattern</p>
+            <p class="fig__label">Live, with sound</p>
+          </div>
+          <div class="mini__fig mini__fig--live" data-live-media data-draw>
+            <svg viewBox="0 0 320 120" class="mini__hops" aria-hidden="true">
+              {
+                hops.map((p, i) => (
+                  <rect x={20 + i * 36} y={hopY(toneHz(p, bits[i])) - 2} width="26" height="4" fill={i % 2 ? 'var(--text)' : 'var(--accent)'} />
+                ))
+              }
+            </svg>
+            <SignalsLive />
+          </div>
+          <div class="mini__body">
+            <h3 class="mini__title"><a href="/work/signals-playground/">Signals playground</a></h3>
+            <p class="mini__text">A JANUS style FH-BFSK preamble, one chip at a time. You can hear each hop.</p>
+          </div>
+        </li>
+
+        <li class="mini paper mini--accent">
+          <div class="fig__bar mini__bar">
+            <p class="fig__label">In progress</p>
+            <p class="fig__label">Research page</p>
+          </div>
+          <div class="mini__fig" data-draw>
+            <svg viewBox="0 0 320 120" class="mini__pool" aria-hidden="true">
+              <path d="M30 30 H290 V100 H30 Z" />
+              <path class="mini__water" d="M30 42 H290" />
+              <circle cx="46" cy="92" r="4" />
+              <circle cx="274" cy="92" r="4" />
+              <path class="mini__ray" d="M46 92 L160 58 L274 92" />
+            </svg>
+          </div>
+          <div class="mini__body">
+            <h3 class="mini__title"><a href="/research/#pool-alarm" class="stretched">Acoustic Pool Alarm</a> <span class="mini__wt">(working title)</span></h3>
+            <p class="mini__text">Can a hydrophone tell a swimmer from a child in trouble? My own project with Because of ADAM.</p>
+          </div>
+        </li>
+      </ul>
     </div>
-    <DepthGauge />
-  </div>
+  </section>
+
+  <BelowSurface />
+  <WebsitesShowcase />
+  <div class="ground-alt"><HomeSkills /></div>
 </BaseLayout>
 
-
 <style>
-  .home-flow {
+  .projects__head {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--accent);
   }
 
-  /* Section order for each audience comes from src/lib/depth.ts (zoneStyles), together with each
-     section's depth, so the order and the depth labels cannot drift apart. */
-
-  .fw__head {
-    display: grid;
-    gap: 1rem 3rem;
+  .projects__title {
+    margin-top: 0;
   }
 
-  @media (min-width: 1100px) {
-    .fw__head {
-      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-      align-items: end;
-    }
-  }
-
-  .fw__links {
-    display: grid;
-    gap: 0.75rem;
-    justify-items: start;
-  }
-
-  .split__more {
-    font-size: 0.92rem;
-    color: var(--text-soft);
-  }
-
-  .spotlights {
-    display: grid;
-    gap: clamp(2.5rem, 6vw, 4.5rem);
-    margin-top: clamp(2rem, 4vw, 3rem);
-  }
-
-  .fw__more-label {
-    margin-top: clamp(2.5rem, 5vw, 4rem);
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+  .projects__note {
+    font-size: 0.875rem;
     color: var(--muted);
   }
 
-  /* The rest of the work: a compact grid, one row of four on wide screens. */
-  .bento {
+  .projects__cards {
     display: grid;
-    gap: 1.1rem;
-    margin-top: 1rem;
-    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+    margin-top: 1.75rem;
   }
 
-  @media (min-width: 720px) {
-    .bento {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .projects__cs {
+    align-self: center;
   }
 
-  @media (min-width: 1100px) {
-    .bento {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+  .minis {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.75rem;
   }
 
-  /* Phones: each tile is a compact row, a cropped picture on the left and the title, a short
-     summary and its number on the right. The outcome line and the tech chips stay on wider
-     screens and in the case study, so the four tiles fit in about a screen. */
-  @media (max-width: 719px) {
-    .bento {
-      gap: 0.75rem;
+  @media (min-width: 760px) {
+    .minis {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .bento > :global(.tile) {
-      grid-area: auto !important;
-    }
-
-    .bento :global(.tile__inner) {
-      display: grid;
-      grid-template-columns: 6.75rem minmax(0, 1fr);
-    }
-
-    .bento :global(.tile__media) {
-      aspect-ratio: auto;
-      min-height: 0 !important;
-      border-bottom: 0;
-      border-right: 1px solid var(--line);
-    }
-
-    /* Drawn art: show its middle, at the full height of the row. */
-    .bento :global(.tile__media > .art) {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      width: auto;
-      height: 100%;
-      aspect-ratio: 600 / 375;
-      max-width: none;
-      translate: -50% 0;
-    }
-
-    .bento :global(.tile__live) {
-      display: none;
-    }
-
-    /* The research tile repeats the Research section that comes right after Featured work, so
-       phones skip it to keep the page short. Wider screens keep it in the grid. */
-    .bento > :global(.tile[data-tags^='research']) {
-      display: none;
-    }
-
-    .bento :global(.tile__body) {
-      gap: 0.4rem;
-      padding: 0.8rem 0.9rem 0.85rem;
-    }
-
-    .bento :global(.tile__body .chip--type) {
-      padding: 0.1rem 0.45rem;
-      font-size: 0.66rem;
-    }
-
-    .bento :global(.tile__title) {
-      font-size: 1.05rem;
-      line-height: 1.25;
-    }
-
-    .bento :global(.tile__summary) {
-      font-size: 0.85rem;
-      line-height: 1.45;
-      -webkit-line-clamp: 2 !important;
-    }
-
-    .bento :global(.tile__metric-v) {
-      font-size: 1.35rem;
-    }
-
-    .bento :global(.tile__outcome),
-    .bento :global(.tile__chips) {
-      display: none;
-    }
-
-    .bento :global(.tile__links) {
-      padding-top: 0.5rem;
-      font-size: 0.84rem;
-    }
-
-    .split__lede {
-      display: none;
+    .minis:has([data-live-on]) {
+      align-items: start;
     }
   }
 
-  /* A tile that spans two rows lets its picture take the extra height, so the text sits at the
-     bottom with no gap under it. In the tall slot the picture also grows past its usual ratio. */
-  .bento > :global(.tile) :global(.tile__media) {
-    flex: 1 1 auto;
-    min-height: 12rem;
+  .mini {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
   }
 
-  .bento > :global(.tile) :global(.tile__body) {
-    flex: 0 0 auto;
+  .mini--accent {
+    border-color: var(--accent);
   }
 
-  .bento > :global(.tile) :global(.tile__img) {
-    position: absolute;
-    inset: 0;
+  .mini__bar {
+    min-height: 2.6rem;
   }
 
-  /* Phones: the rest of the page tightens too, so the whole descent is a short read. Content is
-     the same; only the layout changes, and every link and control stays in the page. */
-  @media (max-width: 719px) {
-    /* Now strip: two columns. */
-    .home :global(.now__grid) {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      column-gap: 1rem;
-    }
-
-    .home :global(.now__item) {
-      padding: 0.8rem 0 0.9rem !important;
-      border-left: 0 !important;
-    }
-
-    .home :global(.now__item:nth-child(-n + 2)) {
-      border-top: 0 !important;
-    }
-
-    .home :global(.now__item dd) {
-      font-size: 0.84rem;
-    }
-
-    /* Featured: the spotlights sit closer together. */
-    .spotlights {
-      gap: 2.25rem;
-    }
-
-    /* Research: a smaller sound speed chart. */
-    .home :global(.ssp__profile) {
-      max-width: 12.5rem;
-      margin-inline: auto;
-    }
-
-    /* Research: the related work lists titles only; each case study has the summary. */
-    .home :global(.research__row-sub) {
-      display: none !important;
-    }
-
-    .home :global(.research__row) {
-      padding-block: 0.7rem;
-    }
-
-    /* Client sites and field notes: rows you swipe through, with the next card peeking in. */
-    .home :global(.sites),
-    .home :global(.notes) {
-      display: flex !important;
-      gap: 0.75rem !important;
-      margin-inline: calc(-1 * var(--gutter));
-      padding: 0.25rem var(--gutter) 0.75rem;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline: var(--gutter);
-      overscroll-behavior-x: contain;
-    }
-
-    .home :global(.sites > .site),
-    .home :global(.notes > .note) {
-      flex: 0 0 84%;
-      scroll-snap-align: start;
-    }
-
-    /* Contact: the form keeps every field, a little tighter. */
-    .home :global(.cform__row) {
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .home :global(.cform textarea) {
-      min-height: 0;
-      height: 6.5rem;
-    }
-
-    #contact :global(.card) {
-      padding: 1.1rem;
-    }
-
-    /* The footer frame right below lists GitHub, LinkedIn and Baton Rouge, so on a phone the
-       contact section keeps only the email line. */
-    .contact-list > li:not(:first-child) {
-      display: none;
-    }
-
-    .contact-list {
-      margin-top: 1.25rem;
-    }
-
-    /* Featured tiles: the whole tile is the link, so the decorative "Case study" row goes. A tile
-       with a live site keeps the row, for that link. */
-    .bento :global(.tile__links:not(:has(.tile__ext))) {
-      display: none;
-    }
-
-    /* The sound speed profile a little narrower, so the figure takes less of the screen. */
-    .home :global(.ssp svg.ssp__profile) {
-      width: 76%;
-      margin-inline: auto;
-    }
-
-    .home :global(.hero) {
-      padding-bottom: 3.25rem;
-    }
-
-    /* Less water between sections: the bands and waves still mark each step down. */
-    .home-flow > :global(.section) {
-      padding-block: 2.25rem;
-    }
-
-    .home-flow > :global(.section--tight) {
-      padding-block: 1.9rem;
-    }
+  .mini__fig {
+    position: relative;
+    aspect-ratio: 8 / 3;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
   }
 
-  /* A live tile while it runs: its panel replaces the picture, and the tile grows to fit it. */
-  /* Its neighbors in the row keep their own height instead of stretching to match. */
-  .bento:has(:global([data-live-on])) {
-    align-items: start;
-  }
-
-  .bento :global(.tile__media[data-live-on]) {
+  .mini__fig[data-live-on] {
     aspect-ratio: auto;
+    overflow: visible;
   }
 
-  .bento :global(.tile__media[data-live-on] > :not(.live)) {
+  .mini__fig[data-live-on] > :not(:global(.live)) {
     display: none;
   }
 
-  @media (max-width: 719px) {
-    .bento :global(.tile[data-live-on] .tile__inner) {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .bento :global(.tile__media[data-live-on]) {
-      border-right: 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    /* At rest on a phone, the button sits under the small picture. */
-    .bento :global(.live__try) {
-      right: 0.4rem;
-      bottom: 0.4rem;
-      padding: 0.3rem 0.55rem;
-      font-size: 0.66rem;
-    }
+  .mini__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 75% 40%;
   }
 
-  /* Audience-specific intro lines. */
-  .aud {
-    display: none;
+  .mini__hops,
+  .mini__pool {
+    width: 100%;
+    height: 100%;
   }
-  .home:has(#aud-hire:checked) .aud--hire,
-  .home:has(#aud-research:checked) .aud--research,
-  .home:has(#aud-website:checked) .aud--website {
-    display: inline;
+
+  .mini__pool path {
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 1.25;
   }
-  .home:not(:has(input[name='audience']:checked)) .aud--hire {
-    display: inline;
+
+  .mini__pool .mini__water {
+    stroke: var(--line-strong);
+    stroke-dasharray: 4 4;
+  }
+
+  .mini__pool circle {
+    fill: var(--accent);
+  }
+
+  .mini__pool .mini__ray {
+    stroke: var(--accent);
+  }
+
+  .mini__body {
+    padding: 1rem 1rem 1.15rem;
+  }
+
+  .mini__title {
+    font-size: 1.1875rem;
+    font-variation-settings: 'wdth' 100;
+    letter-spacing: -0.01em;
+  }
+
+  .mini__title a {
+    text-decoration: none;
+  }
+
+  .mini__title a:hover {
+    text-decoration: underline;
+  }
+
+  .mini__wt {
+    font-weight: 400;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .mini__text {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    color: var(--text-soft);
   }
 </style>

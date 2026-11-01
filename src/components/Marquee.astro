@@ -1,0 +1,69 @@
+---
+// The accent strip under the hero: project names and client domains, scrolling slowly. It is
+// decoration, hidden from screen readers (every name is in the page below), and it holds still
+// with reduced motion.
+import { getProjects, isWebsite } from '@/lib/projects';
+import { displayUrl } from '@/lib/format';
+
+const domains = (await getProjects())
+  .filter((p) => isWebsite(p) && p.data.links.live && p.data.client?.permission && !p.data.links.live.includes('github.io'))
+  .map((p) => displayUrl(p.data.links.live!));
+const items = [
+  '30 lb combat robot',
+  'V2V collision warning over OFDM',
+  'bellhopSim ray tracing',
+  'FH-BFSK playground',
+  '16 by 16 LED spectrum',
+  'Acoustic pool alarm, in progress',
+  ...domains,
+];
+---
+
+<div class="mq" aria-hidden="true">
+  <div class="mq__track">
+    {[0, 1].map(() => <ul class="mq__list">{items.map((t) => <li>{t}</li>)}</ul>)}
+  </div>
+</div>
+
+<style>
+  .mq {
+    overflow: hidden;
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .mq__track {
+    display: flex;
+    width: max-content;
+    animation: mq 60s linear infinite;
+  }
+
+  .mq__list {
+    display: flex;
+    flex: none;
+  }
+
+  /* 19px bold: white on the accent is 3.4:1, which passes as large text. */
+  .mq__list li {
+    padding: 0.7rem 1.4rem;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  @keyframes mq {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mq__track {
+      animation: none;
+    }
+  }
+
+  :global(html[data-motion='reduce']) .mq__track {
+    animation: none;
+  }
+</style>
