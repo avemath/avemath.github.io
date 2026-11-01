@@ -1,0 +1,221 @@
+---
+// Fig. 02: the V2V receiver as a block diagram of real, focusable stages, in signal order. Picking
+// a stage shows what it does and the constellation of the signal after it, computed in the
+// browser by src/lib/ofdm-rx.ts, the port of the MATLAB receiver. The stage order follows
+// V2V_TXRXf.m: the CFO, phase fit and Costas loop run on the single-carrier preamble before the
+// OFDM payload reaches the FFT.
+import { collision, GAP_M, LEAD_V, TTC_WARN } from '@/lib/v2v-scenario';
+
+const ttc = collision(30);
+
+const stages = [
+  {
+    key: 'detect',
+    name: 'detect',
+    text: 'Cross-correlates the samples against the known preamble. A peak marks a packet, and the receiver predicts where the next one should land.',
+    io: 'Takes raw samples from the radio; hands a rough packet start to timing.',
+  },
+  {
+    key: 'timing',
+    name: 'timing',
+    text: 'Sweeps the sample offset around the peak and keeps the one that correlates best.',
+    io: 'Takes the rough start; hands on-time symbols to CFO. They still spin from the frequency offset.',
+  },
+  {
+    key: 'cfo',
+    name: 'CFO',
+    text: 'Estimates the carrier frequency offset from the phase step between preamble symbols and removes it, then fits a line to the leftover phase and fixes the polarity.',
+    io: 'Takes spinning symbols; hands nearly still ones to the Costas loop.',
+  },
+  {
+    key: 'costas',
+    name: 'Costas',
+    text: 'Costas loop. Tracks the phase that is still drifting after CFO correction, one symbol at a time, steered by its own decisions.',
+    io: 'Takes nearly still symbols; hands phase-locked timing and phase to the OFDM payload.',
+  },
+  {
+    key: 'fft',
+    name: 'FFT',
+    text: 'Drops the 16-sample cyclic prefix and takes a 64-point FFT of each OFDM symbol: 48 data subcarriers and 4 pilots, each scaled and turned by the channel.',
+    io: 'Takes payload samples; hands raw subcarriers to MMSE.',
+  },
+  {
+    key: 'mmse',
+    name: 'MMSE',
+    text: 'Estimates the channel on each subcarrier from an OFDM preamble and divides it out, weighted by a noise estimate, so the points land back on plus and minus one.',
+    io: 'Takes raw subcarriers; hands equalized BPSK symbols to Viterbi.',
+  },
+  {
+    key: 'viterbi',
+    name: 'Viterbi',
+    text: 'Decodes the rate 1/2, K=7 convolutional code. The browser port stops just before it, so this view shows the hard decisions it is fed.',
+    io: 'Takes coded bits; hands the 10-byte message to the BSM parser.',
+  },
+  {
+    key: 'bsm',
+    name: 'BSM',
+    text: `Unpacks ID, velocity, acceleration and position, then computes time to collision. Car 1 at 30 m/s is ${GAP_M} m behind car 2 at ${LEAD_V} m/s: ${ttc.ttc.toFixed(1)} s, under the ${TTC_WARN.toFixed(1)} s threshold, so it recommends braking.`,
+    io: 'Takes the decoded message; hands a brake warning to the driver.',
+  },
+];
+---
+
+<div class="cf" data-cf>
+  <div class="cf__plot" data-draw>
+    <ol class="cf__chain" aria-label="Receiver stages, in signal order">
+      {
+        stages.map((s, i) => (
+          <li class="cf__item">
+            <button type="button" class="cf__stage" data-stage={s.key} aria-pressed={s.key === 'costas' ? 'true' : 'false'} aria-describedby="cf-desc">
+              {s.name}
+            </button>
+            {i < stages.length - 1 && <span class="cf__wire" aria-hidden="true" />}
+          </li>
+        ))
+      }
+    </ol>
+    <div class="cf__detail">
+      <div class="cf__desc" id="cf-desc" aria-live="polite">
+        <p data-cf-text>{stages[3].text}</p>
+        <p class="cf__io" data-cf-io>{stages[3].io}</p>
+      </div>
+      <figure class="cf__scope">
+        <svg viewBox="-1.6 -1.6 3.2 3.2" class="cf__svg" data-cf-svg aria-hidden="true">
+          <line x1="-1.6" x2="1.6" y1="0" y2="0"></line>
+          <line y1="-1.6" y2="1.6" x1="0" x2="0"></line>
+        </svg>
+        <p class="cf__bsm mono" data-cf-bsm hidden></p>
+        <figcaption class="cf__cap" data-cf-cap>constellation after this stage</figcaption>
+      </figure>
+    </div>
+  </div>
+  <p class="fig__note">hover or tap a stage to see what it does and what it passes on</p>
+  <script type="application/json" data-cf-stages set:html={JSON.stringify(stages)} />
+</div>
+
+<style>
+  .cf__plot {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .cf__chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 0.75rem;
+  }
+
+  .cf__item {
+    display: flex;
+    align-items: center;
+  }
+
+  .cf__stage {
+    min-height: 2.5rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--text);
+    background: var(--surface);
+    font-size: 0.875rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .cf__stage:hover {
+    background: var(--surface-2);
+  }
+
+  .cf__stage[aria-pressed='true'] {
+    border: 2px solid var(--accent);
+    color: var(--accent-ink);
+    font-weight: 700;
+    padding-inline: calc(0.6rem - 1px);
+  }
+
+  .cf__wire {
+    width: 0.9rem;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .cf__wire[data-hot] {
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .cf__detail {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  @media (min-width: 560px) {
+    .cf__detail {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .cf__desc {
+    padding: 0.85rem 1rem;
+    background: var(--navy);
+    color: var(--on-navy);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .cf__io {
+    margin-top: 0.5rem;
+    color: var(--on-navy-muted);
+  }
+
+  .cf__scope {
+    position: relative;
+    margin: 0;
+    border: 1px solid var(--line);
+  }
+
+  .cf__svg {
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 14rem;
+  }
+
+  .cf__svg line {
+    stroke: var(--line);
+    stroke-width: 0.01;
+  }
+
+  .cf__svg :global(circle) {
+    fill: var(--text);
+  }
+
+  .cf__svg :global(circle.hot) {
+    fill: var(--accent);
+  }
+
+  .cf__bsm {
+    padding: 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+
+  .cf__cap {
+    position: absolute;
+    right: 0.4rem;
+    bottom: 0.3rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .cf__bsm:not([hidden]) + .cf__cap {
+    position: static;
+    padding: 0 0.6rem 0.4rem;
+    text-align: right;
+  }
+</style>
+
+<script>
+  import { mountChain } from '../../scripts/fig/chain';
+  document.querySelectorAll<HTMLElement>('[data-cf]').forEach(mountChain);
+</script>

@@ -5,7 +5,7 @@
 // it. The panel's markup waits in a <template> until then, so it costs the page nothing.
 interface Props {
   /** Which live tile this is: the key of its script in the loader below. */
-  kind: 'rampage' | 'v2v' | 'led' | 'adam' | 'grace' | 'landspace' | 'signals';
+  kind: 'adam' | 'grace' | 'signals';
   /** What the live version is, for screen readers, read before they press Try it. */
   description: string;
   /** The case study section with the full version. */
@@ -47,16 +47,12 @@ const descId = `live-${kind}-desc`;
     gap: 0.45rem;
     min-height: 2.25rem;
     padding: 0.35rem 0.8rem;
-    border: 1px solid color-mix(in oklab, var(--amber-line) 70%, transparent);
-    border-radius: 0.45rem;
-    background: color-mix(in oklab, var(--surface) 92%, transparent);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    border: 2px solid var(--text);
+    background: var(--surface);
+    font-size: 0.875rem;
+    font-weight: 700;
     color: var(--text);
     cursor: pointer;
-    box-shadow: var(--shadow);
   }
 
   :global(html.js) .live__try {
@@ -64,22 +60,21 @@ const descId = `live-${kind}-desc`;
   }
 
   .live__try:hover {
-    border-color: var(--amber-line);
+    border-color: var(--accent);
   }
 
   .live__try:focus-visible,
   .live__panel :global(button:focus-visible),
   .live__panel :global(input:focus-visible),
   .live__panel :global(a:focus-visible) {
-    outline: 2px solid var(--amber-line);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
   .live__dot {
     width: 0.5rem;
     height: 0.5rem;
-    border-radius: 50%;
-    background: var(--amber);
+    background: var(--accent);
   }
 
   :global(html [data-live-on]) .live__try,
@@ -125,8 +120,7 @@ const descId = `live-${kind}-desc`;
     min-height: 2rem;
     padding: 0.25rem 0.65rem;
     border: 1px solid var(--line-strong);
-    border-radius: 0.4rem;
-    font-size: 0.78rem;
+    font-size: 0.8125rem;
     color: var(--text-soft);
     cursor: pointer;
   }
@@ -140,12 +134,8 @@ const descId = `live-${kind}-desc`;
 <script>
   // Loads each live tile's script once its tile is near the screen, and starts it on Try it.
   const loaders = {
-    rampage: () => import('../../scripts/live/rampage'),
-    v2v: () => import('../../scripts/live/v2v'),
-    led: () => import('../../scripts/live/led'),
     adam: () => import('../../scripts/live/adam'),
     grace: () => import('../../scripts/live/grace'),
-    landspace: () => import('../../scripts/live/landspace'),
     signals: () => import('../../scripts/live/signals'),
   };
   type Kind = keyof typeof loaders;

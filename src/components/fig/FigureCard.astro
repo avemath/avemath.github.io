@@ -1,0 +1,186 @@
+---
+// A project spotlight: one paper card split 7/5, the figure on one side and the words on the
+// other, alternating sides. The figure has a label row ("Fig. 01 / Timing diagram") and three
+// tabs: Live, How it works and Code. The two code views take the whole card width, so code is
+// never squeezed into the figure column.
+interface Props {
+  id: string;
+  fig: string;
+  kind: string;
+  /** Figure on the right instead of the left, from 960px up. */
+  flip?: boolean;
+  eyebrow: string;
+  title: string;
+}
+
+const { id, fig, kind, flip = false, eyebrow, title } = Astro.props;
+const views = [
+  { key: 'live', label: 'Live' },
+  { key: 'how', label: 'How it works' },
+  { key: 'code', label: 'Code' },
+];
+---
+
+<article class:list={['fc paper', flip && 'fc--flip']} id={id} aria-labelledby={`${id}-title`} data-fc>
+  <div class="fc__fig">
+    <div class="fig__bar">
+      <p class="fig__label">Fig. {fig} / {kind}</p>
+      <div class="tabset" role="tablist" aria-label={`${title}: views`}>
+        {
+          views.map((v, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`${id}-tab-${v.key}`}
+              aria-controls={`${id}-${v.key}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              data-view={v.key}
+            >
+              {v.label}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div class="fc__view" id={`${id}-live`} role="tabpanel" aria-labelledby={`${id}-tab-live`}>
+      <slot />
+    </div>
+    <div class="fc__view" id={`${id}-how`} role="tabpanel" aria-labelledby={`${id}-tab-how`} hidden>
+      <slot name="how" />
+    </div>
+    <div class="fc__view" id={`${id}-code`} role="tabpanel" aria-labelledby={`${id}-tab-code`} hidden>
+      <slot name="code" />
+    </div>
+  </div>
+
+  <div class="fc__text">
+    <p class="eyebrow fc__eyebrow">{eyebrow}</p>
+    <h3 id={`${id}-title`} class="fc__title">{title}</h3>
+    <div class="fc__body"><slot name="text" /></div>
+    <div class="fc__actions"><slot name="actions" /></div>
+  </div>
+</article>
+
+<style>
+  .fc {
+    display: grid;
+    scroll-margin-top: 5rem;
+  }
+
+  @media (min-width: 960px) {
+    .fc {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+
+    .fc--flip {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+
+    .fc--flip .fc__fig {
+      order: 2;
+      border-left: 1px solid var(--line);
+    }
+
+    .fc:not(.fc--flip) .fc__fig {
+      border-right: 1px solid var(--line);
+    }
+
+    /* The code views take the whole card; the words move under them. */
+    .fc[data-wide] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fc[data-wide] .fc__fig {
+      order: 0;
+      border-inline: 0;
+      border-bottom: 1px solid var(--line);
+    }
+  }
+
+  .fc__fig {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (max-width: 959px) {
+    .fc__fig {
+      border-bottom: 1px solid var(--line);
+    }
+  }
+
+  .fc__view {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .fc__view[hidden] {
+    display: none;
+  }
+
+  .fc__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    min-width: 0;
+  }
+
+  .fc__eyebrow {
+    color: var(--muted);
+  }
+
+  .fc__title {
+    margin-top: 0.6rem;
+    font-size: clamp(2rem, 3.4vw, 2.75rem);
+    line-height: 0.98;
+  }
+
+  .fc__body {
+    margin-top: 1rem;
+    color: var(--text-soft);
+  }
+
+  .fc__body :global(p + p) {
+    margin-top: 0.75rem;
+  }
+
+  .fc__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .fc__actions:empty {
+    display: none;
+  }
+</style>
+
+<script>
+  // Tabs: click, or arrow keys, Home and End. The code views widen the card.
+  document.querySelectorAll<HTMLElement>('[data-fc]').forEach((card) => {
+    const tabs = [...card.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (i: number, focus = false) => {
+      tabs.forEach((t, j) => {
+        const on = i === j;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+      });
+      card.toggleAttribute('data-wide', tabs[i].dataset.view !== 'live');
+      if (focus) tabs[i].focus();
+      card.dispatchEvent(new CustomEvent('viewchange', { detail: tabs[i].dataset.view }));
+    };
+    tabs.forEach((t, i) => t.addEventListener('click', () => select(i)));
+    card.querySelector('[role="tablist"]')!.addEventListener('keydown', (e) => {
+      const ev = e as KeyboardEvent;
+      const at = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      const to = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[ev.key];
+      if (to === undefined || at < 0) return;
+      ev.preventDefault();
+      select((to + tabs.length) % tabs.length, true);
+    });
+  });
+</script>
