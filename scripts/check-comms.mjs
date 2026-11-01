@@ -57,6 +57,23 @@ for (const [s, db] of [['bpsk', 4], ['qpsk', 6]]) {
   check(`${s} Monte Carlo at ${db} dB matches theory within 15%`, Math.abs(sim / th - 1) < 0.15, `${sim.toExponential(2)} vs ${th.toExponential(2)}`);
 }
 
+// The hero's preamble: real JANUS numbers, every tone inside the band, and click-free audio.
+const { preamble, synthesize, CHIPS, CHIP_MS, LISTEN_STRETCH } = await import('../src/lib/preamble.ts');
+const chips = preamble();
+check('Preamble has 32 chips of 6.25 ms', chips.length === 32 && CHIPS * CHIP_MS === 200, `${chips.length} chips, ${CHIPS * CHIP_MS} ms`);
+check('Every preamble tone is inside 9440 to 13600 Hz', chips.every((c) => c.hz > 9440 && c.hz < 13600), `${Math.min(...chips.map((c) => c.hz))} to ${Math.max(...chips.map((c) => c.hz))} Hz`);
+check('The hop never stays on the same pair twice in a row', chips.every((c, i) => i === 0 || c.pair !== chips[i - 1].pair), 'checked 31 hops');
+const sr = 48000;
+const audio = synthesize(chips, sr);
+const chipLen = (CHIP_MS * LISTEN_STRETCH * sr) / 1000;
+check('Playback is 2 s long and starts at chip 0', audio.length === 2 * sr && audio[0] === 0, `${audio.length / sr} s`);
+// A click is a jump between neighboring samples. With the ramps, the largest jump at any chip
+// join is no bigger than the largest step inside a steady tone.
+let maxJoin = 0;
+for (let i = 1; i < CHIPS; i++) maxJoin = Math.max(maxJoin, Math.abs(audio[i * chipLen] - audio[i * chipLen - 1]));
+const steady = 0.18 * 2 * Math.sin((Math.PI * 13600) / sr);
+check('No clicks at chip joins', maxJoin < 1e-3 && maxJoin < steady, `largest join step ${maxJoin.toExponential(2)}`);
+
 if (failures) {
   console.error(`\ntest:comms: ${failures} check(s) failed.`);
   process.exit(1);
