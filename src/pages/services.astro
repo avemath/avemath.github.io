@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { bandVars } from '@/lib/depth';
 import Icon from '@/components/Icon.astro';
 import ProjectTile from '@/components/ProjectTile.astro';
 import { getProjects, isWebsite } from '@/lib/projects';
@@ -66,7 +65,7 @@ const faqLd = {
   description="Fast, accessible websites for small businesses and nonprofits, with an editor you can use yourself. See the process, what's included and recent work."
   jsonLd={[faqLd]}
 >
-  <section class="section svc-hero zone sunlit" style={bandVars(0)}>
+  <section class="section svc-hero">
     <div class="wrap svc-hero__grid">
       <div>
         <p class="eyebrow">Services</p>
@@ -98,7 +97,7 @@ const faqLd = {
     </div>
   </section>
 
-  <section class="section zone" style={bandVars(1)} aria-labelledby="build-title">
+  <section class="section" aria-labelledby="build-title">
     <div class="wrap">
       <p class="eyebrow">What I build</p>
       <h2 id="build-title" class="section-title">Sites for people who'd rather be running their business</h2>
@@ -116,7 +115,7 @@ const faqLd = {
     </div>
   </section>
 
-  <section class="section svc-process zone" style={bandVars(2)} aria-labelledby="process-title">
+  <section class="section svc-process" aria-labelledby="process-title">
     <div class="wrap">
       <p class="eyebrow">Process</p>
       <h2 id="process-title" class="section-title">Five steps, no mystery</h2>
@@ -136,7 +135,7 @@ const faqLd = {
 
 
 
-  <section id="recent" class="section zone" style={bandVars(3)} aria-labelledby="recent-title">
+  <section id="recent" class="section" aria-labelledby="recent-title">
     <div class="wrap">
       <p class="eyebrow">Recent work</p>
       <h2 id="recent-title" class="section-title">Live and in use</h2>
@@ -146,7 +145,7 @@ const faqLd = {
     </div>
   </section>
 
-  <section class="section zone" style={bandVars(4)} aria-labelledby="faq-title">
+  <section class="section" aria-labelledby="faq-title">
     <div class="wrap faq-grid">
       <div class="faq-col">
       <p class="eyebrow">FAQ</p>
@@ -234,7 +233,7 @@ const faqLd = {
 
   :global([data-theme='dark']) .offer__n,
   :global([data-theme='dark']) .step__n {
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 
   @media (max-width: 719px) {
@@ -424,7 +423,7 @@ const faqLd = {
 
   .faq__icon {
     font-family: var(--font-mono);
-    color: var(--accent);
+    color: var(--accent-ink);
     transition: rotate 0.3s var(--ease-out-expo);
   }
 

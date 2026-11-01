@@ -1,13 +1,6 @@
 ---
 import testimonials from '@/data/testimonials.json';
 
-interface Props {
-  /** Band variables from depth.ts, so the section sits in the page's descent. */
-  zoneStyle?: string;
-}
-
-const { zoneStyle } = Astro.props;
-
 // Only quotes their writers have approved are rendered (see docs/CONTENT-GUIDE.md).
 const quotes = testimonials.filter((t) => t.approved);
 ---
@@ -16,8 +9,7 @@ const quotes = testimonials.filter((t) => t.approved);
   quotes.length > 0 && (
     <section
       id="recommendations"
-      class="section section--tight zone"
-      style={zoneStyle}
+      class="section section--tight"
       aria-labelledby="recommendations-title"
       data-section="recommendations"
     >
@@ -86,7 +78,7 @@ const quotes = testimonials.filter((t) => t.approved);
     font-family: var(--font-display);
     font-size: 3.25rem;
     line-height: 1;
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 
   .quote__text p {

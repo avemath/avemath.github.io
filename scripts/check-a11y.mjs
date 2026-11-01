@@ -1,7 +1,8 @@
 // Runs axe-core over every built page and fails on any violation.
 // Passes: dark and light at desktop width, dark and light at phone width. On the phone passes the
-// menu is opened and scanned too, and on the home page the field notes are scanned in their masked
-// state, so those states are covered as well as the server-rendered page.
+// menu is opened and scanned too, the field notes are scanned in their masked state, and the figure
+// cards in their How it works and Code views, so those states are covered as well as the
+// server-rendered page.
 // Pages load with reduced motion so scroll reveals do not hide content from the scan, and nothing
 // off this machine (the analytics beacon, for one) is requested.
 // Run after a build: `npm run build && npm run test:a11y`. CI runs it before every deploy.
@@ -79,6 +80,16 @@ for (const pass of PASSES) {
       return cards.length > 0;
     });
     if (masked) await scan(page, `${pass.name}, field notes masked  ${path}`);
+
+    // Figure cards show the Live view first; the How it works and Code views are scanned too.
+    for (const view of ['how', 'code']) {
+      const opened = await page.evaluate((v) => {
+        const tabs = document.querySelectorAll(`[data-fc] [role="tab"][data-view="${v}"]`);
+        tabs.forEach((t) => t.click());
+        return tabs.length > 0;
+      }, view);
+      if (opened) await scan(page, `${pass.name}, figure ${view} views  ${path}`);
+    }
   }
   await ctx.close();
 }

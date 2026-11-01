@@ -7,7 +7,6 @@ import Icon from '@/components/Icon.astro';
 import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
 import { formatRange } from '@/lib/format';
 import site from '@/data/site.json';
-import { bandVars, caseStart } from '@/lib/depth';
 
 interface Props {
   project: Project;
@@ -40,8 +39,6 @@ for (const [i, g] of (d.gallery ?? []).entries()) {
 }
 const ogImage = `/og/${project.id}.png`;
 // Three gentle bands, one step apart, starting where this kind of work lives (see depth.ts).
-const start = caseStart[d.type] ?? 1;
-const band = (step: number) => bandVars(start + step);
 
 const jsonLd = [
   {
@@ -68,7 +65,7 @@ const jsonLd = [
 
 <BaseLayout title={d.seoTitle ?? d.title} description={d.seoDescription ?? d.summary} image={ogImage} type="article" jsonLd={jsonLd}>
   <article class="case descent">
-    <div class="zone case__zone case__zone--top" style={band(0)}>
+    <div class="case__zone case__zone--top">
     <header class="case__head">
       <div class="wrap">
         <nav aria-label="Breadcrumb" class="no-print">
@@ -192,7 +189,7 @@ const jsonLd = [
 
     </div>
 
-    <div class="zone case__zone" style={band(1)}>
+    <div class="case__zone">
     <slot name="demo" />
 
     <div class="wrap case__body">
@@ -219,7 +216,7 @@ const jsonLd = [
 
     </div>
 
-    <div class="zone case__zone case__zone--end" style={band(2)}>
+    <div class="case__zone case__zone--end">
     {
       d.gallery && !limited && (
         <section id="gallery" class="wrap case__gallery-wrap" aria-labelledby="gallery-title">
@@ -560,7 +557,7 @@ const jsonLd = [
   }
 
   :global([data-theme='dark']) .shot figcaption::before {
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 
   .shot__img {
