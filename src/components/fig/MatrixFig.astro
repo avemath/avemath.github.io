@@ -1,0 +1,118 @@
+---
+// Fig. 03: the 16 by 16 matrix, on navy with the bars in the accent. Every frame is the firmware
+// port in src/lib/led-firmware.ts: the 128-point FFT, the 16 log-spaced bands, the adaptive noise
+// floor and the switch between spectrum and idle glow. The picture at rest is a real frame of the
+// firmware running on the clip, computed when the figure loads.
+---
+
+<div class="mf" data-mf>
+  <div class="mf__plot" data-draw>
+    <canvas class="mf__canvas" width="320" height="320" role="img" aria-label="16 by 16 LED matrix showing a spectrum" data-mf-canvas></canvas>
+    <div class="mf__side">
+      <p class="mf__text">
+        Uses your microphone if you allow it, otherwise a built-in clip. The same 128 point FFT and 16 log spaced bands as the firmware,
+        ported line for line.
+      </p>
+      <div class="mf__ctl" role="group" aria-label="Signal source">
+        <button type="button" class="mf__btn" data-mf-src="mic" aria-pressed="false">Use my mic</button>
+        <button type="button" class="mf__btn" data-mf-src="clip" aria-pressed="false">Play the clip</button>
+        <button type="button" class="mf__btn" data-mf-src="idle" aria-pressed="false">Idle glow</button>
+      </div>
+      <p class="mf__read mono" data-mf-read aria-live="polite"></p>
+    </div>
+  </div>
+  <div class="fig__note mf__note">
+    <label for="mf-name">on boot the real unit spells its owner's name; the demo spells yours if you type it</label>
+    <input id="mf-name" class="mf__name" type="text" maxlength="10" autocomplete="off" spellcheck="false" placeholder="your name" data-mf-name />
+  </div>
+</div>
+
+<style>
+  .mf__plot {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.25rem 1rem;
+    align-items: center;
+  }
+
+  @media (min-width: 560px) {
+    .mf__plot {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    }
+  }
+
+  .mf__canvas {
+    width: 100%;
+    max-width: 18rem;
+    aspect-ratio: 1;
+    background: var(--navy);
+  }
+
+  .mf__text {
+    font-size: 0.875rem;
+    color: var(--text-soft);
+  }
+
+  .mf__ctl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.85rem;
+  }
+
+  .mf__btn {
+    min-height: 2.5rem;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    font-size: 0.8125rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .mf__btn:hover {
+    border-color: var(--text);
+  }
+
+  .mf__btn[aria-pressed='true'] {
+    border: 2px solid var(--text);
+    font-weight: 700;
+    padding-inline: calc(0.65rem - 1px);
+  }
+
+  .mf__read {
+    min-height: 1.4em;
+    margin-top: 0.7rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .mf__note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+
+  .mf__name {
+    width: 10rem;
+    min-height: 2.5rem;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+  }
+
+  .mf__name::placeholder {
+    color: var(--muted);
+    text-transform: none;
+  }
+</style>
+
+<script>
+  import { mountMatrix } from '../../scripts/fig/matrix';
+  document.querySelectorAll<HTMLElement>('[data-mf]').forEach(mountMatrix);
+</script>

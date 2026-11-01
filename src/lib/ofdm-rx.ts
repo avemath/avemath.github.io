@@ -85,6 +85,7 @@ export function createReceiver(initialSeed = 42) {
         return [clean[0] + sigma * p.syncNoise[n][0], clean[1] + sigma * p.syncNoise[n][1]];
       });
 
+      // #region how:rx
       // 1. Coarse CFO from the summed differential phase, with the known symbols stripped off.
       let est = 0;
       if (on.cfo) {
@@ -167,6 +168,7 @@ export function createReceiver(initialSeed = 42) {
         pts.push(y);
         if ((y[0] >= 0 ? 1 : 0) !== bit) errors++;
       });
+      // #endregion
 
       return { rx, pts, H, Hhat, est, phaseErr, errors, bits: p.bits, sync: p.sync };
     },

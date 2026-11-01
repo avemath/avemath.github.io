@@ -1,12 +1,15 @@
-// A small build-time highlighter for the firmware excerpts on the live tiles: comments, strings,
-// numbers and keywords, in Python or C++. Output is HTML with hl-c, hl-s, hl-n and hl-k spans.
+// A small build-time highlighter for the code panels: comments, strings, numbers and keywords, in
+// Python, C++ or TypeScript. Output is HTML with hl-c, hl-s, hl-n and hl-k spans. Each line is
+// highlighted on its own, which is safe because no token in these files spans two lines.
 const KW = {
   py: /^(def|if|else|elif|return|for|in|not|and|or|global|try|except|break|continue|True|False|None|pass|while)$/,
   cpp: /^(if|else|return|for|while|bool|int|double|const|unsigned|long|void|uint8_t|true|false)$/,
+  ts: /^(const|let|for|if|else|return|new|while|continue|of|in|await|async|function|export|import|from|type|interface|true|false|null|typeof)$/,
 };
 const TOKEN = {
   py: /(#[^\n]*)|(f?"(?:[^"\\\n]|\\.)*"|f?'(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g,
   cpp: /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*")|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g,
+  ts: /(\/\/[^\n]*)|('(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\\n]|\\.)*`)|(\b\d+(?:\.\d+)?(?:e-?\d+)?\b)|([A-Za-z_$][\w$]*)/g,
 };
 
 export function highlight(code: string, lang: keyof typeof KW = 'py') {

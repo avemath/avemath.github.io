@@ -43,6 +43,32 @@ const FONT: Record<string, number[]> = {
   L: [0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11111],
   I: [0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b11111],
 };
+/** The rest of A to Z in the same 5x7 grid, for the home page demo that spells a typed name. Not in
+ *  the firmware: its font only has the letters its boot messages use. */
+const DEMO_LETTERS: Record<string, string[]> = {
+  B: ['11110', '10001', '10001', '11110', '10001', '10001', '11110'],
+  D: ['11110', '10001', '10001', '10001', '10001', '10001', '11110'],
+  F: ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+  H: ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+  J: ['00111', '00010', '00010', '00010', '00010', '10010', '01100'],
+  K: ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+  N: ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+  O: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+  P: ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+  Q: ['01110', '10001', '10001', '10001', '10101', '10010', '01101'],
+  S: ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
+  T: ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+  U: ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+  V: ['10001', '10001', '10001', '10001', '10001', '01010', '00100'],
+  W: ['10001', '10001', '10001', '10101', '10101', '10101', '01010'],
+  X: ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
+  Y: ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+  Z: ['11111', '00001', '00010', '00100', '01000', '10000', '11111'],
+};
+export const DEMO_FONT: Record<string, number[]> = {
+  ...Object.fromEntries(Object.entries(DEMO_LETTERS).map(([k, rows]) => [k, rows.map((r) => parseInt(r, 2))])),
+  ...FONT,
+};
 /** The first word of the board's boot message. */
 export const BOOT_MESSAGE = 'LEA';
 const LETTER_WIDTH = 6;
@@ -53,12 +79,12 @@ export const SCROLL_END_MS = 150; // the blank pause before setup() moves on
 export const scrollSteps = (message = BOOT_MESSAGE) => W + message.length * LETTER_WIDTH;
 
 /** Calls `set(x, y, hue)` for every lit LED of scroll frame `step` (0 based, across all loops). */
-export function scrollFrame(step: number, set: (x: number, y: number, hue: number) => void, message = BOOT_MESSAGE) {
+export function scrollFrame(step: number, set: (x: number, y: number, hue: number) => void, message = BOOT_MESSAGE, font = FONT) {
   const per = scrollSteps(message);
   const loop = Math.floor(step / per);
   let xPos = W - (step % per);
   for (let i = 0; i < message.length; i++) {
-    const glyph = FONT[message[i]];
+    const glyph = font[message[i]];
     if (glyph) {
       const hue = (i * 30 + loop * 20) % 256;
       for (let row = 0; row < 7; row++)
@@ -237,6 +263,7 @@ export function createSpectrum() {
       s.levelMax = Math.max(s.levelMax, LEVELMAX_FLOOR);
       return;
     }
+    // #region how:bands
     const raw = new Float64Array(16);
     let peak = 0;
     for (let b = 0; b < 16; b++) {
@@ -258,6 +285,7 @@ export function createSpectrum() {
       else if (peakHold[b] > 0) peakHold[b]--;
       else peakValues[b] = Math.max(0, peakValues[b] - PEAK_FALL_RATE);
     }
+    // #endregion
   }
 
   /** What setup() does after the scroll: restart the baseline timing and the detector. */
