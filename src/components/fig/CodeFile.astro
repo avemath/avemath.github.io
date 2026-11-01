@@ -21,7 +21,7 @@ const lines = whole(source, lang);
     <a class="link cfile__gh" href={url}>View on GitHub</a>
   </div>
   {note && <p class="cfile__note">{note}</p>}
-  <pre class="code cfile__code" tabindex="0" aria-label={`The whole of ${file}`}><code class="code__inner">{lines.map((l) => <span class="code__line" data-n={l.n} set:html={l.html} />)}</code></pre>
+  <pre class="code cfile__code" tabindex="0" aria-label={`The whole of ${file}`}><code class="code__inner">{lines.map((l) => <span class="code__line" data-n={l.n}><span class="code__txt" set:html={l.html} /></span>)}</code></pre>
 </div>
 
 <style>
