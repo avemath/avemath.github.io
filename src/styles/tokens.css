@@ -1,0 +1,107 @@
+/* ------------------------------------------------------------------
+   Design tokens. "The bench": a communications engineer's test report.
+   Navy ground for the hero, the footer and the research page; white
+   paper for the body; one muted buoy orange for the thing that matters
+   on screen. Light values first, dark under [data-theme='dark']. The
+   navy and its inks are the same in both themes.
+
+   The accent (#DE6A41) is for fills and strokes: primary buttons, the
+   marquee, the active trace, callouts. Text in the accent color uses
+   --accent-ink, which passes 4.5:1 on its ground. White on the accent
+   is 3.4:1, so white text on it is set large (19px bold) only.
+   ------------------------------------------------------------------ */
+:root {
+  --navy: #0b1f3a;
+  --navy-deep: #071527;
+  --navy-deeper: #040c18;
+  /* Raised and sunken surfaces on navy. */
+  --navy-2: #102847;
+  --navy-3: #0d2241;
+  --on-navy: #f4f6fa;
+  --on-navy-soft: #d6dde8;
+  --on-navy-muted: #a9b6cc;
+  --on-navy-line: rgb(244 246 250 / 0.22);
+  --on-navy-line-strong: rgb(244 246 250 / 0.45);
+  --accent-on-navy: #ef8d66;
+
+  --accent: #de6a41;
+  --accent-hover: #c95a33;
+  --accent-ink: #b4502a;
+
+  --bg: #ffffff;
+  /* What sits on a solid --text fill (the selected tab, the solid button). */
+  --bg-contrast: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #eef1f5;
+  --ground-alt: #eef1f5;
+  --dot: rgb(11 31 58 / 0.12);
+  --text: #0b1f3a;
+  --text-soft: #26364f;
+  --muted: #5b6778;
+  --line: #cbd3df;
+  --line-strong: #8e9aad;
+  --focus: #0b1f3a;
+  --shadow: 0 10px 24px -18px rgb(11 31 58 / 0.35);
+  --shadow-lift: 0 16px 32px -20px rgb(11 31 58 / 0.45);
+
+  --danger: #a3261b;
+  --ok: #1e6b3e;
+  --leaf: #3f7a52;
+  --leaf-ink: #2f5e3c;
+
+  --code-bg: #f6f8fb;
+  --code-ink: #0b1f3a;
+  --code-num: #7b8698;
+  --code-hot: rgb(222 106 65 / 0.12);
+  --code-comment: #5b6778;
+  --code-string: #8a3f1f;
+  --code-number: #1d5c8a;
+  --code-keyword: #0b1f3a;
+
+  /* Old names, kept so every page reads the new palette. */
+  --accent-wash: rgb(222 106 65 / 0.1);
+  --accent-wash-strong: rgb(222 106 65 / 0.18);
+  --amber: var(--accent);
+  --amber-line: var(--accent);
+  --amber-ink: var(--accent-ink);
+  --on-amber: #ffffff;
+  --grid: rgb(11 31 58 / 0.06);
+
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #071527;
+  --bg-contrast: #071527;
+  --surface: #0e2340;
+  --surface-2: #0b1c33;
+  --ground-alt: #0a1a30;
+  --dot: rgb(244 246 250 / 0.08);
+  --text: #f4f6fa;
+  --text-soft: #d6dde8;
+  --muted: #a9b6cc;
+  --line: #2a3f5e;
+  --line-strong: #5a6f8f;
+  --focus: #ef8d66;
+  --accent-ink: #ef8d66;
+  --shadow: 0 10px 24px -18px rgb(0 0 0 / 0.7);
+  --shadow-lift: 0 16px 32px -20px rgb(0 0 0 / 0.8);
+
+  --danger: #ff8a7a;
+  --ok: #6fd39a;
+  --leaf: #8fd19e;
+  --leaf-ink: #a9dfb5;
+
+  --code-bg: #0a1a30;
+  --code-ink: #e6ebf3;
+  --code-num: #7d8ca5;
+  --code-hot: rgb(222 106 65 / 0.2);
+  --code-comment: #93a2ba;
+  --code-string: #f2a888;
+  --code-number: #8fc4ea;
+  --code-keyword: #ffffff;
+
+  --grid: rgb(244 246 250 / 0.05);
+  color-scheme: dark;
+}

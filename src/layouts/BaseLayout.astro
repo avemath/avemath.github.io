@@ -5,12 +5,11 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import CommandPalette from '@/components/CommandPalette.astro';
 import site from '@/data/site.json';
-// The three Latin font files, preloaded so text can render in the right face on first paint.
-import spaceGroteskUrl from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
-import interUrl from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
-import monoUrl from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+// The Latin font files, preloaded so text can render in the right face on first paint.
+import archivoUrl from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+import monoUrl from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url';
 
-const fontPreloads = [spaceGroteskUrl, interUrl, monoUrl];
+const fontPreloads = [archivoUrl, monoUrl];
 
 interface Props {
   title?: string;
@@ -20,9 +19,13 @@ interface Props {
   noindex?: boolean;
   jsonLd?: Record<string, unknown>[];
   bare?: boolean;
+  /** What the small label at the right of the nav reads: "surface" on home, the depth on /research/. */
+  navLabel?: string;
+  /** The research page has its own footer: back to the surface, and the links. */
+  footer?: 'default' | 'research';
 }
 
-const { bare = false, ...seo } = Astro.props;
+const { bare = false, navLabel, footer = 'default', ...seo } = Astro.props;
 ---
 
 <!doctype html>
@@ -31,7 +34,7 @@ const { bare = false, ...seo } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#061c2b" />
+    <meta name="theme-color" content="#0b1f3a" />
     <script is:inline>
       // Apply saved or system theme and motion settings before first paint.
       (function () {
@@ -48,8 +51,6 @@ const { bare = false, ...seo } = Astro.props;
         // Lets CSS show controls that only work with JavaScript, before first paint, so they never shift the page.
         d.classList.add('js');
         if (motion === 'reduce') d.dataset.motion = 'reduce';
-        var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', theme === 'dark' ? '#061c2b' : '#dff1f3');
       })();
     </script>
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
@@ -62,26 +63,21 @@ const { bare = false, ...seo } = Astro.props;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    {!bare && <Header />}
-    <main id="main" class="descent" tabindex="-1">
+    {!bare && <Header label={navLabel} />}
+    <main id="main" tabindex="-1">
       <slot />
     </main>
-    {!bare && <Footer />}
+    {!bare && <Footer variant={footer} />}
     <CommandPalette />
 
     <script>
       import { initPreferenceControls } from '../scripts/preferences';
-      import { initReveals, whenSettled } from '../scripts/motion';
+      import { initReveals, initDrawIn } from '../scripts/motion';
+      import { initDecodeHeadings } from '../scripts/decode-headings';
       initPreferenceControls();
       initReveals();
-
-      // The light rays, marine snow and glows only move once the page has settled, and only
-      // while their band is on screen.
-      whenSettled(() => {
-        document.documentElement.classList.add('fx-ready');
-        const fx = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle('fx-live', e.isIntersecting)));
-        document.querySelectorAll('.zone').forEach((z) => fx.observe(z));
-      });
+      initDecodeHeadings();
+      initDrawIn();
     </script>
 
     {

@@ -48,3 +48,39 @@ export function initReveals() {
     document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-in'));
   });
 }
+
+/** Plotter draw-in: each `[data-draw]` plot sweeps in left to right over about a second, the first
+ *  time it is on screen. The pending state is set here, so without this script (or with reduced
+ *  motion) every figure is simply drawn. */
+export function initDrawIn() {
+  if (prefersReducedMotion() || !('IntersectionObserver' in window)) return;
+  const els = [...document.querySelectorAll<HTMLElement>('[data-draw]')];
+  // A plot clipped to nothing never counts as on screen, so each one is watched through its parent.
+  const plotOf = new Map<Element, HTMLElement>();
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = plotOf.get(e.target)!;
+        io.unobserve(e.target);
+        el.classList.remove('draw-pending');
+        el.classList.add('draw-run');
+        el.addEventListener('animationend', () => el.classList.remove('draw-run'), { once: true });
+      }
+    },
+    { threshold: 0.25 },
+  );
+  // Anything already on screen at load is left alone, so the first paint never has a hidden figure.
+  for (const el of els) {
+    const r = el.getBoundingClientRect();
+    if ((r.top < innerHeight && r.bottom > 0) || !el.parentElement) continue;
+    el.classList.add('draw-pending');
+    plotOf.set(el.parentElement, el);
+    io.observe(el.parentElement);
+  }
+  window.addEventListener('motionchange', () => {
+    if (!prefersReducedMotion()) return;
+    io.disconnect();
+    els.forEach((el) => el.classList.remove('draw-pending', 'draw-run'));
+  });
+}
