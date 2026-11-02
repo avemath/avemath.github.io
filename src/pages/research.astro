@@ -457,6 +457,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     fill: rgb(244 246 250 / 0.06);
   }
 
+  /* The plot draws at about 0.78 of its viewBox on desktop, so 17 units read as 13px. */
   .arr__lab {
     font-family: var(--font-mono);
     font-size: 17px;
