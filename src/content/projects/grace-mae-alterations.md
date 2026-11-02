@@ -49,8 +49,8 @@ The site had three jobs: explain bustles, timelines and fittings to brides befor
 
 ## Outcome
 
-Lighthouse scores 100 for accessibility and SEO on every page I audited, and 97 to 99 for desktop performance. Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
+Lighthouse scores 100 for accessibility and SEO on every page I audited. Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
 
 ## What I'd do next
 
-Mobile performance sits at 75 to 82, mostly from hero imagery and the Studio bundle. Next I'd split the Studio out of the main bundle and serve smaller hero crops to phones.
+Mobile performance scored 98 on PageSpeed Insights on Nov 1, 2026, with 100 for accessibility, best practices and SEO; desktop scored 100 across the board. Earlier runs scored lower on mobile, mostly from the hero imagery and the Studio bundle.

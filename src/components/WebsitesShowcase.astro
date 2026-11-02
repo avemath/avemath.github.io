@@ -18,14 +18,29 @@ const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': Adam
 // counts. Figures are numbered after the skills matrix (Fig. 06).
 // pagespeedMobile and accessibility are PageSpeed Insights mobile results from 2026-11-01.
 // pageWeightKb is the home page's transferred size from a local Lighthouse mobile run that day.
-const FIRST_FIG = 7;
+interface Props {
+  /** Only the site rows, for /work/, which has its own heading. */
+  rowsOnly?: boolean;
+  /** The figure number of the first site, so each page numbers its own figures. */
+  firstFig?: number;
+}
+
+const { rowsOnly = false, firstFig = 7 } = Astro.props;
+const FIRST_FIG = firstFig;
+const Outer = rowsOnly ? 'div' : 'section';
 const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 ---
 
-<section id="websites" class="section" aria-labelledby="websites-title">
-  <div class="wrap">
-    <h2 id="websites-title" class="section-title web__title" data-decode>Websites I built and keep running</h2>
-    <p class="section-lede sites-lede">Small businesses, a nonprofit and one engineer. Fast, accessible, and the owners update their own content.</p>
+<Outer id={rowsOnly ? undefined : 'websites'} class={rowsOnly ? undefined : 'section'} aria-labelledby={rowsOnly ? undefined : 'websites-title'}>
+  <div class:list={[!rowsOnly && 'wrap']}>
+    {
+      !rowsOnly && (
+        <>
+        <h2 id="websites-title" class="section-title web__title" data-decode>Websites I built and keep running</h2>
+        <p class="section-lede sites-lede">Small businesses, a nonprofit and one engineer. Fast, accessible, and the owners update their own content.</p>
+        </>
+      )
+    }
 
     <ol class="sites">
       {
@@ -41,8 +56,8 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                     mobile={p.data.mobile}
                     alt={p.data.coverAlt ?? ''}
                     url={p.data.links.live}
-                    widths={[240, 480, 680, 960, 1280]}
-                    sizes="(min-width: 960px) 40vw, (min-width: 720px) calc(100vw - 5rem), 8rem"
+                    widths={[480, 640, 960, 1280, 1440]}
+                    sizes="(min-width: 1216px) 42rem, (min-width: 960px) calc((100vw - 5rem) * 0.56), calc(100vw - 2rem)"
                     live={!!Live}
                   >
                     {Live && <Live />}
@@ -118,19 +133,23 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
       }
     </ol>
 
-    <div class="sites__how">
-      <p>
-        Five steps from the first conversation to the written guide, with a quote before I start and a preview link while I build. The
-        services page has the details and the questions people ask.
-      </p>
-      <div class="flex flex-wrap items-center gap-3">
-        <a class="btn btn--primary" href="/services/">See how I work</a>
-        <a class="btn" href="/contact/?topic=website">Start a project</a>
-        <a class="link sites__all" href="/work/#websites">All websites</a>
-      </div>
-    </div>
+    {
+      !rowsOnly && (
+        <div class="sites__how">
+          <p>
+            Five steps from the first conversation to the written guide, with a quote before I start and a preview link while I build. The
+            services page has the details and the questions people ask.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a class="btn btn--primary" href="/services/">See how I work</a>
+            <a class="btn" href="/contact/?topic=website">Start a project</a>
+            <a class="link sites__all" href="/work/#websites">All websites</a>
+          </div>
+        </div>
+      )
+    }
   </div>
-</section>
+</Outer>
 
 <style>
   .sites {
@@ -145,10 +164,16 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     align-items: center;
   }
 
+  /* Desktop: media 7 columns, words 5, both halves centered on each other. The frame fills its
+     column edge to edge; the rows alternate sides. */
   @media (min-width: 960px) {
     .site {
-      grid-template-columns: 1.25fr 1fr;
-      gap: 4rem;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 2.5rem;
+    }
+
+    .site--flip {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     }
 
     .site--flip .site__media {
@@ -156,111 +181,49 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     }
   }
 
-  /* Phones: each site is a compact row. A small screenshot sits beside the name and the kind of
-     business, the numbers run underneath, then the two links. The summary and "What I did" stay
-     on wider screens and in the case study. */
-  @media (max-width: 719px) {
+  .site__media {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .site__media :global(.frame) {
+    width: 100%;
+  }
+
+  /* Phones and small tablets: the media above the words, the full width of the container. */
+  @media (max-width: 959px) {
     .sites {
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    .site {
-      grid-template-columns: 8rem minmax(0, 1fr);
-      gap: 0.9rem;
-      align-items: start;
-      padding: 0.8rem;
-      border: 1px solid var(--line);
-      border-radius: 0;
-      background: var(--surface);
-    }
-
-    .sites-lede,
-    .site__media :global(.frame__bar),
-    .site__media :global(.frame__phone),
-    .site__summary,
-    .site__did {
-      display: none;
-    }
-
-    .site__media :global(.frame__window) {
-      border-radius: 0;
-    }
-
-    .site__copy {
-      display: contents;
+      gap: 3rem;
     }
 
     .site__media {
-      grid-column: 1;
-      grid-row: 1 / 3;
       order: 0 !important;
-    }
-
-    .site__fig {
-      display: none !important;
-    }
-
-    .site__copy > .label {
-      grid-column: 2;
-      grid-row: 1;
-      font-size: 0.875rem;
-      line-height: 1.45;
-    }
-
-    .site__title {
-      grid-column: 2;
-      grid-row: 2;
-      margin-top: 0;
-      font-size: 1.15rem;
-    }
-
-    .site__facts {
-      grid-column: 1 / -1;
-      margin-top: 0;
-      padding-top: 0.7rem;
-    }
-
-    .site__metric {
-      font-size: 1.35rem !important;
-    }
-
-    .site__links {
-      grid-column: 1 / -1;
-      margin-top: 0;
-    }
-
-    /* The other cards in the row keep their own height while one runs a live version. */
-    .sites:has([data-live-on]) {
-      align-items: flex-start;
-    }
-
-    /* A live version needs the card's full width: it moves below the title while it runs. */
-    .site[data-live-on] .site__media {
-      grid-column: 1 / -1;
-      grid-row: 3;
-    }
-
-    .site[data-live-on] .site__copy > .label,
-    .site[data-live-on] .site__title {
-      grid-column: 1 / -1;
-    }
-
-    /* At rest the small screenshot is the button's whole frame. */
-    .site__media :global(.live__try) {
-      right: 0.3rem;
-      bottom: 0.3rem;
-      padding-inline: 0.5rem;
-      font-size: 0.875rem;
     }
   }
 
-  /* The phone mockup covers the bottom right corner, so Try it sits bottom left. */
-  @media (min-width: 720px) {
-    .site__media :global(.live__try) {
-      right: auto;
-      left: 0.7rem;
+  @media (max-width: 719px) {
+    .sites {
+      margin-top: 1.5rem;
     }
+
+    .site__title {
+      font-size: 1.6rem;
+    }
+
+    .site__metric {
+      font-size: 1.5rem !important;
+    }
+
+    /* While a live version runs it needs the full width too. */
+    .sites:has([data-live-on]) {
+      align-items: flex-start;
+    }
+  }
+
+  /* The phone mockup covers the bottom right corner, so Try it sits bottom left, at every width. */
+  .site__media :global(.live__try) {
+    right: auto;
+    left: 0.7rem;
   }
 
   .web__title {
