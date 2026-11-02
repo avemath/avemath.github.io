@@ -189,7 +189,11 @@ const stages = [
     gap: 0.6rem;
   }
 
+  /* Values sit on the tile's bottom edge, so a wrapped label never pushes one out of line. */
   .stats > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line);
     border-radius: 0.6rem;

@@ -240,8 +240,11 @@ import DemoShell from './DemoShell.astro';
     margin-top: 1.25rem;
   }
 
+  /* The state word sits on the tile's bottom edge, so tiles line up when one label wraps. */
   .valve {
     display: grid;
+    grid-template-rows: 1fr auto;
+    align-items: start;
     gap: 0.2rem;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line);
@@ -352,13 +355,13 @@ import DemoShell from './DemoShell.astro';
     color: var(--text-soft);
   }
 
-  .wl__try summary {
-    cursor: pointer;
-    font-weight: 600;
   .wl__try ul {
     max-width: 28em;
   }
 
+  .wl__try summary {
+    cursor: pointer;
+    font-weight: 600;
     color: var(--text);
   }
 
