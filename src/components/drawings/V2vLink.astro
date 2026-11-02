@@ -9,10 +9,10 @@ import Drawing from './Drawing.astro';
 const chain = ['detect', 'timing', 'CFO', 'Costas', 'FFT', 'MMSE', 'Viterbi', 'BSM'];
 // Packet segments, widths only roughly in proportion: the preamble and training are long.
 const seg = [
-  { w: 46, label: 'RRC pre', hot: true },
+  { w: 46, label: 'sync', hot: true },
   { w: 74, label: 'training', hot: true },
-  { w: 22, label: 'OFDM pre', hot: false },
-  { w: 58, label: 'data x 4', hot: false },
+  { w: 22, label: 'pre', hot: false },
+  { w: 58, label: 'data', hot: false },
   { w: 10, label: '', hot: false },
 ];
 ---
@@ -47,7 +47,7 @@ const seg = [
   <text class="t" x="432" y="57">Pluto RX</text>
   <text class="t t--mono t--muted" x="432" y="73">usb:1</text>
 
-  <text class="t t--muted" x="16" y="142">One transmission: Car 2's packet, then Car 1's</text>
+  <text class="t t--muted" x="16" y="142">One transmission: Car 2's packet, then Car 1's (sync, training, OFDM preamble, 4 data symbols)</text>
   {
     [0, 1].map((k) => {
       let x = 16 + k * 214;

@@ -4,6 +4,23 @@
 // drawing is simply there.
 import { prefersReducedMotion } from './preferences';
 
+// Strokes trace in over a second, then the labels, callouts and accent fills fade in. Each
+// animation fills backwards only, so once it ends the drawing is left in its plain, drawn state.
+function run(svg: SVGElement) {
+  svg.classList.remove('sketch-pending');
+  const easing = 'cubic-bezier(0.45, 0, 0.25, 1)';
+  svg.querySelectorAll<SVGElement>('[pathLength]').forEach((el) =>
+    el.animate(
+      [
+        { strokeDasharray: '1', strokeDashoffset: '1' },
+        { strokeDasharray: '1', strokeDashoffset: '0' },
+      ],
+      { duration: 1000, easing, fill: 'backwards' },
+    ),
+  );
+  svg.querySelectorAll<SVGElement>('.t, .co, .f--hot').forEach((el) => el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 700, fill: 'backwards' }));
+}
+
 export function initSketches() {
   if (prefersReducedMotion() || !('IntersectionObserver' in window)) return;
   const io = new IntersectionObserver(
@@ -12,7 +29,7 @@ export function initSketches() {
         if (!e.isIntersecting) continue;
         const svg = e.target as SVGElement;
         io.unobserve(svg);
-        svg.classList.replace('sketch-pending', 'sketch-run');
+        run(svg);
       }
     },
     { threshold: 0.3 },

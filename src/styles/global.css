@@ -696,7 +696,8 @@
   color: var(--muted);
 }
 
-/* The draw-in: set by the script only, never with reduced motion. */
+/* The draw-in's starting state: set by the script only, never with reduced motion. The script
+   then animates each stroke and label in (src/scripts/sketch.ts). */
 .sketch-pending [pathLength] {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -706,32 +707,6 @@
 .sketch-pending .co,
 .sketch-pending .f--hot {
   opacity: 0;
-}
-
-.sketch-run [pathLength] {
-  stroke-dasharray: 1;
-  animation: sketch-line 1s cubic-bezier(0.45, 0, 0.25, 1) both;
-}
-
-.sketch-run .t,
-.sketch-run .co,
-.sketch-run .f--hot {
-  animation: sketch-fade 0.4s 0.7s both;
-}
-
-@keyframes sketch-line {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes sketch-fade {
-  from {
-    opacity: 0;
-  }
 }
 
 /* ------------------------------------------------------------------

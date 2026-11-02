@@ -8,10 +8,10 @@ import { F_HIGH, F_LOW, PAIRS, DF, hopSequence, toneHz } from '@/lib/fhbfsk';
 const N = 8;
 const bits = [1, 0, 1, 1, 0, 0, 1, 1];
 const hops = hopSequence(N, 87);
-const X0 = 70;
-const COL = 62;
-const Y0 = 24;
-const H = 208;
+const X0 = 44;
+const COL = 31;
+const Y0 = 22;
+const H = 110;
 const y = (f: number) => Y0 + ((F_HIGH - f) / (F_HIGH - F_LOW)) * H;
 const pairTop = (p: number) => y(F_LOW + (2 * p + 2) * DF);
 const pairBot = (p: number) => y(F_LOW + 2 * p * DF);
@@ -20,7 +20,7 @@ const pairBot = (p: number) => y(F_LOW + 2 * p * DF);
 <Drawing
   title="Signals playground: frequency hopping in the JANUS band"
   label="The JANUS band from 9440 to 13600 Hz split into 13 tone pairs, with eight chips that each hop to a pair and send its low tone for a 0 or its high tone for a 1."
-  viewBox="0 0 640 270"
+  viewBox="0 0 320 170"
   legend={[
     'Chip length: each chip lasts 6.25 ms, 160 chips a second.',
     'Tone pair: each of the 13 pairs is two tones 160 Hz apart. The low one sends a 0, the high one a 1.',

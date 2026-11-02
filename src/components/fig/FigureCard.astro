@@ -115,7 +115,7 @@ const views = [
     .fc[data-wide] .fc__text {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas: 'eyebrow actions' 'title actions' 'body actions';
+      grid-template-areas: 'eyebrow actions' 'title actions' 'offers actions' 'body actions';
       column-gap: 3rem;
       align-items: start;
     }
@@ -192,8 +192,7 @@ const views = [
 
   .fc--wide .fc__offers,
   .fc[data-wide] .fc__offers {
-    grid-area: body;
-    align-self: start;
+    grid-area: offers;
   }
 
   .fc__body {
