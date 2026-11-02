@@ -7,8 +7,10 @@ export function initHScroll() {
   if (!frames.length) return;
 
   const update = (el: HTMLElement) => {
-    const scrolls = el.scrollWidth > el.clientWidth + 1;
-    el.toggleAttribute('data-scrolls', scrolls);
+    // A frame in a hidden tab has no size yet. It starts out focusable, so the moment its tab opens
+    // on a phone it can already be reached by keyboard; the observer settles it once it has a size.
+    const scrolls = el.clientWidth === 0 || el.scrollWidth > el.clientWidth + 1;
+    el.toggleAttribute('data-scrolls', scrolls && el.clientWidth > 0);
     if (scrolls) {
       el.tabIndex = 0;
       el.setAttribute('role', 'region');
