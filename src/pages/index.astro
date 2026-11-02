@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
-import Marquee from '@/components/Marquee.astro';
 import StatusStrip from '@/components/StatusStrip.astro';
 import FigureCard from '@/components/fig/FigureCard.astro';
 import TimingFig from '@/components/fig/TimingFig.astro';
@@ -61,7 +60,6 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
 <BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
   <Hero />
-  <Marquee />
   <StatusStrip />
 
   <section id="projects" class="section projects" aria-labelledby="projects-title">

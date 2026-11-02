@@ -1,5 +1,6 @@
 ---
 import SignalPanel from './SignalPanel.astro';
+import Marquee from './Marquee.astro';
 import site from '@/data/site.json';
 ---
 
@@ -17,19 +18,29 @@ import site from '@/data/site.json';
       </div>
     </div>
 
-    <SignalPanel />
+    <div class="hero__panel">
+      <SignalPanel />
+    </div>
   </div>
+  <div class="hero__marquee"><Marquee /></div>
 </section>
 
 <style>
+  /* The nav and the hero share one screen: the sentence, the subline, both buttons, the panel (on
+     wide screens) and the top of the marquee fit in 100svh at 1366 by 768 and at 390 by 844. */
   .hero {
-    padding-block: clamp(2.5rem, 4.5vw, 4rem) clamp(3rem, 6vw, 4.5rem);
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100svh - 4rem);
   }
 
   .hero__grid {
+    flex: 1;
     display: grid;
-    gap: 2.75rem;
+    gap: 2rem;
+    align-content: center;
     align-items: center;
+    padding-block: clamp(1.5rem, 4vh, 3rem);
   }
 
   @media (min-width: 1024px) {
@@ -39,18 +50,17 @@ import site from '@/data/site.json';
     }
   }
 
-  /* About 84px on a wide screen. Archivo at width 112 is wide, so phones get a size that keeps
-     "communication" on one line at 390px. */
   .hero__title {
-    font-size: clamp(2.3rem, 1.2rem + 5.2vw, 5.25rem);
-    text-wrap: initial;
+    font-size: clamp(34px, 4.2vw, 62px);
+    line-height: 1.02;
+    text-wrap: balance;
     hyphens: none;
   }
 
   .hero__sub {
-    margin-top: 1.75rem;
+    margin-top: 1.25rem;
     max-width: 36rem;
-    font-size: 1.0625rem;
+    font-size: 18px;
     color: var(--muted);
   }
 
@@ -58,7 +68,7 @@ import site from '@/data/site.json';
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
   }
 
   /* Same weight and size as the accent button beside it, so the pair lines up. */
@@ -67,4 +77,38 @@ import site from '@/data/site.json';
     --btn-line: var(--on-navy);
   }
 
+  /* The panel gives up height first when the screen is short. */
+  .hero__panel :global(.sig__screen) {
+    max-height: calc(100svh - 4rem - 13rem);
+  }
+
+  /* Phones and tablets: the sentence and buttons, then the marquee, then the panel, so the first
+     screen ends on the marquee and the panel waits just below it. */
+  @media (max-width: 1023px) {
+    .hero {
+      min-height: 0;
+    }
+
+    .hero__grid {
+      display: contents;
+    }
+
+    .hero__text {
+      order: 1;
+      padding: 1.75rem var(--gutter);
+    }
+
+    .hero__marquee {
+      order: 2;
+    }
+
+    .hero__panel {
+      order: 3;
+      padding: 1.75rem var(--gutter) 2.5rem;
+    }
+
+    .hero__panel :global(.sig__screen) {
+      max-height: none;
+    }
+  }
 </style>
