@@ -5,19 +5,21 @@ import site from '@/data/site.json';
 interface Props {
   /** The small muted label at the right: the live depth on /research/. */
   label?: string;
+  /** Which item is the current place: set by /work/ and the case studies. */
+  section?: 'projects' | 'websites' | 'research';
 }
 
-const { label } = Astro.props;
+const { label, section } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-// Projects, Websites and Skills are sections of the home page; Research and Contact are pages.
+// Projects and Websites open their sections of /work/, so the whole list is one click from any
+// page. Contact is the footer, which every page has.
 const nav = [
-  { href: '/#projects', label: 'Projects' },
-  { href: '/research/', label: 'Research' },
-  { href: '/#websites', label: 'Websites' },
-  { href: '/#skills', label: 'Skills' },
-  { href: '/contact/', label: 'Contact' },
+  { href: '/work/#engineering', label: 'Projects', key: 'projects' },
+  { href: '/work/#websites', label: 'Websites', key: 'websites' },
+  { href: '/research/', label: 'Research', key: 'research' },
+  { href: '/#contact', label: 'Contact', key: 'contact' },
 ];
-const isCurrent = (href: string) => !href.includes('#') && (path === href.replace(/\/$/, '') || path.startsWith(href.replace(/\/$/, '') + '/'));
+const isCurrent = (key: string) => key === section || (key === 'research' && path === '/research');
 ---
 
 <header class="site-header on-navy no-print" data-header>
@@ -29,7 +31,7 @@ const isCurrent = (href: string) => !href.includes('#') && (path === href.replac
         {
           nav.map((item) => (
             <li>
-              <a href={item.href} class="nav-link" aria-current={isCurrent(item.href) ? 'page' : undefined}>
+              <a href={item.href} class="nav-link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' ? 'page' : 'true') : undefined}>
                 {item.label}
               </a>
             </li>
@@ -60,7 +62,7 @@ const isCurrent = (href: string) => !href.includes('#') && (path === href.replac
             {
               nav.map((item) => (
                 <li>
-                  <a href={item.href} class="mnav__link" aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                  <a href={item.href} class="mnav__link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' ? 'page' : 'true') : undefined}>
                     {item.label}
                   </a>
                 </li>
@@ -137,7 +139,14 @@ const isCurrent = (href: string) => !href.includes('#') && (path === href.replac
     text-underline-offset: 0.3em;
   }
 
-  .nav-link[aria-current='page'] {
+  .nav-link[aria-current] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.45em;
+    text-decoration-color: var(--accent);
+  }
+
+  .nav-link[aria-current] {
     color: var(--accent-ink);
   }
 
@@ -241,7 +250,7 @@ const isCurrent = (href: string) => !href.includes('#') && (path === href.replac
     cursor: pointer;
   }
 
-  .mnav__link[aria-current='page'] {
+  .mnav__link[aria-current] {
     color: var(--accent-ink);
   }
 

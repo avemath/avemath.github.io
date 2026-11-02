@@ -10,7 +10,10 @@ import SignalPanel from '@/components/SignalPanel.astro';
         <p class="nf__code mono">404</p>
         <h1 class="nf__title">No carrier.</h1>
         <p class="nf__text">There is nothing at this address.</p>
-        <a class="btn nf__btn" href="/">Back to the surface</a>
+        <p class="nf__links">
+          <a class="btn" href="/">Back to the surface</a>
+          <a class="link" href="/work/">Or see all work</a>
+        </p>
       </div>
       <SignalPanel empty />
     </div>
@@ -51,8 +54,15 @@ import SignalPanel from '@/components/SignalPanel.astro';
     color: var(--muted);
   }
 
-  .nf__btn {
+  .nf__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
     margin-top: 2rem;
+  }
+
+  .nf__links .btn {
     --btn-line: var(--on-navy);
   }
 </style>
