@@ -384,3 +384,32 @@ RAMpage's Live view adds the pneumatics drawing beside the timing rows. "Fire th
 - Confirm RAMpage's plumbing: what the main valve does, one reservoir or two tanks, how many pistons (`src/components/drawings/RampagePneumatics.astro`).
 - Confirm the pool alarm plan: how many hydrophones and where (`src/components/drawings/PoolSide.astro`).
 - Test "Hear it" in your own Firefox: it could not be automated here.
+
+## Redesign 3d: fixes from a real walkthrough
+
+### What changed
+
+- **Nav on /work/:** the marked item follows the section in view (Projects for Engineering, Research for Research, Websites for Websites), and a hash on load counts, so `/work/#websites` marks Websites. Other pages mark by route. About joined the nav, between Research and Contact; below 860px the nav lives in the menu, so the bar stays one line at 390px.
+- **Hero:** "See my work" goes to `/work/`. The "See what I have built" link under Open to is gone.
+- **Readable text:** every font size under 14px went up to 14px (SVG labels inside figures to 13px, the allowed minimum), and anything under 15px that used the muted grey now uses the softer ink. The status strip labels are 15px, weight 600, in the accent ink; their text is 19px ink at line-height 1.45. Figure label rows are 14px, figure footers and "Try:" lines 15px, the note beside Projects 16px.
+- **Live, Drawing, Code:** under each project title these are links now. On the home page they open that view of the figure and bring it into view; on /work/ they go to the case study's demo or the live site, the drawing (a hash such as `/#rampage-drawing` opens that tab on load) and the repo.
+- **RAMpage:**
+  - The drawing shows the plumbing Ave confirmed: two air tanks, the main valve (GP14), the piston valve (GP15), and two cylinders side by side, each with its own rod, both pushing the plow. The timing rows are unchanged; one valve drives both cylinders.
+  - The vent arrow and label are in ink at 1.5 px with a 13px label, and turn to the accent while venting.
+  - A compact Fire button and a speed control (4x slower, 16x slower, real time; 4x by default) sit right under the figure. The footer says which speed is playing. The big "Fire the plow" button does the same thing.
+  - The legend numbers are callout circles. The status chip replaces "Armed" and says what the drawing says: Ready, Filling, Settling, Plow out, Venting, Out of air. At zero air both buttons read "Refill (new match)".
+- **About teaser:** after the status strip, the portrait, the About page's opening lines and "More about me".
+- **/work/:** the first heading starts 56px under the nav. Website cards are labeled by address ("Fig. 12 / becauseofadam.org"). Figures are numbered per page.
+- **Website facts:** each site card shows mobile performance, accessibility, home page weight, live since and who edits it, from `src/data/sites.json`. The commit counts and similar numbers are gone from the cards (the case studies keep their own metrics).
+- **Depth:** paper cards have a two-layer shadow and lift 2px on hover or focus (a faint light ring instead of a shadow in dark mode). Figure areas sit on a light tint. Section grounds alternate on the home page: status white, About alt, Projects white, Below the surface navy, Websites alt, Skills white. On a hovered card the accent strokes brighten and the "Try:" word pulses once; nothing moves without a hover.
+- **Small fixes:** the RAMpage case study's serial log is focusable, since bigger text made it scroll on phones.
+
+### Checked
+
+`/work/#websites` marks Websites, scrolling to Research marks Research, and the top marks Projects. The RAMpage legend reads "1 fill 50 ms, 2 extend 400 ms, 3 1 of 17 shots used" with circles; the Fire button sits 13px under the timing rows; at 16x slower the chip and the drawing both read "Plow out" mid-strike. The marquee pauses on hover. The header is one line (65px) at 390. The research nav reads "depth 0 m" at the top and changes on scroll. The breadcrumb on Because of ADAM reads "Work / Websites / Because of ADAM". "Hear it" still plays all 32 chips from the first in Chrome.
+
+### New TODO(ave) items
+
+- Re-measure the website facts on PageSpeed Insights: `pagespeedMobile`, `accessibility` and `pageWeightKb` in `src/data/sites.json` are local Lighthouse mobile runs from 2026-11-01 (Because of ADAM 99, 100, 101 KB; Grace Mae 91, 100, 496 KB; PLV 87, 100, 287 KB; Nicholas 90, 100, 400 KB). Scores moved a few points between runs.
+- Confirm `liveSince`: it is each build's end month (or start month while ongoing) from the case studies, which may not be the launch month.
+- The RAMpage plumbing TODO is cleared. Cylinder bore and stroke are still not stated; the drawing does not need them.

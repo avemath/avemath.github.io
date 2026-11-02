@@ -105,5 +105,14 @@ export function mountChain(root: HTMLElement) {
   });
   stepBtn?.addEventListener('click', () => select((current + 1) % stages.length));
 
-  select(current < 0 ? 3 : current);
+  // The first constellation runs the receiver, so it waits until the figure is near the screen.
+  const near = new IntersectionObserver(
+    ([e]) => {
+      if (!e.isIntersecting) return;
+      near.disconnect();
+      select(current < 0 ? 3 : current);
+    },
+    { rootMargin: '600px 0px' },
+  );
+  near.observe(root);
 }

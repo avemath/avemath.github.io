@@ -228,5 +228,15 @@ export function mountMatrix(root: HTMLElement) {
   }
 
   document.addEventListener('visibilitychange', () => document.hidden && source !== 'none' && stopTo('none'));
-  still();
+  // The resting frame runs 9 s of the firmware on the clip, so it waits until the figure is near
+  // the screen instead of costing the first load.
+  const near = new IntersectionObserver(
+    ([e]) => {
+      if (!e.isIntersecting) return;
+      near.disconnect();
+      if (source === 'none') still();
+    },
+    { rootMargin: '600px 0px' },
+  );
+  near.observe(root);
 }
