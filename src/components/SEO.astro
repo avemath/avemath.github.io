@@ -24,6 +24,7 @@ const clamp = (text: string, max = 160) => (text.length <= max ? text : `${text.
 const description = clamp(rawDescription);
 
 const fullTitle = title ? `${title} | ${site.name}` : site.title;
+// A page that asks not to be indexed has no canonical address (the 404 is served at any path).
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL(image, Astro.site).href;
 
@@ -48,15 +49,14 @@ const graph = [person, ...jsonLd];
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex, follow" />}
+{noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={canonical} />}
 <meta name="author" content={site.name} />
 
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={site.name} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
-<meta property="og:url" content={canonical} />
+{!noindex && <meta property="og:url" content={canonical} />}
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
