@@ -19,8 +19,6 @@ const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': Adam
 // TODO(ave): re-measure on PageSpeed Insights. pagespeedMobile, accessibility and pageWeightKb
 // are Lighthouse mobile runs from 2026-11-01, made locally because the PageSpeed Insights API was
 // over its daily quota. Scores moved a few points between runs.
-// TODO(ave): confirm liveSince. It is the month each build finished (or started, while ongoing),
-// from the case studies, which may not be the exact launch month.
 const FIRST_FIG = 7;
 const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 ---
