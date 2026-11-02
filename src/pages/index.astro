@@ -10,6 +10,7 @@ import ChainFig from '@/components/fig/ChainFig.astro';
 import MatrixFig from '@/components/fig/MatrixFig.astro';
 import CodeHow from '@/components/fig/CodeHow.astro';
 import CodeFile from '@/components/fig/CodeFile.astro';
+import V2vStagesHow from '@/components/fig/V2vStagesHow.astro';
 import SignalsLive from '@/components/live/SignalsLive.astro';
 import BelowSurface from '@/components/BelowSurface.astro';
 import MarginNote from '@/components/MarginNote.astro';
@@ -22,9 +23,9 @@ import HomeSkills from '@/components/HomeSkills.astro';
 import site from '@/data/site.json';
 import { cut, lineOf, region } from '@/lib/excerpt';
 import { hopSequence, toneHz, F_HIGH, F_LOW } from '@/lib/fhbfsk';
+import { v2vStages } from '@/lib/v2v-stages';
 import eigenrays from '@/assets/projects/bellhop-sim/ssp_and_rays.png';
 import pico from '../../vendor/rampage/pico_direct.py?raw';
-import ofdmRx from '../lib/ofdm-rx.ts?raw';
 import ledFw from '../lib/led-firmware.ts?raw';
 
 const SELF = 'https://github.com/avemath/avemath.github.io/blob/main';
@@ -33,20 +34,15 @@ const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/929c280/pico_direct.py'
 // Fig. 01, How it works: the strike itself, straight from the Pico's firmware.
 const picoHow = cut(pico, '# Increment activation counter', 45, 'py');
 const picoNotes: { text: string; lines: [number, number] }[] = [
-  { text: 'Count the shot, start the 500 ms cooldown, and lock out once all 17 are used.', lines: [lineOf(pico, '# Increment activation counter'), lineOf(pico, 'weapon_depleted = True') + 1] },
-  { text: 'Fill: the main valve opens for 50 ms to build pressure, then closes.', lines: [lineOf(pico, '# 1. Open main valve'), lineOf(pico, '# 4. Dweel time') - 1] },
-  { text: 'Extend: the piston valve opens for 400 ms, full extension.', lines: [lineOf(pico, '# 5. Open piston valves'), lineOf(pico, 'utime.sleep_ms(SOLENOID_ACTIVATION_TIME)')] },
-  { text: 'Close the piston valve and open the main valve again to vent.', lines: [lineOf(pico, '# 7. Close valves'), lineOf(pico, '# 8. Re-open main valve') + 1] },
+  { text: 'Count the activation, start the 500 ms cooldown, and lock out once all 17 are used (about the first six deliver full force).', lines: [lineOf(pico, '# Increment activation counter'), lineOf(pico, 'weapon_depleted = True') + 1] },
+  { text: 'Plow home: the exhaust (main_solenoid, GP14) stays open for 50 ms, then closes, then a 50 ms dwell.', lines: [lineOf(pico, '# 1. Open main valve'), lineOf(pico, '# 4. Dweel time') - 1] },
+  { text: 'Plow out: both inlets (piston_solenoid, GP15) open together for 400 ms, full extension.', lines: [lineOf(pico, '# 5. Open piston valves'), lineOf(pico, 'utime.sleep_ms(SOLENOID_ACTIVATION_TIME)')] },
+  { text: 'The inlets close and the exhaust reopens, so the plow vents and retracts.', lines: [lineOf(pico, '# 7. Close valves'), lineOf(pico, '# 8. Re-open main valve') + 1] },
 ];
 
-// Fig. 02, How it works: the receiver stages in the port of the MATLAB receiver.
-const rxHow = region(ofdmRx, 'rx', 'ts');
-const rxNotes: { text: string; lines: [number, number] }[] = [
-  { text: 'CFO: the phase step between known preamble symbols, averaged, gives the frequency offset to remove.', lines: [lineOf(ofdmRx, '// 1. Coarse CFO'), lineOf(ofdmRx, 'rx = rx.map((z, n) => rot(z, -step * n));')] },
-  { text: 'A line fit to the leftover phase on the training symbols, then the polarity is fixed.', lines: [lineOf(ofdmRx, '// 2. Fit a line'), lineOf(ofdmRx, 'if (corr < 0)')] },
-  { text: 'Costas loop: each decision steers the phase estimate a little.', lines: [lineOf(ofdmRx, '// 3. Decision-directed Costas'), lineOf(ofdmRx, 'return y;', lineOf(ofdmRx, '// 3. Decision-directed Costas'))] },
-  { text: 'MMSE: divide out the channel estimate on each subcarrier, weighted by the noise.', lines: [lineOf(ofdmRx, 'if (on.mmse) {'), lineOf(ofdmRx, 'y = [num[0] / den, num[1] / den];')] },
-];
+// Fig. 02: the MATLAB file that ran on the radios, and where each receiver stage sits in it.
+const V2V_FILE = 'https://github.com/avemath/v2v-bsm-ofdm/blob/main/V2V_TXRXf.m';
+const v2vLines = v2vStages.map((st, i) => `${i + 1} ${st.name} ${st.lines[0]} to ${st.lines[1]}`).join('; ');
 
 // Fig. 03, How it works: FFT bins into 16 bands, AGC and smoothing, as in loop().
 const ledHow = region(ledFw, 'bands', 'ts');
@@ -90,8 +86,10 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <Fragment slot="text">
             <p>
               A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the RC receiver with hardware
-              interrupts, sequences two valves, enforces a 17 shot air budget and stops on signal loss. A Pi 4B streams video over UDP on its
-              own, so a video crash never touches the weapon.
+              interrupts, sequences the inlet and exhaust valves, and holds a hard limit of 17 activations in firmware, of which about the
+              first six deliver full force before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust and cuts the
+              receiver's power through a solid-state relay. A Pi 4B streams video over UDP on its own, so a video crash never touches the
+              weapon.
             </p>
           </Fragment>
           <Fragment slot="actions">
@@ -100,22 +98,22 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           </Fragment>
         </FigureCard>
 
-        <FigureCard id="v2v" fig="02" kind="Receiver chain" flip eyebrow="EE 4003, with Jason Phan" title="V2V collision warning over OFDM">
+        <FigureCard id="v2v" fig="02" kind="Receiver chain" flip eyebrow="EE 4003, with lab partner Jason Phan" title="V2V collision warning over OFDM">
           <ChainFig />
           <V2vLink slot="drawing" />
-          <CodeHow slot="how" excerpt={rxHow} file="src/lib/ofdm-rx.ts" url={`${SELF}/src/lib/ofdm-rx.ts#L${rxHow.from}`} notes={rxNotes} />
+          <V2vStagesHow slot="how" url={V2V_FILE} />
           <CodeFile
             slot="code"
-            code="ofdm-rx"
-            file="src/lib/ofdm-rx.ts"
-            url={`${SELF}/src/lib/ofdm-rx.ts`}
-            note="The receiver from V2V_TXRXf.m (github.com/avemath/v2v-bsm-ofdm), ported to run in the browser. The figure runs this file."
+            code="v2v-txrx"
+            file="V2V_TXRXf.m"
+            url={V2V_FILE}
+            note={`The transmitter and receiver that ran on the radios. The receiver stages, by line: ${v2vLines}. The live figure runs a browser port, src/lib/ofdm-rx.ts.`}
           />
           <Fragment slot="text">
             <p>
-              A BPSK-OFDM link modeled on 802.11p (the car version of Wi-Fi), running between two PlutoSDRs, which are software radios. I
-              built the receiver: packet detection, timing recovery, CFO correction, a Costas loop (it tracks leftover phase drift), MMSE
-              equalization and Viterbi decoding. Two cars trade safety messages and the receiver computes time to collision.
+              A BPSK-OFDM link modeled on IEEE 802.11p (the car version of Wi-Fi), run over the air between two PlutoSDR software radios.
+              I designed and wrote the transmitter, the nine-stage receiver and the warning logic. One radio sends both cars' safety
+              messages in turn; the other decodes them and computes time to collision. All five hardware runs decoded with zero bit errors.
             </p>
           </Fragment>
           <Fragment slot="actions">

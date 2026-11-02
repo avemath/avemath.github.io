@@ -10,7 +10,7 @@ status: complete
 summary: Senior design capstone. I wrote the control software for a 30 lb pneumatic combat robot, splitting weapon safety and live video across two controllers so neither could stall the other.
 outcome: First place in the LSU senior design combat robotics competition.
 role: Lead programmer and systems integration. I owned the Pico W weapon and safety firmware, the Pi 4B video pipeline, and the test scripts.
-team: Five-person senior design team, advised by Dr. Adrian Stein.
+team: "Avery Matherne (control software, systems integration), Chris Cashen, Nicholas Woodroffe, Matthew van Winkle and Miles Mouton, advised by Dr. Adrian Stein."
 seoDescription: "Control software for a 30 lb pneumatic combat robot: weapon safety on a Pico W, live video on a Pi 4B, and first place in LSU's senior design competition."
 keywords: ["robot", "combat robotics", "senior design", "capstone", "firmware", "pneumatic", "kill switch", "UDP video"]
 stack: [MicroPython, Python, Raspberry Pi Pico W, Raspberry Pi 4B, OpenCV, UDP, FlySky RC]
@@ -39,7 +39,8 @@ gallery:
     caption: Lid on, back on the shop bench.
 metrics:
   - { label: Result, value: "1st place" }
-  - { label: Plow strikes per match, value: "17" }
+  - { label: Activations allowed by firmware, value: "17" }
+  - { label: Trigger to solenoid, average, value: "31.5 ms" }
   - { label: Max frame size, value: "65,000 B" }
 demo: weapon-logic
 ---
@@ -50,7 +51,7 @@ Combat is a rough place for electronics: vibration, interference, flaky radio li
 
 ## My role
 
-I was the lead programmer and handled systems integration. I wrote the weapon and safety firmware on the Pico W, the video pipeline on the Pi 4B and the receiver on the driver's laptop, plus the scripts we used to test latency and heat.
+The team was Avery Matherne (control software and systems integration), Chris Cashen, Nicholas Woodroffe, Matthew van Winkle and Miles Mouton. The mechanical design and the pneumatic analysis were the mechanical team's work. I wrote the three programs: `pico_direct.py` (weapon and safety firmware on the Pico W), `pi4_direct.py` (the video pipeline on the Pi 4B) and `video_direct.py` (the receiver on the driver's laptop), plus the scripts we used to test latency and heat.
 
 ## Approach
 
@@ -58,13 +59,17 @@ I was the lead programmer and handled systems integration. I wrote the weapon an
 
 **Read the radio directly.** The Pico times RC pulses with pin interrupts on both edges in microseconds. Anything outside 900 to 2100 µs is thrown out as noise, and a switch only counts as on above 1700 µs and off below 1300 µs.
 
-**Fire in a fixed sequence.** Each strike vents the main valve, waits, closes it, then drives the piston valve for 400 ms before resetting. Firing is edge-triggered, so holding the switch fires once, not repeatedly. There's a 500 ms cooldown, and the robot carries enough air for 17 strikes. The firmware counts them and locks out at zero instead of firing on an empty tank.
+**The pneumatics, as built.** Two one-piece aluminum reservoirs rated 200 psi are charged before a match from an external compressor through a Schrader valve; there is no compressor on the robot, for vibration, power and weight. Each reservoir has its own quarter-inch inlet solenoid valve (12 V, 8.5 W), and both inlets open together on GP15. They feed one shared supply line, which drives two pneumatic cylinders, one above the other, each with its own rod and both pushing the one plow, about 80 lbf per cylinder at 200 psi. A half-inch exhaust solenoid valve (12 V, 16 W) on GP14 branches off the shared line to atmosphere. It sits open when idle so the plow stays pulled in, and it is forced open on any error or emergency stop.
 
-**Fail safe three ways.** The weapon stops if the kill switch is flipped, if either channel goes quiet for more than a second, or if the kill switch is already on at power-up. Each cause has its own recovery rule, and in every stop state both valves go to their safe positions. The status LED tells the pit crew which state it's in from across the arena.
+**Fire in a fixed sequence.** Each strike runs six steps: the exhaust stays open for 50 ms with the plow home, the exhaust closes, a 50 ms dwell, both inlets open for 400 ms to drive the plow out to full extension, the inlets close, and the exhaust reopens so the plow vents and retracts. Firing is edge-triggered, so holding the switch fires once, not repeatedly. There's a 500 ms cooldown and a hard limit of 17 activations in firmware, of which about the first six deliver full force before reservoir pressure drops. The team's air analysis predicted five cycles above 30 lbf; testing measured six.
 
-**Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video goes over UDP instead of TCP. Each frame is JPEG-encoded, and the quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
+**Fail safe three ways.** The kill switch is RC channel 5 and the weapon trigger is channel 6. A kill, a lost signal (either channel quiet for more than a second) or an error forces the exhaust open and cuts power to the FlySky receiver through a solid-state relay, which puts the motor controllers into failsafe. The kill switch also blocks firing if it is already on at power-up. The drive motors connect from the receiver straight to the ESC, with no software in the path. The status LED tells the pit crew which state the board is in from across the arena.
 
-**Test what scares you.** I wrote a latency test that measures from the trigger pulse to the solenoid pin, with a 50 ms target, and a thermal logger for the Pi inside a sealed enclosure.
+**Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video from a fisheye Pi camera goes over UDP instead of TCP. Each frame is JPEG-encoded, and the adaptive quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. With an external antenna the stream averaged 17.4 FPS, 11.2 FPS more than with the internal antenna. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
+
+**Electronics.** A 4-in-1 BLHeli_32 70 A ESC, 650 Kv brushless motors, a 5S LiPo, a 100 A maxi fuse, and a 5 V to 3.3 V level shifter between the Pico and the 5 V side.
+
+**Test what scares you.** I wrote a latency test that measures from the trigger pulse to the solenoid pin against a 50 ms target: it measured 28 to 36 ms, 31.5 ms on average. The kill switch cuts power within 35 ms. I also wrote a thermal logger for the Pi inside a sealed enclosure.
 
 ## Outcome
 

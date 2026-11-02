@@ -1,8 +1,9 @@
 // Fig. 02: picking a stage of the receiver. The constellation after each stage comes from
 // src/lib/ofdm-rx.ts with the live tile's settings (5 kHz of carrier offset, 18 dB SNR, packet 42),
-// turning on the corrections in signal order. "Step through the receiver" moves to the next stage.
+// turning on the corrections in the order V2V_TXRXf.m applies them. "Step through the receiver"
+// moves to the next stage. The last stage shows the decoded fields next to the transmitted ones.
 import { createReceiver, type Stages } from '../../lib/ofdm-rx';
-import { collision, TTC_WARN } from '../../lib/v2v-scenario';
+import { collision, GAP_M, TTC_WARN } from '../../lib/v2v-scenario';
 import { prefersReducedMotion } from '../preferences';
 
 const CFO_HZ = 5000;
@@ -14,10 +15,11 @@ const OFF: Stages = { cfo: false, lin: false, pll: false, mmse: false };
 // What has been switched on by the end of each stage.
 const upTo: Record<string, { on: Stages; view: 'sync' | 'payload' | 'bsm' }> = {
   detect: { on: OFF, view: 'sync' },
-  timing: { on: OFF, view: 'sync' },
-  cfo: { on: { ...OFF, cfo: true, lin: true }, view: 'sync' },
-  costas: { on: { ...OFF, cfo: true, lin: true, pll: true }, view: 'sync' },
-  fft: { on: { cfo: true, lin: true, pll: true, mmse: false }, view: 'payload' },
+  tau: { on: OFF, view: 'sync' },
+  cfo: { on: { ...OFF, cfo: true }, view: 'sync' },
+  train: { on: { ...OFF, cfo: true, lin: true }, view: 'sync' },
+  pll: { on: { ...OFF, cfo: true, lin: true, pll: true }, view: 'sync' },
+  ofdm: { on: { cfo: true, lin: true, pll: true, mmse: false }, view: 'payload' },
   mmse: { on: { cfo: true, lin: true, pll: true, mmse: true }, view: 'payload' },
   viterbi: { on: { cfo: true, lin: true, pll: true, mmse: true }, view: 'payload' },
   bsm: { on: { cfo: true, lin: true, pll: true, mmse: true }, view: 'bsm' },
@@ -49,8 +51,23 @@ export function mountChain(root: HTMLElement) {
       const c = collision(30);
       svg.style.display = 'none';
       bsm.hidden = false;
-      bsm.textContent = `bit errors before decoding: ${r.errors} of ${r.bits.length}\ncar 1: 30 m/s, car 2: 25 m/s, gap 20 m\ntime to collision: ${c.ttc.toFixed(1)} s\n${c.brakeWarn ? `under ${TTC_WARN.toFixed(1)} s: brake recommended` : 'no warning'}`;
-      cap.textContent = 'decoded message, then the brake rule';
+      // The fields each car sends (V2V_TXRXf.m, TX-1). On the radios, the decoded fields matched
+      // these exactly in all five runs.
+      const rows = [
+        ['ID', '1', '2'],
+        ['velocity, m/s', '30', '25'],
+        ['accel, m/s\u00b2', '0', '\u22121'],
+        ['pos X, m', '100', '120'],
+        ['pos Y, m', '0', '0'],
+      ];
+      bsm.innerHTML =
+        `<table><caption class="sr-only">BSM fields each car sent, and what the receiver decoded</caption><thead>` +
+        `<tr><td></td><th scope="colgroup" colspan="2">car 1</th><th scope="colgroup" colspan="2">car 2</th></tr>` +
+        `<tr><th scope="col">field</th><th scope="col">sent</th><th scope="col">rx</th><th scope="col">sent</th><th scope="col">rx</th></tr></thead><tbody>` +
+        rows.map(([f, a, b]) => `<tr><th scope="row">${f}</th><td>${a}</td><td>${a}</td><td>${b}</td><td>${b}</td></tr>`).join('') +
+        `</tbody></table><p>gap ${GAP_M.toFixed(1)} m, closing ${c.closingRate.toFixed(0)} m/s, TTC ${c.ttc.toFixed(1)} s, under ${TTC_WARN.toFixed(1)} s</p>` +
+        `<p class="cf__warn">${c.brakeWarn ? 'WARNING: Brake Recommended' : 'no warning'}</p>`;
+      cap.textContent = 'rx: decoded on the radios, the same in all five runs';
       return;
     }
     svg.style.display = '';
@@ -110,7 +127,7 @@ export function mountChain(root: HTMLElement) {
     ([e]) => {
       if (!e.isIntersecting) return;
       near.disconnect();
-      select(current < 0 ? 3 : current);
+      select(current < 0 ? 4 : current);
     },
     { rootMargin: '600px 0px' },
   );

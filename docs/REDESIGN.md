@@ -421,3 +421,27 @@ The LED matrix's resting frame (9 s of the firmware run on the clip) and the V2V
 ### Websites showcase layout
 
 The site rows are media 7 columns, words 5, with both halves centered and the sides alternating. The browser frame fills its column (56% of the container at 1366 and 1440), keeps 16:10, and the phone overlay stays on its bottom right. The screenshots' `sizes` match the real frame width, so a 2x screen gets the 1440px file. Below 960px the media stacks above the words at the full container width, and "Try it" sits bottom left at every width so it never covers the phone. /work/ shows the same rows in its Websites section (Fig. 11 to 14), with website work that has no live site, the PLV Abstract Builder, as a card after them.
+
+## Project facts
+
+RAMpage and V2V, corrected from the source documents on branch `project-facts`.
+
+### Sources
+
+- RAMpage: the team's final presentation (May 2025), `pico_direct.py`, `pi4_direct.py` and `video_direct.py`.
+- V2V: the final report and final presentation for EE 4003 (May 2026), `V2V_TXRXf.m`, and the Run 4 figures from the course folder.
+
+### RAMpage
+
+- Pneumatics as built: two 200 psi aluminum reservoirs, charged before a match through a Schrader valve (no compressor on the robot), each with its own inlet valve; both inlets open together on GP15 into one shared line that drives two stacked cylinders pushing one plow. The exhaust valve (GP14) branches off that line to atmosphere: open at idle, forced open on error or E-stop. The drawing, timing rows ("GP14 exhaust", "GP15 inlets"), legend and How notes follow the six-step sequence, and the status word now follows the valve states, so it can't run ahead of the drawing.
+- Air budget: 17 cells, the first six shaded as full force. "About six cycles above 30 lbf, 17 allowed by firmware."
+- Safety: kill on channel 5, trigger on channel 6; a kill, lost signal or error opens the exhaust and cuts the receiver's power through a solid-state relay, which puts the ESC into failsafe, within 35 ms. Trigger to solenoid 28 to 36 ms, 31.5 ms on average. Drive is receiver to ESC with no software.
+- Video, electronics and team credit as in the case study. The RAMpage repo README's Weapon System section is fixed on branch `readme-pneumatics` (not pushed).
+
+### V2V
+
+- The receiver is nine stages in `V2V_TXRXf.m` order: PRE detect, tau sweep, CFO, TRAIN fit, decision-directed PLL, OFDM demod and channel estimate, MMSE, Viterbi, BSM. "Costas loop" is gone from the site; the stage is a decision-directed PLL (gain 0.001, 8-symbol burn-in), and `src/lib/ofdm-rx.ts` now matches it. The 3c entry above still says Costas; that was the wording then.
+- The live figure stays simulated, because `run4.zip` holds only figures and no IQ capture; its footer says so and shows the five-run table. The last stage shows each car's fields sent and decoded, the gap, TTC 4.0 s and the warning.
+- How it works shows each stage's Run 4 figure, labeled with the report's figure number, and its lines in `V2V_TXRXf.m`. The Code tab is `V2V_TXRXf.m` itself (`vendor/v2v/`, line endings only changed), with MATLAB highlighting.
+- Role: "Final project for EE 4003 with lab partner Jason Phan. I designed and wrote the transmitter, receiver and warning logic, and ran all five hardware tests." No "co-author" and no "we built" or "we ran".
+- Figures also went to the V2V repo on branch `figures` (not pushed). Course helper files were not copied. The printout photos are printed code pages, so none were used, and no photo of a person is on the site.
