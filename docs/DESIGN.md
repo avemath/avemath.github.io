@@ -51,13 +51,16 @@ The original plan used GSAP for the hero. In practice the only effect that neede
 | Component | Notes |
 |---|---|
 | `Header` | navy on every page. Name, five links, a small label at the right (`surface` on home, the live depth on /research/), search and theme. A native `<details>` menu below 860px |
-| `Hero` | the headline as HTML, and the signal panel (`src/scripts/signal-panel.ts`, signal in `src/lib/preamble.ts`) |
+| `Hero` | the headline as HTML, and the signal panel |
+| `SignalPanel` | the preamble on a scope (`src/scripts/signal-panel.ts`, signal in `src/lib/preamble.ts`); `empty` for the 404 page |
+| `MarginNote` | one field note beside the figure it is about, tap to decode |
+| `HomeSkills` | Fig. 06, the skills matrix: a real table, every dot a link to a file |
 | `fig/FigureCard` | a project spotlight: a 7/5 paper card with a figure label row and Live, How it works and Code tabs. The code views widen to the full card |
 | `fig/TimingFig`, `ChainFig`, `MatrixFig` | the three live figures, each run by the project's real code in `src/lib` |
 | `fig/CodeHow`, `fig/CodeFile` | code panels cut at build time from the real files (`src/lib/excerpt.ts`), with real line numbers |
 | `Marquee`, `StatusStrip`, `BelowSurface`, `HomeSkills` | home page sections |
 | `WebsitesShowcase` | the client sites two by two, only those with `client.permission` |
-| `DepthGauge`, `FieldNotes` | /research/ only |
+| `DepthGauge` | /research/ only |
 | `Footer` | "Say hi." and the links; the research variant has "Back to the surface" |
 | `ProjectTile`, `ProjectArt` | /work/ and services |
 | `CommandPalette` | native `<dialog>`; Ctrl K, Cmd K or `/` |

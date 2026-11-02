@@ -275,3 +275,47 @@ Client quotes from Rickey (PLV) and Grace (Grace Mae) are on their site cards, a
 ### Checks
 
 `npm run verify` and `npm run test:a11y` pass (24 pages, 156 scans, now including each figure card's How it works and Code views). Mobile Lighthouse on `astro preview`: home 99 / 100 / 96 / 100, research 99 / 100 / 96 / 100 (performance, accessibility, best practices, SEO), CLS 0 and TBT 0 ms on both. Best practices loses 4 points only to the analytics beacon, which is blocked on localhost.
+
+## Redesign 3b: polish pass
+
+Every page should give a visitor a reason to keep scrolling and something to touch.
+
+### What moved
+
+- **Field notes** left their own section. Each is now one small card under the figure it is about (`MarginNote`, data in `src/data/facts.json` with a `where`): "1500 m/s" in the 0 to 20 m band, "A radio link" with the ONR figure, "g/cm³" (the bottom density bug) with bellhopSim, "Adam" with the pool alarm, and "13 pairs" (JANUS) under the Signals card on the home page. One per place, same decode behavior.
+- **Skills** became Fig. 06, a matrix of skills by project. **Website cards** became Fig. 07 to 10, with a label row and each site's mobile performance score from `src/data/sites.json`. Rickey's and Grace's approved quotes moved into that file's `quote` slot.
+- The hero panel became its own component, `SignalPanel`, so the 404 page can show it with no signal.
+
+### What was added
+
+- A plain caption under the hero panel ("This is the preamble an underwater modem sends before it talks.") with a mouse and a touch version of the second sentence.
+- A "Try:" line in the footer of every project figure; "hover" reads "tap" on touch screens.
+- Scroll cues: "See what I have built" under Open to, "Three more below, then the research." between the large and small project cards (placed there because that is where it is true), and "Or see the websites" beside "Back to the surface".
+- The 404 page: "No carrier." beside an empty scope whose cursors still move and read `t = --`, `f = --`. Its HTML is 18 KB gzipped (77 KB raw, mostly the inline stylesheet every page shares), plus about 5 KB of scripts.
+- `rev <date>` in the footer, from the last commit's date (`git log -1 --format=%cs`), or the build date without git.
+- The ONR band says: "Details are limited to what the project has published. Ask me about the methods, not the data."
+- Small details: a progress bar on "Hear it"; the V2V constellation moves from one stage's points to the next over 300 ms; "Fire the plow" becomes "Refill (new match)" at zero; project card titles decode on first view.
+- A plain-words pass: JANUS, BELLHOP, eigenrays, Costas and the BSM each get a few plain words at their first use on a page.
+
+### What was deleted
+
+Four field notes, because no band is about them: "Land agent" (day job plot twist), "17" (shots per match), "2.9 GHz" (radio workaround) and "113 posts" (where the voice came from). Their stories are still in the RAMpage, V2V, Because of ADAM and About pages. The "surface" label in the home nav is gone.
+
+### Skills mapping rules
+
+- `usedIn` in `src/lib/skills.ts` holds, per skill, one entry per project: what the file does, the file's path, and for client sites which repo.
+- A dot needs a tracked file on the repo's `main` branch. Nothing is mapped from a description alone. The first map was built by checking each file with git, and every link was then checked for a 200 on GitHub.
+- Columns: RAMpage, V2V, bellhopSim, Signals, LED, Landspace, Client sites. Landspace is defined but hidden, because its repo is private and its dots would not open.
+- Skills with no public file stay in the data with a `TODO(ave)` and are left off the matrix.
+
+### Notes on facts
+
+- The JANUS hop pattern is part of the published standard, so the copy no longer says it is not public; it says the playground hops in its own order.
+- Nicholas's site moved from avemath.github.io/nmdomke/ (now a 404) to nmdomke.github.io; the project link is updated.
+- The website scores are Lighthouse mobile runs from 2026-11-01, made locally because the PageSpeed Insights API was over its daily quota.
+
+### New TODO(ave) items
+
+- Re-measure the website scores on pagespeed.web.dev: `src/components/WebsitesShowcase.astro`, data in `src/data/sites.json`.
+- Make the Landspace repo public to show its column: `src/lib/skills.ts`.
+- Ten skills have no public file: Embedded wiring and soldering, Client communication, Project management, Fundraising and outreach, Linux, Google Apps Script, and, until Landspace is public, Public records and title research, Excel runsheets, Supabase and Leaflet: `src/lib/skills.ts`.
