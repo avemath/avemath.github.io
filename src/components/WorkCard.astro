@@ -49,9 +49,12 @@ const kind = isWebsite(project) && d.links.live ? displayUrl(d.links.live) : typ
     </h3>
     {
       has.length > 0 && (
-        <p class="wc__offers">
-          <span class="sr-only">Offers: </span>
-          {has.join(' · ')}
+        <p class="wc__offers above-stretch">
+          {has.map((o) => (
+            <a href={o.href} aria-label={`${o.label}: ${d.title}`}>
+              {o.label}
+            </a>
+          ))}
         </p>
       )
     }
@@ -125,9 +128,19 @@ const kind = isWebsite(project) && d.links.live ? displayUrl(d.links.live) : typ
   }
 
   .wc__offers {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .wc__offers a {
+    padding-block: 0.2rem;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.25em;
   }
 
   .wc__summary {

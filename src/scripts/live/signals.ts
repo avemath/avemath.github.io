@@ -41,7 +41,7 @@ export function mount(panel: HTMLElement) {
       h += `<rect x="${x + colW / 2 - 3}" y="${off - 3}" width="6" height="6" fill="var(--surface)" stroke="var(--muted)"/>`;
       h += `<rect x="${x + colW / 2 - 6}" y="${on - 6}" width="12" height="12" fill="${col}" stroke="var(--text)"/>`;
       h += `<rect x="${x + 6}" y="${T + plotH + 10}" width="${colW - 12}" height="18" rx="4" fill="${col}"/>`;
-      h += `<text x="${x + colW / 2}" y="${T + plotH + 22}" text-anchor="middle" style="fill:var(--surface);font-weight:600;font-size:10px">${b}</text>`;
+      h += `<text x="${x + colW / 2}" y="${T + plotH + 22}" text-anchor="middle" style="fill:var(--surface);font-weight:600;font-size:13px">${b}</text>`;
       h += `</g>`;
     }
     h += `<rect x="${L}" y="${T}" width="${N * colW}" height="${plotH}" fill="none" stroke="var(--line-strong)"/>`;

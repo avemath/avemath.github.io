@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
 import StatusStrip from '@/components/StatusStrip.astro';
+import AboutTeaser from '@/components/AboutTeaser.astro';
 import FigureCard from '@/components/fig/FigureCard.astro';
 import TimingFig from '@/components/fig/TimingFig.astro';
 import ChainFig from '@/components/fig/ChainFig.astro';
@@ -65,6 +66,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 <BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
   <Hero />
   <StatusStrip />
+  <AboutTeaser />
 
   <section id="projects" class="section projects" aria-labelledby="projects-title">
     <div class="wrap">
@@ -160,7 +162,11 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           </div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/bellhop-sim/" class="stretched">bellhopSim</a></h3>
-            <p class="mini__offers"><span class="sr-only">Offers: </span>Figures · Drawing · Code</p>
+            <p class="mini__offers above-stretch">
+              <a href="/work/bellhop-sim/#gallery">Figures</a>
+              <a href="/research/#bellhop">Drawing</a>
+              <a href="https://github.com/avemath/bellhopSim">Code</a>
+            </p>
             <p class="mini__text">BELLHOP (a standard model of how sound travels underwater) for shallow water, with the three physics bugs I found and fixed.</p>
           </div>
           <p class="fig__try">Open the figures and the fixes.</p>
@@ -193,7 +199,11 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <div class="mini__note"><MarginNote where="signals" /></div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/signals-playground/">Signals playground</a></h3>
-            <p class="mini__offers"><span class="sr-only">Offers: </span>Live · Drawing · Code</p>
+            <p class="mini__offers">
+              <a href="#sig-live" data-tab-target="sig-tab-live">Live</a>
+              <a href="#sig-drawing" data-tab-target="sig-tab-drawing">Drawing</a>
+              <a href="https://github.com/avemath/avemath.github.io/blob/main/src/components/demos/SignalsDemo.astro">Code</a>
+            </p>
             <p class="mini__text">A JANUS style FH-BFSK preamble, one chip at a time. You can hear each hop.</p>
           </div>
         </li>
@@ -224,8 +234,8 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   </section>
 
   <BelowSurface />
-  <WebsitesShowcase />
-  <div class="ground-alt"><HomeSkills /></div>
+  <div class="ground-alt"><WebsitesShowcase /></div>
+  <HomeSkills />
 </BaseLayout>
 
 <style>
@@ -244,8 +254,8 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   }
 
   .projects__note {
-    font-size: 0.875rem;
-    color: var(--muted);
+    font-size: 1rem;
+    color: var(--text-soft);
   }
 
   .projects__cards {
@@ -376,10 +386,20 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   }
 
   .mini__offers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
     margin-top: 0.2rem;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .mini__offers a {
+    padding-block: 0.2rem;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.25em;
   }
 
   .mini__text {

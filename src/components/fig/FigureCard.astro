@@ -65,7 +65,15 @@ const views = [
   <div class="fc__text">
     <p class="eyebrow fc__eyebrow">{eyebrow}</p>
     <h3 id={`${id}-title`} class="fc__title" data-decode>{title}</h3>
-    <p class="fc__offers"><span class="sr-only">Offers: </span>{offers.join(' · ')}</p>
+    <p class="fc__offers">
+      {
+        offers.map((o) => (
+          <a href={`#${id}`} data-tab-target={`${id}-tab-${o.toLowerCase()}`}>
+            {o}
+          </a>
+        ))
+      }
+    </p>
     <div class="fc__body"><slot name="text" /></div>
     <div class="fc__actions"><slot name="actions" /></div>
   </div>
@@ -183,11 +191,26 @@ const views = [
     line-height: 0.98;
   }
 
+  /* Live, Drawing, Code: links that open those views of the figure. */
   .fc__offers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.1rem;
     margin-top: 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .fc__offers a {
+    padding-block: 0.25rem;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.25em;
+  }
+
+  .fc__offers a:hover {
+    text-decoration-color: var(--accent);
   }
 
   .fc--wide .fc__offers,

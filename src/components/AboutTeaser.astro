@@ -1,0 +1,72 @@
+---
+// A short About on the home page, so the person behind the work is one scroll away: the About
+// page's portrait and the first lines of its opening, with a link to the rest.
+import { Image } from 'astro:assets';
+import portrait from '@/assets/portrait.jpg';
+import site from '@/data/site.json';
+---
+
+<section class="about-t ground-alt" aria-labelledby="about-t-title">
+  <div class="wrap about-t__row">
+    <Image src={portrait} alt={site.name} widths={[160, 320]} sizes="10rem" format="webp" quality={80} loading="lazy" class="about-t__photo" />
+    <div class="about-t__text">
+      <h2 id="about-t-title" class="about-t__title">I like systems that work when it matters.</h2>
+      <p>
+        I'm Ave. I'm a computer engineer and graduate researcher at LSU, I design and build websites, I do ownership research as a land
+        agent, and I co-founded a drowning awareness nonprofit with my family. It's mostly the same thing: figuring out how something
+        really works, then building it so other people can rely on it.
+      </p>
+      <a class="link about-t__more" href="/about/">More about me</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-t {
+    padding-block: 2.25rem;
+  }
+
+  .about-t__row {
+    display: grid;
+    gap: 1.25rem 2rem;
+    align-items: center;
+  }
+
+  @media (min-width: 720px) {
+    .about-t__row {
+      grid-template-columns: 10rem minmax(0, 1fr);
+    }
+  }
+
+  .about-t__photo {
+    width: 7rem;
+    height: 7rem;
+    object-fit: cover;
+    border: 1px solid var(--line);
+  }
+
+  @media (min-width: 720px) {
+    .about-t__photo {
+      width: 10rem;
+      height: 10rem;
+    }
+  }
+
+  .about-t__title {
+    font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+    line-height: 1.05;
+  }
+
+  .about-t__text p {
+    margin-top: 0.6rem;
+    max-width: 52rem;
+    font-size: 1.0625rem;
+    color: var(--text-soft);
+  }
+
+  .about-t__more {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding-block: 0.2rem;
+  }
+</style>
