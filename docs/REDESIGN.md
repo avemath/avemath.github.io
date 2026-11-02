@@ -408,6 +408,10 @@ RAMpage's Live view adds the pneumatics drawing beside the timing rows. "Fire th
 
 `/work/#websites` marks Websites, scrolling to Research marks Research, and the top marks Projects. The RAMpage legend reads "1 fill 50 ms, 2 extend 400 ms, 3 1 of 17 shots used" with circles; the Fire button sits 13px under the timing rows; at 16x slower the chip and the drawing both read "Plow out" mid-strike. The marquee pauses on hover. The header is one line (65px) at 390. The research nav reads "depth 0 m" at the top and changes on scroll. The breadcrumb on Because of ADAM reads "Work / Websites / Because of ADAM". "Hear it" still plays all 32 chips from the first in Chrome.
 
+### Performance
+
+The LED matrix's resting frame (9 s of the firmware run on the clip) and the V2V figure's first constellation now wait until their figure is near the screen, which kept the home page's main thread free at load. Mobile Lighthouse: home 97 to 98 over three runs, /work/ 98, /research/ 99; accessibility 100 and CLS 0 on all three. One earlier home run scored 75 with 610 ms of blocking time, before the deferral; runs after it did not repeat that.
+
 ### New TODO(ave) items
 
 - Re-measure the website facts on PageSpeed Insights: `pagespeedMobile`, `accessibility` and `pageWeightKb` in `src/data/sites.json` are local Lighthouse mobile runs from 2026-11-01 (Because of ADAM 99, 100, 101 KB; Grace Mae 91, 100, 496 KB; PLV 87, 100, 287 KB; Nicholas 90, 100, 400 KB). Scores moved a few points between runs.
