@@ -512,10 +512,10 @@ const jsonLd = [
     padding-block: clamp(3rem, 6vw, 5rem);
   }
 
+  /* The contents rail starts at the container's left edge, like the head, the gallery and the pager. */
   @media (min-width: 1100px) {
     .case__body {
       grid-template-columns: 14rem minmax(0, 44rem);
-  /* The contents rail starts at the container's left edge, like the head, the gallery and the pager. */
       justify-content: start;
       gap: 4rem;
     }
@@ -564,16 +564,15 @@ const jsonLd = [
 
   /* The gallery spans the contents rail and the reading column (62rem), from the container's edge. */
   .case__gallery-wrap {
-    max-width: calc(62rem + 2 * clamp(1rem, 4vw, 2.5rem));
     padding-bottom: clamp(3rem, 6vw, 5rem);
   }
 
-  /* Same size as the other section headings in the case study, on the gallery's own left edge. */
-  .case__gallery-wrap > .section-title {
   .case__gallery {
     max-width: 62rem;
   }
 
+  /* Same size as the other section headings in the case study, on the gallery's own left edge. */
+  .case__gallery-wrap > .section-title {
     font-size: 1.75rem;
   }
 
@@ -657,12 +656,12 @@ const jsonLd = [
   .shot__img :global(video) {
     background: #05070c;
   }
+
   /* The clips are about 860 to 960 px wide; shown any wider they turn soft, so they stop there. */
   .shot:has(video) {
     width: 100%;
     max-width: 54rem;
   }
-
 
   /* The frame clips anything outside it, so a video's focus ring sits inside its edge. */
   .shot__img :global(video:focus-visible) {
