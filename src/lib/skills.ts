@@ -3,7 +3,7 @@
 // only when one of these terms is in that project's stack, so the links never claim more than
 // the case studies list. A skill with no terms has no linked project, and the page says so.
 //
-// `usedIn` feeds the home page's skills matrix (Fig. 06): one entry per project where the skill
+// `usedIn` feeds the home page's skills matrix (Fig. 10): one entry per project where the skill
 // was used, each pointing at one real file in that project's repo, so every dot opens a file.
 // Add a dot only when there is a tracked file to point at; never from a description alone.
 

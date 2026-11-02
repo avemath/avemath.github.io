@@ -15,7 +15,8 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
 // Each site's facts come from src/data/sites.json: things a visitor can judge (speed,
 // accessibility, page weight, how long it has been live, what the owner edits), not commit
-// counts. Figures are numbered after the skills matrix (Fig. 06).
+// counts. On the home page the site figures follow the hop pattern (Fig. 05) and come before the
+// skills matrix.
 // pagespeedMobile and accessibility are PageSpeed Insights mobile results, dated by measuredOn.
 // pageWeightKb is the home page's transferred size from a local Lighthouse mobile run that day.
 interface Props {
@@ -25,7 +26,7 @@ interface Props {
   firstFig?: number;
 }
 
-const { rowsOnly = false, firstFig = 7 } = Astro.props;
+const { rowsOnly = false, firstFig = 6 } = Astro.props;
 const FIRST_FIG = firstFig;
 const Outer = rowsOnly ? 'div' : 'section';
 const siteData = (id: string) => sitesData.find((s) => s.slug === id);

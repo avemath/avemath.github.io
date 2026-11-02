@@ -56,7 +56,7 @@ The original plan used GSAP for the hero. In practice the only effect that neede
 | `WorkCard` | a project on /work/: figure label, picture, title, what it offers (Live, Drawing, Code), one line |
 | `drawings/*` | schematic line drawings, one per project, in one style (see REDESIGN.md, Redesign 3c) |
 | `MarginNote` | one field note beside the figure it is about, tap to decode |
-| `HomeSkills` | Fig. 06, the skills matrix: a real table, every dot a link to a file |
+| `HomeSkills` | Fig. 10, the skills matrix: a real table, every dot a link to a file |
 | `fig/FigureCard` | a project spotlight: a 7/5 paper card with a figure label row and Live, How it works and Code tabs. The code views widen to the full card |
 | `fig/TimingFig`, `ChainFig`, `MatrixFig` | the three live figures, each run by the project's real code in `src/lib` |
 | `fig/CodeHow`, `fig/CodeFile` | code panels cut at build time from the real files (`src/lib/excerpt.ts`), with real line numbers |
