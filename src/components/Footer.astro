@@ -1,4 +1,5 @@
 ---
+import { execSync } from 'node:child_process';
 import site from '@/data/site.json';
 
 interface Props {
@@ -8,15 +9,24 @@ interface Props {
 
 const { variant = 'default' } = Astro.props;
 const year = new Date().getFullYear();
+// The revision: the date of the last commit, read at build time. Falls back to the build date
+// where git is not available.
+let rev = new Date().toISOString().slice(0, 10);
+try {
+  rev = execSync('git log -1 --format=%cs', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || rev;
+} catch {
+  // No git here: keep the build date.
+}
 ---
 
 <footer id="footer" class:list={['site-footer on-navy no-print', variant === 'research' && 'site-footer--deep']}>
   <div class="wrap foot">
     {
       variant === 'research' ? (
-        <a class="btn" href="/">
-          Back to the surface
-        </a>
+        <p class="foot__back">
+          <a class="btn" href="/">Back to the surface</a>
+          <a class="foot__link" href="/#websites">Or see the websites</a>
+        </p>
       ) : (
         <div>
           <p class="foot__hi">Say hi.</p>
@@ -50,6 +60,7 @@ const year = new Date().getFullYear();
       <p class="foot__small">
         © <span data-year>{year}</span> {site.name}. Built with Astro, hosted on GitHub Pages.
         <a href="https://github.com/avemath/avemath.github.io">Source</a>
+        <span class="foot__rev mono">rev {rev}</span>
       </p>
       <script is:inline>
         // The build-time year is the fallback; this keeps it current between deploys.
@@ -82,6 +93,18 @@ const year = new Date().getFullYear();
   .site-footer--deep .foot {
     align-items: center;
     padding-block: 2rem;
+  }
+
+  .foot__back {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .foot__rev {
+    margin-left: 0.75rem;
+    font-size: 0.75rem;
   }
 
   .foot__hi {

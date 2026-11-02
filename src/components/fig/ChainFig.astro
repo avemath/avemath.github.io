@@ -54,7 +54,7 @@ const stages = [
   {
     key: 'bsm',
     name: 'BSM',
-    text: `Unpacks ID, velocity, acceleration and position, then computes time to collision. Car 1 at 30 m/s is ${GAP_M} m behind car 2 at ${LEAD_V} m/s: ${ttc.ttc.toFixed(1)} s, under the ${TTC_WARN.toFixed(1)} s threshold, so it recommends braking.`,
+    text: `Reads the Basic Safety Message (what each car broadcasts about itself): ID, velocity, acceleration and position. Then it computes time to collision. Car 1 at 30 m/s is ${GAP_M} m behind car 2 at ${LEAD_V} m/s: ${ttc.ttc.toFixed(1)} s, under the ${TTC_WARN.toFixed(1)} s threshold, so it recommends braking.`,
     io: 'Takes the decoded message; hands a brake warning to the driver.',
   },
 ];
@@ -89,7 +89,7 @@ const stages = [
       </figure>
     </div>
   </div>
-  <p class="fig__note">hover or tap a stage to see what it does and what it passes on</p>
+  <p class="fig__try"><span class="on-mouse">Hover</span><span class="on-touch">Tap</span> the Costas stage, then step through.</p>
   <script type="application/json" data-cf-stages set:html={JSON.stringify(stages)} />
 </div>
 

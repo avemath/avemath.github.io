@@ -52,7 +52,7 @@ export function mountTiming(root: HTMLElement) {
     state.textContent = label;
     if (!fire) return;
     const out = fw.activations >= MAX_WEAPON_ACTIVATIONS;
-    fire.textContent = out ? 'Reboot to refill' : 'Fire the plow';
+    fire.textContent = out ? 'Refill (new match)' : 'Fire the plow';
   };
 
   // Redraws the traces left to right in real time, as the valves would switch.
