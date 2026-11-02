@@ -12,6 +12,7 @@ import { chromium } from 'playwright';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const DIST = 'dist';
+const site = JSON.parse(await readFile('src/data/site.json', 'utf8'));
 const { server, base } = serveDist(DIST);
 
 const fonts = await readdir(join(DIST, '_astro'));
@@ -50,7 +51,7 @@ for (const f of (await readdir('src/content/projects')).filter((f) => f.endsWith
   projects.push({ id: f.replace(/\.md$/, ''), title: field('title'), type: LABELS[field('type')] ?? '', summary: field('summary') });
 }
 const cards = [
-  { file: 'default', eyebrow: 'Baton Rouge, LA · M.S. ECE at LSU', title: 'Avery Matherne', sub: 'I research communication systems at LSU and build websites for small businesses and nonprofits.' },
+  { file: 'default', eyebrow: site.title.split('|')[1].trim(), title: site.name, sub: 'I research communication systems at LSU and build websites for small businesses and nonprofits.' },
   { file: 'research', eyebrow: 'Research', title: 'Research, below the surface.', sub: 'Underwater acoustic channels, the ONR data management work, bellhopSim, and the acoustic pool alarm.' },
   ...projects.map((p) => ({ file: p.id, eyebrow: p.type, title: p.title, sub: p.summary })),
 ];
