@@ -30,6 +30,7 @@ import { F_HIGH, F_LOW, PAIRS } from '@/lib/fhbfsk';
         <button type="button" class="sig__play" data-sig-play aria-pressed="false">
           <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1.5v9l8-4.5z" fill="currentColor"></path></svg>
           <span data-sig-play-label>Hear it, 2 s</span>
+          <span class="sig__prog" aria-hidden="true"></span>
         </button>
       </div>
       <p class="sr-only" aria-live="polite" data-sig-live></p>
@@ -210,6 +211,18 @@ import { F_HIGH, F_LOW, PAIRS } from '@/lib/fhbfsk';
     font-weight: 700;
     color: var(--on-navy);
     cursor: pointer;
+  }
+
+  /* While it plays, a thin bar along the bottom edge shows how far through the 2 s it is. */
+  .sig__prog {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(var(--p, 0));
+    transform-origin: left;
   }
 
   .sig__play svg {

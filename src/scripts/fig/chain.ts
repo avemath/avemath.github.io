@@ -3,6 +3,7 @@
 // turning on the corrections in signal order. "Step through the receiver" moves to the next stage.
 import { createReceiver, type Stages } from '../../lib/ofdm-rx';
 import { collision, TTC_WARN } from '../../lib/v2v-scenario';
+import { prefersReducedMotion } from '../preferences';
 
 const CFO_HZ = 5000;
 const SNR_DB = 18;
@@ -35,6 +36,8 @@ export function mountChain(root: HTMLElement) {
   const stepBtn = card?.querySelector<HTMLButtonElement>('[data-step]');
   const rx = createReceiver(42);
   const axes = svg.innerHTML;
+  let shown: [number, number][] | null = null;
+  let morph = 0;
   let current = buttons.findIndex((b) => b.getAttribute('aria-pressed') === 'true');
 
   function plot(i: number) {
@@ -42,6 +45,7 @@ export function mountChain(root: HTMLElement) {
     const { on, view } = upTo[key];
     const r = rx.receive(CFO_HZ, SNR_DB, on);
     if (view === 'bsm') {
+      shown = null;
       const c = collision(30);
       svg.style.display = 'none';
       bsm.hidden = false;
@@ -55,13 +59,32 @@ export function mountChain(root: HTMLElement) {
     // Scale so the clean points sit at plus and minus one.
     const clip = (v: number) => Math.max(-1.55, Math.min(1.55, v));
     const decided = key === 'viterbi';
+    const next = pts.map(([a, b]) => [clip(a), clip(-b)] as [number, number]);
     let dots = '';
-    for (let k = 0; k < pts.length; k++) {
-      const [a, b] = pts[k];
-      const wrong = decided && (a >= 0 ? 1 : 0) !== r.bits[k];
-      dots += `<circle cx="${clip(a).toFixed(3)}" cy="${clip(-b).toFixed(3)}" r="0.035"${wrong ? ' class="hot"' : ''}/>`;
-    }
+    next.forEach(([x, y], k) => {
+      const wrong = decided && (pts[k][0] >= 0 ? 1 : 0) !== r.bits[k];
+      dots += `<circle cx="${x.toFixed(3)}" cy="${y.toFixed(3)}" r="0.035"${wrong ? ' class="hot"' : ''}/>`;
+    });
     svg.innerHTML = axes + dots;
+    // From the previous stage's points to this one's over 300 ms, so the move is what the stage did.
+    // Only between two views of the same signal (same number of points), and never with reduced motion.
+    const from = shown;
+    shown = next;
+    cancelAnimationFrame(morph);
+    if (from && from.length === next.length && !prefersReducedMotion()) {
+      const circles = [...svg.querySelectorAll('circle')];
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - t0) / 300);
+        const e = 1 - (1 - t) ** 3;
+        circles.forEach((c, k) => {
+          c.setAttribute('cx', (from[k][0] + (next[k][0] - from[k][0]) * e).toFixed(3));
+          c.setAttribute('cy', (from[k][1] + (next[k][1] - from[k][1]) * e).toFixed(3));
+        });
+        if (t < 1) morph = requestAnimationFrame(step);
+      };
+      step(t0);
+    }
     cap.textContent = decided ? `${r.errors} of ${r.bits.length} decisions wrong, in orange` : view === 'sync' ? 'preamble symbols after this stage' : 'data subcarriers after this stage';
   }
 

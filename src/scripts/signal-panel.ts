@@ -204,6 +204,7 @@ export function mountSignalPanel(fig: HTMLElement) {
     src = null;
     cancelAnimationFrame(raf);
     playing = -1;
+    play.style.setProperty('--p', '0');
     play.setAttribute('aria-pressed', 'false');
     playLabel.textContent = 'Hear it, 2 s';
     draw();
@@ -226,6 +227,7 @@ export function mountSignalPanel(fig: HTMLElement) {
     const chipS = (CHIP_MS * LISTEN_STRETCH) / 1000;
     const ac = audio;
     const tick = () => {
+      play.style.setProperty('--p', String(Math.min(1, Math.max(0, (ac.currentTime - t0) / (chipS * CHIPS)))));
       const k = Math.floor((ac.currentTime - t0) / chipS);
       if (k !== playing && k < CHIPS) {
         playing = k;
