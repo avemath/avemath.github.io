@@ -221,10 +221,14 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     }
   }
 
-  /* The phone mockup covers the bottom right corner, so Try it sits bottom left, at every width. */
+  /* Try it sits in the browser frame's top bar, so it covers none of the site's screenshot. */
   .site__media :global(.live__try) {
-    right: auto;
-    left: 0.7rem;
+    top: 0.2rem;
+    right: 0.4rem;
+    bottom: auto;
+    min-height: 1.6rem;
+    padding: 0.1rem 0.6rem;
+    border-width: 1.5px;
   }
 
   .web__title {
