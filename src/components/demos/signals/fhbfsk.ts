@@ -88,7 +88,7 @@ export function init(panel: HTMLElement) {
     hops = hopPattern(c.n, c.seed);
     pitchMsg.textContent = pitchNotes[c.mode];
 
-    const L = 64, R = 40, T = 26, plotH = 364, colW = 44;
+    const L = 76, R = 40, T = 26, plotH = 364, colW = 44;
     const W = L + c.n * colW + R;
     const rowY = T + plotH + 30;
     const H = rowY + 62;
