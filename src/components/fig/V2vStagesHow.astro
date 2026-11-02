@@ -1,0 +1,121 @@
+---
+// The V2V tile's How it works view: each receiver stage with the figure V2V_TXRXf.m saved for it on
+// Run 4 (six inches apart, a laptop lid between the radios), labeled with the report's figure
+// number, and the lines of the file that do the work.
+import { Image } from 'astro:assets';
+import { v2vStages } from '@/lib/v2v-stages';
+import fig2 from '@/assets/projects/v2v-bsm-ofdm/run4-fig2_pre_correlation.png';
+import fig3 from '@/assets/projects/v2v-bsm-ofdm/run4-fig3_tau_sweep.png';
+import fig4 from '@/assets/projects/v2v-bsm-ofdm/run4-fig4_cfo_correction.png';
+import fig5 from '@/assets/projects/v2v-bsm-ofdm/run4-fig5_train_fit.png';
+import fig6 from '@/assets/projects/v2v-bsm-ofdm/run4-fig6_pll.png';
+import fig7 from '@/assets/projects/v2v-bsm-ofdm/run4-fig7_channel_estimate.png';
+import fig8 from '@/assets/projects/v2v-bsm-ofdm/run4-fig8_ofdm_grid.png';
+import fig9 from '@/assets/projects/v2v-bsm-ofdm/run4-fig9_bpsk_constellation.png';
+import fig12 from '@/assets/projects/v2v-bsm-ofdm/collision-avoidance.png';
+
+interface Props {
+  /** The GitHub link to V2V_TXRXf.m, without a line anchor. */
+  url: string;
+}
+
+const { url } = Astro.props;
+
+const figs: Record<string, { img: ImageMetadata; n: string; title: string; run4: boolean; cap: string; alt: string }> = {
+  detect: { img: fig2, n: '02', title: 'PRE correlation', run4: true, cap: 'One sharp peak per packet; both cars decoded at BER 0.', alt: 'A train of sharp correlation peaks above the noise floor, with the Car 1 and Car 2 packets marked.' },
+  tau: { img: fig3, n: '03', title: 'Tau sweep', run4: true, cap: 'The score peaks at tau 0 for both cars.', alt: 'Score against sampling offset 0 to 15 for each car, highest at 0.' },
+  cfo: { img: fig4, n: '04', title: 'CFO correction', run4: true, cap: 'A smeared ring becomes two clusters after removing about minus 5.8 to 5.9 kHz.', alt: 'Preamble constellations before and after CFO correction: a ring, then two clusters.' },
+  train: { img: fig5, n: '05', title: 'TRAIN fit', run4: true, cap: 'Rotated clusters land on the real axis.', alt: 'Training symbols before and after the phase and polarity fit.' },
+  pll: { img: fig6, n: '06', title: 'Decision-directed PLL', run4: true, cap: 'The loop removes the last of the phase error.', alt: 'Preamble constellations before and after the PLL, centered on plus and minus one after.' },
+  ofdm: { img: fig7, n: '07', title: 'Channel estimate', run4: true, cap: 'Hk across the 48 data subcarriers, both cars.', alt: 'Channel magnitude per data subcarrier for both cars.' },
+  mmse: { img: fig8, n: '08', title: 'OFDM grid', run4: true, cap: 'Uneven before; plus or minus one on every subcarrier after MMSE.', alt: 'Resource grids before equalization and after MMSE for both cars.' },
+  viterbi: { img: fig9, n: '09', title: 'BPSK constellation', run4: true, cap: 'What Viterbi is fed: two tight clusters per car, zero bit errors after.', alt: 'Equalized BPSK constellations for both cars, titled BER 0.0000.' },
+  bsm: { img: fig12, n: '12', title: 'Collision avoidance', run4: false, cap: 'Gap 20.0 m, closing 5 m/s, TTC 4.0 s: WARNING: Brake Recommended.', alt: 'The road scenario with Car 1 behind Car 2, a 20.0 m gap, TTC 4.0 s and a brake warning.' },
+};
+---
+
+<div class="vh">
+  <p class="vh__intro">
+    The nine stages as they ran on the radios, Run 4: six inches apart, a laptop lid between them. Each figure is the one V2V_TXRXf.m saves for that stage.
+  </p>
+  <ol class="vh__list">
+    {
+      v2vStages.map((s, i) => {
+        const f = figs[s.key];
+        return (
+          <li class="vh__item">
+            <figure>
+              <Image src={f.img} alt={f.alt} widths={[320, 640]} sizes="(min-width: 960px) 18rem, 90vw" format="webp" quality={80} loading="lazy" class="vh__img" />
+              <figcaption>
+                <span class="vh__label">{`Fig. ${f.n} / ${f.title}${f.run4 ? ', Run 4' : ''}`}</span>
+                <span class="vh__stage">
+                  {i + 1}. {s.name}
+                </span>{' '}
+                {f.cap}{' '}
+                <a class="link vh__lines" href={`${url}#L${s.lines[0]}-L${s.lines[1]}`}>
+                  lines {s.lines[0]} to {s.lines[1]}
+                </a>
+              </figcaption>
+            </figure>
+          </li>
+        );
+      })
+    }
+  </ol>
+</div>
+
+<style>
+  .vh {
+    padding: 1rem;
+  }
+
+  .vh__intro {
+    font-size: 0.875rem;
+    color: var(--text-soft);
+  }
+
+  .vh__list {
+    display: grid;
+    gap: 1.25rem 1rem;
+    margin-top: 0.85rem;
+  }
+
+  @media (min-width: 560px) {
+    .vh__list {
+      grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    }
+  }
+
+  .vh__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--text-soft);
+  }
+
+  .vh__label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--text);
+  }
+
+  .vh__stage {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .vh__lines {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+</style>

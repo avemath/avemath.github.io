@@ -1,6 +1,7 @@
 // The V2V receiver chain from the OFDM demo, as a module the case study's demo and the home page
-// tile share: the 802.11p-style frame, the three-path channel, and the four sync stages (coarse
-// CFO, linear phase fit, Costas loop, MMSE equalizer). No DOM here.
+// tile share: the 802.11p-style frame, the three-path channel, and the receiver's correction
+// stages in the order V2V_TXRXf.m runs them (coarse CFO, TRAIN linear phase fit, decision-directed
+// PLL, then MMSE equalization of the OFDM payload). No DOM here.
 
 export type C = [number, number];
 export type Stages = { cfo: boolean; lin: boolean; pll: boolean; mmse: boolean };
@@ -125,16 +126,24 @@ export function createReceiver(initialSeed = 42) {
         if (corr < 0) rx = rx.map(([a, b]) => [-a, -b]);
       }
 
-      // 3. Decision-directed Costas loop for the leftover phase wander.
+      // 3. Decision-directed BPSK PLL for the leftover phase, as in V2V_TXRXf.m: loop gain 0.001,
+      // an 8-symbol burn-in, a small dead zone, then one global phase alignment to the known PRE.
       if (on.pll) {
         let theta = 0;
-        const mu = 0.06;
-        rx = rx.map((z) => {
+        const beta = 0.001;
+        const burn = 8;
+        rx = rx.map((z, k) => {
           const y = rot(z, -theta);
-          const err = Math.sign(y[0]) * y[1];
-          theta += mu * err;
+          if (k >= burn) {
+            let err = Math.sign(y[0]) * y[1];
+            if (Math.abs(err) < 5e-3) err = 0;
+            theta += beta * err;
+          }
           return y;
         });
+        const align = rx.reduce<C>((acc, z, n) => [acc[0] + z[0] * p.sync[n], acc[1] + z[1] * p.sync[n]], [0, 0]);
+        const phiAlign = Math.atan2(align[1], align[0]);
+        rx = rx.map((z) => rot(z, -phiAlign));
       }
 
       const phaseErr = rx.reduce((acc, z, n) => {

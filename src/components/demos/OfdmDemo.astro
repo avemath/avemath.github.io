@@ -4,7 +4,7 @@ import DemoShell from './DemoShell.astro';
 const stages = [
   { id: 'cfo', label: 'Coarse CFO correction', hint: 'Phase step between preamble symbols' },
   { id: 'lin', label: 'Linear phase fit and polarity', hint: 'Line through the training phase' },
-  { id: 'pll', label: 'Costas loop', hint: 'Tracks what is left' },
+  { id: 'pll', label: 'Decision-directed PLL', hint: 'Tracks what is left, gain 0.001' },
   { id: 'mmse', label: 'MMSE equalizer', hint: 'Per-subcarrier channel estimate' },
 ];
 ---

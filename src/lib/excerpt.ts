@@ -4,7 +4,7 @@
 // line they start with and a line count.
 import { highlight } from './highlight';
 
-export type Lang = 'py' | 'cpp' | 'ts';
+export type Lang = 'py' | 'cpp' | 'ts' | 'matlab';
 export interface Excerpt {
   /** Highlighted HTML, one entry per line. */
   lines: string[];

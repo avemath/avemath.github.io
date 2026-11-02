@@ -56,7 +56,7 @@ export function fileUrl(use: Use) {
 }
 
 export const skillMap: Record<string, { area: Area; terms: string[]; usedIn: Use[] }> = {
-  'Digital communications (BPSK, OFDM, synchronization)': { area: 'comms', terms: ['Digital communications', 'OFDM'], usedIn: [{ project: 'v2v', detail: 'OFDM link, Costas PLL, V2V_TXRXf.m', file: 'V2V_TXRXf.m' }, { project: 'bellhop', detail: 'BPSK link over multipath, utils.py', file: 'src/utils.py' }, { project: 'signals', detail: 'BPSK to 16QAM BER, comms.ts', file: 'src/lib/comms.ts' }] },
+  'Digital communications (BPSK, OFDM, synchronization)': { area: 'comms', terms: ['Digital communications', 'OFDM'], usedIn: [{ project: 'v2v', detail: 'OFDM link, decision-directed PLL, V2V_TXRXf.m', file: 'V2V_TXRXf.m' }, { project: 'bellhop', detail: 'BPSK link over multipath, utils.py', file: 'src/utils.py' }, { project: 'signals', detail: 'BPSK to 16QAM BER, comms.ts', file: 'src/lib/comms.ts' }] },
   'Software-defined radio (ADALM-PLUTO)': { area: 'comms', terms: ['ADALM-PLUTO SDR'], usedIn: [{ project: 'v2v', detail: 'Pluto sdrtx and sdrrx, V2V_TXRXf.m', file: 'V2V_TXRXf.m' }] },
   MATLAB: { area: 'tools', terms: ['MATLAB'], usedIn: [{ project: 'v2v', detail: 'full TX and RX chain, V2V_TXRXf.m', file: 'V2V_TXRXf.m' }] },
   ESP32: { area: 'embedded', terms: ['ESP32'], usedIn: [{ project: 'led', detail: 'ESP32 ADC sampling, LEA firmware', file: 'Spectrum Analyzer Code (LEA).txt' }] },
