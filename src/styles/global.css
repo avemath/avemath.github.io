@@ -462,6 +462,7 @@
 
 .paper:hover .fig__try::before {
   display: inline-block;
+  margin-right: 0.3em;
   animation: try-pulse 0.6s ease-out 1;
 }
 
