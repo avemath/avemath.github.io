@@ -35,7 +35,6 @@ gallery:
 metrics:
   - { label: Version, value: "0.3" }
   - { label: Unit test checks, value: "950" }
-  - { label: Browser test files, value: "126" }
   - { label: Practice tour cards, value: "39" }
 client:
   name: Petro Land Ventures, Inc.
@@ -59,7 +58,7 @@ A land abstract is slow, manual work, and it's easy to get wrong. Someone pulls 
 
 **A free practice tour.** A 39-card tour walks a practice job of five made-up documents through all six steps. Each document shows one feature, like a blank date line or an upside-down scan to turn, and nothing is sent or saved while it's open. The screenshots here use that practice job, so every name and record in them is made up.
 
-**Tests on fictional documents.** 41 unit test files with 950 checks, and 126 browser test files that replay recorded reads of 12 fictional documents, so the tests never spend anything or touch a real record.
+**Tests on fictional documents.** Unit tests with 950 checks, and browser tests that replay recorded reads of 12 fictional documents, so the tests never spend anything or touch a real record.
 
 ## Outcome
 

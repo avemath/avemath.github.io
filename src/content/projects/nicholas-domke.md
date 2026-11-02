@@ -30,7 +30,6 @@ gallery:
     alt: The footer drawn as an engineering title block, with cells for title, engineer, discipline, date, scale, units, sheet and revision letter D.
     caption: The footer is a drawing title block. The revision letter goes up with each real update.
 metrics:
-  - { label: Commits, value: "163" }
   - { label: 3D model file, value: "174 KB" }
   - { label: Build step, value: "None" }
 client:
@@ -58,7 +57,7 @@ Nicholas is a mechanical engineering student at LSU applying to graduate program
 
 ## Outcome
 
-The site is live on GitHub Pages: plain HTML, CSS and JavaScript, 163 commits, and a 174 KB 3D model.
+The site is live on GitHub Pages: plain HTML, CSS and JavaScript, and a 174 KB 3D model.
 
 ## What I'd do next
 

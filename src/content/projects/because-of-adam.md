@@ -26,7 +26,6 @@ gallery:
     alt: Water safety page header reading "No single layer is enough. Stack them."
     caption: Long-form pages use the same deep-water palette, from surface light down to the deep end.
 metrics:
-  - { label: Commits, value: "260" }
   - { label: Pages, value: "30+" }
   - { label: Hosting cost, value: "$0" }
 client:

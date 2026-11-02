@@ -7,7 +7,7 @@ featured: false
 order: 14
 period: { start: "2026-05", end: "2026-08" }
 status: complete
-summary: Acoustic characterization and underwater network simulation in support of autonomous maritime systems.
+summary: Acoustic characterization of a thruster on a test stand in the lab tank, and work with the underwater network simulation tools.
 outcome: Internship completed August 2026.
 role: Engineering intern on the Baton Rouge team.
 seoTitle: "Integer Technologies internship"
@@ -26,7 +26,7 @@ Integer Technologies builds software for autonomous surface and underwater vehic
 
 ## My role
 
-I was an engineering intern on the Baton Rouge team. I worked on acoustic characterization and underwater network simulation in support of autonomous maritime systems: planning measurements, analyzing the data, and working with the simulation tools.
+I was an engineering intern on the Baton Rouge team. My main project was the acoustic characterization of a thruster on a test stand in the lab tank: I planned the measurements, ran them, and analyzed the recordings. I also worked with the team's underwater network simulation tools.
 
 ## What I can share
 
