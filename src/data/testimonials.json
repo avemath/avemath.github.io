@@ -12,5 +12,21 @@
     "name": "Dr. Adrian Stein",
     "title": "Assistant Professor, LSU Mechanical and Industrial Engineering",
     "context": "RAMpage senior design advisor"
+  },
+  {
+    "approved": false,
+    "project": "petro-land-ventures",
+    "quote": "Avery built us a site that speaks to oil companies and landowners at the same time, and I can update it myself without calling her.",
+    "name": "Rickey",
+    "title": "Petro Land Ventures",
+    "context": "plvinc.com"
+  },
+  {
+    "approved": false,
+    "project": "grace-mae-alterations",
+    "quote": "Brides come in already knowing what a bustle is, and the inquiry forms arrive with everything I need to give a quote.",
+    "name": "Grace",
+    "title": "Grace Mae Alterations",
+    "context": "gracemaealterations.com"
   }
 ]

@@ -6,7 +6,7 @@ import testimonials from '@/data/testimonials.json';
 const projects = await getProjects();
 const onHome = Astro.url.pathname === '/';
 // The Recommendations section only renders once a quote is approved (see Testimonials.astro).
-const hasRecommendations = testimonials.some((t) => t.approved);
+const hasRecommendations = testimonials.some((t) => t.approved && !('project' in t));
 
 type Item = { id: string; group: string; label: string; hint?: string; href?: string; action?: string; keywords?: string };
 

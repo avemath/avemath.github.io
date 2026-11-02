@@ -258,10 +258,8 @@ The spectrogram hero and its How it works walkthrough (`tx-raster.ts`, `tx-signa
 
 ### Placeholders for Ave (`grep -rn "TODO(ave)" src`)
 
-- `[LOCATION OR REMOTE]` in the Open to column: `src/components/StatusStrip.astro`.
-- `[ONE SENTENCE ON YOUR SLICE OF THE PROBLEM, IN YOUR WORDS]` on the research page: `src/pages/research.astro`.
 - The LED clip: "Play the clip" plays the firmware demo's generated track; swap in a recording if you want one: `src/scripts/fig/matrix.ts`.
-- Client quotes on the website cards: `src/components/WebsitesShowcase.astro`.
+- Client quotes: drafts for Rickey (PLV) and Grace (Grace Mae) are in `src/data/testimonials.json` with `"approved": false`. Each shows on its site card once the owner okays the wording and it is set to true.
 - The pool alarm name: the NAME comments in `src/pages/research.astro` and `acoustic-pool-alarm.md`.
 
 ### Copy that differs from the mockups, and why
@@ -271,7 +269,7 @@ The spectrogram hero and its How it works walkthrough (`tx-raster.ts`, `tx-signa
 - The pool alarm says it is at the prior-work and planning stage, as `acoustic-pool-alarm.md` does, instead of "the signal chain, a recording rig, and a dataset".
 - The field notes are the six existing ones from `facts.json`.
 - Skills are the full two groups from `skills.json`, one line per area, so they match the résumé.
-- The footer email is still the one in `site.json`.
+- The footer email is the personal one in `site.json`, by Ave's choice.
 
 ### Checks
 

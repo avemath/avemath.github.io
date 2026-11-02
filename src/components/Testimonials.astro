@@ -2,7 +2,8 @@
 import testimonials from '@/data/testimonials.json';
 
 // Only quotes their writers have approved are rendered (see docs/CONTENT-GUIDE.md).
-const quotes = testimonials.filter((t) => t.approved);
+// Client quotes (those with a `project`) show on that site's card on the home page instead.
+const quotes = testimonials.filter((t) => t.approved && !('project' in t));
 ---
 
 {
