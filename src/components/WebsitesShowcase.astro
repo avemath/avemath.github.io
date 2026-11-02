@@ -109,7 +109,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                   </div>
                   <div class="site__links mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
                     <a class="btn btn--small" href={projectHref(p)}>
-                      Read the case study <Icon name="arrow-right" />
+                      Case study <Icon name="arrow-right" />
                     </a>
                     <a class="link inline-flex items-center gap-1 text-sm" href={p.data.links.live}>
                       {p.data.linkLabel ?? `Visit ${new URL(p.data.links.live!).host}`} <Icon name="arrow-up-right" class="h-[0.9em] w-[0.9em]" />
