@@ -1,5 +1,4 @@
 ---
-# TODO(ave): say what fixed the mobile score, if anything specific did. The repo has no performance change after the old 75 to 82 note was written.
 title: Grace Mae Alterations
 short: gracemaealterations.com
 type: client-site
