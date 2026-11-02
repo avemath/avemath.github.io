@@ -417,3 +417,7 @@ The LED matrix's resting frame (9 s of the firmware run on the clip) and the V2V
 - Website scores: re-measured by Ave on PageSpeed Insights on 2026-11-01 (mobile performance and accessibility: Because of ADAM 100, 100; PLV 98, 100; Grace Mae 98, 100; Nicholas 97, 100). Page weights are from local Lighthouse runs that day.
 - `liveSince` is confirmed by Ave: Grace Mae Apr 2026, PLV Jun 2026, Because of ADAM Sep 2026, Nicholas Oct 2026.
 - The RAMpage plumbing TODO is cleared. Cylinder bore and stroke are still not stated; the drawing does not need them.
+
+### Websites showcase layout
+
+The site rows are media 7 columns, words 5, with both halves centered and the sides alternating. The browser frame fills its column (56% of the container at 1366 and 1440), keeps 16:10, and the phone overlay stays on its bottom right. The screenshots' `sizes` match the real frame width, so a 2x screen gets the 1440px file. Below 960px the media stacks above the words at the full container width, and "Try it" sits bottom left at every width so it never covers the phone. /work/ shows the same rows in its Websites section (Fig. 11 to 14), with website work that has no live site, the PLV Abstract Builder, as a card after them.

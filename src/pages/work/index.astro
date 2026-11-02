@@ -1,12 +1,19 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import WorkCard from '@/components/WorkCard.astro';
+import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import { getWorkOrder, workSection, workSections } from '@/lib/projects';
 
 const order = await getWorkOrder();
 const sections = workSections.map((s) => ({ ...s, projects: order.filter((p) => workSection(p) === s.id) }));
-// Figure numbers run through the whole page, in order.
+// Figure numbers run through the page, in order. The client sites with a screenshot and a live
+// address show as the same large rows as the home page; any other website work follows as cards.
+const showcased = (p: (typeof order)[number]) => !!(p.data.cover && p.data.links.live && p.data.client?.permission);
+const webStart = order.findIndex((p) => workSection(p) === 'websites') + 1;
+const webRows = order.filter((p) => workSection(p) === 'websites' && showcased(p));
 const figOf = new Map(order.map((p, i) => [p.id, i + 1]));
+let n = webStart + webRows.length;
+for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf.set(p.id, n++);
 ---
 
 <BaseLayout
@@ -44,11 +51,14 @@ const figOf = new Map(order.map((p, i) => [p.id, i + 1]));
             </h2>
             <p class="work-sec__intro">{s.intro}</p>
           </div>
-          <div class="work-grid">
-            {s.projects.map((p) => (
-              <WorkCard project={p} fig={figOf.get(p.id)!} />
-            ))}
-          </div>
+          {s.id === 'websites' && <WebsitesShowcase rowsOnly firstFig={webStart} />}
+          {(s.id === 'websites' ? s.projects.filter((p) => !showcased(p)) : s.projects).length > 0 && (
+            <div class="work-grid">
+              {(s.id === 'websites' ? s.projects.filter((p) => !showcased(p)) : s.projects).map((p) => (
+                <WorkCard project={p} fig={figOf.get(p.id)!} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     ))
