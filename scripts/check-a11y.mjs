@@ -1,7 +1,7 @@
 // Runs axe-core over every built page and fails on any violation.
 // Passes: dark and light at desktop width, dark and light at phone width. On the phone passes the
 // menu is opened and scanned too, the field notes are scanned in their masked state, and the figure
-// cards in their How it works and Code views, so those states are covered as well as the
+// cards in their Drawing, How it works and Code views, so those states are covered as well as the
 // server-rendered page.
 // Pages load with reduced motion so scroll reveals do not hide content from the scan, and nothing
 // off this machine (the analytics beacon, for one) is requested.
@@ -81,8 +81,15 @@ for (const pass of PASSES) {
     });
     if (masked) await scan(page, `${pass.name}, field notes masked  ${path}`);
 
-    // Figure cards show the Live view first; the How it works and Code views are scanned too.
-    for (const view of ['how', 'code']) {
+    // Figure cards show the Live view first; the Drawing, How it works and Code views are scanned
+    // too, and so are the second tabs of the small tabbed figures.
+    const smallTabs = await page.evaluate(() => {
+      const tabs = document.querySelectorAll('[data-tabs] [role="tab"]:last-child');
+      tabs.forEach((t) => t.click());
+      return tabs.length > 0;
+    });
+    if (smallTabs) await scan(page, `${pass.name}, small figure tabs  ${path}`);
+    for (const view of ['drawing', 'how', 'code']) {
       const opened = await page.evaluate((v) => {
         const tabs = document.querySelectorAll(`[data-fc] [role="tab"][data-view="${v}"]`);
         tabs.forEach((t) => t.click());

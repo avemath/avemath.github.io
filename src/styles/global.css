@@ -156,6 +156,7 @@
   --surface: var(--navy-2);
   --surface-2: var(--navy-3);
   --text: var(--on-navy);
+  --bg-contrast: var(--navy);
   --text-soft: var(--on-navy-soft);
   --muted: var(--on-navy-muted);
   --line: var(--on-navy-line);
