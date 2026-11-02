@@ -19,7 +19,7 @@ links:
 metrics:
   - { label: Message size, value: "10 bytes" }
   - { label: Data subcarriers, value: "48" }
-  - { label: "Over-the-air runs, all at BER 0", value: "5" }
+  - { label: "Runs on the radios, all at BER 0", value: "5" }
   - { label: Time to collision in the test scenario, value: "4.0 s" }
 demo: ofdm
 ---
