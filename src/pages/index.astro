@@ -80,8 +80,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <CodeHow slot="how" excerpt={picoHow} file="pico_direct.py" url={`${RAMPAGE}#L${picoHow.from}-L${picoHow.from + 44}`} notes={picoNotes} />
           <CodeFile
             slot="code"
-            source={pico}
-            lang="py"
+            code="pico-direct"
             file="pico_direct.py"
             url={RAMPAGE}
             note="The Pico W firmware as it ran on the robot, vendored unmodified. The figure runs src/lib/rampage-firmware.ts, a line for line port of it."
@@ -105,8 +104,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <CodeHow slot="how" excerpt={rxHow} file="src/lib/ofdm-rx.ts" url={`${SELF}/src/lib/ofdm-rx.ts#L${rxHow.from}`} notes={rxNotes} />
           <CodeFile
             slot="code"
-            source={ofdmRx}
-            lang="ts"
+            code="ofdm-rx"
             file="src/lib/ofdm-rx.ts"
             url={`${SELF}/src/lib/ofdm-rx.ts`}
             note="The receiver from V2V_TXRXf.m (github.com/avemath/v2v-bsm-ofdm), ported to run in the browser. The figure runs this file."
@@ -130,8 +128,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <CodeHow slot="how" excerpt={ledHow} file="src/lib/led-firmware.ts" url={`${SELF}/src/lib/led-firmware.ts#L${ledHow.from}`} notes={ledNotes} />
           <CodeFile
             slot="code"
-            source={ledFw}
-            lang="ts"
+            code="led-firmware"
             file="src/lib/led-firmware.ts"
             url={`${SELF}/src/lib/led-firmware.ts`}
             note="The ESP32 firmware (github.com/avemath/led-audio-spectrum), ported to the browser. The figure runs this file."
