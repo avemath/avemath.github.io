@@ -7,15 +7,19 @@ import Icon from './Icon.astro';
 import AdamLive from './live/AdamLive.astro';
 import GraceLive from './live/GraceLive.astro';
 import { getProjects, isWebsite, projectHref } from '@/lib/projects';
-import testimonials from '@/data/testimonials.json';
+import sitesData from '@/data/sites.json';
 
 const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live && p.data.client?.permission);
 const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
 // The kind of client, short: the part of the kind line before the place.
 const kindOf = (kind = '') => kind.split(',')[0].replace(/^./, (c) => c.toLowerCase());
-// A client's quote shows on their card once its owner has okayed the wording ("approved" in
-// src/data/testimonials.json).
-const quoteFor = (id: string) => testimonials.find((t) => 'project' in t && t.project === id && t.approved);
+// Each card's label row and quote come from src/data/sites.json: the site's mobile performance
+// score and the owner's quote, shown only when filled. Figures are numbered after the skills
+// matrix (Fig. 06).
+// TODO(ave): re-measure. The scores are Lighthouse mobile runs from 2026-11-01, made locally
+// because the PageSpeed Insights API was over its daily quota; refresh them on pagespeed.web.dev.
+const FIRST_FIG = 7;
+const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 ---
 
 <section id="websites" class="section web" aria-labelledby="websites-title">
@@ -30,11 +34,20 @@ const quoteFor = (id: string) => testimonials.find((t) => 'project' in t && t.pr
 
     <ul class="sites">
       {
-        sites.map((p) => {
+        sites.map((p, i) => {
           const Live = live[p.id];
+          const data = siteData(p.id);
           return (
             <li class="site" data-live-host={Live ? '' : undefined}>
-              <div class="site__media">
+              <div class="site__media paper">
+                <div class="fig__bar site__bar">
+                  <p class="fig__label">Fig. {String(FIRST_FIG + i).padStart(2, '0')} / {new URL(p.data.links.live!).host}</p>
+                  {data?.pagespeedMobile && (
+                    <p class="fig__label">
+                      Mobile performance <strong class="site__score">{data.pagespeedMobile}</strong>
+                    </p>
+                  )}
+                </div>
                 <BrowserFrame
                   src={p.data.cover!}
                   alt={p.data.coverAlt ?? ''}
@@ -53,19 +66,12 @@ const quoteFor = (id: string) => testimonials.find((t) => 'project' in t && t.pr
                 <p class="site__kind">{kindOf(p.data.client?.kind)}</p>
               </div>
               <p class="site__summary">{p.data.summary}</p>
-              {(() => {
-                const q = quoteFor(p.id);
-                return (
-                  q && (
-                    <figure class="site__quote">
-                      <blockquote>{q.quote}</blockquote>
-                      <figcaption>
-                        {q.name}, {q.title}
-                      </figcaption>
-                    </figure>
-                  )
-                );
-              })()}
+              {data?.quote && (
+                <figure class="site__quote">
+                  <blockquote>{data.quote}</blockquote>
+                  <figcaption>{data.quoteBy}</figcaption>
+                </figure>
+              )}
               <p class="site__links">
                 <a class="link" href={projectHref(p)}>
                   Case study
@@ -132,11 +138,24 @@ const quoteFor = (id: string) => testimonials.find((t) => 'project' in t && t.pr
     min-width: 0;
   }
 
-  /* The browser frame becomes a paper card: square, a 1px border, the soft shadow. */
+  /* The browser frame sits inside a paper card, under the figure's label row. */
   .site__media :global(.frame__window) {
+    border: 0;
     border-radius: 0;
-    border-color: var(--line);
-    box-shadow: var(--shadow);
+    box-shadow: none;
+  }
+
+  .site__media :global(.frame) {
+    margin: 0;
+  }
+
+  .site__bar {
+    min-height: 2.75rem;
+  }
+
+  .site__score {
+    color: var(--text);
+    font-weight: 700;
   }
 
   .site__row {

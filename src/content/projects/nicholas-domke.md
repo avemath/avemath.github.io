@@ -14,7 +14,7 @@ keywords: ["mechanical engineering", "portfolio", "three.js", "CAD", "dot matrix
 stack: [HTML, CSS, JavaScript, three.js, GitHub Pages]
 links:
   # Once the repo moves to Nicholas's GitHub, update the live link; the label can stay.
-  live: https://avemath.github.io/nmdomke/
+  live: https://nmdomke.github.io/
 linkLabel: Visit Nicholas's site
 cover: ../../assets/projects/nicholas-domke/desktop.png
 mobile: ../../assets/projects/nicholas-domke/mobile.png
