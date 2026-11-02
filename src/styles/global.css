@@ -273,7 +273,7 @@
 @layer components {
   .section-lede {
     margin-top: 1rem;
-    max-width: 40rem;
+    max-width: 28em;
     color: var(--text-soft);
     font-size: 1.0625rem;
   }
@@ -817,6 +817,11 @@
 
 .prose > * + * {
   margin-top: 1.15em;
+}
+
+/* Reading lines stay near 70 characters; figures and tables keep the whole column. */
+.prose > :is(p, ul, ol, blockquote, h2, h3):not(:has(> img)) {
+  max-width: 30em;
 }
 
 .prose h2 {
