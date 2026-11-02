@@ -144,8 +144,8 @@ const { empty = false } = Astro.props;
     bottom: 0.85rem;
   }
 
-  /* Touch screens have no cursors to move. */
-  @media (hover: none) {
+  /* Touch screens have no cursors to move, and a narrow screen has no room beside Hear it. */
+  @media (hover: none), (max-width: 520px) {
     .sig__hint {
       visibility: hidden;
     }
