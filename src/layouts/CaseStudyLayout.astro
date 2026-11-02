@@ -647,6 +647,12 @@ const jsonLd = [
     background: #05070c;
   }
 
+  /* The frame clips anything outside it, so a video's focus ring sits inside its edge. */
+  .shot__img :global(video:focus-visible) {
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
+  }
+
   .shot__link {
     position: relative;
     display: block;
