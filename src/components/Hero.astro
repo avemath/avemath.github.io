@@ -34,8 +34,14 @@ import { F_HIGH, F_LOW, PAIRS } from '@/lib/fhbfsk';
       </div>
       <p class="sr-only" aria-live="polite" data-sig-live></p>
       <figcaption class="sig__note">
-        {DURATION_MS} ms on air, played ten times slower so you can hear every hop. The band, the {PAIRS} tone pairs and the chip length
-        are JANUS; the hop order is my own.
+        <span class="sig__plain">
+          This is the preamble an underwater modem sends before it talks.
+          <span class="sig__do sig__do--mouse">Move your mouse to read it.</span><span class="sig__do sig__do--touch">Tap Hear it to listen.</span>
+        </span>
+        <span class="sig__tech">
+          {DURATION_MS} ms on air, played ten times slower. The band, the {PAIRS} tone pairs and the chip length follow JANUS, the NATO
+          standard for underwater modems; the hop order is the playground's own.
+        </span>
       </figcaption>
     </figure>
   </div>
@@ -216,9 +222,33 @@ import { F_HIGH, F_LOW, PAIRS } from '@/lib/fhbfsk';
   }
 
   .sig__note {
-    margin-top: 0.6rem;
-    font-size: 0.8125rem;
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
     color: var(--muted);
+  }
+
+  .sig__plain {
+    font-size: 0.9375rem;
+  }
+
+  .sig__tech {
+    font-size: 0.8125rem;
+  }
+
+  /* The second sentence of the caption matches the device: a mouse reads, a finger listens. */
+  .sig__do--touch {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .sig__do--mouse {
+      display: none;
+    }
+
+    .sig__do--touch {
+      display: inline;
+    }
   }
 </style>
 

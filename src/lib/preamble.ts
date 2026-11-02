@@ -1,7 +1,7 @@
 // The hero's signal: a 32-chip FH-BFSK preamble in the JANUS band. The band (9440 to 13600 Hz),
 // the 13 tone pairs and the 6.25 ms chip come from the public JANUS papers, through
-// src/lib/fhbfsk.ts. The real hop pattern and preamble bits are not public, so the hop order is
-// the Signals playground's own (seed 87) and the bits come from the same seeded generator.
+// src/lib/fhbfsk.ts. The hop order is not the standard's: it is the Signals playground's own
+// (seed 87), and the bits come from the same seeded generator.
 // No DOM here, so scripts/check-comms.mjs can test it.
 import { mulberry32 } from './comms.ts';
 import { DF, F_LOW, PAIRS, hopSequence, toneHz } from './fhbfsk.ts';
