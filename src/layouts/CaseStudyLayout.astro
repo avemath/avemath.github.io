@@ -4,7 +4,7 @@ import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import ProjectArt from '@/components/ProjectArt.astro';
 import Icon from '@/components/Icon.astro';
-import { type Project, typeLabels, statusLabels, projectHref } from '@/lib/projects';
+import { type Project, typeLabels, statusLabels, projectHref, workSection } from '@/lib/projects';
 import { formatRange } from '@/lib/format';
 import site from '@/data/site.json';
 
@@ -38,6 +38,9 @@ for (const [i, g] of (d.gallery ?? []).entries()) {
   if (!('video' in g)) fullSize.set(i, (await getImage({ src: g.src, format: 'webp', quality: 85 })).src);
 }
 const ogImage = `/og/${project.id}.png`;
+// The nav marks Projects for engineering, Websites for sites and Research for research.
+const sec = workSection(project);
+const navSection = sec === 'engineering' ? 'projects' : sec;
 // Three gentle bands, one step apart, starting where this kind of work lives (see depth.ts).
 
 const jsonLd = [
@@ -63,15 +66,24 @@ const jsonLd = [
 ];
 ---
 
-<BaseLayout title={d.seoTitle ?? d.title} description={d.seoDescription ?? d.summary} image={ogImage} type="article" jsonLd={jsonLd}>
+<BaseLayout
+  title={d.seoTitle ?? d.title}
+  description={d.seoDescription ?? d.summary}
+  image={ogImage}
+  type="article"
+  jsonLd={jsonLd}
+  section={navSection}
+>
   <article class="case descent">
     <div class="case__zone case__zone--top">
     <header class="case__head">
       <div class="wrap">
-        <nav aria-label="Breadcrumb" class="no-print">
-          <a href="/work/" class="back link">
-            <Icon name="arrow-left" class="h-4 w-4" /> All work
-          </a>
+        <nav aria-label="Breadcrumb" class="crumbs no-print">
+          <ol>
+            <li><a href="/work/" class="link">Work</a></li>
+            <li><a href={`/work/#${sec}`} class="link">{sec === 'websites' ? 'Websites' : sec === 'research' ? 'Research' : 'Engineering'}</a></li>
+            <li aria-current="page">{d.title}</li>
+          </ol>
         </nav>
 
         <div class="case__intro">
@@ -245,6 +257,7 @@ const jsonLd = [
       )
     }
 
+    <p class="wrap case__all no-print"><a class="link" href="/work/"><Icon name="arrow-left" class="inline h-4 w-4" /> Back to all work</a></p>
     <nav class="wrap case__pager no-print" aria-label="More projects">
       {
         prev ? (
@@ -310,6 +323,35 @@ const jsonLd = [
 
   .case__head {
     padding-block: clamp(2rem, 5vw, 3.5rem) clamp(2rem, 4vw, 3rem);
+  }
+
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: 0.5rem;
+    color: var(--muted);
+  }
+
+  .crumbs a {
+    display: inline-block;
+    padding-block: 0.3rem;
+  }
+
+  .crumbs [aria-current] {
+    padding-block: 0.3rem;
+    color: var(--text);
+  }
+
+  .case__all {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    font-size: 0.9375rem;
   }
 
   .back {

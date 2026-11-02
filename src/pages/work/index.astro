@@ -1,62 +1,87 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import ProjectTile from '@/components/ProjectTile.astro';
-import { getProjects, typeLabels, allTags } from '@/lib/projects';
-import { projectTypes } from '@/content.config';
+import WorkCard from '@/components/WorkCard.astro';
+import { getWorkOrder, workSection, workSections } from '@/lib/projects';
 
-const projects = await getProjects();
-const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p) => allTags(p).includes(t)).length]));
+const order = await getWorkOrder();
+const sections = workSections.map((s) => ({ ...s, projects: order.filter((p) => workSection(p) === s.id) }));
+// Figure numbers run through the whole page, in order.
+const figOf = new Map(order.map((p, i) => [p.id, i + 1]));
 ---
 
 <BaseLayout
   title="Work"
-  description="Research, engineering, software and client websites by Avery Matherne, each with a case study on what I did and how."
+  description="Engineering, research and client websites by Avery Matherne, each with a case study on what I did and how."
+  section="projects"
 >
-  <section class="section pb-10">
+  <section class="section work-head" id="all">
     <div class="wrap">
-      <p class="eyebrow">Work</p>
-      <h1 class="section-title" style="font-size: clamp(2.5rem, 6vw, 4.5rem)">Everything I've built since 2024</h1>
+      <h1 class="section-title work-head__title">All work</h1>
       <p class="section-lede">
-        {projects.length} projects across research, hardware, software and live client sites. Filter by type, or open any card for the
-        full case study.
+        {order.length} projects: the engineering and research first, then the websites. Every card opens a case study with what I did and
+        how.
       </p>
-
-      <div class="filters" role="group" aria-label="Filter projects by type" data-filters>
-        <button type="button" class="filter" aria-pressed="true" data-filter="all">
-          All <span class="filter__n">{projects.length}</span>
-        </button>
+      <nav class="filters" aria-label="Jump to a kind of work">
+        <a class="filter" href="#all">All <span class="filter__n">{order.length}</span></a>
         {
-          projectTypes.map((t) => (
-            <button type="button" class="filter" aria-pressed="false" data-filter={t}>
-              {typeLabels[t]} <span class="filter__n">{counts[t]}</span>
-            </button>
+          [sections[0], sections[2], sections[1]].map((s) => (
+            <a class="filter" href={`#${s.id}`}>
+              {s.label} <span class="filter__n">{s.projects.length}</span>
+            </a>
           ))
         }
-      </div>
-      <p class="sr-only" aria-live="polite" data-filter-status></p>
+      </nav>
     </div>
   </section>
 
-  <section class="pb-16 pt-12 md:pb-24" aria-label="Projects">
-    <div class="wrap">
-      <div class="work-grid" data-work-grid>
-        {projects.map((p, i) => <ProjectTile project={p} headingLevel="h2" eager={i < 2} />)}
-      </div>
+  {
+    sections.map((s) => (
+      <section id={s.id} class="section work-sec" aria-labelledby={`${s.id}-title`}>
+        <div class="wrap">
+          <div class="work-sec__head">
+            <h2 id={`${s.id}-title`} class="section-title section-title--sm" data-decode>
+              {s.label}
+            </h2>
+            <p class="work-sec__intro">{s.intro}</p>
+          </div>
+          <div class="work-grid">
+            {s.projects.map((p) => (
+              <WorkCard project={p} fig={figOf.get(p.id)!} />
+            ))}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section section--tight">
+    <div class="wrap work-end">
+      <p>Want the story behind the work, or to see the research underwater?</p>
+      <p class="work-end__links">
+        <a class="btn" href="/research/">The research page</a>
+        <a class="link" href="/about/">About me</a>
+        <a class="link" href="/contact/">Get in touch</a>
+      </p>
     </div>
   </section>
 </BaseLayout>
 
 <style>
+  .work-head {
+    padding-bottom: 1.5rem;
+  }
+
+  .work-head__title {
+    margin-top: 0;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  /* Plain anchors: they work with no script at all. */
   .filters {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 2rem;
-  }
-
-  /* Space is reserved before JS runs so the grid never jumps. */
-  .filters:not([data-ready]) {
-    visibility: hidden;
+    margin-top: 1.75rem;
   }
 
   .filter {
@@ -69,84 +94,63 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
     background: var(--surface);
     color: var(--text);
     font-size: 0.92rem;
-    cursor: pointer;
-    transition:
-      border-color 0.2s,
-      background-color 0.2s,
-      color 0.2s;
+    font-weight: 600;
+    text-decoration: none;
   }
 
   .filter:hover {
     border-color: var(--text);
   }
 
-  .filter[aria-pressed='true'] {
-    border-color: var(--text);
-    background: var(--text);
-    color: var(--bg-contrast);
-    font-weight: 700;
-  }
-
   .filter__n {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  .work-sec {
+    scroll-margin-top: 4rem;
+  }
+
+  .work-sec__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--text);
+  }
+
+  .work-sec__head .section-title {
+    margin-top: 0;
+  }
+
+  .work-sec__intro {
+    max-width: 30rem;
+    color: var(--muted);
   }
 
   .work-grid {
     display: grid;
-    gap: 1.1rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
   }
 
-  .work-grid > :global(.tile[hidden]) {
-    display: none;
+  .work-end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    color: var(--text-soft);
   }
 
-  /* A row of three that ends on one tile closes with a wide row instead of an orphan.
-     Before JavaScript runs the nth-child rule covers the unfiltered grid; after, the script
-     marks the last visible tile so filtered views behave the same. */
-  @media (min-width: 1100px) {
-    .work-grid > :global(.tile[data-orphan]),
-    .work-grid:not([data-ready]) > :global(.tile:nth-child(3n + 1):last-child) {
-      grid-column: 1 / -1;
-    }
+  .work-end__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
   }
 </style>
-
-<script>
-  const wrap = document.querySelector<HTMLElement>('[data-filters]')!;
-  const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('[data-filter]')];
-  const grid = document.querySelector<HTMLElement>('[data-work-grid]')!;
-  const tiles = [...grid.querySelectorAll<HTMLElement>(':scope > .tile')];
-  const status = document.querySelector<HTMLElement>('[data-filter-status]')!;
-  wrap.dataset.ready = '';
-
-  // A three-column row that ends on one tile gets a wide closing row (see the styles above).
-  function markOrphan() {
-    const visible = tiles.filter((t) => !t.hidden);
-    tiles.forEach((t) => t.removeAttribute('data-orphan'));
-    if (visible.length % 3 === 1) visible[visible.length - 1]?.setAttribute('data-orphan', '');
-    grid.dataset.ready = '';
-  }
-
-  function apply(type: string, announce = true) {
-    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === type)));
-    let shown = 0;
-    tiles.forEach((t) => {
-      const match = type === 'all' || (t.dataset.tags ?? '').split(' ').includes(type);
-      t.hidden = !match;
-      if (match) shown++;
-    });
-    markOrphan();
-    if (announce) status.textContent = `Showing ${shown} project${shown === 1 ? '' : 's'}.`;
-    const url = new URL(location.href);
-    if (type === 'all') url.searchParams.delete('type');
-    else url.searchParams.set('type', type);
-    history.replaceState(null, '', url);
-  }
-
-  buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter!)));
-  const initial = new URLSearchParams(location.search).get('type');
-  if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial, false);
-  else markOrphan();
-</script>

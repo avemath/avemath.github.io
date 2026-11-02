@@ -4,6 +4,7 @@
 // each valve open (high) or closed (low); both valves are active low on the board, and the main
 // valve rests open as an exhaust. "Fire the plow" runs src/lib/rampage-firmware.ts, the line for
 // line port of pico_direct.py, so the cooldown, the air budget and the lockout are the firmware's.
+import RampagePneumatics from '../drawings/RampagePneumatics.astro';
 import { LOOP_MS, MAX_WEAPON_ACTIVATIONS, SOLENOID_ACTIVATION_TIME, SOLENOID_SEQUENCE_DELAY } from '@/lib/rampage-firmware';
 
 const X0 = 150;
@@ -60,6 +61,8 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
 ---
 
 <div class="tf" data-tf>
+  <div class="tf__wrap">
+  <div class="tf__pn"><RampagePneumatics /></div>
   <div class="tf__plot" data-draw>
     <svg viewBox="0 0 640 262" class="tf__svg" role="group" aria-label="Timing diagram of one plow strike. Tab to each trace to read it.">
       <defs>
@@ -92,6 +95,7 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
         <text class="tf__name" x="0" y="208">air budget</text>
         {cells.map((cx, i) => <rect class="tf__cell" x={cx + 1.5} y="196" width={cellW - 3} height="14" data-cell={i} />)}
       </g>
+      <line class="tf__head" x1={X0} x2={X0} y1="16" y2="228" data-tf-head data-x0={X0} data-x1={X1} data-span={SPAN} aria-hidden="true" />
       <g aria-hidden="true" class="tf__callouts">
         <circle cx={x(t0) + (x(closeMain) - x(t0)) / 2} cy="66" r="9" /><text x={x(t0) + (x(closeMain) - x(t0)) / 2} y="70">1</text>
         <circle cx={x(openPiston) + (x(done) - x(openPiston)) / 2} cy="118" r="9" /><text x={x(openPiston) + (x(done) - x(openPiston)) / 2} y="122">2</text>
@@ -100,11 +104,13 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     </svg>
     <p class="tf__tip mono" data-tf-tip aria-hidden="true"></p>
   </div>
+  </div>
   <div class="fig__note tf__legend">
     <p>
       <span class="tf__k">1</span> fill {SOLENOID_SEQUENCE_DELAY} ms
       <span class="tf__k">2</span> extend {SOLENOID_ACTIVATION_TIME} ms
       <span class="tf__k">3</span> <span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} shots used
+      <span class="tf__slow">· played 4x slower than real</span>
     </p>
     <p class="tf__state" aria-live="polite"><span class="sr-only">Firmware: </span><span data-tf-state>Armed</span></p>
   </div>
@@ -112,6 +118,44 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
 </div>
 
 <style>
+  /* The drawing and the timing rows side by side when there is room, stacked when not. */
+  .tf {
+    container-type: inline-size;
+  }
+
+  .tf__wrap {
+    display: grid;
+    align-items: center;
+  }
+
+  .tf__pn {
+    padding: 1rem 1rem 0;
+  }
+
+  @container (min-width: 760px) {
+    .tf__wrap {
+      grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+    }
+
+    .tf__pn {
+      padding: 1rem 0 1rem 1rem;
+    }
+  }
+
+  .tf__head {
+    stroke: var(--accent);
+    stroke-width: 2;
+    opacity: 0;
+  }
+
+  .tf[data-running] .tf__head {
+    opacity: 1;
+  }
+
+  .tf__slow {
+    color: var(--muted);
+  }
+
   .tf__plot {
     position: relative;
     padding: 1rem 1rem 0.25rem;

@@ -1,27 +1,30 @@
 ---
-// The Code tab: the whole file, line by line, with a link to it on GitHub.
-import { whole, type Lang } from '@/lib/excerpt';
+// The Code tab: the whole file, line by line, with a link to it on GitHub. The lines come from
+// /code/<key>.json (src/pages/code), fetched the first time the tab opens, so the page itself
+// stays light. The GitHub link works without any of that.
+import { codeFiles } from '@/lib/code-files';
+import { whole } from '@/lib/excerpt';
 
 interface Props {
-  source: string;
-  lang: Lang;
+  /** Which file: a key of codeFiles in src/lib/code-files.ts. */
+  code: string;
   file: string;
   url: string;
   /** Where the file comes from, when it is a port or a vendored copy. */
   note?: string;
 }
 
-const { source, lang, file, url, note } = Astro.props;
-const lines = whole(source, lang);
+const { code, file, url, note } = Astro.props;
+const count = whole(codeFiles[code].source, codeFiles[code].lang).length;
 ---
 
-<div class="cfile">
+<div class="cfile" data-cfile={`/code/${code}.json`}>
   <div class="cfile__top">
-    <p class="mono cfile__name">{file} · {lines.length} lines</p>
+    <p class="mono cfile__name">{file} · {count} lines</p>
     <a class="link cfile__gh" href={url}>View on GitHub</a>
   </div>
   {note && <p class="cfile__note">{note}</p>}
-  <pre class="code cfile__code" tabindex="0" aria-label={`The whole of ${file}`}><code class="code__inner">{lines.map((l) => <span class="code__line" data-n={l.n}><span class="code__txt" set:html={l.html} /></span>)}</code></pre>
+  <pre class="code cfile__code" tabindex="0" aria-label={`The whole of ${file}`}><code class="code__inner" data-cfile-lines><span class="cfile__wait">Loading the file.</span></code></pre>
 </div>
 
 <style>
@@ -54,7 +57,31 @@ const lines = whole(source, lang);
   }
 
   .cfile__code {
-    max-height: 32rem;
+    height: 32rem;
     border: 1px solid var(--line);
   }
+
+  .cfile__wait {
+    padding: 0 1rem;
+    color: var(--code-comment);
+  }
 </style>
+
+<script>
+  // Fetch a file's lines the first time its panel is on screen (the tab has opened).
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      io.unobserve(e.target);
+      const box = e.target as HTMLElement;
+      const target = box.querySelector<HTMLElement>('[data-cfile-lines]')!;
+      fetch(box.dataset.cfile!)
+        .then((r) => r.json())
+        .then(({ lines }: { lines: { n: number; html: string }[] }) => {
+          target.innerHTML = lines.map((l) => `<span class="code__line" data-n="${l.n}"><span class="code__txt">${l.html}</span></span>`).join('');
+        })
+        .catch(() => (target.textContent = 'The file did not load. Open it on GitHub instead.'));
+    }
+  });
+  document.querySelectorAll('[data-cfile]').forEach((el) => io.observe(el));
+</script>

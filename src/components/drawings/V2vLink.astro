@@ -1,0 +1,97 @@
+---
+// The V2V link as built, from the repo's README and V2V_TXRXf.m: two simulated cars, one Pluto
+// transmitting both cars' packets back to back (Car 2, then Car 1) and one Pluto receiving, at
+// 2.9 GHz and 10 MHz. Each packet is an RRC sync preamble (63 symbols), a 256-symbol training
+// sequence, one OFDM preamble symbol, four OFDM data symbols and a 50 us guard. The receiver
+// finds, corrects and decodes both, then computes time to collision.
+import Drawing from './Drawing.astro';
+
+const chain = ['detect', 'timing', 'CFO', 'Costas', 'FFT', 'MMSE', 'Viterbi', 'BSM'];
+// Packet segments, widths only roughly in proportion: the preamble and training are long.
+const seg = [
+  { w: 46, label: 'sync', hot: true },
+  { w: 74, label: 'training', hot: true },
+  { w: 22, label: 'pre', hot: false },
+  { w: 58, label: 'data', hot: false },
+  { w: 10, label: '', hot: false },
+];
+---
+
+<Drawing
+  title="V2V: two simulated cars, one radio link"
+  label="One ADALM-PLUTO radio sends both cars' safety messages, Car 2 then Car 1, across a 2.9 GHz link to a second radio, whose receiver finds, corrects and decodes them and computes time to collision."
+  viewBox="0 0 640 330"
+  legend={[
+    'Each packet opens with a known preamble: 63 RRC-shaped symbols to find it, then 256 training symbols to lock phase.',
+    'CFO: the receiver measures the carrier frequency offset between the two radios from the preamble and removes it.',
+    'Time to collision: gap over closing speed from the two decoded messages. 20 m at 5 m/s is 4 s, under the 5 s limit, so it warns.',
+  ]}
+  note="The cars are simulated; one radio carries both of their messages. The RF path was a short coax or an antenna pair; the repo does not say which."
+>
+  <rect class="s f" pathLength="1" x="16" y="20" width="96" height="34"></rect>
+  <text class="t" x="26" y="42">Car 1 BSM</text>
+  <rect class="s f" pathLength="1" x="16" y="66" width="96" height="34"></rect>
+  <text class="t" x="26" y="88">Car 2 BSM</text>
+  <path class="s" pathLength="1" d="M112 37 H140 V60 M112 83 H140 V60 H160"></path>
+
+  <rect class="s f" pathLength="1" x="160" y="36" width="120" height="48"></rect>
+  <text class="t" x="172" y="57">Pluto TX</text>
+  <text class="t t--mono t--muted" x="172" y="73">usb:0</text>
+
+  <path class="s s--hot" pathLength="1" d="M280 60 H330"></path>
+  <path class="s s--hot" pathLength="1" d="M336 46 Q344 60 336 74 M348 40 Q360 60 348 80 M360 46 Q368 60 360 74"></path>
+  <path class="s s--hot" pathLength="1" d="M370 60 H420"></path>
+  <text class="t t--mono t--hot" x="300" y="100">2.9 GHz, 10 MHz</text>
+
+  <rect class="s f" pathLength="1" x="420" y="36" width="120" height="48"></rect>
+  <text class="t" x="432" y="57">Pluto RX</text>
+  <text class="t t--mono t--muted" x="432" y="73">usb:1</text>
+
+  <text class="t t--muted" x="16" y="142">One transmission: Car 2's packet, then Car 1's (sync, training, OFDM preamble, 4 data symbols)</text>
+  {
+    [0, 1].map((k) => {
+      let x = 16 + k * 214;
+      return (
+        <g>
+          {seg.map((s) => {
+            const r = (
+              <g>
+                <rect class:list={['s', s.hot ? 'f--hot' : 'f']} pathLength="1" x={x} y="152" width={s.w} height="24" />
+                {s.label && (
+                  <text class="t t--mono t--muted" x={x + 3} y="192">
+                    {s.label}
+                  </text>
+                )}
+              </g>
+            );
+            x += s.w;
+            return r;
+          })}
+          <text class="t" x={16 + k * 214} y="210">
+            {k === 0 ? 'Car 2' : 'Car 1'}
+          </text>
+        </g>
+      );
+    })
+  }
+
+  <text class="t t--muted" x="16" y="250">The receiver, stage by stage</text>
+  {
+    chain.map((c, i) => (
+      <g>
+        <rect class="s f" pathLength="1" x={16 + i * 64} y="262" width="54" height="28" />
+        <text class="t" x={43 + i * 64} y="280" text-anchor="middle">
+          {c}
+        </text>
+        {i < chain.length - 1 && <path class="s s--soft" pathLength="1" d={`M${70 + i * 64} 276 H${80 + i * 64}`} />}
+      </g>
+    ))
+  }
+  <path class="s s--hot" pathLength="1" d="M528 276 H548"></path>
+  <rect class="s s--hot f" pathLength="1" x="548" y="262" width="76" height="28"></rect>
+  <text class="t t--hot" x="586" y="280" text-anchor="middle">TTC 4.0 s</text>
+
+  <g class="co"><circle cx="16" cy="152" r="9"></circle><text x="16" y="156">1</text></g>
+  <g class="co"><circle cx="172" cy="262" r="9"></circle><text x="172" y="266">2</text></g>
+  <g class="co"><circle cx="624" cy="262" r="9"></circle><text x="624" y="266">3</text></g>
+</Drawing>

@@ -2,6 +2,8 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DepthGauge from '@/components/DepthGauge.astro';
 import MarginNote from '@/components/MarginNote.astro';
+import BellhopRays from '@/components/drawings/BellhopRays.astro';
+import PoolSide from '@/components/drawings/PoolSide.astro';
 import { rangeLabel, zoneById } from '@/lib/depth';
 import arrivalsData from '@/data/bellhop-arrivals.json';
 
@@ -139,8 +141,12 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
         <figure class="rfig rfig--boxed">
           <div class="fig__bar">
             <p class="fig__label">Fig. R2 / Arrivals, 15 km, sandy bottom</p>
-            <p class="fig__label">draws in on scroll</p>
+            <div class="tabset" role="tablist" aria-label="bellhopSim: views" data-tabs>
+              <button type="button" role="tab" id="r2-tab-live" aria-controls="r2-live" aria-selected="true" tabindex="0">Arrivals</button>
+              <button type="button" role="tab" id="r2-tab-drawing" aria-controls="r2-drawing" aria-selected="false" tabindex="-1">Drawing</button>
+            </div>
           </div>
+          <div id="r2-live" role="tabpanel" aria-labelledby="r2-tab-live">
           <div class="rfig__plot" data-draw>
             <svg viewBox="0 0 600 230" class="arr" role="img" aria-label={`${ch.arrivals.length} arrivals of one ping at 15 km over ${(maxDelay / 1000).toFixed(1)} seconds. ${ch.n_within_20db} are within 20 dB of the strongest, spread over ${Math.round(windowMs)} ms.`}>
               <rect class="arr__win" x={ax(firstStrong)} y={R2.y0 - 6} width={ax(firstStrong + windowMs) - ax(firstStrong)} height={R2.y1 - R2.y0 + 6} />
@@ -157,6 +163,10 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             {ch.arrivals.length} arrivals from BELLHOP: 1000 m of water, source at 50 m, receiver at 100 m, 3.5 kHz. The strongest is in
             orange; {ch.n_within_20db} fall within 20 dB of it.
           </p>
+          </div>
+          <div id="r2-drawing" role="tabpanel" aria-labelledby="r2-tab-drawing" hidden>
+            <BellhopRays />
+          </div>
         </figure>
           <MarginNote where="bellhop" />
         </div>
@@ -172,21 +182,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             <p class="fig__label">Fig. R3 / Pool, side view</p>
             <p class="fig__label">in progress</p>
           </div>
-          <div class="rfig__plot" data-draw>
-            <svg viewBox="0 0 320 170" class="pool" role="img" aria-label="A pool in side view with a hydrophone in each bottom corner and sound from a swimmer at the surface reaching both.">
-              <text class="pool__cap" x="14" y="18">two hydrophones, one swimmer, many echoes</text>
-              <path class="pool__walls" d="M10 30 V160 H310 V30" />
-              <line class="pool__water" x1="10" y1="40" x2="310" y2="40" />
-              <rect class="pool__swimmer" x="154" y="34" width="12" height="22" />
-              <path class="pool__ray" d="M160 58 L22 150" />
-              <path class="pool__ray" d="M160 58 L298 150" />
-              <path class="pool__ray pool__ray--echo" d="M160 58 L120 160 L22 150" />
-              <path class="pool__ray pool__ray--echo" d="M160 58 L310 120 L298 150" />
-              <circle class="pool__hp" cx="22" cy="150" r="5" />
-              <circle class="pool__hp" cx="298" cy="150" r="5" />
-            </svg>
-          </div>
-          <p class="fig__note">A drawing of the plan, not a measurement. Nothing is built yet.</p>
+          <PoolSide />
         </figure>
           <MarginNote where="pool-alarm" />
         </div>
@@ -486,43 +482,6 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     stroke-width: 4;
   }
 
-  /* R3 */
-  .pool__cap {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    fill: var(--on-navy-muted);
-  }
-
-  .pool__walls {
-    fill: none;
-    stroke: var(--on-navy);
-    stroke-width: 1.25;
-  }
-
-  .pool__water {
-    stroke: var(--line-strong);
-    stroke-dasharray: 4 4;
-  }
-
-  .pool__swimmer {
-    fill: none;
-    stroke: var(--on-navy);
-  }
-
-  .pool__ray {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 1;
-  }
-
-  .pool__ray--echo {
-    stroke-opacity: 0.45;
-    stroke-dasharray: 3 3;
-  }
-
-  .pool__hp {
-    fill: var(--accent);
-  }
 </style>
 
 <script>

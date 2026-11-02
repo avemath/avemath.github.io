@@ -200,44 +200,94 @@ export function mountSignalPanel(fig: HTMLElement) {
   });
 
   // ---- Sound: the preamble, ten times slower, from chip 0. Nothing plays until pressed. ----
+  // The AudioContext is made on the first press and resumed before anything is scheduled. Some
+  // systems report "running" before the output device has started and then jump the clock
+  // forward, which used to skip the first chips, so playback waits until the clock is visibly
+  // ticking. Each chip is its own source, scheduled from one start time taken after that wait.
   let audio: AudioContext | null = null;
-  let src: AudioBufferSourceNode | null = null;
+  let sources: AudioBufferSourceNode[] = [];
   let raf = 0;
+  let run = 0;
+  const chipS = (CHIP_MS * LISTEN_STRETCH) / 1000;
+  const setLabel = (text: string) => playLabel && (playLabel.textContent = text);
+
   const stop = () => {
-    try {
-      src?.stop();
-    } catch {
-      // Already finished.
+    run++;
+    for (const s of sources) {
+      try {
+        s.stop();
+      } catch {
+        // Not started yet, or already finished.
+      }
     }
-    src = null;
+    sources = [];
     cancelAnimationFrame(raf);
     playing = -1;
     play?.style.setProperty('--p', '0');
     play?.setAttribute('aria-pressed', 'false');
-    if (playLabel) playLabel.textContent = 'Hear it, 2 s';
+    if (play) play.disabled = false;
+    setLabel('Hear it, 2 s');
     draw();
   };
+
+  // Resolves once currentTime has advanced on two polls in a row, or after 3 s regardless.
+  const clockRunning = (ctx: AudioContext) =>
+    new Promise<void>((done) => {
+      let last = ctx.currentTime;
+      let ticks = 0;
+      const until = performance.now() + 3000;
+      const poll = () => {
+        const now = ctx.currentTime;
+        ticks = now > last ? ticks + 1 : 0;
+        last = now;
+        if (ticks >= 2 || performance.now() > until) done();
+        else setTimeout(poll, 15);
+      };
+      setTimeout(poll, 15);
+    });
+
   play?.addEventListener('click', async () => {
-    if (src) return stop();
+    // A press during playback starts over from chip 0.
+    if (sources.length) stop();
+    const mine = ++run;
+    play.disabled = true;
+    setLabel('Starting');
     audio ??= new AudioContext();
-    if (audio.state === 'suspended') await audio.resume();
-    const data = synthesize(chips, audio.sampleRate);
-    const buf = audio.createBuffer(1, data.length, audio.sampleRate);
-    buf.copyToChannel(data, 0);
-    src = audio.createBufferSource();
-    src.buffer = buf;
-    src.connect(audio.destination);
-    const t0 = audio.currentTime + 0.05;
-    src.start(t0);
-    src.onended = stop;
-    play!.setAttribute('aria-pressed', 'true');
-    playLabel!.textContent = 'Stop';
-    const chipS = (CHIP_MS * LISTEN_STRETCH) / 1000;
-    const ac = audio;
+    const ctx = audio;
+    // A browser with no audio output may never finish resuming; give it 3 s, then say so.
+    const resumed = await Promise.race([ctx.resume().then(() => true), new Promise<false>((r) => setTimeout(() => r(false), 3000))]);
+    if (mine !== run) return;
+    if (!resumed) {
+      play.disabled = false;
+      setLabel('No sound output');
+      setTimeout(() => mine === run && setLabel('Hear it, 2 s'), 2500);
+      return;
+    }
+    await clockRunning(ctx);
+    if (mine !== run) return;
+
+    const t0 = ctx.currentTime + 0.05;
+    sources = chips.map((chip, i) => {
+      const data = synthesize([chip], ctx.sampleRate);
+      const buf = ctx.createBuffer(1, data.length, ctx.sampleRate);
+      buf.copyToChannel(data, 0);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(t0 + i * chipS);
+      return src;
+    });
+    if (import.meta.env.DEV) console.assert(sources.length === CHIPS, `scheduled ${sources.length} chips, expected ${CHIPS}`);
+    sources[sources.length - 1].onended = () => mine === run && stop();
+
+    play.disabled = false;
+    play.setAttribute('aria-pressed', 'true');
+    setLabel('Restart');
     const tick = () => {
-      play!.style.setProperty('--p', String(Math.min(1, Math.max(0, (ac.currentTime - t0) / (chipS * CHIPS)))));
-      const k = Math.floor((ac.currentTime - t0) / chipS);
-      if (k !== playing && k < CHIPS) {
+      const t = ctx.currentTime - t0;
+      play.style.setProperty('--p', String(Math.min(1, Math.max(0, t / (chipS * CHIPS)))));
+      const k = Math.floor(t / chipS);
+      if (k !== playing && k >= 0 && k < CHIPS) {
         playing = k;
         draw();
       }
@@ -245,7 +295,7 @@ export function mountSignalPanel(fig: HTMLElement) {
     };
     raf = requestAnimationFrame(tick);
   });
-  document.addEventListener('visibilitychange', () => document.hidden && src && stop());
+  document.addEventListener('visibilitychange', () => document.hidden && sources.length && stop());
 
   new ResizeObserver(resize).observe(screen);
   resize();

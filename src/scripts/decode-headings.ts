@@ -1,8 +1,8 @@
 // Decode headings: each section heading marked `data-decode` resolves out of random glyphs once,
-// in about 400 ms, as it scrolls into view. It never loops. The heading's real text stays in the
+// in about 900 ms, letter by letter from the left, as it scrolls into view. It never loops. The heading's real text stays in the
 // DOM the whole time (only its color goes transparent), and a layer hidden from screen readers
 // draws the glyphs over it, so readers and search engines always get the plain words.
-import { decode } from './decode';
+import { decodeStaggered } from './decode';
 import { prefersReducedMotion } from './preferences';
 
 export function initDecodeHeadings() {
@@ -40,9 +40,9 @@ function run(h: HTMLElement) {
   const fx = h.querySelector<HTMLElement>('.dh__fx')!;
   const text = real.textContent ?? '';
   h.dataset.decoding = '';
-  decode(fx, text, 400);
+  const ms = decodeStaggered(fx, text);
   setTimeout(() => {
     delete h.dataset.decoding;
     fx.textContent = '';
-  }, 460);
+  }, ms + 60);
 }

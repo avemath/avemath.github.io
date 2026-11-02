@@ -83,6 +83,10 @@ let row = 0;
       </div>
       <figcaption class="fig__note">Every dot is a file you can open.</figcaption>
     </figure>
+    <p class="skills__more">
+      <a class="btn" href="/about/">More about me</a>
+      <a class="link" href="/resume/">The résumé</a>
+    </p>
   </div>
 </section>
 
@@ -106,6 +110,14 @@ let row = 0;
 
   .sm {
     margin: 1.5rem 0 0;
+  }
+
+  .skills__more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: 1.75rem;
   }
 
   /* Phones: the table keeps its width and scrolls sideways; the skill names stay put. */

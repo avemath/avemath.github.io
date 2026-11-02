@@ -319,3 +319,68 @@ Four field notes, because no band is about them: "Land agent" (day job plot twis
 - Re-measure the website scores on pagespeed.web.dev: `src/components/WebsitesShowcase.astro`, data in `src/data/sites.json`.
 - Make the Landspace repo public to show its column: `src/lib/skills.ts`.
 - Ten skills have no public file: Embedded wiring and soldering, Client communication, Project management, Fundraising and outreach, Linux, Google Apps Script, and, until Landspace is public, Public records and title research, Excel runsheets, Supabase and Leaflet: `src/lib/skills.ts`.
+
+## Redesign 3c: flow and clarity
+
+### The hero
+
+The headline is `clamp(34px, 4.2vw, 62px)` at line-height 1.02 and the subline 18px. The marquee moved into the hero, so the first screen ends on it. On wide screens the hero holds the sentence, the subline, both buttons, the signal panel and the top of the marquee inside one screen; the panel gives up height first when the screen is short. On phones the order is sentence and buttons, marquee, then the panel. Measured at 1366 by 768, 1440 by 900 and 390 by 844: the headline's last word, both buttons and the top of the marquee are on the first screen in all three.
+
+### The audio fix
+
+"Hear it" could wait about two seconds and then play only the last chips. Some systems report the AudioContext as running before the output device has started, then jump its clock forward past chips that were already scheduled. Now:
+
+- The AudioContext is made on the first press and resumed before anything is scheduled.
+- Playback waits until `currentTime` has visibly advanced on two polls in a row (up to 3 s).
+- Each of the 32 chips is its own buffer source (each one is the tested, click-free `synthesize()` output), all scheduled from one start time, `currentTime + 0.05`, taken after that wait.
+- While starting, the button reads "Starting" and is disabled; during playback it reads "Restart", and a press starts over from chip 0; at the end it reads "Hear it, 2 s" again.
+- A browser that never starts its audio output gets "No sound output" after 3 s instead of hanging.
+- In development, a console assertion checks that 32 sources were scheduled.
+
+How it was tested: a Playwright script loads the page cold, presses the button, records what reaches the speakers through a tap on the audio graph, logs the button's states, and decodes the tone in every 62.5 ms slot with a Goertzel filter at each of the 26 tones. Chrome, headless and headed through WSLg's PulseAudio output: 32 sources scheduled, all 32 chips decoded in order, first chip 9680 Hz as expected. Firefox could not be tested this way: Playwright's Firefox never starts any AudioContext here, so the button correctly fell back to "No sound output".
+
+### Headings
+
+The decode now takes about 900 ms: a 150 ms scramble, then each letter settles about 25 ms after the one before, so the settle moves across the word. Glyphs change every 60 ms instead of every frame. Project card titles use it too.
+
+### The nav map
+
+| Page | Nav and the links it ends with |
+|---|---|
+| Every page | Nav: Projects (`/work/#engineering`), Websites (`/work/#websites`), Research (`/research/`), Contact (`/#contact`, the footer). Footer: email, GitHub, LinkedIn, résumé; site links to All work, Research, Services, About, Résumé. |
+| `/` | Hero: See the projects (`#projects`), Résumé. Status strip: See what I have built. Projects ends with "All engineering projects" (`/work/#engineering`). Below the surface: Go below (`/research/`). Websites ends with See how I work, Start a project, "All websites" (`/work/#websites`). Skills ends with More about me (`/about/`) and the résumé. |
+| `/work/` | Projects is marked. Filters are plain anchors: All, Engineering, Websites, Research. Ends with the research page, About and Get in touch. |
+| Case studies | Breadcrumb "Work / Engineering / RAMpage Combat Robot". Projects, Websites or Research is marked by the project's section. Ends with Back to all work, previous and next in /work/ order, and Get in touch. |
+| `/research/` | Research is marked; the label shows the live depth, 0 m at the top and 100 m at the bottom. Ends with Back to the surface and "Or see the websites". |
+| `/contact/` | Ends with See all work and the research page. |
+| `/about/`, `/services/`, `/resume/` | Already ended with forward links (contact, case studies, all work). |
+| 404 | Back to the surface and "Or see all work". |
+
+### Websites
+
+The heading is "Websites I built and keep running", with "Small businesses, a nonprofit and one engineer. Fast, accessible, and the owners update their own content." The large alternating showcase from before redesign 3 is back (browser and phone frames, what the business needed, what I did, the numbers, the live versions), in the new type and colors, with the figure label as a quiet row above each site's copy. Client quotes are pull-quote bands between the sites, from `src/data/sites.json`, shown only when filled. The services heading "Sites for people who'd rather be running their business" is now "Sites the owners run themselves".
+
+### Drawings
+
+Every project figure has a Drawing tab (Live, Drawing, How it works, Code). The drawings live in `src/components/drawings/`, one per project, all through `Drawing.astro`:
+
+- Ink strokes at 1.5 px, the accent at 2 px for the one key path, numbered callouts in accent circles with a legend under the figure, labels in Archivo and readouts in Plex Mono.
+- Schematics of signal paths and hardware, drawn only from what the repos and case studies say; anything uncertain is said in the drawing's note or marked `TODO(ave): confirm`.
+- Each has an `aria-label` sentence and a `<title>`. Strokes draw in once with stroke-dashoffset (Web Animations, filling backwards, so a drawing always ends fully drawn), skipped with reduced motion.
+
+What the facts changed: V2V is drawn as one transmitting Pluto carrying both simulated cars' messages to one receiving Pluto, because that is how it was built (README: "two simulated vehicles", "one TX, one RX"). The LED drawing shows "LEA" only; the firmware's full boot message includes a second name that may be a middle name, which the content rules keep off the site. The LED fan is bins 2 to 51 of the 128-point FFT, not 128 bins, because that is what the band edges use.
+
+RAMpage's Live view adds the pneumatics drawing beside the timing rows. "Fire the plow" runs the firmware port 4x slower than real: a playhead sweeps the rows, the valves and the piston move as the firmware switches them, and a status word reads Filling, Settling, Plow out, Venting, then Ready.
+
+### Small things
+
+- Project cards show what they offer (Live, Drawing, Code) in a quiet row under the title.
+- The marquee pauses while hovered. It is hidden from screen readers and has nothing to focus, so it has no focus pause.
+- The footer's rev line links to the commit on GitHub.
+- The Code tab fetches its file (`/code/<key>.json`) the first time it opens, which took the home page from 504 KB to 288 KB of HTML.
+
+### New TODO(ave) items
+
+- Confirm RAMpage's plumbing: what the main valve does, one reservoir or two tanks, how many pistons (`src/components/drawings/RampagePneumatics.astro`).
+- Confirm the pool alarm plan: how many hydrophones and where (`src/components/drawings/PoolSide.astro`).
+- Test "Hear it" in your own Firefox: it could not be automated here.

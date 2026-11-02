@@ -1,6 +1,7 @@
 ---
 // The research page's depth gauge: a scale from the surface to 100 m at the right edge, with a
-// marker at the current depth. The depth is wherever the reading line (40% down the screen)
+// marker at the current depth. The depth is wherever the reading line (which moves from the top of the screen to the bottom as
+// the page scrolls)
 // crosses a section, interpolated across that section's range from src/lib/depth.ts. The same
 // number goes into the nav label ("depth 36 m"). Wide screens only; the nav label carries it on
 // phones. Decorative: every section's own label states its range in text.
@@ -79,7 +80,10 @@ import { gaugeMarks, MAX_DEPTH } from '@/lib/depth';
   let queued = false;
   function update() {
     queued = false;
-    const line = innerHeight * 0.4;
+    // The reading line moves down the screen as the page scrolls: at the top of the page it is
+    // at the top of the screen (0 m), at the bottom of the page it is at the bottom (100 m).
+    const room = document.documentElement.scrollHeight - innerHeight;
+    const line = innerHeight * (room > 0 ? Math.min(1, scrollY / room) : 0);
     let depth = 0;
     for (const { z, el } of sections) {
       const r = el!.getBoundingClientRect();

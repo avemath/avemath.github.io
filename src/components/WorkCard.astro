@@ -1,0 +1,141 @@
+---
+// A project on /work/: a paper card with the figure label row, the project's picture (its cover
+// or its drawn signature), the title, one line, what the card offers (Live, Drawing, Code) and
+// the links. The whole card opens the case study.
+import { Image } from 'astro:assets';
+import ProjectArt from './ProjectArt.astro';
+import { type Project, typeLabels, projectHref, offers } from '@/lib/projects';
+import { displayUrl } from '@/lib/format';
+
+interface Props {
+  project: Project;
+  fig: number;
+  eager?: boolean;
+}
+
+const { project, fig, eager = false } = Astro.props;
+const d = project.data;
+const has = offers(project);
+---
+
+<article class="wc paper" aria-labelledby={`wc-${project.id}`}>
+  <div class="fig__bar wc__bar">
+    <p class="fig__label">Fig. {String(fig).padStart(2, '0')} / {typeLabels[d.type]}</p>
+    {d.confidentiality === 'limited' && <p class="fig__label">public wording only</p>}
+  </div>
+  <div class="wc__media">
+    {
+      d.cover ? (
+        <Image
+          src={d.cover}
+          alt=""
+          widths={[360, 480, 640, 800]}
+          sizes="(min-width: 1216px) 23rem, (min-width: 1100px) 30vw, (min-width: 720px) 46vw, calc(100vw - 2rem)"
+          format="webp"
+          quality={74}
+          loading={eager ? 'eager' : 'lazy'}
+          class="wc__img"
+        />
+      ) : (
+        <ProjectArt slug={project.id} />
+      )
+    }
+  </div>
+  <div class="wc__body">
+    <h3 class="wc__title" id={`wc-${project.id}`}>
+      <a href={projectHref(project)} class="stretched">{d.title}</a>
+    </h3>
+    {
+      has.length > 0 && (
+        <p class="wc__offers">
+          <span class="sr-only">Offers: </span>
+          {has.join(' · ')}
+        </p>
+      )
+    }
+    <p class="wc__summary">{d.summary}</p>
+    {
+      d.links.live && (
+        <p class="wc__live above-stretch">
+          <a class="link" href={d.links.live}>
+            {d.linkLabel ?? `Visit ${displayUrl(d.links.live)}`}
+          </a>
+        </p>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .wc {
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s;
+  }
+
+  .wc:hover,
+  .wc:focus-within {
+    border-color: var(--text);
+  }
+
+  .wc__bar {
+    min-height: 2.6rem;
+  }
+
+  .wc__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+
+  .wc__img,
+  .wc__media > :global(.art) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .wc__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1rem 1.15rem;
+  }
+
+  .wc__title {
+    font-size: 1.25rem;
+    font-variation-settings: 'wdth' 100;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .wc__title a {
+    text-decoration: none;
+  }
+
+  .wc__title a:hover {
+    text-decoration: underline;
+  }
+
+  .wc__offers {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .wc__summary {
+    font-size: 0.9375rem;
+    color: var(--text-soft);
+  }
+
+  .wc__live {
+    margin-top: auto;
+    padding-top: 0.4rem;
+    font-size: 0.9375rem;
+  }
+</style>

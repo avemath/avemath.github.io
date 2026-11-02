@@ -1,0 +1,56 @@
+---
+// The JANUS band as the Signals playground lays it out (src/lib/fhbfsk.ts): 9440 to 13600 Hz in
+// 13 tone pairs, 160 Hz per tone, and a hop pattern across time, one 6.25 ms chip per column,
+// using the playground's own hop order (seed 87) and its example bits.
+import Drawing from './Drawing.astro';
+import { F_HIGH, F_LOW, PAIRS, DF, hopSequence, toneHz } from '@/lib/fhbfsk';
+
+const N = 8;
+const bits = [1, 0, 1, 1, 0, 0, 1, 1];
+const hops = hopSequence(N, 87);
+const X0 = 44;
+const COL = 31;
+const Y0 = 22;
+const H = 110;
+const y = (f: number) => Y0 + ((F_HIGH - f) / (F_HIGH - F_LOW)) * H;
+const pairTop = (p: number) => y(F_LOW + (2 * p + 2) * DF);
+const pairBot = (p: number) => y(F_LOW + 2 * p * DF);
+---
+
+<Drawing
+  title="Signals playground: frequency hopping in the JANUS band"
+  label="The JANUS band from 9440 to 13600 Hz split into 13 tone pairs, with eight chips that each hop to a pair and send its low tone for a 0 or its high tone for a 1."
+  viewBox="0 0 320 170"
+  legend={[
+    'Chip length: each chip lasts 6.25 ms, 160 chips a second.',
+    'Tone pair: each of the 13 pairs is two tones 160 Hz apart. The low one sends a 0, the high one a 1.',
+    'Preamble: JANUS opens with a 32-chip preamble the receiver hunts for. The playground leaves it out; the hero panel on the home page draws one.',
+  ]}
+  note="The hop order is the playground's own, not the standard's."
+>
+  {
+    Array.from({ length: PAIRS }, (_, p) => (
+      <rect class="s s--soft" pathLength="1" x={X0} y={pairTop(p)} width={N * COL} height={pairBot(p) - pairTop(p)} fill="none" />
+    ))
+  }
+  <text class="t t--mono t--muted" x={X0 - 6} y={y(F_HIGH) + 4} text-anchor="end">13.6k</text>
+  <text class="t t--mono t--muted" x={X0 - 6} y={y(F_LOW) + 4} text-anchor="end">9.44k</text>
+  <text class="t t--muted" x={X0 - 6} y={Y0 + H / 2} text-anchor="end">Hz</text>
+
+  {
+    hops.map((p, i) => (
+      <g>
+        <rect class="s s--hot f--hot" pathLength="1" x={X0 + i * COL + 8} y={y(toneHz(p, bits[i])) - 3} width={COL - 16} height="6" />
+      </g>
+    ))
+  }
+  {hops.slice(1).map((p, i) => <path class="s s--soft s--dash" pathLength="1" d={`M${X0 + (i + 1) * COL - 8} ${y(toneHz(hops[i], bits[i]))} L${X0 + (i + 1) * COL + 8} ${y(toneHz(p, bits[i + 1]))}`} />)}
+
+  <path class="s" pathLength="1" d={`M${X0} ${Y0 + H + 14} h${COL} M${X0} ${Y0 + H + 9} v10 M${X0 + COL} ${Y0 + H + 9} v10`}></path>
+  <text class="t t--mono" x={X0 + COL + 8} y={Y0 + H + 18}>6.25 ms</text>
+  <text class="t t--muted" x={X0 + N * COL} y={Y0 + H + 18} text-anchor="end">time</text>
+
+  <g class="co"><circle cx={X0 + COL / 2} cy={Y0 + H + 28} r="9"></circle><text x={X0 + COL / 2} y={Y0 + H + 32}>1</text></g>
+  <g class="co"><circle cx={X0 + N * COL + 18} cy={(pairTop(6) + pairBot(6)) / 2} r="9"></circle><text x={X0 + N * COL + 18} y={(pairTop(6) + pairBot(6)) / 2 + 4}>2</text></g>
+  <g class="co"><circle cx={X0 + 10} cy={Y0 - 10} r="9"></circle><text x={X0 + 10} y={Y0 - 6}>3</text></g>
+</Drawing>

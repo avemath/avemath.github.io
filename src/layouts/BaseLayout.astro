@@ -21,11 +21,13 @@ interface Props {
   bare?: boolean;
   /** The small label at the right of the nav: the live depth on /research/, nothing elsewhere. */
   navLabel?: string;
+  /** Which nav item to mark as the current place, when the path alone does not say. */
+  section?: 'projects' | 'websites' | 'research';
   /** The research page has its own footer: back to the surface, and the links. */
   footer?: 'default' | 'research';
 }
 
-const { bare = false, navLabel, footer = 'default', ...seo } = Astro.props;
+const { bare = false, navLabel, section, footer = 'default', ...seo } = Astro.props;
 ---
 
 <!doctype html>
@@ -63,7 +65,7 @@ const { bare = false, navLabel, footer = 'default', ...seo } = Astro.props;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-    {!bare && <Header label={navLabel} />}
+    {!bare && <Header label={navLabel} section={section} />}
     <main id="main" tabindex="-1">
       <slot />
     </main>
@@ -74,10 +76,14 @@ const { bare = false, navLabel, footer = 'default', ...seo } = Astro.props;
       import { initPreferenceControls } from '../scripts/preferences';
       import { initReveals, initDrawIn } from '../scripts/motion';
       import { initDecodeHeadings } from '../scripts/decode-headings';
+      import { initSketches } from '../scripts/sketch';
+      import { initTabs } from '../scripts/tabs';
       initPreferenceControls();
       initReveals();
       initDecodeHeadings();
       initDrawIn();
+      initTabs();
+      initSketches();
     </script>
 
     {
