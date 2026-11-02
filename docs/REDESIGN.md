@@ -414,6 +414,6 @@ The LED matrix's resting frame (9 s of the firmware run on the clip) and the V2V
 
 ### New TODO(ave) items
 
-- Re-measure the website facts on PageSpeed Insights: `pagespeedMobile`, `accessibility` and `pageWeightKb` in `src/data/sites.json` are local Lighthouse mobile runs from 2026-11-01 (Because of ADAM 99, 100, 101 KB; Grace Mae 91, 100, 496 KB; PLV 87, 100, 287 KB; Nicholas 90, 100, 400 KB). Scores moved a few points between runs.
+- Website scores: re-measured by Ave on PageSpeed Insights on 2026-11-01 (mobile performance and accessibility: Because of ADAM 100, 100; PLV 98, 100; Grace Mae 98, 100; Nicholas 97, 100). Page weights are from local Lighthouse runs that day.
 - `liveSince` is confirmed by Ave: Grace Mae Apr 2026, PLV Jun 2026, Because of ADAM Sep 2026, Nicholas Oct 2026.
 - The RAMpage plumbing TODO is cleared. Cylinder bore and stroke are still not stated; the drawing does not need them.
