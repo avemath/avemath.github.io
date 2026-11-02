@@ -265,6 +265,18 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     letter-spacing: 0;
   }
 
+  /* Headings inherit the display leading (0.94), too tight once one wraps on a phone. Print and
+     wide screens keep it, so the PDF stays one page. */
+  @media screen and (max-width: 600px) {
+    .r-h {
+      line-height: 1.35;
+    }
+
+    .r-title {
+      line-height: 1.3;
+    }
+  }
+
   .r-title a {
     text-decoration: none;
   }
