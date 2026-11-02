@@ -45,7 +45,7 @@ How to add work and keep the site current, plus the rules every page follows.
 
 3. Write the body with these sections: **Context**, **Approach**, **Outcome**, **What I'd do next**. Add **My role** after Context only when there was a team and the split matters; for solo work, one sentence at the end of Context is enough (the role line in the frontmatter already shows in the header). Bold the first words of each approach paragraph.
 4. Screenshots: capture at 1440×900 for desktop and 390×844 for mobile with reduced motion on, then save them as PNG in `src/assets/projects/<slug>/`. Astro converts them to WebP at build time, so the source size doesn't matter.
-5. The home page shows three projects as figure cards and three as small cards, set by hand in `src/pages/index.astro`. Every project is on /work/.
+5. The home page shows three projects as figure cards and three as small cards, set by hand in `src/pages/index.astro`. Every project is on /work/, in three sections (engineering, research, websites) set by `workSection` in `src/lib/projects.ts`; that order is also the case studies' previous and next.
 6. Run `npm run verify`, then `npm run assets` to make its social card. Commit and push.
 
 ## Update the rest
