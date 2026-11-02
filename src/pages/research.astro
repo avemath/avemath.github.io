@@ -159,7 +159,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
               {bars.map((b) => <line class:list={['arr__bar', b.inside && 'arr__bar--in', b.strongest && 'arr__bar--top']} x1={b.x} x2={b.x} y1={R2.y1} y2={b.y} />)}
               {delayTicks.map((t) => <text class="arr__tick" x={ax(t)} y={R2.y1 + 20} text-anchor="middle">{t}</text>)}
               <text class="arr__tick" x={R2.x1} y={R2.y1 + 40} text-anchor="end">delay, ms</text>
-              <text class="arr__tick" x={R2.x0 - 10} y={R2.y0 - 14} text-anchor="end">dB</text>
+              <text class="arr__tick" x={R2.x0 - 10} y={R2.y0 - 22} text-anchor="end">dB</text>
             </svg>
           </div>
           <p class="fig__note">
@@ -449,8 +449,9 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     bottom: 0;
     max-width: 16rem;
     padding: 0.45rem 0.6rem;
-    background: var(--on-navy);
-    color: var(--navy);
+    border: 1px solid var(--on-navy-line-strong);
+    background: var(--navy-deep);
+    color: var(--on-navy);
     font-size: 0.875rem;
     line-height: 1.45;
   }
