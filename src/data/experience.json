@@ -92,13 +92,13 @@
     {
       "id": "v2v",
       "title": "V2V Collision Warning over OFDM",
-      "role": "EE 4003 final project, with Jason Phan",
+      "role": "EE 4003 final project, with lab partner Jason Phan",
       "start": "2026-01",
       "end": "2026-05",
       "bullets": [
-        "Built a BPSK-OFDM physical layer in MATLAB, modeled on IEEE 802.11p, and ran it over two ADALM-PLUTO SDRs.",
-        "Implemented the receiver: packet detection, timing recovery, CFO correction, a Costas loop, MMSE equalization and Viterbi decoding.",
-        "Decoded two vehicles' safety messages and computed time-to-collision for a brake warning."
+        "Designed and wrote the transmitter, receiver and warning logic in MATLAB: a BPSK-OFDM link modeled on IEEE 802.11p, run over the air on two ADALM-PLUTO SDRs.",
+        "Receiver: preamble detection, timing, CFO correction, a phase fit, a decision-directed PLL, OFDM channel estimation, MMSE equalization and Viterbi decoding.",
+        "Ran all five hardware tests, through a hand, a laptop lid and around a corner: zero bit errors on both cars' safety messages, ending in a time-to-collision brake warning."
       ],
       "project": "v2v-bsm-ofdm"
     },

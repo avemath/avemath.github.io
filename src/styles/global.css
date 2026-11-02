@@ -890,6 +890,61 @@
   color: var(--text);
 }
 
+/* Figures in case study prose: a Markdown image, then a paragraph that opens with an italic label
+   ("Fig. 02 / PRE correlation, Run 4.") as its caption. Plots keep their white paper in both themes. */
+.prose p:has(> img) {
+  margin-top: 1.75rem;
+}
+
+.prose img {
+  display: block;
+  width: 100%;
+  max-width: 44rem;
+  height: auto;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.prose p:has(> img) + p {
+  margin-top: 0.6rem;
+  max-width: 44rem;
+  font-size: 0.9rem;
+}
+
+.prose p:has(> img) + p > em:first-child {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.prose table {
+  width: 100%;
+  max-width: 44rem;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.prose th,
+.prose td {
+  padding: 0.45rem 0.75rem 0.45rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.prose td:last-child {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
 /* Wiring diagrams drawn inline in case study prose, so they follow the theme tokens. */
 .wiring {
   margin-block: 2rem;
