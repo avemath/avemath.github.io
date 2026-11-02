@@ -257,7 +257,10 @@ const jsonLd = [
       )
     }
 
-    <p class="wrap case__all no-print"><a class="link" href="/work/"><Icon name="arrow-left" class="inline h-4 w-4" /> Back to all work</a></p>
+    {
+      // The first and last case studies already offer "All work" in the pager, so the link would repeat it.
+      prev && next && <p class="wrap case__all no-print"><a class="link" href="/work/"><Icon name="arrow-left" class="inline h-4 w-4" /> Back to all work</a></p>
+    }
     <nav class="wrap case__pager no-print" aria-label="More projects">
       {
         prev ? (
