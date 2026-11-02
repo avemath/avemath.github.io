@@ -92,6 +92,8 @@ const { bare = false, navLabel, section, footer = 'default', ...seo } = Astro.pr
       site.cloudflareAnalyticsToken && (
         <script is:inline define:vars={{ beacon: JSON.stringify({ token: site.cloudflareAnalyticsToken }) }}>
           addEventListener('load', function () {
+            // Only the live site reports; a local preview would only log the beacon's CORS refusal.
+            if (location.hostname !== 'avemath.github.io') return;
             var s = document.createElement('script');
             s.defer = true;
             s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
