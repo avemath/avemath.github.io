@@ -45,7 +45,7 @@ How to add work and keep the site current, plus the rules every page follows.
 
 3. Write the body with these sections: **Context**, **Approach**, **Outcome**, **What I'd do next**. Add **My role** after Context only when there was a team and the split matters; for solo work, one sentence at the end of Context is enough (the role line in the frontmatter already shows in the header). Bold the first words of each approach paragraph.
 4. Screenshots: capture at 1440×900 for desktop and 390×844 for mobile with reduced motion on, then save them as PNG in `src/assets/projects/<slug>/`. Astro converts them to WebP at build time, so the source size doesn't matter.
-5. To feature it on the home page, add it to the `bento` list in `src/pages/index.astro`.
+5. The home page shows three projects as figure cards and three as small cards, set by hand in `src/pages/index.astro`. Every project is on /work/.
 6. Run `npm run verify`, then `npm run assets` to make its social card. Commit and push.
 
 ## Update the rest
@@ -57,10 +57,11 @@ How to add work and keep the site current, plus the rules every page follows.
 | Gallery clips | an mp4 and a WebVTT captions file in `public/media/`, a poster image beside the project's photos, and a `video:` entry in the project's `gallery` (see `rampage.md`). Transcode to H.264 at 720p or less, strip audio unless it matters, and keep each clip under about 5 MB. Clips never autoplay. |
 | Wiring photos | skip any where the wiring looks messy. A close-up of a board with its leads is fine; a tangle inside a chassis or sprawled across a bench is not. |
 | "Off the clock" on About | `src/data/offclock.json` for the words. Photos go in `src/assets/offclock/`, named in each entry's `photo`, with an `alt`. Entries without a photo render as text cards. |
-| "Now" strip | `src/data/now.json` |
+| "Now" strip on About | `src/data/now.json` |
+| Right now, Research, Open to (home) | `src/components/StatusStrip.astro` |
 | Experience, education, résumé | `src/data/experience.json` (the HTML résumé and PDF both read it) |
 | Skills | `src/data/skills.json` |
-| Field notes | `src/data/facts.json` (six facts whose stories are not already told elsewhere on the home page; keep the count at six so the ledger rows stay full) |
+| Field notes (/research/) | `src/data/facts.json` (keep the count at six, so the rows of three stay full) |
 | Quotes | `src/data/testimonials.json` (only entries with `"approved": true` render) |
 | Email, socials, form key, analytics token | `src/data/site.json` |
 
@@ -80,7 +81,7 @@ After changing experience data, run `npm run build && npm run assets` so the PDF
 ## Upkeep checklist
 
 - [ ] New client site goes up within a week of launch
-- [ ] "Now" strip refreshed each semester
+- [ ] "Now" strip and the home status strip refreshed each semester
 - [ ] Résumé PDF regenerated after any experience change
 - [ ] Commit counts and Lighthouse numbers in case studies rechecked twice a year
 - [ ] `npm run verify` and `npm run test:a11y` pass before every push
