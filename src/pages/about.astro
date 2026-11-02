@@ -301,7 +301,13 @@ const principles = [
     display: grid;
     gap: 1rem;
     margin-top: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+
+  /* Three cards, three across from tablet width, so none sits alone in a row. */
+  @media (min-width: 768px) {
+    .offclock {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .offclock__item {
