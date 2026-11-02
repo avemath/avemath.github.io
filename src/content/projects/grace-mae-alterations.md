@@ -24,7 +24,6 @@ gallery:
     caption: The bustle explorer. Pick a style and a train, then press "Bustle it" to watch the pickup points travel.
 metrics:
   - { label: Lighthouse accessibility, value: "100" }
-  - { label: Commits, value: "106" }
   - { label: Fields the owner edits, value: "~435" }
 client:
   name: Grace Mae Alterations

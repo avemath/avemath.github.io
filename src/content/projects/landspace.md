@@ -30,7 +30,6 @@ gallery:
     alt: Lease offer check listing the terms of an offer and flags for a low royalty and missing clauses.
     caption: A lease offer check for owners, written in plain language and printable.
 metrics:
-  - { label: Commits, value: "110" }
   - { label: Instrument types, value: "~130" }
   - { label: Automated checks, value: "9 suites" }
 ---

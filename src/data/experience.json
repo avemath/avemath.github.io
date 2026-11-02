@@ -22,9 +22,10 @@
       "location": "Baton Rouge, LA",
       "start": "2026-05",
       "end": "2026-08",
-      "summary": "Acoustic characterization and underwater network simulation for autonomous maritime systems.",
+      "summary": "Acoustic characterization of a thruster in the lab tank, and underwater network simulation.",
       "bullets": [
-        "Worked on acoustic characterization and underwater network simulation in support of autonomous maritime systems."
+        "Characterized the acoustics of a thruster on a test stand in the lab tank: planned the measurements, ran them, and analyzed the recordings.",
+        "Worked with the underwater network simulation tools."
       ],
       "project": "integer-internship"
     },
@@ -34,7 +35,7 @@
       "title": "Web Designer and Developer",
       "org": "Freelance",
       "location": "Remote",
-      "start": "2026",
+      "start": "2026-04",
       "end": null,
       "summary": "Design, build, content structure and launch for small businesses and nonprofits.",
       "bullets": [
@@ -146,7 +147,8 @@
       "end": "2026-05",
       "expected": false,
       "notes": [
-        "Tiger Excellence Non-Resident Award, all four years",
+        "Tiger Excellence Scholars Award, all four years",
+        "Tiger Alumni Legacy Scholarship, all four years",
         "Coursework: Signals and Systems, Digital Communication and Networking, Probability for ECE, Communications in Computing, Communications Engineering Design"
       ]
     }

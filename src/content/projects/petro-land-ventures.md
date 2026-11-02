@@ -26,7 +26,6 @@ gallery:
     alt: Sample work page showing an annotated mineral ownership report built from fictional data.
     caption: Annotated sample deliverables, so a client can see the work before they call.
 metrics:
-  - { label: Commits, value: "119" }
   - { label: Service pages, value: "6" }
   - { label: Basins mapped, value: "5" }
 client:
