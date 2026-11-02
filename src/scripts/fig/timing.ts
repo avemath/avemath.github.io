@@ -64,8 +64,8 @@ export function mountTiming(root: HTMLElement) {
   // timing rows, the traces redraw behind it, and the pneumatics drawing and its status word
   // follow the valves exactly as the firmware switches them.
   const pn = card?.querySelector<HTMLElement>('[data-pn]') ?? null;
-  const pnMain = pn?.querySelector<SVGTextElement>('[data-pn-main]');
-  const pnPiston = pn?.querySelector<SVGTextElement>('[data-pn-piston]');
+  const pnMain = pn?.querySelector<SVGTextElement>('[data-pn-exhaust]');
+  const pnPiston = pn?.querySelector<SVGTextElement>('[data-pn-inlets]');
   const pnStatus = pn?.querySelector<HTMLElement>('[data-pn-status]');
   const head = svg.querySelector<SVGLineElement>('[data-tf-head]')!;
   const x0 = Number(head.dataset.x0);
@@ -78,9 +78,9 @@ export function mountTiming(root: HTMLElement) {
     const fired = firedAt >= 0;
     const rel = elapsed - firedAt;
     if (pn) {
-      pn.dataset.main = fw.mainOpen ? 'open' : 'closed';
-      pn.dataset.piston = fw.pistonOpen ? 'open' : 'closed';
-      pn.dataset.pressure = fired && rel < STROKE_MS ? 'on' : 'off';
+      // The firmware's main_solenoid is the exhaust (GP14); piston_solenoid is both inlets (GP15).
+      pn.dataset.exhaust = fw.mainOpen ? 'open' : 'closed';
+      pn.dataset.inlets = fw.pistonOpen ? 'open' : 'closed';
       pn.dataset.vent = fired && fw.mainOpen && rel >= STROKE_MS ? 'on' : 'off';
       if (pnMain) pnMain.textContent = fw.mainOpen ? 'open' : 'closed';
       if (pnPiston) pnPiston.textContent = fw.pistonOpen ? 'open' : 'closed';

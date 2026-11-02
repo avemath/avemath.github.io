@@ -33,10 +33,10 @@ const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/929c280/pico_direct.py'
 // Fig. 01, How it works: the strike itself, straight from the Pico's firmware.
 const picoHow = cut(pico, '# Increment activation counter', 45, 'py');
 const picoNotes: { text: string; lines: [number, number] }[] = [
-  { text: 'Count the shot, start the 500 ms cooldown, and lock out once all 17 are used.', lines: [lineOf(pico, '# Increment activation counter'), lineOf(pico, 'weapon_depleted = True') + 1] },
-  { text: 'Fill: the main valve opens for 50 ms to build pressure, then closes.', lines: [lineOf(pico, '# 1. Open main valve'), lineOf(pico, '# 4. Dweel time') - 1] },
-  { text: 'Extend: the piston valve opens for 400 ms, full extension.', lines: [lineOf(pico, '# 5. Open piston valves'), lineOf(pico, 'utime.sleep_ms(SOLENOID_ACTIVATION_TIME)')] },
-  { text: 'Close the piston valve and open the main valve again to vent.', lines: [lineOf(pico, '# 7. Close valves'), lineOf(pico, '# 8. Re-open main valve') + 1] },
+  { text: 'Count the activation, start the 500 ms cooldown, and lock out once all 17 are used (about the first six deliver full force).', lines: [lineOf(pico, '# Increment activation counter'), lineOf(pico, 'weapon_depleted = True') + 1] },
+  { text: 'Plow home: the exhaust (main_solenoid, GP14) stays open for 50 ms, then closes, then a 50 ms dwell.', lines: [lineOf(pico, '# 1. Open main valve'), lineOf(pico, '# 4. Dweel time') - 1] },
+  { text: 'Plow out: both inlets (piston_solenoid, GP15) open together for 400 ms, full extension.', lines: [lineOf(pico, '# 5. Open piston valves'), lineOf(pico, 'utime.sleep_ms(SOLENOID_ACTIVATION_TIME)')] },
+  { text: 'The inlets close and the exhaust reopens, so the plow vents and retracts.', lines: [lineOf(pico, '# 7. Close valves'), lineOf(pico, '# 8. Re-open main valve') + 1] },
 ];
 
 // Fig. 02, How it works: the receiver stages in the port of the MATLAB receiver.
@@ -90,8 +90,10 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <Fragment slot="text">
             <p>
               A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the RC receiver with hardware
-              interrupts, sequences two valves, enforces a 17 shot air budget and stops on signal loss. A Pi 4B streams video over UDP on its
-              own, so a video crash never touches the weapon.
+              interrupts, sequences the inlet and exhaust valves, and holds a hard limit of 17 activations in firmware, of which about the
+              first six deliver full force before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust and cuts the
+              receiver's power through a solid-state relay. A Pi 4B streams video over UDP on its own, so a video crash never touches the
+              weapon.
             </p>
           </Fragment>
           <Fragment slot="actions">

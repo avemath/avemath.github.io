@@ -53,11 +53,11 @@ import DemoShell from './DemoShell.astro';
 
       <div class="wl__valves">
         <div class="valve" data-valve="main">
-          <span class="label">Main / exhaust · GP14</span>
+          <span class="label">Exhaust · GP14</span>
           <span class="valve__val mono" data-valve-val="main">OPEN</span>
         </div>
         <div class="valve" data-valve="piston">
-          <span class="label">Piston · GP15</span>
+          <span class="label">Inlets · GP15</span>
           <span class="valve__val mono" data-valve-val="piston">CLOSED</span>
         </div>
       </div>
@@ -88,7 +88,7 @@ import DemoShell from './DemoShell.astro';
     <summary>Things to try</summary>
     <ul>
       <li>Flick the trigger 18 times. Shot 17 empties the tank, and the firmware refuses to fire on empty air.</li>
-      <li>Turn the transmitter off. After one second with no pulses the board declares signal loss and safes both valves.</li>
+      <li>Turn the transmitter off. After one second with no pulses the board declares signal loss, opens the exhaust and closes the inlets.</li>
       <li>Power cycle with the kill switch on. The startup interlock catches it.</li>
       <li>
         Flip the kill switch on, then the trigger on, then the kill switch off. The plow fires on reset. That's a real bug in the
