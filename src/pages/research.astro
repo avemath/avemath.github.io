@@ -102,6 +102,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             <script type="application/json" data-net-nodes set:html={JSON.stringify(nodes.map(({ id, text }) => ({ id, text })))} />
           </div>
           <p class="fig__note">A drawing of the kind of network the project is about, not project data. Solid lines are radio, orange lines acoustic.</p>
+          <p class="fig__try"><span class="on-mouse">Hover</span><span class="on-touch">Tap</span> a node to see how it links to the others.</p>
         </figure>
           <MarginNote where="onr" />
         </div>
