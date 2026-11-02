@@ -19,14 +19,14 @@ links:
 metrics:
   - { label: Message size, value: "10 bytes" }
   - { label: Data subcarriers, value: "48" }
-  - { label: "Over-the-air runs, all at BER 0", value: "5" }
+  - { label: "Runs on the radios, all at BER 0", value: "5" }
   - { label: Time to collision in the test scenario, value: "4.0 s" }
 demo: ofdm
 ---
 
 ## Context
 
-Cars that talk to each other can warn a driver before a crash they can't see yet. In real systems each car broadcasts a Basic Safety Message, in the style of SAE J2735, about 10 times a second: who it is, how fast it's going, and where it is. The physical layer here is modeled on IEEE 802.11p: a 10 MHz channel, OFDM, BPSK and a rate 1/2 convolutional code.
+Cars that talk to each other can warn a driver before a crash they can't see yet. In real systems each car broadcasts a Basic Safety Message (BSM), in the style of SAE J2735, about 10 times a second: who it is, how fast it's going, and where it is. The physical layer here is modeled on IEEE 802.11p: a 10 MHz channel, OFDM (the data split across many narrow subcarriers sent at once), BPSK and a rate 1/2 convolutional code.
 
 ## My role
 
@@ -44,7 +44,7 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 **The frame.** Every packet is a preamble (PRE) of 63 BPSK symbols at 16 samples per symbol with root-raised-cosine pulses, a 256-symbol training sequence (TRAIN), one OFDM preamble symbol, four OFDM data symbols, and a guard of zeros. The OFDM symbols use 52 subcarriers at 156.25 kHz spacing: 48 data and 4 pilots at plus and minus 7 and 21, with a 16-sample cyclic prefix (1.6 microseconds at 10 MHz).
 
-**The receiver, in order.** All figures below are from Run 4: six inches apart, with a laptop lid between the radios.
+**The receiver, in order.** All figures below are from Run 4: six inches apart, with a laptop lid between the radios. Their numbers are the ones in the final report.
 
 1. **PRE detect.** Cross-correlate the received samples with the known BPSK preamble. One peak per packet gives coarse timing.
 
@@ -70,7 +70,7 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 *Fig. 05 / TRAIN fit, Run 4.* The fit turns two rotated clusters into two clusters on the real axis.
 
-5. **Decision-directed PLL.** A BPSK phase-locked loop with loop gain 0.001 and an 8-symbol burn-in tracks the residual phase on the PRE.
+5. **Decision-directed PLL.** A BPSK phase-locked loop (PLL) with loop gain 0.001 and an 8-symbol burn-in tracks the residual phase on the PRE.
 
 ![PRE constellations per car before and after the phase-locked loop: before, clusters slightly off the axis; after, centered on plus and minus one.](../../assets/projects/v2v-bsm-ofdm/run4-fig6_pll.png)
 

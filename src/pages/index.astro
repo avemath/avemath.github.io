@@ -111,7 +111,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           />
           <Fragment slot="text">
             <p>
-              A BPSK-OFDM link modeled on IEEE 802.11p (the car version of Wi-Fi), run over the air between two PlutoSDR software radios.
+              An OFDM radio link (data split across many narrow carriers at once), modeled on IEEE 802.11p (the car version of Wi-Fi), run over the air between two ADALM-PLUTO software radios.
               I designed and wrote the transmitter, the nine-stage receiver and the warning logic. One radio sends both cars' safety
               messages in turn; the other decodes them and computes time to collision. All five hardware runs decoded with zero bit errors.
             </p>
@@ -156,7 +156,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             <p class="fig__label">Figures</p>
           </div>
           <div class="mini__fig" data-draw>
-            <Image src={eigenrays} alt="BELLHOP output: the Munk sound speed profile beside 50 rays leaving a source at 1300 m and bending back toward the channel axis over 100 km." widths={[400, 640]} sizes="(min-width: 960px) 24rem, calc(100vw - 2rem)" format="webp" quality={76} loading="lazy" class="mini__img" />
+            <Image src={eigenrays} alt="BELLHOP output: the Munk sound speed profile beside 50 rays leaving a source at 1300 m and bending back toward the channel axis over 100 km." widths={[400, 640]} sizes="(min-width: 960px) 24rem, (min-width: 720px) 30vw, calc(100vw - 2rem)" format="webp" quality={76} loading="lazy" class="mini__img" />
           </div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/bellhop-sim/" class="stretched">bellhopSim</a></h3>
@@ -180,7 +180,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           </div>
           <div id="sig-live" role="tabpanel" aria-labelledby="sig-tab-live">
           <div class="mini__fig mini__fig--live" data-live-media data-draw>
-            <svg viewBox="0 0 320 120" class="mini__hops" aria-hidden="true">
+            <svg viewBox="0 0 400 120" preserveAspectRatio="xMinYMid meet" class="mini__hops" aria-hidden="true">
               {
                 hops.map((p, i) => (
                   <rect x={20 + i * 36} y={hopY(toneHz(p, bits[i])) - 2} width="26" height="4" fill={i % 2 ? 'var(--text)' : 'var(--accent)'} />
@@ -282,7 +282,8 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     margin-top: 1.75rem;
   }
 
-  @media (min-width: 760px) {
+  /* Three across only once each column can be about 280px wide. */
+  @media (min-width: 1024px) {
     .minis {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -323,11 +324,12 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     display: none;
   }
 
+  /* The whole plot, axes included, on its own white paper. */
   .mini__img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: 75% 40%;
+    object-fit: contain;
+    background: #fff;
   }
 
   .mini__hops,

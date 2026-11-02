@@ -17,7 +17,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
 >
   <div class="resume-zone">
   <div class="wrap resume-tools no-print">
-    <div class="flex flex-wrap items-center justify-between gap-4 py-8">
+    <div class="resume-tools__row flex flex-wrap items-center justify-between gap-4 py-8">
       <div>
         <p class="eyebrow">Résumé</p>
         <p class="mt-2 text-soft">The same content as the PDF, kept in sync from one data file.</p>
@@ -157,6 +157,12 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
 </BaseLayout>
 
 <style>
+  /* The intro and its buttons sit over the sheet, on the sheet's edges. */
+  .resume-tools__row {
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+
   .resume {
     max-width: 52rem;
     margin-inline: auto;
@@ -234,18 +240,19 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     break-inside: avoid;
   }
 
+  /* On a phone the date always sits on its own line under the title, so every entry reads the same. */
   .r-row {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
+    flex-direction: column;
     gap: 0.25rem 1rem;
   }
 
   /* From phone-landscape up, and in print, a long title wraps while the date stays on its first line. */
   @media print, (min-width: 480px) {
     .r-row {
-      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: baseline;
     }
 
     .r-title {
@@ -263,6 +270,18 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     font-size: 1rem;
     font-weight: 600;
     letter-spacing: 0;
+  }
+
+  /* Headings inherit the display leading (0.94), too tight once one wraps. Print keeps it, so the
+     PDF stays one page. */
+  @media screen {
+    .r-h {
+      line-height: 1.35;
+    }
+
+    .r-title {
+      line-height: 1.3;
+    }
   }
 
   .r-title a {

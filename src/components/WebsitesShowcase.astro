@@ -15,7 +15,8 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
 // Each site's facts come from src/data/sites.json: things a visitor can judge (speed,
 // accessibility, page weight, how long it has been live, what the owner edits), not commit
-// counts. Figures are numbered after the skills matrix (Fig. 06).
+// counts. On the home page the site figures follow the hop pattern (Fig. 05) and come before the
+// skills matrix.
 // pagespeedMobile and accessibility are PageSpeed Insights mobile results, dated by measuredOn.
 // pageWeightKb is the home page's transferred size from a local Lighthouse mobile run that day.
 interface Props {
@@ -25,7 +26,7 @@ interface Props {
   firstFig?: number;
 }
 
-const { rowsOnly = false, firstFig = 7 } = Astro.props;
+const { rowsOnly = false, firstFig = 6 } = Astro.props;
 const FIRST_FIG = firstFig;
 const Outer = rowsOnly ? 'div' : 'section';
 const siteData = (id: string) => sitesData.find((s) => s.slug === id);
@@ -109,7 +110,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                   </div>
                   <div class="site__links mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
                     <a class="btn btn--small" href={projectHref(p)}>
-                      Read the case study <Icon name="arrow-right" />
+                      Case study <Icon name="arrow-right" />
                     </a>
                     <a class="link inline-flex items-center gap-1 text-sm" href={p.data.links.live}>
                       {p.data.linkLabel ?? `Visit ${new URL(p.data.links.live!).host}`} <Icon name="arrow-up-right" class="h-[0.9em] w-[0.9em]" />
@@ -220,10 +221,14 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     }
   }
 
-  /* The phone mockup covers the bottom right corner, so Try it sits bottom left, at every width. */
+  /* Try it sits in the browser frame's top bar, so it covers none of the site's screenshot. */
   .site__media :global(.live__try) {
-    right: auto;
-    left: 0.7rem;
+    top: 0.2rem;
+    right: 0.4rem;
+    bottom: auto;
+    min-height: 1.6rem;
+    padding: 0.1rem 0.6rem;
+    border-width: 1.5px;
   }
 
   .web__title {

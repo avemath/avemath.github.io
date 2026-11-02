@@ -87,7 +87,7 @@ import DemoShell from './DemoShell.astro';
   <details class="wl__try">
     <summary>Things to try</summary>
     <ul>
-      <li>Flick the trigger 18 times. Shot 17 empties the tank, and the firmware refuses to fire on empty air.</li>
+      <li>Flick the trigger 18 times. The firmware allows 17 activations and refuses the 18th. On the real robot only about the first six hit at full force.</li>
       <li>Turn the transmitter off. After one second with no pulses the board declares signal loss, opens the exhaust and closes the inlets.</li>
       <li>Power cycle with the kill switch on. The startup interlock catches it.</li>
       <li>
@@ -240,8 +240,11 @@ import DemoShell from './DemoShell.astro';
     margin-top: 1.25rem;
   }
 
+  /* The state word sits on the tile's bottom edge, so tiles line up when one label wraps. */
   .valve {
     display: grid;
+    grid-template-rows: 1fr auto;
+    align-items: start;
     gap: 0.2rem;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line);
@@ -350,6 +353,10 @@ import DemoShell from './DemoShell.astro';
     border-radius: 0.75rem;
     font-size: 0.92rem;
     color: var(--text-soft);
+  }
+
+  .wl__try ul {
+    max-width: 28em;
   }
 
   .wl__try summary {

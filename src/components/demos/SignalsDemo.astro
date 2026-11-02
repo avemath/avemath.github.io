@@ -25,7 +25,7 @@ const schemes = [
   <div class="sig" data-signals>
     <div class="sig__note">
       <p>
-        <strong>From the JANUS standard</strong>, as reported in public papers: the 9440 to 13600 Hz band (center 11520 Hz, 4160 Hz wide),
+        <strong>From the JANUS standard</strong> (the NATO standard for underwater modems), as reported in public papers: the 9440 to 13600 Hz band (center 11520 Hz, 4160 Hz wide),
         13 tone pairs (26 tones, 160 Hz apart), and 6.25 ms chips (160 per second).
       </p>
       <p>
@@ -104,7 +104,7 @@ const schemes = [
         <div class="field">
           <label for="fh-pitch">Pitch mapping for audio</label>
           <select id="fh-pitch" data-fh-in="pitch">
-            <option value="exag">Exaggerated gap (easiest to hear)</option>
+            <option value="exag">Wide gap (easiest to hear)</option>
             <option value="prop">Proportional (true spacing)</option>
             <option value="true">True band tones (shrill)</option>
           </select>
@@ -337,6 +337,10 @@ const schemes = [
     gap: 1.5rem;
   }
 
+  .sig__note :global(p) {
+    max-width: 28em;
+  }
+
   .sig__note {
     display: grid;
     gap: 0.4rem;
@@ -402,7 +406,7 @@ const schemes = [
   }
 
   .sig__explain {
-    max-width: 46rem;
+    max-width: 28em;
     color: var(--text-soft);
   }
 
@@ -423,7 +427,7 @@ const schemes = [
   .sig__hint {
     font-size: 0.875rem;
     color: var(--text-soft);
-    max-width: 46rem;
+    max-width: 30em;
   }
 
   .sig__hint {

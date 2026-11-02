@@ -68,8 +68,8 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
 <div class="tf" data-tf>
   <div class="tf__wrap">
   <div class="tf__pn"><RampagePneumatics /></div>
-  <div class="tf__plot" data-draw>
-    <svg viewBox="0 0 640 262" class="tf__svg" role="group" aria-label="Timing diagram of one plow strike. Tab to each trace to read it.">
+  <div class="tf__plot" data-draw data-hscroll="Timing diagram">
+    <svg viewBox="0 0 640 262" class="tf__svg" style="--fig-w:640px" role="group" aria-label="Timing diagram of one plow strike. Tab to each trace to read it.">
       <defs>
         <clipPath id="tf-clip"><rect x="0" y="0" width="640" height="200" data-tf-clip></rect></clipPath>
       </defs>
@@ -124,7 +124,7 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     <p>
       <span class="tf__item"><span class="callout" aria-hidden="true">1</span> exhaust open {SOLENOID_SEQUENCE_DELAY} ms, plow home</span>
       <span class="tf__item"><span class="callout" aria-hidden="true">2</span> inlets open {SOLENOID_ACTIVATION_TIME} ms, plow out</span>
-      <span class="tf__item"><span class="callout" aria-hidden="true">3</span> <span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} used: about six cycles above 30 lbf, {MAX_WEAPON_ACTIVATIONS} allowed by firmware</span>
+      <span class="tf__item"><span class="callout" aria-hidden="true">3</span> <span><span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} used: about six cycles above 30 lbf, {MAX_WEAPON_ACTIVATIONS} allowed by firmware</span></span>
     </p>
     <p class="tf__slow" data-tf-speed-note>played 4x slower than real</p>
   </div>
@@ -140,6 +140,11 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
   .tf__wrap {
     display: grid;
     align-items: center;
+  }
+
+  /* Each column may shrink below its drawing's width; on a phone the drawing scrolls instead. */
+  .tf__wrap > * {
+    min-width: 0;
   }
 
   .tf__pn {
@@ -346,9 +351,10 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     gap: 0.4rem 1.25rem;
   }
 
+  /* The callout sits at the first line when an item wraps. */
   .tf__item {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.45rem;
   }
 

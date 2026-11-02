@@ -59,7 +59,7 @@ const stages = [
         <canvas width="420" height="420" data-plot="ofdm" role="img" aria-label="Constellation of the OFDM data subcarriers"></canvas>
       </figure>
       <figure class="plot plot--wide">
-        <figcaption class="label">Channel magnitude per subcarrier · pilots in amber</figcaption>
+        <figcaption class="label">Channel magnitude per subcarrier · pilots in blue</figcaption>
         <canvas width="860" height="150" data-plot="h" role="img" aria-label="Channel magnitude across 64 subcarriers"></canvas>
       </figure>
       <dl class="stats mono">
@@ -189,7 +189,11 @@ const stages = [
     gap: 0.6rem;
   }
 
+  /* Values sit on the tile's bottom edge, so a wrapped label never pushes one out of line. */
   .stats > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line);
     border-radius: 0.6rem;
@@ -287,9 +291,10 @@ const stages = [
       ctx.stroke();
       ctx.setLineDash([]);
       const accent = css('--accent');
-      const amber = css('--amber');
+      // The site's amber is its accent now, so the second color is the blue it uses for signals.
+      const second = css('--code-number');
       pts.forEach((z, i) => {
-        ctx.fillStyle = isOne(i) ? accent : amber;
+        ctx.fillStyle = isOne(i) ? accent : second;
         ctx.globalAlpha = 0.8;
         ctx.beginPath();
         ctx.arc(w / 2 + z[0] * sc, h / 2 - z[1] * sc, 3, 0, Math.PI * 2);
@@ -315,7 +320,7 @@ const stages = [
         if (NULLS.has(k)) return;
         const mag = Math.sqrt(abs2(H[k]));
         const bh = (mag / max) * (h - 10);
-        ctx.fillStyle = PILOTS.includes(k) ? css('--amber') : css('--accent');
+        ctx.fillStyle = PILOTS.includes(k) ? css('--code-number') : css('--accent');
         ctx.globalAlpha = 0.75;
         ctx.fillRect(x * bw + 1, h - bh, bw - 2, bh);
         if (Hhat) {

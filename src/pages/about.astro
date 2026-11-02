@@ -171,7 +171,7 @@ const principles = [
               <li class="offclock__item card" data-reveal>
                 {photo && (
                   <div class="offclock__photo">
-                    <Image src={photo} alt={o.alt} widths={[480, 720, 960]} sizes="(min-width: 960px) 24rem, 100vw" format="webp" quality={80} />
+                    <Image src={photo} alt={o.alt} widths={[480, 640, 800, 960]} sizes="(min-width: 960px) 24rem, (min-width: 720px) 50vw, 100vw" format="webp" quality={80} />
                   </div>
                 )}
                 <div class="offclock__body">
@@ -247,9 +247,9 @@ const principles = [
   .about-title {
     margin-top: 1rem;
     max-width: 15ch;
-    font-size: clamp(2.6rem, 6.5vw, 4.75rem);
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
     font-weight: 600;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.035em;
   }
 
   .portrait {
@@ -301,7 +301,13 @@ const principles = [
     display: grid;
     gap: 1rem;
     margin-top: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+
+  /* Three cards, three across from tablet width, so none sits alone in a row. */
+  @media (min-width: 768px) {
+    .offclock {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .offclock__item {
@@ -379,7 +385,7 @@ const principles = [
   }
 
   .about-fig {
-    margin: 0;
+    margin: 1.75rem 0 0;
   }
 
   .about-fig__pair {

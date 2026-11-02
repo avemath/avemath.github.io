@@ -73,9 +73,10 @@ import Icon from '../Icon.astro';
     }
   }
 
+  /* Extra room at the top, so the mode badge sits above the LEDs instead of on them. */
   .spec__matrix {
     position: relative;
-    padding: 0.9rem;
+    padding: 2.25rem 0.9rem 0.9rem;
     border-radius: 1rem;
     background: #05070c;
     border: 1px solid #1d2638;
@@ -220,6 +221,7 @@ import Icon from '../Icon.astro';
 
   .spec__aside {
     margin-top: 1.25rem;
+    max-width: 28em;
     font-size: 0.88rem;
     color: var(--text-soft);
   }

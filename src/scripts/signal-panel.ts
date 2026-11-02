@@ -74,13 +74,6 @@ export function mountSignalPanel(fig: HTMLElement) {
     }
     ctx.stroke();
 
-    ctx.fillStyle = 'rgba(169,182,204,0.9)';
-    ctx.font = '11px "IBM Plex Mono", monospace';
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'right';
-    for (const f of GRID_HZ.slice(1, -1)) ctx.fillText(`${f / 1000} kHz`, b.x1 - 4, yOf(f) - 8);
-    ctx.textAlign = 'left';
-
     // The tones: one bar per chip, at its hop frequency.
     const shift = drift * (b.x1 - b.x0);
     for (const c of chips) {
@@ -94,6 +87,21 @@ export function mountSignalPanel(fig: HTMLElement) {
       ctx.fillRect(x, yOf(c.hz) - (near || hot ? 2 : 1.5), Math.min(w, b.x1 - x), near || hot ? 4 : 3);
     }
     ctx.globalAlpha = 1;
+
+    // Axis labels go on top of the tones, each on a small navy plate so a tone never runs through one.
+    ctx.font = '11px "IBM Plex Mono", monospace';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'right';
+    for (const f of GRID_HZ.slice(1, -1)) {
+      const label = `${f / 1000} kHz`;
+      const y = yOf(f) - 8;
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(11,31,58,0.92)';
+      ctx.fillRect(b.x1 - 6 - tw, y - 7, tw + 4, 14);
+      ctx.fillStyle = 'rgba(169,182,204,0.9)';
+      ctx.fillText(label, b.x1 - 4, y);
+    }
+    ctx.textAlign = 'left';
   }
 
   function resize() {

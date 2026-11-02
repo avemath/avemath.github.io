@@ -78,12 +78,14 @@ const { bare = false, navLabel, section, footer = 'default', ...seo } = Astro.pr
       import { initDecodeHeadings } from '../scripts/decode-headings';
       import { initSketches } from '../scripts/sketch';
       import { initTabs } from '../scripts/tabs';
+      import { initHScroll } from '../scripts/hscroll';
       initPreferenceControls();
       initReveals();
       initDecodeHeadings();
       initDrawIn();
       initTabs();
       initSketches();
+      initHScroll();
     </script>
 
     {
@@ -92,6 +94,8 @@ const { bare = false, navLabel, section, footer = 'default', ...seo } = Astro.pr
       site.cloudflareAnalyticsToken && (
         <script is:inline define:vars={{ beacon: JSON.stringify({ token: site.cloudflareAnalyticsToken }) }}>
           addEventListener('load', function () {
+            // Only the live site reports; a local preview would only log the beacon's CORS refusal.
+            if (location.hostname !== 'avemath.github.io') return;
             var s = document.createElement('script');
             s.defer = true;
             s.src = 'https://static.cloudflareinsights.com/beacon.min.js';

@@ -1,5 +1,5 @@
 ---
-// Fig. 06, where each skill was used: skills down the side ("Know well" first, then "Have built
+// Fig. 10, where each skill was used: skills down the side ("Know well" first, then "Have built
 // with"), projects across the top, and a dot wherever a real file in that project's repo shows
 // the skill. Every dot links to its file. The data is `usedIn` in src/lib/skills.ts; a skill with
 // no public file is left off. On a phone the table scrolls sideways with the skill names frozen.
@@ -26,10 +26,10 @@ let row = 0;
 
     <figure class="sm paper" data-sm style={`--rows:${total}`}>
       <div class="fig__bar">
-        <p class="fig__label">Fig. 06 / Where each skill was used</p>
+        <p class="fig__label">Fig. 10 / Where each skill was used</p>
         <p class="fig__label"><span class="on-mouse">hover</span><span class="on-touch">tap</span> a dot to see the file</p>
       </div>
-      <div class="sm__scroll" tabindex="0" role="region" aria-label="Skills by project, scrolls sideways">
+      <div class="sm__scroll" data-hscroll="Skills by project">
         <table class="sm__table">
           <caption class="sr-only">Where each skill was used. Each mark links to a file in that project's code.</caption>
           <thead>

@@ -70,7 +70,7 @@ body{width:1200px;height:630px;background:#0b1f3a radial-gradient(rgb(244 246 25
 .c{position:absolute;left:80px;top:72px;bottom:64px;width:640px;display:flex;flex-direction:column}
 .e{font-size:24px;font-weight:600;color:#ef8d66}
 h1{font-weight:800;font-variation-settings:'wdth' 112;font-size:${c.title.length > 40 ? 58 : c.title.length > 24 ? 68 : 88}px;line-height:.96;letter-spacing:-.03em;margin-top:22px}
-p{margin-top:24px;font-size:26px;line-height:1.4;color:#a9b6cc;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+p{margin-top:24px;font-size:26px;line-height:1.4;color:#a9b6cc;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .f{margin-top:auto;display:flex;align-items:center;gap:14px;font-family:PM;font-size:20px;color:#a9b6cc}
 .f:before{content:'';width:40px;height:6px;background:#de6a41}
 .bar{position:absolute;left:0;right:0;bottom:0;height:14px;background:#de6a41}
@@ -85,6 +85,20 @@ for (const c of cards) {
   await writeFile(join(DIST, '__og.html'), html(c));
   await page.goto(`${base}/__og.html`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
+  // A long title plus a long summary can crowd the footer line: step the title down until the
+  // column fits, with room to spare above the footer.
+  await page.evaluate(() => {
+    const col = document.querySelector('.c');
+    const h1 = document.querySelector('h1');
+    const foot = document.querySelector('.f');
+    const p = document.querySelector('p');
+    let size = parseFloat(getComputedStyle(h1).fontSize);
+    while (size > 44 && p.getBoundingClientRect().bottom > foot.getBoundingClientRect().top - 24) {
+      size -= 2;
+      h1.style.fontSize = `${size}px`;
+    }
+    return col.scrollHeight;
+  });
   await page.screenshot({ path: `public/og/${c.file}.png` });
 }
 console.log(`social cards: ${cards.length}`);

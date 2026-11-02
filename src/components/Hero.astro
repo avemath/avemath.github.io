@@ -44,8 +44,9 @@ import site from '@/data/site.json';
   }
 
   @media (min-width: 1024px) {
+    /* The title column is wide enough for the headline to fit in six lines at 1440. */
     .hero__grid {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      grid-template-columns: minmax(0, 5fr) minmax(0, 3fr);
       gap: clamp(2rem, 4vw, 4rem);
     }
   }
