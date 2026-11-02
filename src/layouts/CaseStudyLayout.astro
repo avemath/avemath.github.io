@@ -317,8 +317,19 @@ const jsonLd = [
     padding-bottom: clamp(2.5rem, 5vw, 4rem);
   }
 
+  /* Without a metrics row the head already ends in its own padding; the zone adds only a little,
+     so every case study opens its body the same distance below the head. */
+  .case__zone--top:not(:has(.case__metrics)) {
+    padding-bottom: 1rem;
+  }
+
   .case__zone--end {
     padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  /* Without a gallery the body's own bottom padding is the gap, as it is after a gallery. */
+  .case__zone--end:not(:has(.case__gallery-wrap)) {
+    padding-top: 0;
   }
 
   .case__head {
@@ -333,9 +344,10 @@ const jsonLd = [
     color: var(--muted);
   }
 
-  .crumbs li + li::before {
+  /* The slash trails each item, so a wrapped line never starts with one. */
+  .crumbs li:not(:last-child)::after {
     content: '/';
-    margin-right: 0.5rem;
+    margin-left: 0.5rem;
     color: var(--muted);
   }
 
@@ -350,7 +362,7 @@ const jsonLd = [
   }
 
   .case__all {
-    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    margin-block: clamp(2.5rem, 5vw, 3.5rem) 1.25rem;
     font-size: 0.9375rem;
   }
 
@@ -445,9 +457,11 @@ const jsonLd = [
     background: var(--surface);
   }
 
+  /* Labels start at the top and values sit on one baseline at the bottom, however the labels wrap. */
   .case__metrics > div {
     display: flex;
     flex-direction: column-reverse;
+    justify-content: space-between;
     gap: 0.35rem;
     padding: 1.25rem 1.4rem;
   }
@@ -476,6 +490,10 @@ const jsonLd = [
     .case__metrics > div:last-child:nth-child(odd) {
       grid-column: 1 / -1;
     }
+  }
+
+  .case__metrics .label {
+    text-wrap: balance;
   }
 
   .case__metric {
@@ -546,11 +564,9 @@ const jsonLd = [
     padding-bottom: clamp(3rem, 6vw, 5rem);
   }
 
-  /* The heading starts where the prose column starts, past the contents column. */
-  @media (min-width: 1100px) {
-    .case__gallery-wrap > .section-title {
-      margin-left: 18rem;
-    }
+  /* Same size as the other section headings in the case study, on the gallery's own left edge. */
+  .case__gallery-wrap > .section-title {
+    font-size: 1.75rem;
   }
 
   .case__gallery {
@@ -584,17 +600,27 @@ const jsonLd = [
     }
   }
 
+  /* Each shot spans two rows of the gallery grid (image, caption), so captions in a row line up
+     even when the images differ in height. */
   .shot {
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    align-content: start;
     margin: 0;
     counter-increment: shot;
   }
 
+  .shot__img {
+    align-self: start;
+  }
+
+  /* The same label format as every other figure on the site: "Fig. 01 / caption". */
   .shot figcaption::before {
-    content: 'Fig ' counter(shot, decimal-leading-zero) '  ';
+    content: 'Fig. ' counter(shot, decimal-leading-zero) ' / ';
     font-family: var(--font-mono);
     font-size: 0.875rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--accent-ink);
   }
 

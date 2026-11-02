@@ -1029,9 +1029,10 @@
 
 .wiring__w--gnd,
 .wiring__w--usb {
-  stroke: var(--text-soft);
+  stroke: var(--muted);
 }
 
+/* Signal in blue, so it reads apart from ground (gray) and both supplies (red, orange). */
 .wiring__w--sig {
   stroke: var(--code-number);
 }

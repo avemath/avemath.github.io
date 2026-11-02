@@ -282,7 +282,8 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     margin-top: 1.75rem;
   }
 
-  @media (min-width: 760px) {
+  /* Three across only once each column can be about 280px wide. */
+  @media (min-width: 1024px) {
     .minis {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
