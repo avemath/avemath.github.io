@@ -1,7 +1,7 @@
 ---
 // The V2V tile's How it works view: each receiver stage with the figure V2V_TXRXf.m saved for it on
-// Run 4 (six inches apart, a laptop lid between the radios), labeled with the report's figure
-// number, and the lines of the file that do the work.
+// Run 4 (six inches apart, a laptop lid between the radios), labeled by stage so the home page keeps
+// one figure numbering, with the report's figure number alongside, and the lines that do the work.
 import { Image } from 'astro:assets';
 import { v2vStages } from '@/lib/v2v-stages';
 import fig2 from '@/assets/projects/v2v-bsm-ofdm/run4-fig2_pre_correlation.png';
@@ -47,10 +47,8 @@ const figs: Record<string, { img: ImageMetadata; n: string; title: string; run4:
             <figure>
               <Image src={f.img} alt={f.alt} widths={[320, 640]} sizes="(min-width: 960px) 18rem, 90vw" format="webp" quality={80} loading="lazy" class="vh__img" />
               <figcaption>
-                <span class="vh__label">{`Fig. ${f.n} / ${f.title}${f.run4 ? ', Run 4' : ''}`}</span>
-                <span class="vh__stage">
-                  {i + 1}. {s.name}
-                </span>{' '}
+                <span class="vh__label">{`Stage ${i + 1} / ${f.title}${f.run4 ? ', Run 4' : ''} (report Fig. ${f.n})`}</span>
+                <span class="vh__stage">{s.name}</span>{' '}
                 {f.cap}{' '}
                 <a class="link vh__lines" href={`${url}#L${s.lines[0]}-L${s.lines[1]}`}>
                   lines {s.lines[0]} to {s.lines[1]}

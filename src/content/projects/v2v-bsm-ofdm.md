@@ -44,7 +44,7 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 **The frame.** Every packet is a preamble (PRE) of 63 BPSK symbols at 16 samples per symbol with root-raised-cosine pulses, a 256-symbol training sequence (TRAIN), one OFDM preamble symbol, four OFDM data symbols, and a guard of zeros. The OFDM symbols use 52 subcarriers at 156.25 kHz spacing: 48 data and 4 pilots at plus and minus 7 and 21, with a 16-sample cyclic prefix (1.6 microseconds at 10 MHz).
 
-**The receiver, in order.** All figures below are from Run 4: six inches apart, with a laptop lid between the radios.
+**The receiver, in order.** All figures below are from Run 4: six inches apart, with a laptop lid between the radios. Their numbers are the ones in the final report.
 
 1. **PRE detect.** Cross-correlate the received samples with the known BPSK preamble. One peak per packet gives coarse timing.
 
