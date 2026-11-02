@@ -23,7 +23,7 @@ const {
 const clamp = (text: string, max = 160) => (text.length <= max ? text : `${text.slice(0, max - 1).replace(/\s+\S*$/, '')}…`);
 const description = clamp(rawDescription);
 
-const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | Engineer and Web Designer`;
+const fullTitle = title ? `${title} | ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL(image, Astro.site).href;
 
