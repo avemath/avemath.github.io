@@ -436,6 +436,42 @@
   box-shadow: var(--shadow);
 }
 
+/* Paper lifts 2px on hover or focus within, with its shadow deepening. The skills matrix is
+   paper too, but a whole table should not move. */
+.paper {
+  transition:
+    transform 0.16s ease-out,
+    box-shadow 0.16s ease-out;
+}
+
+.paper:not(.sm):hover,
+.paper:not(.sm):focus-within {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* A project card under the pointer: its accent strokes brighten, and the "Try:" word pulses once. */
+.paper:hover .s--hot,
+.paper:hover .pn__plow {
+  stroke: var(--accent-bright);
+}
+
+.paper:hover .f--hot {
+  fill: var(--accent-bright);
+}
+
+.paper:hover .fig__try::before {
+  display: inline-block;
+  animation: try-pulse 0.6s ease-out 1;
+}
+
+@keyframes try-pulse {
+  40% {
+    transform: scale(1.18);
+    color: var(--accent-bright);
+  }
+}
+
 .card--lift {
   transition:
     border-color 0.2s,
