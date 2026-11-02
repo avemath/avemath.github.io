@@ -590,7 +590,10 @@ const jsonLd = [
       grid-column: 1 / -1;
     }
 
-    /* Four shots: the three details sit in one row under the lead. */
+  }
+
+  /* Four shots: the three details sit in one row under the lead, once each can be about 280px. */
+  @media (min-width: 1024px) {
     .case__gallery:has(.shot:nth-child(4):last-child) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
