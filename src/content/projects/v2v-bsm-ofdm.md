@@ -26,7 +26,7 @@ demo: ofdm
 
 ## Context
 
-Cars that talk to each other can warn a driver before a crash they can't see yet. In real systems each car broadcasts a Basic Safety Message, in the style of SAE J2735, about 10 times a second: who it is, how fast it's going, and where it is. The physical layer here is modeled on IEEE 802.11p: a 10 MHz channel, OFDM, BPSK and a rate 1/2 convolutional code.
+Cars that talk to each other can warn a driver before a crash they can't see yet. In real systems each car broadcasts a Basic Safety Message (BSM), in the style of SAE J2735, about 10 times a second: who it is, how fast it's going, and where it is. The physical layer here is modeled on IEEE 802.11p: a 10 MHz channel, OFDM (the data split across many narrow subcarriers sent at once), BPSK and a rate 1/2 convolutional code.
 
 ## My role
 
@@ -70,7 +70,7 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 *Fig. 05 / TRAIN fit, Run 4.* The fit turns two rotated clusters into two clusters on the real axis.
 
-5. **Decision-directed PLL.** A BPSK phase-locked loop with loop gain 0.001 and an 8-symbol burn-in tracks the residual phase on the PRE.
+5. **Decision-directed PLL.** A BPSK phase-locked loop (PLL) with loop gain 0.001 and an 8-symbol burn-in tracks the residual phase on the PRE.
 
 ![PRE constellations per car before and after the phase-locked loop: before, clusters slightly off the axis; after, centered on plus and minus one.](../../assets/projects/v2v-bsm-ofdm/run4-fig6_pll.png)
 

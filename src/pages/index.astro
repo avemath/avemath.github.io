@@ -111,7 +111,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           />
           <Fragment slot="text">
             <p>
-              A BPSK-OFDM link modeled on IEEE 802.11p (the car version of Wi-Fi), run over the air between two PlutoSDR software radios.
+              An OFDM radio link (data split across many narrow carriers at once), modeled on IEEE 802.11p (the car version of Wi-Fi), run over the air between two ADALM-PLUTO software radios.
               I designed and wrote the transmitter, the nine-stage receiver and the warning logic. One radio sends both cars' safety
               messages in turn; the other decodes them and computes time to collision. All five hardware runs decoded with zero bit errors.
             </p>
