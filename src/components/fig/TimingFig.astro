@@ -105,14 +105,23 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     <p class="tf__tip mono" data-tf-tip aria-hidden="true"></p>
   </div>
   </div>
+  <div class="tf__controls">
+    <button type="button" class="btn btn--small btn--primary tf__fire" data-fire>Fire</button>
+    <fieldset class="tf__speed">
+      <legend>Speed</legend>
+      <label><input type="radio" name="tf-speed" value="4" checked data-speed /> 4x slower</label>
+      <label><input type="radio" name="tf-speed" value="16" data-speed /> 16x slower</label>
+      <label><input type="radio" name="tf-speed" value="1" data-speed /> Real time</label>
+    </fieldset>
+    <p class="tf__chip" aria-live="polite"><span class="sr-only">Plow: </span><span data-tf-state>Ready</span></p>
+  </div>
   <div class="fig__note tf__legend">
     <p>
-      <span class="tf__k">1</span> fill {SOLENOID_SEQUENCE_DELAY} ms
-      <span class="tf__k">2</span> extend {SOLENOID_ACTIVATION_TIME} ms
-      <span class="tf__k">3</span> <span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} shots used
-      <span class="tf__slow">· played 4x slower than real</span>
+      <span class="tf__item"><span class="callout" aria-hidden="true">1</span> fill {SOLENOID_SEQUENCE_DELAY} ms</span>
+      <span class="tf__item"><span class="callout" aria-hidden="true">2</span> extend {SOLENOID_ACTIVATION_TIME} ms</span>
+      <span class="tf__item"><span class="callout" aria-hidden="true">3</span> <span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} shots used</span>
     </p>
-    <p class="tf__state" aria-live="polite"><span class="sr-only">Firmware: </span><span data-tf-state>Armed</span></p>
+    <p class="tf__slow" data-tf-speed-note>played 4x slower than real</p>
   </div>
   <p class="fig__try">Fire it three times and watch the budget.</p>
 </div>
@@ -150,10 +159,6 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
 
   .tf[data-running] .tf__head {
     opacity: 1;
-  }
-
-  .tf__slow {
-    color: var(--muted);
   }
 
   .tf__plot {
@@ -249,6 +254,95 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     display: block;
   }
 
+  /* Fire, the speed and the plow's state, right under the drawing and the timing rows. */
+  .tf__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1.25rem;
+    padding: 0.75rem 0.9rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .tf__speed {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tf__speed legend {
+    float: left;
+    margin-right: 0.6rem;
+    font-size: 0.9375rem;
+    color: var(--text-soft);
+  }
+
+  .tf__speed label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--line-strong);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .tf__speed label + label {
+    border-left: 0;
+  }
+
+  .tf__speed input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .tf__speed label:has(input:checked) {
+    background: var(--text);
+    color: var(--bg-contrast);
+  }
+
+  .tf__speed label:has(input:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .tf__chip {
+    margin-left: auto;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .tf__legend p {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+  }
+
+  .tf__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .tf__legend .callout {
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+
   .tf__legend {
     display: flex;
     flex-wrap: wrap;
@@ -257,20 +351,6 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     color: var(--text-soft);
   }
 
-  .tf__k {
-    margin-left: 0.6rem;
-    font-weight: 700;
-    color: var(--accent-ink);
-  }
-
-  .tf__k:first-child {
-    margin-left: 0;
-  }
-
-  .tf__state {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-  }
 
 </style>
 

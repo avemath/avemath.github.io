@@ -13,10 +13,14 @@ import { getProjects, isWebsite, projectHref } from '@/lib/projects';
 
 const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live && p.data.client?.permission);
 const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
-// The figure label row and the mobile performance score come from src/data/sites.json. Figures
-// are numbered after the skills matrix (Fig. 06).
-// TODO(ave): re-measure. The scores are Lighthouse mobile runs from 2026-11-01, made locally
-// because the PageSpeed Insights API was over its daily quota; refresh them on pagespeed.web.dev.
+// Each site's facts come from src/data/sites.json: things a visitor can judge (speed,
+// accessibility, page weight, how long it has been live, what the owner edits), not commit
+// counts. Figures are numbered after the skills matrix (Fig. 06).
+// TODO(ave): re-measure on PageSpeed Insights. pagespeedMobile, accessibility and pageWeightKb
+// are Lighthouse mobile runs from 2026-11-01, made locally because the PageSpeed Insights API was
+// over its daily quota. Scores moved a few points between runs.
+// TODO(ave): confirm liveSince. It is the month each build finished (or started, while ongoing),
+// from the case studies, which may not be the exact launch month.
 const FIRST_FIG = 7;
 const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 ---
@@ -50,7 +54,6 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                 <div class="site__copy">
                   <p class="site__fig">
                     <span>Fig. {String(FIRST_FIG + i).padStart(2, '0')} / {new URL(p.data.links.live!).host}</span>
-                    {data?.pagespeedMobile && <span>Mobile performance {data.pagespeedMobile}</span>}
                   </p>
                   <p class="label site__kind">{p.data.client?.kind}</p>
                   <h3 class="site__title">{p.data.title}</h3>
@@ -60,15 +63,36 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                       <dt class="label">What I did</dt>
                       <dd>{p.data.role}</dd>
                     </dl>
-                    {p.data.metrics && (
-                      <dl class="site__metrics">
-                        {p.data.metrics.map((m) => (
+                    {data && (
+                      <>
+                        <dl class="site__metrics">
                           <div>
-                            <dt class="label">{m.label}</dt>
-                            <dd class="site__metric">{m.value}</dd>
+                            <dt class="label">Mobile performance</dt>
+                            <dd class="site__metric">{data.pagespeedMobile}</dd>
                           </div>
-                        ))}
-                      </dl>
+                          <div>
+                            <dt class="label">Accessibility</dt>
+                            <dd class="site__metric">{data.accessibility}</dd>
+                          </div>
+                          <div>
+                            <dt class="label">Home page weight</dt>
+                            <dd class="site__metric">
+                              {data.pageWeightKb}
+                              <span class="site__unit">KB</span>
+                            </dd>
+                          </div>
+                        </dl>
+                        <dl class="site__more">
+                          <div>
+                            <dt class="label">Live since</dt>
+                            <dd>{data.liveSince}</dd>
+                          </div>
+                          <div>
+                            <dt class="label">Who edits it</dt>
+                            <dd>{data.ownerEdits}</dd>
+                          </div>
+                        </dl>
+                      </>
                     )}
                   </div>
                   <div class="site__links mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -354,6 +378,24 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     line-height: 1;
     letter-spacing: -0.035em;
     font-variant-numeric: tabular-nums;
+  }
+
+  .site__unit {
+    margin-left: 0.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .site__more {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem 1.5rem;
+  }
+
+  .site__more dd {
+    margin-top: 0.15rem;
+    font-size: 1rem;
   }
 
   .sites__how {

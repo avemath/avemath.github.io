@@ -1,44 +1,45 @@
 ---
-// RAMpage's pneumatics as a schematic that moves with the firmware: the air reservoir, the main
-// valve (GP14), the piston valve (GP15), the piston and the plow. Its state is set from
-// src/lib/rampage-firmware.ts by src/scripts/fig/timing.ts, so the valves open and close exactly
-// when the firmware switches them. The labels follow the README's sequence: the main valve opens
-// to let air in, pressure builds, the piston valve extends the plow, and the main valve vents.
-// TODO(ave): confirm the plumbing. The sources disagree on the main valve (the code calls it the
-// exhaust, the README says it fills the system and later vents it), the README says one reservoir
-// where a photo caption says two air tanks, and the number of pistons is not stated.
+// RAMpage's pneumatics as a schematic that moves with the firmware: two air tanks feeding the
+// main valve (GP14, the exhaust and reservoir valve in the README), then the piston valve (GP15),
+// which feeds two pneumatic cylinders side by side, each with its own rod, both pushing the one
+// plow. One valve drives both cylinders, so the timing rows have one piston row. Its state is set
+// from src/lib/rampage-firmware.ts by src/scripts/fig/timing.ts, so the valves open and close
+// exactly when the firmware switches them. Plumbing confirmed by Ave; cylinder bore and stroke
+// are not stated and the drawing does not need them.
 ---
 
 <div class="pn" data-pn data-main="open" data-piston="closed" data-pressure="off" data-vent="off">
-  <svg class="dw__svg pn__svg" viewBox="0 0 360 222" role="img" aria-label="The plow's pneumatics: an air reservoir, the main valve, the piston valve, and the piston that pushes the plow out." data-sketch>
+  <svg class="dw__svg pn__svg" viewBox="0 0 380 236" role="img" aria-label="The plow's pneumatics: two air tanks feed the main valve, then the piston valve, which drives two cylinders that push the plow out together." data-sketch>
     <title>RAMpage pneumatics</title>
-    <rect class="s f" pathLength="1" x="12" y="60" width="64" height="96" rx="20"></rect>
-    <text class="t" x="44" y="176" text-anchor="middle">air reservoir</text>
+    <rect class="s f" pathLength="1" x="10" y="34" width="46" height="78" rx="16"></rect>
+    <rect class="s f" pathLength="1" x="10" y="126" width="46" height="78" rx="16"></rect>
+    <text class="t" x="33" y="224" text-anchor="middle">air tanks</text>
+    <path class="s" pathLength="1" d="M56 73 H80 V165 H56 M80 119 H100"></path>
 
-    <path class="s" pathLength="1" d="M76 108 H112"></path>
-    <rect class="s pn__valve pn__valve--main" pathLength="1" x="112" y="90" width="44" height="36"></rect>
-    <text class="t t--mono" x="134" y="82" text-anchor="middle">GP14</text>
-    <text class="t" x="134" y="146" text-anchor="middle">main valve</text>
-    <text class="t t--muted pn__state pn__state--main" x="134" y="160" text-anchor="middle" data-pn-main>open</text>
-    <path class="s pn__vent" pathLength="1" d="M134 90 V54 M126 62 L134 52 L142 62"></path>
-    <text class="t t--muted pn__venttext" x="148" y="58">vent</text>
+    <rect class="s pn__valve pn__valve--main" pathLength="1" x="100" y="101" width="44" height="36"></rect>
+    <text class="t t--mono" x="122" y="152" text-anchor="middle">GP14</text>
+    <text class="t" x="122" y="168" text-anchor="middle">main valve</text>
+    <text class="t pn__state pn__state--main" x="122" y="184" text-anchor="middle" data-pn-main>open</text>
+    <path class="s pn__vent" pathLength="1" d="M122 101 V54 M114 64 L122 52 L130 64"></path>
+    <text class="t pn__venttext" x="132" y="64">vent</text>
 
-    <path class="s pn__pipe" pathLength="1" d="M156 108 H200"></path>
-    <rect class="s pn__valve pn__valve--piston" pathLength="1" x="200" y="90" width="44" height="36"></rect>
-    <text class="t t--mono" x="222" y="82" text-anchor="middle">GP15</text>
-    <text class="t" x="222" y="146" text-anchor="middle">piston valve</text>
-    <text class="t t--muted pn__state" x="222" y="160" text-anchor="middle" data-pn-piston>closed</text>
+    <path class="s pn__pipe" pathLength="1" d="M144 119 H180"></path>
+    <rect class="s pn__valve pn__valve--piston" pathLength="1" x="180" y="101" width="44" height="36"></rect>
+    <text class="t t--mono" x="202" y="152" text-anchor="middle">GP15</text>
+    <text class="t" x="202" y="168" text-anchor="middle">piston valve</text>
+    <text class="t pn__state" x="202" y="184" text-anchor="middle" data-pn-piston>closed</text>
 
-    <path class="s pn__pipe2" pathLength="1" d="M244 108 H262 V176"></path>
-    <rect class="s f" pathLength="1" x="232" y="176" width="64" height="24"></rect>
-    <text class="t" x="264" y="214" text-anchor="middle">piston</text>
+    <path class="s pn__pipe2" pathLength="1" d="M224 119 H240 M240 75 V163 M240 75 H252 M240 163 H252"></path>
+    <rect class="s f" pathLength="1" x="252" y="62" width="58" height="26"></rect>
+    <rect class="s f" pathLength="1" x="252" y="150" width="58" height="26"></rect>
+    <text class="t" x="252" y="52">2 cylinders</text>
     <g class="pn__rod">
-      <path class="s" pathLength="1" d="M276 188 H322"></path>
-      <path class="s s--hot f--hot pn__plow" pathLength="1" d="M322 168 L340 168 L350 206 L322 206 Z"></path>
+      <path class="s" pathLength="1" d="M282 75 H334 M282 163 H334"></path>
+      <path class="s s--hot f--hot pn__plow" pathLength="1" d="M334 48 L350 48 L364 190 L334 190 Z"></path>
     </g>
-    <text class="t" x="300" y="160">plow</text>
+    <text class="t" x="349" y="210" text-anchor="middle">plow</text>
   </svg>
-  <p class="pn__status" aria-live="polite"><span class="sr-only">Plow: </span><span data-pn-status>Ready</span></p>
+  <p class="pn__status"><span class="sr-only">Plow: </span><span data-pn-status>Ready</span></p>
 </div>
 
 <style>
@@ -47,7 +48,7 @@
   }
 
   .pn__svg {
-    max-width: 24rem;
+    max-width: 26rem;
   }
 
   .pn__valve {
@@ -58,10 +59,6 @@
   .pn[data-main='open'] .pn__valve--main,
   .pn[data-piston='open'] .pn__valve--piston {
     fill: var(--accent);
-  }
-
-  .pn[data-main='open'] .pn__state--main {
-    fill: var(--accent-ink);
   }
 
   .pn__pipe,
@@ -75,25 +72,34 @@
     stroke-width: 3;
   }
 
-  .pn__vent,
-  .pn__venttext {
-    opacity: 0.25;
-    transition: opacity 0.12s;
+  /* The vent: always readable in ink; it turns to the accent while the main valve vents. */
+  .pn__vent {
+    stroke: var(--text);
+    stroke-width: 1.5;
   }
 
-  .pn[data-vent='on'] .pn__vent,
-  .pn[data-vent='on'] .pn__venttext {
-    opacity: 1;
+  .pn__venttext {
+    font-size: 13px;
+    fill: var(--text);
+  }
+
+  .pn[data-vent='on'] .pn__vent {
     stroke: var(--accent);
+    stroke-width: 2.5;
+  }
+
+  .pn[data-vent='on'] .pn__venttext {
+    fill: var(--accent-ink);
+    font-weight: 700;
   }
 
   .pn__rod {
     transition: transform 0.3s ease-out;
   }
 
-  /* Retracted, the plow sits against the piston; extended, it is pushed out 26 units. */
+  /* Retracted, the plow sits against the rods' ends; extended, both rods push it out together. */
   .pn[data-piston='closed'] .pn__rod {
-    transform: translateX(-26px);
+    transform: translateX(-22px);
   }
 
   .pn[data-piston='open'] .pn__rod {
@@ -103,7 +109,7 @@
   .pn__status {
     margin-top: 0.25rem;
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     font-weight: 500;
     color: var(--text);
   }

@@ -1,6 +1,7 @@
 // Fig. 01: tooltips on the traces, and "Fire the plow", which runs the real firmware port. The
 // firmware boots on its virtual clock in an instant (its 3 s startup interlock is behavior, not
-// something to wait through here), then runs, 4x slower than real, only while a strike plays out.
+// something to wait through here), then runs, 4x slower than real by default (16x or real time
+// by choice), only while a strike plays out.
 // Nothing moves while nobody is pressing anything.
 import { createFirmware, LOOP_MS, MAX_WEAPON_ACTIVATIONS, SOLENOID_ACTIVATION_TIME, SOLENOID_SEQUENCE_DELAY } from '../../lib/rampage-firmware';
 
@@ -14,7 +15,14 @@ export function mountTiming(root: HTMLElement) {
   const state = root.querySelector<HTMLElement>('[data-tf-state]')!;
   const cells = [...root.querySelectorAll<SVGRectElement>('[data-cell]')];
   const card = root.closest<HTMLElement>('[data-fc]');
-  const fire = card?.querySelector<HTMLButtonElement>('[data-fire]');
+  // Two Fire buttons do the same thing: the compact one under the figure, and the big one in
+  // the text column.
+  const fires = [...(card ?? root).querySelectorAll<HTMLButtonElement>('[data-fire]')];
+  const speedNote = root.querySelector<HTMLElement>('[data-tf-speed-note]');
+  const speeds = [...root.querySelectorAll<HTMLInputElement>('[data-speed]')];
+  const slowness = () => Number(speeds.find((r) => r.checked)?.value ?? 4);
+  const describe = (k: number) => (k === 1 ? 'played in real time' : `played ${k}x slower than real`);
+  speeds.forEach((r) => r.addEventListener('change', () => speedNote && (speedNote.textContent = describe(slowness()))));
 
   // ---- Tooltips: hover or focus a trace ----
   const show = (row: SVGGElement) => {
@@ -47,18 +55,14 @@ export function mountTiming(root: HTMLElement) {
   const paint = () => {
     used.textContent = String(fw.activations);
     cells.forEach((c, i) => c.toggleAttribute('data-used', i < fw.activations));
-    const [label] = fw.stateLabel();
-    state.textContent = label;
-    if (!fire) return;
     const out = fw.activations >= MAX_WEAPON_ACTIVATIONS;
-    fire.textContent = out ? 'Refill (new match)' : 'Fire the plow';
+    fires.forEach((b) => (b.textContent = out ? 'Refill (new match)' : b.closest('.tf') ? 'Fire' : 'Fire the plow'));
   };
 
   // ---- One strike, played 4x slower than real so the 50 ms steps can be seen ----
   // The firmware runs on its virtual clock at a quarter of real speed. A playhead sweeps the
   // timing rows, the traces redraw behind it, and the pneumatics drawing and its status word
   // follow the valves exactly as the firmware switches them.
-  const SLOW = 4;
   const pn = card?.querySelector<HTMLElement>('[data-pn]') ?? null;
   const pnMain = pn?.querySelector<SVGTextElement>('[data-pn-main]');
   const pnPiston = pn?.querySelector<SVGTextElement>('[data-pn-piston]');
@@ -81,17 +85,18 @@ export function mountTiming(root: HTMLElement) {
       if (pnMain) pnMain.textContent = fw.mainOpen ? 'open' : 'closed';
       if (pnPiston) pnPiston.textContent = fw.pistonOpen ? 'open' : 'closed';
     }
-    if (!pnStatus) return;
     let word = fw.activations >= MAX_WEAPON_ACTIVATIONS ? 'Out of air' : 'Ready';
     if (fired && rel < SOLENOID_SEQUENCE_DELAY) word = 'Filling';
     else if (fired && rel < SOLENOID_SEQUENCE_DELAY * 2) word = 'Settling';
     else if (fired && rel < STROKE_MS) word = 'Plow out';
     else if (fired && elapsed < WINDOW_MS) word = 'Venting';
-    if (pnStatus.textContent !== word) pnStatus.textContent = word;
+    // The chip under the timing rows says the same word as the drawing.
+    if (pnStatus && pnStatus.textContent !== word) pnStatus.textContent = word;
+    if (state.textContent !== word) state.textContent = word;
   };
 
   let busy = false;
-  fire?.addEventListener('click', () => {
+  const onFire = () => {
     if (busy) return;
     if (fw.activations >= MAX_WEAPON_ACTIVATIONS) {
       boot();
@@ -102,6 +107,7 @@ export function mountTiming(root: HTMLElement) {
     busy = true;
     root.dataset.running = '';
     const before = fw.activations;
+    const SLOW = slowness();
     fw.tx.trigger = true;
     let elapsed = 0;
     let firedAt = -1;
@@ -135,7 +141,9 @@ export function mountTiming(root: HTMLElement) {
       }
     };
     requestAnimationFrame(run);
-  });
+  };
+  fires.forEach((b) => b.addEventListener('click', onFire));
 
   paint();
+  showStrike(-1, 0);
 }
