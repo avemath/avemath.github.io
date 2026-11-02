@@ -1033,10 +1033,13 @@
 }
 
 .wiring__w--sig {
-  stroke: var(--text);
+  stroke: var(--code-number);
 }
 
-.wiring__arrow--sig,
+.wiring__arrow--sig {
+  fill: var(--code-number);
+}
+
 .wiring__leds {
   fill: var(--text);
 }
