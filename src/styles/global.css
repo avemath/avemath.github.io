@@ -1,207 +1,13 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/space-grotesk';
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/jetbrains-mono';
-
-/* ------------------------------------------------------------------
-   Fallback faces with the web fonts' metrics. While the real files load,
-   text set in Arial or Courier New takes the same space, so the swap does
-   not move the layout. The size-adjust values were measured by rendering
-   the same sentence in both fonts; the overrides are the web fonts' hhea
-   metrics divided by that ratio. Semibold text gets its own face because
-   the bold fallback is already close to the web font's width.
-   ------------------------------------------------------------------ */
-@font-face {
-  font-family: 'Inter Fallback';
-  font-weight: 100 500;
-  src: local('Arial'), local('Liberation Sans'), local('Helvetica Neue'), local('Helvetica');
-  size-adjust: 106.7%;
-  ascent-override: 90.8%;
-  descent-override: 22.6%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: 'Inter Fallback';
-  font-weight: 600 900;
-  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Helvetica Neue Bold'), local('Helvetica-Bold');
-  size-adjust: 101.8%;
-  ascent-override: 95.2%;
-  descent-override: 23.7%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: 'Space Grotesk Fallback';
-  font-weight: 100 500;
-  src: local('Arial'), local('Liberation Sans'), local('Helvetica Neue'), local('Helvetica');
-  size-adjust: 108.6%;
-  ascent-override: 90.6%;
-  descent-override: 26.9%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: 'Space Grotesk Fallback';
-  font-weight: 600 900;
-  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Helvetica Neue Bold'), local('Helvetica-Bold');
-  size-adjust: 101.4%;
-  ascent-override: 97%;
-  descent-override: 28.8%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: 'JetBrains Mono Fallback';
-  font-weight: 100 900;
-  src: local('Courier New'), local('Liberation Mono'), local('Menlo'), local('Consolas'), local('Cascadia Mono');
-  size-adjust: 100%;
-  ascent-override: 102%;
-  descent-override: 30%;
-  line-gap-override: 0%;
-}
+@import './fonts.css';
+@import './tokens.css';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-/* ------------------------------------------------------------------
-   Design tokens. "Descent": a signal sent down through the ocean. The
-   home page is water that gets one clear step darker per section, from
-   a bright surface to a near-black seafloor, with sonar teal for lines
-   and signal amber for the one thing that matters on screen.
-
-   --band-0 to --band-11 are the twelve depth shades. A `.zone` takes
-   its shade from --band and redefines its surfaces and lines from it,
-   so cards always sit one step lighter than the water around them. In
-   the light theme the lower half of the descent is dark water: those
-   zones set --deep to 1 and switch to the light-on-dark inks. Every text
-   token passes AA on every band in both themes (see docs/REDESIGN.md).
-   ------------------------------------------------------------------ */
-:root {
-  --band-0: #e4f8fd;
-  --band-1: #d9f0f7;
-  --band-2: #cee8f1;
-  --band-3: #c4e0ec;
-  --band-4: #bad8e6;
-  --band-5: #b1d0e0;
-  --band-6: #1d4357;
-  --band-7: #18384a;
-  --band-8: #142e3f;
-  --band-9: #102534;
-  --band-10: #0b1c2a;
-  --band-11: #07141f;
-  --bg: #e4f8fd;
-  --bg-deep: #c9e2e9;
-  --text: #0b1d29;
-  --text-soft: #223b49;
-  --muted: #334d5a;
-  --accent: #1d6a86;
-  --accent-ink: #0f5168;
-  --accent-wash: rgb(29 106 134 / 0.1);
-  /* Stronger wash for staged backgrounds, which go flat on the pale light surface. */
-  --accent-wash-strong: rgb(29 106 134 / 0.18);
-  --amber: #f0a940;
-  /* Amber for strokes. Light amber is too pale to read as text, so text uses --amber-ink. */
-  --amber-line: #b8700a;
-  --amber-ink: #6f4200;
-  --on-amber: #1a1203;
-  --danger: #9f1d13;
-  --leaf: #4a7c59;
-  --leaf-ink: #2f5e3c;
-  --ok: #24693e;
-  --shadow: 0 1px 2px rgb(11 29 41 / 0.06), 0 12px 32px -16px rgb(11 29 41 / 0.28);
-  --shadow-lift: 0 2px 4px rgb(11 29 41 / 0.06), 0 24px 48px -20px rgb(11 29 41 / 0.38);
-  --gutter: clamp(1rem, 4vw, 2.5rem);
-  color-scheme: light;
-}
-
-[data-theme='dark'] {
-  --band-0: #0f4955;
-  --band-1: #0a424f;
-  --band-2: #083a48;
-  --band-3: #083442;
-  --band-4: #062f3d;
-  --band-5: #062938;
-  --band-6: #062432;
-  --band-7: #06202d;
-  --band-8: #061c29;
-  --band-9: #061824;
-  --band-10: #061420;
-  --band-11: #05111c;
-  --bg: #061c2b;
-  --bg-deep: #041420;
-  --text: #e4f0f5;
-  --text-soft: #c3d6df;
-  --muted: #adc6d2;
-  --accent: #7ccbe6;
-  --accent-ink: #93d5ec;
-  --accent-wash: rgb(124 203 230 / 0.1);
-  --accent-wash-strong: rgb(124 203 230 / 0.14);
-  --amber: #f0a940;
-  --amber-line: #f0a940;
-  --amber-ink: #f5c27a;
-  --on-amber: #1a1203;
-  --danger: #ff8a7a;
-  --leaf: #8fd19e;
-  --leaf-ink: #a9dfb5;
-  --ok: #6fd39a;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.65);
-  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 28px 56px -20px rgb(0 0 0 / 0.8);
-  color-scheme: dark;
-}
-
-/* Surfaces and lines follow whatever --bg is in scope: the page's, or a zone's own shade. In the
-   light theme a deep zone (--deep: 1) mixes them the way the dark theme does. */
-:root,
-.zone {
-  --surface: color-mix(in oklab, var(--bg), #fff calc(62% - var(--deep, 0) * 57%));
-  --surface-2: color-mix(in oklab, var(--bg), #fff calc(32% - var(--deep, 0) * 24%));
-  --line: color-mix(in oklab, var(--bg), color-mix(in srgb, #0b1d29, #fff calc(var(--deep, 0) * 100%)) 13%);
-  --line-strong: color-mix(in oklab, var(--bg), color-mix(in srgb, #0b1d29, #fff calc(var(--deep, 0) * 100%)) 26%);
-  --grid: rgb(11 29 41 / 0.05);
-}
-
-/* Light theme, dark water: the inks swap to the dark theme's set. */
-:root:not([data-theme='dark']) .zone {
-  --text: color-mix(in srgb, #0b1d29, #e4f0f5 calc(var(--deep) * 100%));
-  --text-soft: color-mix(in srgb, #223b49, #c3d6df calc(var(--deep) * 100%));
-  --muted: color-mix(in srgb, #334d5a, #adc6d2 calc(var(--deep) * 100%));
-  --accent: color-mix(in srgb, #1d6a86, #7ccbe6 calc(var(--deep) * 100%));
-  --accent-ink: color-mix(in srgb, #0f5168, #93d5ec calc(var(--deep) * 100%));
-  --accent-wash: color-mix(in srgb, var(--accent) 10%, transparent);
-  --accent-wash-strong: color-mix(in srgb, var(--accent) 16%, transparent);
-  --amber-line: color-mix(in srgb, #b8700a, #f0a940 calc(var(--deep) * 100%));
-  --amber-ink: color-mix(in srgb, #6f4200, #f5c27a calc(var(--deep) * 100%));
-  --danger: color-mix(in srgb, #9f1d13, #ff8a7a calc(var(--deep) * 100%));
-  --ok: color-mix(in srgb, #24693e, #6fd39a calc(var(--deep) * 100%));
-}
-
-/* Tailwind's color utilities read these, and a variable resolves where it is declared, so each
-   zone declares them again to pick up its own shade and inks. */
-.zone {
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-line: var(--line);
-  --color-text: var(--text);
-  --color-soft: var(--text-soft);
-  --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-amber-ink: var(--amber-ink);
-}
-
-[data-theme='dark'],
-[data-theme='dark'] .zone {
-  --surface: color-mix(in oklab, var(--bg), #fff 5%);
-  --surface-2: color-mix(in oklab, var(--bg), #fff 8%);
-  --line: color-mix(in oklab, var(--bg), #fff 13%);
-  --line-strong: color-mix(in oklab, var(--bg), #fff 24%);
-  --grid: rgb(228 240 245 / 0.04);
-}
-
 @theme {
-  --font-display: 'Space Grotesk Variable', 'Space Grotesk Fallback', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono Fallback', ui-monospace, 'Cascadia Code', Menlo, monospace;
+  --font-display: 'Archivo Variable', 'Archivo Wide Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Archivo Variable', 'Archivo Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'IBM Plex Mono Fallback', ui-monospace, Menlo, monospace;
 
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -210,9 +16,9 @@
   --color-text: var(--text);
   --color-soft: var(--text-soft);
   --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-amber: var(--amber);
-  --color-amber-ink: var(--amber-ink);
+  --color-accent: var(--accent-ink);
+  --color-amber: var(--accent);
+  --color-amber-ink: var(--accent-ink);
   --color-leaf: var(--leaf);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -225,7 +31,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
-    scroll-padding-top: 5.5rem;
+    scroll-padding-top: 5rem;
     background: var(--bg);
   }
 
@@ -241,8 +47,7 @@
     color: var(--text);
     font-family: var(--font-sans);
     font-size: 1.0625rem;
-    line-height: 1.65;
-    font-feature-settings: 'cv11', 'ss01';
+    line-height: 1.5;
     overflow-x: clip;
   }
 
@@ -251,10 +56,18 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-weight: 800;
+    font-variation-settings: 'wdth' 112;
+    line-height: 0.94;
+    letter-spacing: -0.03em;
     text-wrap: balance;
     color: var(--text);
+  }
+
+  h3,
+  h4 {
+    line-height: 1.05;
+    letter-spacing: -0.02em;
   }
 
   p,
@@ -268,13 +81,12 @@
 
   ::selection {
     background: var(--accent);
-    color: var(--bg);
+    color: #fff;
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--focus);
     outline-offset: 3px;
-    border-radius: 4px;
   }
 
   img,
@@ -297,14 +109,14 @@
   width: 100%;
   max-width: 76rem;
   margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2.5rem);
+  padding-inline: var(--gutter);
 }
 
 .wrap-narrow {
   width: 100%;
   max-width: 46rem;
   margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2.5rem);
+  padding-inline: var(--gutter);
 }
 
 /* Layered under components so Tailwind utilities (pt-0, pb-10, text-base) can override them. */
@@ -313,27 +125,61 @@
     padding-block: clamp(3rem, 7vw, 6rem);
   }
 
-  /* A section that holds one card: the card frames the content, so the band stays short. */
   .section--band {
     padding-block: clamp(2rem, 4vw, 3rem);
   }
 
-  .section + .section--band {
+  .section--tight {
+    padding-block: clamp(2.25rem, 5vw, 4rem);
+  }
+
+  .section + .section {
+    border-top: 1px solid var(--line);
+  }
+
+  .section + .section--band,
+  .section + .ground-alt,
+  .ground-alt + .section {
     border-top: 0;
   }
 }
 
-@layer components {
-  .section + .section {
-    border-top: 1px solid var(--line);
-  }
+/* The alternate ground: a pale grey with a faint dot grid, like the paper under a scope. */
+.ground-alt {
+  background: var(--ground-alt) radial-gradient(var(--dot) 1px, transparent 1.4px) 0 0 / 20px 20px;
 }
 
-/* Supporting sections sit a size down from the main ones, so the page has a hierarchy of its own. */
-@layer components {
-  .section--tight {
-    padding-block: clamp(2.25rem, 5vw, 4rem);
-  }
+/* Navy ground: the hero, the footer and the research page. The same navy in both themes, so its
+   inks are fixed too. */
+.on-navy {
+  --bg: var(--navy);
+  --surface: var(--navy-2);
+  --surface-2: var(--navy-3);
+  --text: var(--on-navy);
+  --text-soft: var(--on-navy-soft);
+  --muted: var(--on-navy-muted);
+  --line: var(--on-navy-line);
+  --line-strong: var(--on-navy-line-strong);
+  --accent-ink: var(--accent-on-navy);
+  --focus: var(--accent-on-navy);
+  --dot: rgb(244 246 250 / 0.09);
+  --shadow: none;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-soft: var(--text-soft);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent-ink);
+  --color-amber-ink: var(--accent-ink);
+  background-color: var(--navy);
+  color: var(--text);
+}
+
+.dot-grid {
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.4px);
+  background-size: 20px 20px;
 }
 
 .skip-link {
@@ -342,10 +188,10 @@
   top: -4rem;
   z-index: 100;
   padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  background: var(--amber);
-  color: var(--on-amber);
-  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1875rem;
   text-decoration: none;
   transition: top 0.2s;
 }
@@ -367,56 +213,13 @@
 }
 
 /* ------------------------------------------------------------------
-   The descent. A zone is a solid band in the shade of its slot (0 at
-   the surface, 11 on the seafloor; src/lib/depth.ts generates which
-   section gets which). Each band after the hero rises over the one
-   above with a soft wave edge: it overlaps by --wave, and a mask cuts
-   the overlap into a wave so the shade above shows in the troughs.
-   ------------------------------------------------------------------ */
-.zone {
-  --deep: 0;
-  --bg: var(--band, var(--band-0));
-  position: relative;
-  overflow-x: clip;
-  background: var(--bg);
-  color: var(--text);
-}
-
-.home-flow > .zone,
-.descent > .zone ~ .zone,
-.now.zone,
-.site-footer.zone {
-  --wave: clamp(1.25rem, 2.6vw, 2.5rem);
-  --wave-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22C160 8 300 6 470 18S760 38 960 26 1280 8 1440 22V40H0Z'/%3E%3C/svg%3E");
-  margin-top: calc(-1 * var(--wave));
-  border-top: var(--wave) solid transparent;
-  -webkit-mask:
-    var(--wave-shape) calc(var(--slot, 0) * -317px) 0 / 1440px var(--wave) repeat-x,
-    linear-gradient(#000 0 0) 0 calc(var(--wave) - 2px) / 100% 100% no-repeat;
-  mask:
-    var(--wave-shape) calc(var(--slot, 0) * -317px) 0 / 1440px var(--wave) repeat-x,
-    linear-gradient(#000 0 0) 0 calc(var(--wave) - 2px) / 100% 100% no-repeat;
-}
-
-/* The browser lays out a band only as it nears the screen, so the first paint does not wait on
-   the layout of the whole long page. Once laid out, a band keeps its real size. */
-.home-flow > .zone,
-.site-footer.zone {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1100px;
-}
-
-/* ------------------------------------------------------------------
-   Pinned side headings. From 1100px a section's label and heading stay
-   in a left column, with a fine tick ruler, while its content scrolls
-   on the right. Phones and tablets stack normally.
+   Pinned side headings (About). From 1100px the heading stays in a
+   left column while the content scrolls on the right.
    ------------------------------------------------------------------ */
 .corner {
   display: none;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 
@@ -430,17 +233,13 @@
 
   .pinned__head {
     position: sticky;
-    top: 6.5rem;
-    padding-left: 1.1rem;
-    /* A short tick every 8px and a longer one every 40px. */
-    background:
-      repeating-linear-gradient(180deg, var(--line-strong) 0 1px, transparent 1px 40px) 0 0 / 9px 100% no-repeat,
-      repeating-linear-gradient(180deg, var(--line) 0 1px, transparent 1px 8px) 0 0 / 5px 100% no-repeat;
-    border-left: 1px solid var(--line);
+    top: 6rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--text);
   }
 
   .pinned__head .section-title {
-    font-size: clamp(1.75rem, 2.4vw, 2.25rem);
+    font-size: clamp(1.9rem, 2.6vw, 2.5rem);
   }
 
   .pinned__head .corner {
@@ -450,289 +249,24 @@
 }
 
 /* ------------------------------------------------------------------
-   The signal trace: the page's spine. A thin waveform runs down the
-   left gutter of the home page from the transmitter in the hero to the
-   receiver in the footer, with a node at each section. Each section
-   draws its own segment from its slot's trace (src/lib/depth.ts), so
-   the noise grows with depth and the trace follows any audience order
-   without measuring anything. It is decorative and hidden from screen
-   readers; the depth gauge carries the same depths as links.
-   ------------------------------------------------------------------ */
-.spine {
-  display: none;
-}
-
-.home .spine,
-body:has(.home) .site-footer .spine {
-  --spine-x: max(calc(var(--gutter) / 2 - 7px), calc((100% - 76rem) / 4 + var(--gutter) / 2 - 7px));
-  display: block;
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  bottom: 0;
-  left: var(--spine-x);
-  width: 14px;
-  pointer-events: none;
-  /* The node: a small ring on the trace, level with the section's label. */
-  background: radial-gradient(circle at 7px var(--node-top), var(--accent) 0 3px, var(--bg) 3.5px 4.5px, transparent 5px) no-repeat;
-}
-
-.spine::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--accent);
-  -webkit-mask: var(--trace) 0 0 / 14px 128px repeat-y;
-  mask: var(--trace) 0 0 / 14px 128px repeat-y;
-  opacity: 0.6;
-}
-
-/* The depth beside each node, on the outside of the trace, where the margin has room for it. */
-.spine::after {
-  content: var(--node, '') / '';
-  position: absolute;
-  top: calc(var(--node-top) - 0.5rem);
-  right: calc(100% + 0.3rem);
-  display: none;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  line-height: 1rem;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  color: var(--muted);
-}
-
-@media (min-width: 1440px) {
-  .spine::after {
-    display: block;
-  }
-}
-
-.home-flow > .section {
-  --node-top: calc(var(--wave, 0px) + clamp(3rem, 7vw, 6rem) + 0.45rem);
-}
-
-.home-flow > .section--tight {
-  --node-top: calc(var(--wave, 0px) + clamp(2.25rem, 5vw, 4rem) + 0.45rem);
-}
-
-/* TX: the trace starts at the transmitter, level with the hero's eyebrow. */
-.hero .spine {
-  --node-top: calc(clamp(3.25rem, 7vw, 5.5rem) + 0.45rem);
-}
-
-.hero .spine::before {
-  top: var(--node-top);
-}
-
-.hero .spine::after {
-  content: 'TX' / '';
-}
-
-.now .spine {
-  --node-top: calc(var(--wave, 0px) + 3.8rem);
-}
-
-/* RX: the trace ends at the receiver, level with the received frame. */
-.site-footer .spine {
-  --node-top: calc(var(--wave, 0px) + 11.2rem);
-}
-
-.site-footer .spine::before {
-  bottom: auto;
-  height: var(--node-top);
-}
-
-.site-footer .spine::after {
-  content: 'RX' / '';
-}
-
-/* Phones: just a faint straight line at the very edge, so it never crowds the text. */
-@media (max-width: 719px) {
-  .home .spine,
-  body:has(.home) .site-footer .spine {
-    left: 0;
-    width: 7px;
-    background: none;
-  }
-
-  .spine::before {
-    left: 5px;
-    width: 1px;
-    -webkit-mask: none;
-    mask: none;
-    opacity: 0.35;
-  }
-}
-
-/* It draws itself down each section as the section scrolls into view. Static under reduced
-   motion and where scroll-driven animation is not supported. The hero's segment is on screen
-   from the start, so it is always drawn. */
-@keyframes spine-draw {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    html:not([data-motion='reduce']) .home-flow .spine,
-    html:not([data-motion='reduce']) body:has(.home) .site-footer .spine {
-      animation: spine-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 45%;
-    }
-  }
-}
-
-/* Soft light rays from the surface, in the top two bands. They fade with depth and sway slowly. */
-.sunlit::after {
-  --ray: rgb(255 255 255 / 0.62);
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: 0 -25% auto;
-  height: 100%;
-  pointer-events: none;
-  background: conic-gradient(
-    from 0deg at 50% -35%,
-    transparent 0 150deg,
-    var(--ray) 151.5deg,
-    transparent 153.5deg 157deg,
-    var(--ray) 158deg,
-    transparent 160.5deg 163deg,
-    var(--ray) 165deg,
-    transparent 166.5deg 171deg,
-    var(--ray) 172.5deg,
-    transparent 175deg 178deg,
-    var(--ray) 179deg,
-    transparent 180.5deg 185deg,
-    var(--ray) 187deg,
-    transparent 189deg 194deg,
-    var(--ray) 195deg,
-    transparent 196.5deg 200deg,
-    var(--ray) 202deg,
-    transparent 205deg 360deg
-  );
-  -webkit-mask-image: linear-gradient(#000, transparent 80%);
-  mask-image: linear-gradient(#000, transparent 80%);
-  opacity: var(--rays, 0.55);
-  transform-origin: 50% -35%;
-  animation: sway 16s ease-in-out infinite alternate paused;
-}
-
-[data-theme='dark'] .sunlit::after {
-  --ray: rgb(160 225 240 / 0.12);
-}
-
-@keyframes sway {
-  from {
-    rotate: -2.5deg;
-  }
-  to {
-    rotate: 2.5deg;
-  }
-}
-
-/* Marine snow: faint specks drifting down through the deepest two section bands. */
-.zone::before {
-  --speck: rgb(205 232 242 / 0.55);
-  content: '';
-  display: var(--snow, none);
-  position: absolute;
-  z-index: -1;
-  inset: -240px 0 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(1.6px 1.6px at 34px 42px, var(--speck), transparent),
-    radial-gradient(1px 1px at 128px 96px, var(--speck), transparent),
-    radial-gradient(1.3px 1.3px at 206px 172px, var(--speck), transparent),
-    radial-gradient(1px 1px at 76px 204px, var(--speck), transparent),
-    radial-gradient(1.2px 1.2px at 168px 18px, var(--speck), transparent),
-    radial-gradient(1px 1px at 58px 24px, var(--speck), transparent),
-    radial-gradient(1.4px 1.4px at 18px 92px, var(--speck), transparent);
-  background-size: 240px 240px, 240px 240px, 240px 240px, 240px 240px, 240px 240px, 120px 120px, 120px 120px;
-  opacity: 0.6;
-  animation: snow 70s linear infinite paused;
-}
-
-@keyframes snow {
-  to {
-    transform: translateY(240px);
-  }
-}
-
-/* Only once the page has settled and while in view (scripts set fx-ready and fx-live), and
-   never with reduced motion. */
-.zone.fx-live::before,
-.sunlit.fx-live::after {
-  animation-play-state: running;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .zone::before,
-  .sunlit::after {
-    animation: none;
-  }
-}
-
-html[data-motion='reduce'] .zone::before,
-html[data-motion='reduce'] .sunlit::after {
-  animation: none;
-}
-
-/* One label per section on the home page: its depth leads the eyebrow ("200 m · Featured work"). */
-.home .zone .eyebrow::before {
-  content: var(--depth, '') / '';
-  width: auto;
-  height: auto;
-  margin-right: -0.6rem;
-  background: none;
-  white-space: pre;
-}
-
-/* ------------------------------------------------------------------
    Type helpers
    ------------------------------------------------------------------ */
 .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
   color: var(--accent-ink);
 }
 
-[data-theme='dark'] .eyebrow {
-  color: var(--accent);
-}
-
-.eyebrow::before {
-  content: '';
-  width: 1.5rem;
-  height: 1px;
-  background: currentColor;
-}
-
-.eyebrow--plain::before {
-  display: none;
-}
-
 .section-title {
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
-  font-weight: 600;
-  margin-top: 0.85rem;
+  margin-top: 0.5rem;
+  font-size: clamp(2.5rem, 5.4vw, 4rem);
 }
 
 .section-title--sm {
-  font-size: clamp(1.6rem, 2.8vw, 2.25rem);
-  margin-top: 0.65rem;
+  font-size: clamp(1.9rem, 3.4vw, 2.75rem);
 }
 
 @layer components {
@@ -740,7 +274,7 @@ html[data-motion='reduce'] .sunlit::after {
     margin-top: 1rem;
     max-width: 40rem;
     color: var(--text-soft);
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
   }
 }
 
@@ -748,16 +282,17 @@ html[data-motion='reduce'] .sunlit::after {
   font-family: var(--font-mono);
 }
 
+/* Depth ranges, axis labels and readouts: IBM Plex Mono, the instrument face. */
 .label {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  line-height: 1.4;
   color: var(--muted);
 }
 
 .link {
-  color: var(--accent-ink);
+  color: var(--text);
+  font-weight: 600;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
@@ -765,67 +300,90 @@ html[data-motion='reduce'] .sunlit::after {
   transition: text-decoration-color 0.2s;
 }
 
-[data-theme='dark'] .link {
-  color: var(--accent);
-}
-
 .link:hover {
   text-decoration-color: currentColor;
 }
 
 /* ------------------------------------------------------------------
-   Buttons and chips
+   Buttons: square, 2px border, 50px tall, bold.
    ------------------------------------------------------------------ */
 .btn {
   --btn-bg: transparent;
   --btn-fg: var(--text);
-  --btn-line: var(--line-strong);
+  --btn-line: var(--text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  min-height: 2.875rem;
-  padding: 0.7rem 1.25rem;
-  border: 1px solid var(--btn-line);
-  border-radius: 0.55rem;
+  min-height: 50px;
+  padding: 0.6rem 1.15rem;
+  border: 2px solid var(--btn-line);
+  border-radius: 0;
   background: var(--btn-bg);
   color: var(--btn-fg);
-  font-weight: 600;
-  font-size: 0.975rem;
-  line-height: 1;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.1;
   text-decoration: none;
   cursor: pointer;
   transition:
-    transform 0.25s var(--ease-out-expo),
     background-color 0.2s,
     border-color 0.2s,
-    box-shadow 0.25s;
+    color 0.2s;
 }
 
 .btn:hover {
-  border-color: var(--accent);
+  --btn-bg: color-mix(in oklab, var(--text) 7%, transparent);
 }
 
 .btn:active {
   transform: translateY(1px);
 }
 
+/* Accent fill with white text. White on the accent passes only as large text (3.4:1), so the
+   label is set at 19px bold, which counts as large. */
 .btn--primary {
-  --btn-bg: var(--amber);
-  --btn-fg: var(--on-amber);
-  --btn-line: var(--amber);
+  --btn-bg: var(--accent);
+  --btn-fg: #fff;
+  --btn-line: var(--accent);
+  font-size: 1.1875rem;
 }
 
 .btn--primary:hover {
-  --btn-bg: color-mix(in oklab, var(--amber) 88%, white);
-  border-color: var(--btn-bg);
-  box-shadow: 0 10px 30px -12px color-mix(in oklab, var(--amber) 70%, transparent);
+  --btn-bg: var(--accent-hover);
+  --btn-line: var(--accent-hover);
+}
+
+/* Solid ink: the main action inside a paper card. */
+.btn--solid {
+  --btn-bg: var(--text);
+  --btn-fg: var(--bg-contrast);
+  --btn-line: var(--text);
+}
+
+.btn--solid:hover {
+  --btn-bg: color-mix(in oklab, var(--text) 86%, var(--bg));
+}
+
+/* Accent outline, for the one action in a dark band. */
+.btn--line-accent {
+  --btn-fg: var(--accent-ink);
+  --btn-line: var(--accent);
 }
 
 .btn--small {
-  min-height: 2.25rem;
-  padding: 0.45rem 0.9rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.85rem;
   font-size: 0.875rem;
+}
+
+/* A small primary button cannot carry white on the accent (its label is too small), so it
+   becomes a solid ink button instead. */
+.btn--small.btn--primary {
+  --btn-bg: var(--text);
+  --btn-fg: var(--bg-contrast);
+  --btn-line: var(--text);
 }
 
 .btn svg {
@@ -838,11 +396,10 @@ html[data-motion='reduce'] .sunlit::after {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.2rem 0.55rem;
   border: 1px solid var(--line);
-  border-radius: 0.35rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   line-height: 1.4;
   color: var(--text-soft);
   background: var(--surface);
@@ -850,19 +407,13 @@ html[data-motion='reduce'] .sunlit::after {
 }
 
 .chip--type {
-  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
-  background: var(--accent-wash);
-  color: var(--accent-ink);
-}
-
-[data-theme='dark'] .chip--type {
-  color: var(--accent-ink);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .chip--limited {
-  border-color: color-mix(in oklab, var(--amber) 55%, transparent);
-  color: var(--amber-ink);
-  background: color-mix(in oklab, var(--amber) 10%, transparent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .status-dot {
@@ -870,32 +421,29 @@ html[data-motion='reduce'] .sunlit::after {
   height: 0.45rem;
   border-radius: 50%;
   background: var(--ok);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 25%, transparent);
 }
 
 /* ------------------------------------------------------------------
-   Cards
+   Paper cards: white, 1px border, a soft shadow, square corners.
    ------------------------------------------------------------------ */
-.card {
+.card,
+.paper {
   position: relative;
   border: 1px solid var(--line);
-  border-radius: 1rem;
+  border-radius: 0;
   background: var(--surface);
   box-shadow: var(--shadow);
 }
 
 .card--lift {
   transition:
-    transform 0.4s var(--ease-out-expo),
-    box-shadow 0.4s var(--ease-out-expo),
-    border-color 0.3s;
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .card--lift:hover,
 .card--lift:focus-within {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lift);
-  border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+  border-color: var(--text);
 }
 
 /* Make a whole card clickable from its title link without nesting links. */
@@ -903,7 +451,6 @@ html[data-motion='reduce'] .sunlit::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: inherit;
   z-index: 1;
 }
 
@@ -912,12 +459,173 @@ html[data-motion='reduce'] .sunlit::after {
   z-index: 2;
 }
 
-/* Grid paper texture used behind sections */
-.grid-paper {
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 32px 32px;
+/* ------------------------------------------------------------------
+   Figures: every figure has a label row ("Fig. 01 / Timing diagram")
+   and, when it has views, square tabs on the right.
+   ------------------------------------------------------------------ */
+.fig__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  min-height: 3.25rem;
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.fig__label {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.fig__note {
+  padding: 0.7rem 0.9rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.tabset {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.tabset [role='tab'] {
+  min-height: 2.25rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tabset [role='tab']:hover {
+  border-color: var(--text);
+}
+
+.tabset [role='tab'][aria-selected='true'] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg-contrast);
+}
+
+/* Numbered callouts: the only round things on the site. */
+.callout {
+  display: inline-grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ------------------------------------------------------------------
+   Decode headings: section headings resolve out of random glyphs once,
+   as they scroll into view. The real text stays in the DOM; only the
+   layer drawn over it changes (src/scripts/decode-headings.ts).
+   ------------------------------------------------------------------ */
+.dh {
+  position: relative;
+}
+
+.dh__fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.dh[data-decoding] .dh__real {
+  color: transparent;
+}
+
+/* ------------------------------------------------------------------
+   Plotter draw-in: a figure's plot sweeps in left to right the first
+   time it is on screen. The script adds the pending class itself, so
+   nothing is hidden without it, and never with reduced motion.
+   ------------------------------------------------------------------ */
+@keyframes draw-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+[data-draw].draw-pending {
+  clip-path: inset(0 100% 0 0);
+}
+
+[data-draw].draw-run {
+  animation: draw-in 1s cubic-bezier(0.45, 0, 0.25, 1) both;
+}
+
+/* ------------------------------------------------------------------
+   Code panels (How it works and Code tabs): IBM Plex Mono at 14px with
+   line numbers. Never narrower than 60 characters; narrower screens
+   scroll the panel sideways instead of wrapping the code.
+   ------------------------------------------------------------------ */
+.code {
+  margin: 0;
+  overflow: auto;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 4;
+}
+
+.code__inner {
+  display: grid;
+  min-width: 62ch;
+  padding: 0.75rem 0;
+}
+
+.code__line {
+  display: grid;
+  grid-template-columns: 4.5ch minmax(0, 1fr);
+  gap: 1.25ch;
+  padding-right: 1rem;
+  white-space: pre;
+  transition: background-color 0.15s;
+}
+
+.code__line::before {
+  content: attr(data-n);
+  text-align: right;
+  color: var(--code-num);
+  user-select: none;
+}
+
+.code__line[data-hot] {
+  background: var(--code-hot);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.code .hl-c {
+  color: var(--code-comment);
+}
+
+.code .hl-s {
+  color: var(--code-string);
+}
+
+.code .hl-n {
+  color: var(--code-number);
+}
+
+.code .hl-k {
+  color: var(--code-keyword);
+  font-weight: 500;
 }
 
 /* ------------------------------------------------------------------
@@ -926,6 +634,7 @@ html[data-motion='reduce'] .sunlit::after {
 .prose {
   color: var(--text-soft);
   font-size: 1.0625rem;
+  line-height: 1.6;
 }
 
 .prose > * + * {
@@ -934,39 +643,28 @@ html[data-motion='reduce'] .sunlit::after {
 
 .prose h2 {
   margin-top: 2.75rem;
-  font-size: 1.6rem;
-  font-weight: 600;
+  font-size: 1.75rem;
   color: var(--text);
-}
-
-.prose h2::before {
-  content: '// ';
-  font-family: var(--font-mono);
-  font-size: 0.75em;
-  color: var(--accent);
-  letter-spacing: 0;
 }
 
 .prose h3 {
   margin-top: 2rem;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   color: var(--text);
 }
 
 .prose strong {
   color: var(--text);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .prose a {
-  color: var(--accent-ink);
+  color: var(--text);
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.2em;
   text-decoration-thickness: 1px;
-}
-
-[data-theme='dark'] .prose a {
-  color: var(--accent);
+  text-decoration-color: var(--accent);
 }
 
 .prose ul,
@@ -987,8 +685,8 @@ html[data-motion='reduce'] .sunlit::after {
   position: absolute;
   left: -1.1rem;
   top: 0.72em;
-  width: 0.4rem;
-  height: 1px;
+  width: 0.45rem;
+  height: 2px;
   background: var(--accent);
 }
 
@@ -1002,10 +700,6 @@ html[data-motion='reduce'] .sunlit::after {
   font-size: 0.85em;
 }
 
-[data-theme='dark'] .prose ol > li::marker {
-  color: var(--accent);
-}
-
 .prose li + li {
   margin-top: 0.5em;
 }
@@ -1014,7 +708,6 @@ html[data-motion='reduce'] .sunlit::after {
   font-family: var(--font-mono);
   font-size: 0.88em;
   padding: 0.1em 0.35em;
-  border-radius: 0.3em;
   background: var(--surface-2);
   color: var(--text);
 }
@@ -1028,7 +721,6 @@ html[data-motion='reduce'] .sunlit::after {
   max-width: 32rem;
   padding: 0.25rem;
   border: 1px solid var(--line);
-  border-radius: 1rem;
   background: var(--surface-2);
 }
 
@@ -1054,7 +746,7 @@ html[data-motion='reduce'] .sunlit::after {
   fill: var(--text);
   font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .wiring__s,
@@ -1094,7 +786,7 @@ html[data-motion='reduce'] .sunlit::after {
 }
 
 .wiring__w--3v {
-  stroke: var(--amber-ink);
+  stroke: var(--accent-ink);
 }
 
 .wiring__w--gnd,
@@ -1103,12 +795,12 @@ html[data-motion='reduce'] .sunlit::after {
 }
 
 .wiring__w--sig {
-  stroke: var(--accent);
+  stroke: var(--text);
 }
 
 .wiring__arrow--sig,
 .wiring__leds {
-  fill: var(--accent);
+  fill: var(--text);
 }
 
 .wiring__dot {
@@ -1191,7 +883,8 @@ html[data-motion='reduce'] *::after {
    ------------------------------------------------------------------ */
 @media print {
   :root,
-  [data-theme='dark'] {
+  [data-theme='dark'],
+  .on-navy {
     --bg: #fff;
     --surface: #fff;
     --surface-2: #fff;
@@ -1207,30 +900,6 @@ html[data-motion='reduce'] *::after {
   .no-print,
   .site-header,
   .site-footer {
-    display: none !important;
-  }
-
-  /* A zone sets its own shade inline and its own inks, so print restates the paper colors here. */
-  .zone {
-    --bg: #fff !important;
-    --surface: #fff !important;
-    --surface-2: #fff !important;
-    --text: #000 !important;
-    --text-soft: #111 !important;
-    --muted: #333 !important;
-    --line: #bbb !important;
-    --line-strong: #b9b4a6 !important;
-    --accent: #000 !important;
-    --accent-ink: #000 !important;
-    background: #fff !important;
-    margin-top: 0 !important;
-    border-top: 0 !important;
-    -webkit-mask: none !important;
-    mask: none !important;
-  }
-
-  .zone::before,
-  .zone::after {
     display: none !important;
   }
 

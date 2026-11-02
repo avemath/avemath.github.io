@@ -1,7 +1,7 @@
 // The FH-BFSK chip math from my standalone study tool, shared by the Signals playground demo
 // (src/components/demos/signals/fhbfsk.ts) and the home page's live tile. Each chip hops to one of
 // 13 tone pairs and sends the low tone for a 0 or the high tone for a 1.
-import { mulberry32 } from './comms';
+import { mulberry32 } from './comms.ts';
 
 // JANUS band plan, from the public papers cited on the Signals page.
 export const F_LOW = 9440;

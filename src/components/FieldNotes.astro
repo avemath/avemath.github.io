@@ -1,67 +1,78 @@
 ---
 import facts from '@/data/facts.json';
 
-// Six facts whose stories are not already told elsewhere on the home page.
+// Six facts with the stories behind them, on the research page. Each value starts masked and
+// decodes as it scrolls into view; a tap replays it.
 const notes = facts;
 ---
 
-<section id="field-notes" class="section section--tight home-section zone" aria-labelledby="notes-title" data-section="field-notes">
-  <span class="spine" aria-hidden="true"></span>
-  <div class="wrap pinned">
-    <div class="pinned__head">
-      <p class="eyebrow">Field notes</p>
-      <h2 id="notes-title" class="section-title section-title--sm">A few things that are true</h2>
-      <p class="section-lede">Facts from the work above, and the stories behind them.</p>
-      <p class="corner" aria-hidden="true">{String(notes.length).padStart(2, '0')} notes</p>
-    </div>
-
-    <ul class="notes">
-      {
-        notes.map((n, i) => (
-          <li class="note" data-reveal>
-            <button type="button" class="note-card" data-note>
-              <span class="note-card__top">
-                <span class="note-card__label">{n.label}</span>
-                <span class="mono note-card__idx" aria-hidden="true">
-                  N{String(i + 1).padStart(2, '0')}
-                </span>
-              </span>
-              <span class="sr-only">{n.value}</span>
-              <span class="note-card__value" data-note-value data-text={n.value} aria-hidden="true">
-                {n.value}
-              </span>
-              <span class="note-card__detail">{n.detail}</span>
-              <span class="note-card__hint mono" aria-hidden="true">
-                tap to decode
-              </span>
-            </button>
-          </li>
-        ))
-      }
-    </ul>
+<section id="field-notes" class="notes-sec" aria-labelledby="notes-title">
+  <div class="notes-sec__head">
+    <h2 id="notes-title" class="section-title notes-sec__title" data-decode>Field notes</h2>
+    <p class="notes-sec__hint">tap a note to decode it</p>
   </div>
+
+  <ul class="notes">
+    {
+      notes.map((n, i) => (
+        <li class="note">
+          <button type="button" class="note-card" data-note>
+            <span class="note-card__top">
+              <span class="note-card__label">{n.label}</span>
+              <span class="note-card__idx" aria-hidden="true">
+                N{String(i + 1).padStart(2, '0')}
+              </span>
+            </span>
+            <span class="sr-only">{n.value}</span>
+            <span class="note-card__value" data-note-value data-text={n.value} aria-hidden="true">
+              {n.value}
+            </span>
+            <span class="note-card__detail">{n.detail}</span>
+            <span class="note-card__hint" aria-hidden="true">
+              <span class="note-card__tap">tap to decode</span>
+              <span class="note-card__done">decoded</span>
+            </span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
 </section>
 
 <style>
-  /* Bioluminescence: each fact is a tile that glows softly in the dark water. Column counts
-     always give full rows (6 = 3 x 2 or 2 x 3), so no cell is ever empty. */
-  .notes {
-    --glow: color-mix(in srgb, var(--accent) 42%, transparent);
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin-top: 2rem;
+  .notes-sec__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
   }
 
-  @media (max-width: 479px) {
+  .notes-sec__title {
+    margin-top: 0;
+  }
+
+  .notes-sec__hint {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  /* Three per row, so six notes make two full rows. */
+  .notes {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
     .notes {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 1100px) {
+  @media (min-width: 960px) {
     .notes {
-      margin-top: 0;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
@@ -69,172 +80,82 @@ const notes = facts;
     display: grid;
   }
 
-  /* The whole cell is the button: a tap decodes a fact early or replays it. */
   .note-card {
-    position: relative;
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
     width: 100%;
     height: 100%;
-    padding: 1.35rem 1.4rem 1.5rem;
-    border: 1px solid color-mix(in oklab, var(--accent) 34%, transparent);
-    border-radius: 0.9rem;
-    background:
-      radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--accent) 11%, transparent), transparent 70%),
-      var(--surface);
-    box-shadow: 0 0 26px -10px var(--glow);
+    padding: 1rem 1.1rem 1.1rem;
+    border: 1px solid var(--line);
+    background: rgb(4 12 24 / 0.35);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
     text-align: left;
+    color: var(--text);
     cursor: pointer;
-    transition:
-      border-color 0.3s,
-      box-shadow 0.3s;
-  }
-
-  /* A slow glow that breathes, out of step from tile to tile. Opacity only, so it is cheap, and it
-     runs only while the band is on screen and motion is allowed. */
-  .note-card::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    box-shadow:
-      0 0 34px -6px var(--glow),
-      inset 0 0 22px -12px var(--glow);
-    opacity: 0.45;
-    pointer-events: none;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    :global(html.fx-ready:not([data-motion='reduce']) .fx-live) .note-card::before {
-      animation: glow 6s ease-in-out infinite alternate;
-    }
-  }
-
-  .note:nth-child(2) .note-card::before { animation-delay: -1.7s; }
-  .note:nth-child(3) .note-card::before { animation-delay: -3.1s; }
-  .note:nth-child(4) .note-card::before { animation-delay: -4.4s; }
-  .note:nth-child(5) .note-card::before { animation-delay: -0.9s; }
-  .note:nth-child(6) .note-card::before { animation-delay: -2.6s; }
-
-  @keyframes glow {
-    to {
-      opacity: 1;
-    }
+    transition: border-color 0.2s;
   }
 
   .note-card:hover {
-    border-color: color-mix(in oklab, var(--accent) 60%, transparent);
-    box-shadow: 0 0 34px -8px var(--glow);
+    border-color: var(--line-strong);
   }
 
-  .note-card:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  @media (max-width: 719px) {
-    .note-card {
-      padding: 1rem 1rem 1.15rem;
-    }
-
-    .note-card__value {
-      font-size: clamp(1.5rem, 7vw, 2rem);
-    }
-
-    .note-card__detail {
-      font-size: 0.85rem;
-    }
-
-    .note-card__hint {
-      left: 1rem;
-      bottom: 1rem;
-    }
-  }
-
-  /* The label is the headline of the card: what the fact is about. It never masks. */
   .note-card__top {
     display: flex;
-    align-items: baseline;
     justify-content: space-between;
-    gap: 0.75rem;
-    padding-bottom: 0.85rem;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .note-card__label {
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    color: var(--text);
-  }
-
-  .note-card__idx {
-    flex: none;
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    color: var(--accent-ink);
-  }
-
-  :global([data-theme='dark']) .note-card__idx {
-    color: var(--accent);
+    gap: 1rem;
+    color: var(--muted);
   }
 
   .note-card__value {
-    display: block;
-    margin-top: 1rem;
-    font-family: var(--font-display);
-    font-size: clamp(2.25rem, 3vw, 2.75rem);
-    font-weight: 600;
-    letter-spacing: -0.035em;
-    line-height: 1;
+    font-family: var(--font-sans);
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-variation-settings: 'wdth' 112;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
     color: var(--text);
-    text-shadow: 0 0 18px var(--glow);
-    transition: color 0.5s;
+    min-height: 1.05em;
+  }
+
+  /* Masked: the glyphs, in mono so they never change width as they resolve. */
+  .note-card[data-masked] .note-card__value {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-variation-settings: normal;
+    font-size: 1.5rem;
+    letter-spacing: 0;
+    color: var(--muted);
   }
 
   .note-card__detail {
-    display: block;
-    margin-top: 0.75rem;
-    font-size: 0.92rem;
-    line-height: 1.55;
     color: var(--text-soft);
-    transition: opacity 0.5s ease 0.2s;
   }
 
   .note-card__hint {
-    position: absolute;
-    left: 1.4rem;
-    bottom: 1.3rem;
+    margin-top: auto;
+    padding-top: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .note-card__tap {
+    color: var(--accent-ink);
+  }
+
+  .note-card__done,
+  .note-card[data-masked] .note-card__tap {
+    display: inline;
+  }
+
+  .note-card:not([data-masked]) .note-card__tap,
+  .note-card[data-masked] .note-card__done {
     display: none;
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
+  }
+
+  .note-card__done {
     color: var(--muted);
-  }
-
-  /* The masked state only exists once JavaScript has run, so no-JS visitors see every fact.
-     The detail keeps its space (opacity, not display) so decoding never shifts the layout. */
-  .note-card[data-masked] .note-card__value {
-    color: var(--muted);
-  }
-
-  .note-card[data-masked] .note-card__detail {
-    opacity: 0;
-    transition: none;
-  }
-
-  .note-card[data-masked] .note-card__hint {
-    display: block;
-  }
-
-  .note-card[data-masked]::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: repeating-linear-gradient(0deg, transparent 0 3px, var(--grid) 3px 4px);
-    pointer-events: none;
   }
 </style>
 

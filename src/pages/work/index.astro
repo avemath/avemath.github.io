@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { bandVars } from '@/lib/depth';
 import ProjectTile from '@/components/ProjectTile.astro';
 import { getProjects, typeLabels, allTags } from '@/lib/projects';
 import { projectTypes } from '@/content.config';
@@ -13,7 +12,7 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
   title="Work"
   description="Research, engineering, software and client websites by Avery Matherne, each with a case study on what I did and how."
 >
-  <section class="section pb-10 zone sunlit" style={bandVars(0)}>
+  <section class="section pb-10">
     <div class="wrap">
       <p class="eyebrow">Work</p>
       <h1 class="section-title" style="font-size: clamp(2.5rem, 6vw, 4.5rem)">Everything I've built since 2024</h1>
@@ -38,7 +37,7 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
     </div>
   </section>
 
-  <section class="pb-16 pt-12 md:pb-24 zone" style={bandVars(1)} aria-label="Projects">
+  <section class="pb-16 pt-12 md:pb-24" aria-label="Projects">
     <div class="wrap">
       <div class="work-grid" data-work-grid>
         {projects.map((p, i) => <ProjectTile project={p} headingLevel="h2" eager={i < 2} />)}
@@ -67,9 +66,8 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
     min-height: 2.75rem;
     padding: 0.5rem 0.95rem;
     border: 1px solid var(--line-strong);
-    border-radius: 999px;
     background: var(--surface);
-    color: var(--text-soft);
+    color: var(--text);
     font-size: 0.92rem;
     cursor: pointer;
     transition:
@@ -79,13 +77,14 @@ const counts = Object.fromEntries(projectTypes.map((t) => [t, projects.filter((p
   }
 
   .filter:hover {
-    border-color: var(--accent);
+    border-color: var(--text);
   }
 
   .filter[aria-pressed='true'] {
-    border-color: var(--accent);
-    background: var(--accent);
-    color: var(--bg);
+    border-color: var(--text);
+    background: var(--text);
+    color: var(--bg-contrast);
+    font-weight: 700;
   }
 
   .filter__n {

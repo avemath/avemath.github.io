@@ -1,0 +1,533 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import DepthGauge from '@/components/DepthGauge.astro';
+import FieldNotes from '@/components/FieldNotes.astro';
+import { rangeLabel, zoneById } from '@/lib/depth';
+import arrivalsData from '@/data/bellhop-arrivals.json';
+
+// Fig. R2: every arrival from the bellhopSim comms scenario (1000 m of water, sand bottom, source
+// at 50 m, receiver 15 km away at 100 m, 3.5 kHz), recomputed with BELLHOP using the repo's own
+// export settings. The counts match docs/figures/figures.json in that repo.
+const ch = arrivalsData.comms;
+const DB_FLOOR = -40;
+const maxDelay = Math.ceil(Math.max(...ch.arrivals.map((a) => a.delay_ms)) / 500) * 500;
+const R2 = { x0: 44, x1: 584, y0: 34, y1: 196 };
+const ax = (ms: number) => R2.x0 + (ms / maxDelay) * (R2.x1 - R2.x0);
+const ay = (db: number) => R2.y1 - ((Math.max(DB_FLOOR, db) - DB_FLOOR) / -DB_FLOOR) * (R2.y1 - R2.y0);
+const bars = ch.arrivals.map((a) => ({ x: ax(a.delay_ms), y: ay(a.db), strongest: a.db === 0, inside: a.db >= -20 }));
+const windowMs = ch.spread_within_20db_ms;
+const firstStrong = Math.min(...ch.arrivals.filter((a) => a.db >= -20).map((a) => a.delay_ms));
+const delayTicks = Array.from({ length: maxDelay / 500 + 1 }, (_, i) => i * 500);
+
+// Fig. R1: an illustration of the kind of network the project is about. Positions are drawing
+// coordinates, not data.
+const nodes = [
+  { id: 'ship', label: 'ship', x: 16, y: 22, text: 'Surface ship: radio links through the air, acoustic links down into the water.' },
+  { id: 'buoy', label: 'buoy', x: 62, y: 16, text: 'Buoy: sits at the surface, so it can pass messages between radio above and acoustic below.' },
+  { id: 'auv', label: 'AUV', x: 44, y: 58, text: 'AUV: underwater, so its only link is acoustic. Slow, delayed by seconds, and easy to lose.' },
+  { id: 'sensor', label: 'sensor', x: 80, y: 72, text: 'Sensor: collects data all day and can send only a little of it.' },
+];
+const links = [
+  { a: 'ship', b: 'buoy', kind: 'radio' },
+  { a: 'ship', b: 'auv', kind: 'acoustic' },
+  { a: 'auv', b: 'sensor', kind: 'acoustic' },
+  { a: 'buoy', b: 'sensor', kind: 'acoustic' },
+];
+const at = (id: string) => nodes.find((n) => n.id === id)!;
+---
+
+<BaseLayout
+  title="Research"
+  description="Underwater acoustic channels, my ONR research on data management for distributed naval platforms, bellhopSim, and an acoustic pool alarm."
+  image="/og/research.png"
+  navLabel="depth 0 m"
+  footer="research"
+>
+  <div class="under on-navy" data-under>
+    <div class="under__dark" aria-hidden="true"></div>
+    <DepthGauge />
+
+    <section id="below" class="wrap zone-r zone-r--first" aria-labelledby="research-title">
+      <div class="zone-r__grid">
+        <div>
+          <p class="range mono">{rangeLabel(zoneById('below'))}</p>
+          <h1 id="research-title" class="research__h1">Research, below the surface.</h1>
+          <p class="zone-r__text">
+            Underwater acoustic channels do everything a radio channel does, slower and worse: long delays, strong multipath, Doppler from
+            anything that moves. I work on getting data through them anyway, and on one question of my own about what a pool sounds like.
+          </p>
+        </div>
+        <figure class="rfig">
+          <div class="rfig__plot" data-draw>
+            <svg viewBox="0 0 320 170" class="rays" role="img" aria-label="Three paths from a source to a receiver: one direct, one off the surface, one off the bottom.">
+              <line class="rays__surface" x1="0" y1="22" x2="320" y2="22" />
+              <line class="rays__bottom" x1="0" y1="160" x2="320" y2="160" />
+              <path class="rays__ray rays__ray--soft" d="M40 40 L160 22 L280 98" />
+              <path class="rays__ray" d="M40 40 L280 98" />
+              <path class="rays__ray rays__ray--soft" d="M40 40 L176 160 L280 98" />
+              <rect class="rays__src" x="34" y="34" width="12" height="12" />
+              <rect class="rays__rx" x="274" y="92" width="12" height="12" />
+            </svg>
+          </div>
+          <figcaption class="rfig__cap mono">source, surface bounce, bottom bounce, direct</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="onr" class="wrap zone-r" aria-labelledby="onr-title">
+      <div class="zone-r__grid zone-r__grid--flip">
+        <figure class="rfig rfig--boxed">
+          <div class="fig__bar">
+            <p class="fig__label">Fig. R1 / Platform network</p>
+            <p class="fig__label">hover a node</p>
+          </div>
+          <div class="net" data-net data-draw>
+            <svg viewBox="0 0 100 90" preserveAspectRatio="none" class="net__links" aria-hidden="true">
+              {links.map((l) => <line x1={at(l.a).x} y1={at(l.a).y} x2={at(l.b).x} y2={at(l.b).y} class={`net__link net__link--${l.kind}`} data-a={l.a} data-b={l.b} />)}
+            </svg>
+            {
+              nodes.map((n) => (
+                <button type="button" class="net__node" style={`left:${n.x}%;top:${(n.y / 90) * 100}%`} data-node={n.id} aria-describedby="net-read">
+                  {n.label}
+                </button>
+              ))
+            }
+            <p class="net__read" id="net-read" data-net-read aria-live="polite">Hover or focus a node.</p>
+            <script type="application/json" data-net-nodes set:html={JSON.stringify(nodes.map(({ id, text }) => ({ id, text })))} />
+          </div>
+          <p class="fig__note">A drawing of the kind of network the project is about, not project data. Solid lines are radio, orange lines acoustic.</p>
+        </figure>
+        <div>
+          <p class="range mono">{rangeLabel(zoneById('onr'))}</p>
+          <h2 id="onr-title" class="research__h2" data-decode>Intelligent data management for distributed naval platforms</h2>
+          <p class="zone-r__text">
+            ONR funded, with Integer Technologies. Many platforms, thin and unreliable links between them, and far more data than the links
+            can carry. I work with the communications group, on the end to end chain that carries data from underwater acoustic links to the links above the water. Thesis track, expected May 2028.
+          </p>
+          <p class="zone-r__small">Advisor: Dr. Shuangqing Wei, LSU. Details limited to what is public.</p>
+          <p class="zone-r__links">
+            <a class="link" href="/work/onr-intelligent-data-management/">What I can share</a>
+            <a class="link" href="https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php">The public announcement</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="bellhop" class="wrap zone-r" aria-labelledby="bellhop-title">
+      <div class="zone-r__grid">
+        <div>
+          <p class="range mono">{rangeLabel(zoneById('bellhop'))}</p>
+          <h2 id="bellhop-title" class="research__h2" data-decode>bellhopSim</h2>
+          <p class="zone-r__text">
+            A Python wrapper around BELLHOP for shallow water channels: eigenrays, arrival structure, delay spread within 20 dB of the
+            strongest arrival, and a BER sweep. While documenting it I found three physics bugs (range units, bottom density units, the BER
+            model) and fixed them with regression tests.
+          </p>
+          <div class="zone-r__actions">
+            <a class="btn" href="/work/bellhop-sim/">Figures and fixes</a>
+            <a class="link" href="https://github.com/avemath/bellhopSim">Code</a>
+          </div>
+        </div>
+        <figure class="rfig rfig--boxed">
+          <div class="fig__bar">
+            <p class="fig__label">Fig. R2 / Arrivals, 15 km, sandy bottom</p>
+            <p class="fig__label">draws in on scroll</p>
+          </div>
+          <div class="rfig__plot" data-draw>
+            <svg viewBox="0 0 600 230" class="arr" role="img" aria-label={`${ch.arrivals.length} arrivals of one ping at 15 km over ${(maxDelay / 1000).toFixed(1)} seconds. ${ch.n_within_20db} are within 20 dB of the strongest, spread over ${Math.round(windowMs)} ms.`}>
+              <rect class="arr__win" x={ax(firstStrong)} y={R2.y0 - 6} width={ax(firstStrong + windowMs) - ax(firstStrong)} height={R2.y1 - R2.y0 + 6} />
+              <text class="arr__lab" x={ax(firstStrong)} y={R2.y0 - 14}>20 dB window: {Math.round(windowMs)} ms</text>
+              {[0, -10, -20, -30, -40].map((d) => <text class="arr__tick" x={R2.x0 - 6} y={ay(d) + 3} text-anchor="end">{d}</text>)}
+              <line class="arr__axis" x1={R2.x0} y1={R2.y1} x2={R2.x1} y2={R2.y1} />
+              {bars.map((b) => <line class:list={['arr__bar', b.inside && 'arr__bar--in', b.strongest && 'arr__bar--top']} x1={b.x} x2={b.x} y1={R2.y1} y2={b.y} />)}
+              {delayTicks.map((t) => <text class="arr__tick" x={ax(t)} y={R2.y1 + 15} text-anchor="middle">{t}</text>)}
+              <text class="arr__tick" x={R2.x1} y={R2.y1 + 30} text-anchor="end">delay, ms</text>
+              <text class="arr__tick" x={R2.x0 - 6} y={R2.y0 - 14} text-anchor="end">dB</text>
+            </svg>
+          </div>
+          <p class="fig__note">
+            {ch.arrivals.length} arrivals from BELLHOP: 1000 m of water, source at 50 m, receiver at 100 m, 3.5 kHz. The strongest is in
+            orange; {ch.n_within_20db} fall within 20 dB of it.
+          </p>
+        </figure>
+      </div>
+    </section>
+
+    <section id="pool-alarm" class="wrap zone-r" aria-labelledby="pool-title">
+      {/* NAME: working title until Avery picks one. Update the title here and in acoustic-pool-alarm.md then, and delete this comment. */}
+      <div class="zone-r__grid zone-r__grid--flip">
+        <figure class="rfig rfig--boxed">
+          <div class="fig__bar">
+            <p class="fig__label">Fig. R3 / Pool, side view</p>
+            <p class="fig__label">in progress</p>
+          </div>
+          <div class="rfig__plot" data-draw>
+            <svg viewBox="0 0 320 170" class="pool" role="img" aria-label="A pool in side view with a hydrophone in each bottom corner and sound from a swimmer at the surface reaching both.">
+              <text class="pool__cap" x="14" y="18">two hydrophones, one swimmer, many echoes</text>
+              <path class="pool__walls" d="M10 30 V160 H310 V30" />
+              <line class="pool__water" x1="10" y1="40" x2="310" y2="40" />
+              <rect class="pool__swimmer" x="154" y="34" width="12" height="22" />
+              <path class="pool__ray" d="M160 58 L22 150" />
+              <path class="pool__ray" d="M160 58 L298 150" />
+              <path class="pool__ray pool__ray--echo" d="M160 58 L120 160 L22 150" />
+              <path class="pool__ray pool__ray--echo" d="M160 58 L310 120 L298 150" />
+              <circle class="pool__hp" cx="22" cy="150" r="5" />
+              <circle class="pool__hp" cx="298" cy="150" r="5" />
+            </svg>
+          </div>
+          <p class="fig__note">A drawing of the plan, not a measurement. Nothing is built yet.</p>
+        </figure>
+        <div>
+          <p class="range mono">{rangeLabel(zoneById('pool-alarm'))}</p>
+          <h2 id="pool-title" class="research__h2">Acoustic Pool Alarm <span class="research__wt">(working title)</span></h2>
+          <p class="zone-r__text">
+            My own project, with Because of ADAM. Can hydrophones in a home pool tell the difference between a kid swimming and a kid in
+            trouble, fast enough to matter? Right now: reviewing prior work and ASTM F2208, the standard for residential pool alarms, and
+            planning the first bench tests.
+          </p>
+          <div class="zone-r__actions">
+            <a class="btn btn--line-accent" href="/work/acoustic-pool-alarm/">Follow along</a>
+            <a class="link" href="/work/because-of-adam/">Because of ADAM</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap zone-r zone-r--notes">
+      <FieldNotes />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* The page is the water: lighter navy at the surface, near black at the bottom. A second layer
+     darkens the whole screen a little more as the depth grows. */
+  .under {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(180deg, #14325c 0%, var(--navy) 22%, var(--navy-deep) 58%, var(--navy-deeper) 100%);
+  }
+
+  .under__dark {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: #02060d;
+    opacity: calc(var(--depth, 0) * 0.35);
+    pointer-events: none;
+  }
+
+  :global(body:has([data-under])) {
+    background: var(--navy-deeper);
+  }
+
+  :global(body:has([data-under]) .site-header) {
+    background: #14325c;
+  }
+
+  .zone-r {
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .zone-r--first {
+    padding-top: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .zone-r--notes {
+    border-bottom: 0;
+  }
+
+  .zone-r__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 960px) {
+    .zone-r__grid {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: clamp(2.5rem, 5vw, 4.5rem);
+    }
+
+    .zone-r__grid--flip {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    }
+  }
+
+  @media (max-width: 959px) {
+    .zone-r__grid--flip > figure {
+      order: 2;
+    }
+  }
+
+  .range {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .research__h1 {
+    margin-top: 0.75rem;
+    font-size: clamp(2.75rem, 7vw, 5rem);
+  }
+
+  .research__h2 {
+    margin-top: 0.75rem;
+    font-size: clamp(2.1rem, 4.4vw, 3.25rem);
+  }
+
+  .research__wt {
+    font-size: 0.45em;
+    font-weight: 400;
+    font-variation-settings: 'wdth' 100;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .zone-r__text {
+    margin-top: 1.25rem;
+    max-width: 38rem;
+    color: var(--text-soft);
+  }
+
+  .zone-r__small {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .zone-r__links,
+  .zone-r__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .zone-r__links {
+    margin-top: 1rem;
+    font-size: 0.9375rem;
+  }
+
+  /* ---- Figures on dark water ---- */
+  .rfig {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .rfig--boxed {
+    border: 1px solid var(--line);
+    background: rgb(4 12 24 / 0.3);
+  }
+
+  .rfig__plot {
+    padding: 0.75rem;
+  }
+
+  .rfig:not(.rfig--boxed) .rfig__plot {
+    border: 1px solid var(--line);
+    border-bottom: 0;
+  }
+
+  .rfig__cap {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    background: rgb(244 246 250 / 0.06);
+    font-size: 0.75rem;
+    color: var(--text-soft);
+  }
+
+  .rays,
+  .arr,
+  .pool {
+    width: 100%;
+    height: auto;
+  }
+
+  .rays__surface {
+    stroke: var(--line-strong);
+  }
+
+  .rays__bottom {
+    stroke: var(--line);
+    stroke-dasharray: 3 4;
+  }
+
+  .rays__ray {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .rays__ray--soft {
+    stroke-opacity: 0.55;
+    stroke-width: 1;
+  }
+
+  .rays__src {
+    fill: var(--accent);
+  }
+
+  .rays__rx {
+    fill: none;
+    stroke: var(--on-navy);
+    stroke-width: 1.5;
+  }
+
+  /* R1: nodes are buttons, so they take focus in order and work by keyboard. */
+  .net {
+    position: relative;
+    aspect-ratio: 10 / 8;
+    margin: 0.75rem;
+  }
+
+  .net__links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .net__link {
+    stroke: rgb(244 246 250 / 0.45);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .net__link--acoustic {
+    stroke: var(--accent);
+    stroke-opacity: 0.6;
+  }
+
+  .net__link[data-hot] {
+    stroke-width: 2.5;
+    stroke-opacity: 1;
+  }
+
+  .net__node {
+    position: absolute;
+    translate: -50% -50%;
+    min-width: 4.5rem;
+    min-height: 2.5rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--on-navy);
+    background: var(--navy);
+    font-size: 0.875rem;
+    color: var(--on-navy);
+    cursor: pointer;
+  }
+
+  .net__node[aria-pressed='true'],
+  .net__node:hover {
+    border: 2px solid var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .net__read {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    max-width: 16rem;
+    padding: 0.45rem 0.6rem;
+    background: var(--on-navy);
+    color: var(--navy);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  /* R2 */
+  .arr__win {
+    fill: rgb(244 246 250 / 0.06);
+  }
+
+  .arr__lab {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    fill: var(--on-navy-soft);
+  }
+
+  .arr__tick {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--on-navy-muted);
+  }
+
+  .arr__axis {
+    stroke: var(--line-strong);
+  }
+
+  .arr__bar {
+    stroke: rgb(244 246 250 / 0.35);
+    stroke-width: 2;
+  }
+
+  .arr__bar--in {
+    stroke: var(--on-navy);
+    stroke-width: 3;
+  }
+
+  .arr__bar--top {
+    stroke: var(--accent);
+    stroke-width: 4;
+  }
+
+  /* R3 */
+  .pool__cap {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--on-navy-muted);
+  }
+
+  .pool__walls {
+    fill: none;
+    stroke: var(--on-navy);
+    stroke-width: 1.25;
+  }
+
+  .pool__water {
+    stroke: var(--line-strong);
+    stroke-dasharray: 4 4;
+  }
+
+  .pool__swimmer {
+    fill: none;
+    stroke: var(--on-navy);
+  }
+
+  .pool__ray {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1;
+  }
+
+  .pool__ray--echo {
+    stroke-opacity: 0.45;
+    stroke-dasharray: 3 3;
+  }
+
+  .pool__hp {
+    fill: var(--accent);
+  }
+</style>
+
+<script>
+  // R1: hovering, focusing or tapping a node lights its links and says what it is.
+  const net = document.querySelector<HTMLElement>('[data-net]');
+  if (net) {
+    const texts: { id: string; text: string }[] = JSON.parse(net.querySelector('[data-net-nodes]')!.textContent!);
+    const read = net.querySelector<HTMLElement>('[data-net-read]')!;
+    const nodes = [...net.querySelectorAll<HTMLButtonElement>('[data-node]')];
+    const links = [...net.querySelectorAll<SVGLineElement>('[data-a]')];
+    const pick = (b: HTMLButtonElement) => {
+      const id = b.dataset.node!;
+      nodes.forEach((n) => n.setAttribute('aria-pressed', String(n === b)));
+      links.forEach((l) => l.toggleAttribute('data-hot', l.dataset.a === id || l.dataset.b === id));
+      read.textContent = texts.find((t) => t.id === id)!.text;
+    };
+    nodes.forEach((b) => {
+      b.setAttribute('aria-pressed', 'false');
+      ['mouseenter', 'focus', 'click'].forEach((ev) => b.addEventListener(ev, () => pick(b)));
+    });
+  }
+</script>

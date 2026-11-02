@@ -1,442 +1,101 @@
 ---
-// Depth gauge for the home page. Desktop gets a slim scale on the left whose marks link to the
-// section at each depth; narrower screens get a thin bar across the top. Which section sits at
-// a depth depends on the audience switcher, so each mark carries one link per audience and CSS
-// shows the one for the checked option. That way the links are right without JavaScript; the
-// script only moves the marker, the readout and the signal meter.
-import { slots, orders, audiences, sectionNames } from '@/lib/depth';
-
-const marks = slots.map((s, i) => {
-  const ids = audiences.map((a) => orders[a][i]);
-  const same = ids.every((id) => id === ids[0]);
-  return {
-    slot: s,
-    links: same ? [{ id: ids[0], aud: '' }] : audiences.map((a, j) => ({ id: ids[j], aud: a })),
-  };
-});
-const short = (m: number) => m.toLocaleString('en-US');
+// The research page's depth gauge: a scale from the surface to 100 m at the right edge, with a
+// marker at the current depth. The depth is wherever the reading line (40% down the screen)
+// crosses a section, interpolated across that section's range from src/lib/depth.ts. The same
+// number goes into the nav label ("depth 36 m"). Wide screens only; the nav label carries it on
+// phones. Decorative: every section's own label states its range in text.
+import { gaugeMarks, MAX_DEPTH } from '@/lib/depth';
 ---
 
-<nav class="gauge" aria-label="Depth" data-gauge>
-  <p class="gauge__now" aria-hidden="true">
-    <span class="gauge__label" data-ink>Depth</span>
-    <span class="gauge__depth" data-gauge-depth data-ink>0 m</span>
-    <span class="gauge__zone" data-gauge-zone data-ink>{slots[0].zone}</span>
-    <span class="gauge__section" data-gauge-section data-ink>{sectionNames.top}</span>
-  </p>
-  <div class="gauge__scale" style={`--n:${slots.length}`}>
-    <span class="gauge__marker" aria-hidden="true" data-gauge-marker></span>
-    <ol>
-      {
-        marks.map((m, i) => (
-          <li class="gauge__mark" style={`--i:${i}`} data-ink>
-            {m.links.map((l) => (
-              <a href={`#${l.id}`} class:list={['gauge__link', l.aud && `gauge__link--${l.aud}`]} data-slot={i}>
-                <span class="gauge__tick" aria-hidden="true" />
-                <span class="gauge__m" aria-hidden="true">
-                  {short(m.slot.depth)}
-                </span>
-                <span class="sr-only">
-                  {short(m.slot.depth)} m, {sectionNames[l.id]}
-                </span>
-              </a>
-            ))}
-          </li>
-        ))
-      }
-    </ol>
+<div class="gauge" aria-hidden="true" data-gauge>
+  <div class="gauge__scale">
+    {
+      gaugeMarks.map((m) => (
+        <span class="gauge__mark" style={`--at:${m / MAX_DEPTH}`}>
+          {m === 0 || m === MAX_DEPTH ? `${m} m` : m}
+        </span>
+      ))
+    }
+    <span class="gauge__dot" data-gauge-dot></span>
   </div>
-  <div class="gauge__meter" aria-hidden="true" data-meter data-ink>
-    <span class="gauge__bars"><i></i><i></i><i></i><i></i><i></i></span>
-    <span class="gauge__meter-label" data-meter-label>Sig</span>
-  </div>
-</nav>
-
-<div class="depthbar" aria-hidden="true" data-depthbar><span></span></div>
+</div>
 
 <style>
   .gauge {
     display: none;
   }
 
-  /* Only where the page margin can hold it. It sits on the right edge, since the signal trace
-     runs down the left gutter: at 1440px the content column ends 152px from the edge and the
-     gauge takes the outer 112px, so there are 40px between them. No panel: it sits on the water
-     and takes its ink from the band under it (the script sets data-deep over dark water). */
-  @media (min-width: 1440px) {
+  @media (min-width: 1280px) {
     .gauge {
+      display: block;
       position: fixed;
-      z-index: 30;
-      right: 1rem;
-      top: 50%;
-      translate: 0 -50%;
-      display: grid;
-      gap: 1rem;
-      width: 6rem;
-      font-family: var(--font-mono);
-      transition: color 0.3s;
+      z-index: 5;
+      top: 6rem;
+      bottom: 3rem;
+      right: max(1rem, calc((100vw - 76rem) / 2 - 4.5rem));
+      width: 3.5rem;
+      pointer-events: none;
     }
-
-    .depthbar {
-      display: none;
-    }
-  }
-
-  .gauge__now {
-    display: grid;
-    gap: 0.2rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid var(--line);
-    line-height: 1.3;
-  }
-
-  .gauge__label {
-    font-size: 0.62rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .gauge__depth {
-    white-space: nowrap;
-    font-size: 1.2rem;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .gauge__zone {
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent-ink);
-  }
-
-  .gauge__section {
-    hyphens: auto;
-    overflow-wrap: break-word;
-    font-family: var(--font-sans);
-    font-size: 0.76rem;
-    color: var(--text-soft);
   }
 
   .gauge__scale {
-    --scale-h: min(44vh, 22rem);
     position: relative;
-    height: var(--scale-h);
-    margin-left: 0.3rem;
-  }
-
-  /* The scale line is drawn one segment per mark, so each segment takes the ink of the band
-     behind it, like the text. Ticks and line use the muted ink, which passes on every band. */
-  .gauge__mark::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 1px;
-    height: calc(var(--scale-h) / (var(--n) - 1));
-    background: var(--muted);
-  }
-
-  .gauge__mark:last-child::before {
-    display: none;
-  }
-
-  /* Every line of the gauge carries a soft halo in the color of its own water, so it stays
-     legible for the moment it crosses a band's wave edge. */
-  .gauge [data-ink] {
-    --halo: var(--band-2);
-    text-shadow:
-      0 0 2px var(--halo),
-      0 0 5px var(--halo),
-      0 0 9px var(--halo);
-  }
-
-  :global([data-theme='dark']) .gauge [data-ink],
-  :global(:root:not([data-theme='dark'])) .gauge [data-deep] {
-    --halo: var(--band-9);
+    height: 100%;
+    border-left: 1px solid var(--line);
   }
 
   .gauge__mark {
     position: absolute;
-    left: 0;
-    top: calc(var(--i) / (var(--n) - 1) * 100%);
+    left: 0.45rem;
+    top: calc(var(--at) * 100%);
     translate: 0 -50%;
-  }
-
-  .gauge__link {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 1.5rem;
-    padding-right: 0.35rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.02em;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
     color: var(--muted);
-    text-decoration: none;
-    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
-  .gauge__link:hover,
-  .gauge__link[aria-current] {
-    color: var(--text);
-  }
-
-  .gauge__tick {
-    width: 0.45rem;
-    height: 1px;
-    background: var(--muted);
-  }
-
-  .gauge__link:hover .gauge__tick,
-  .gauge__link[aria-current] .gauge__tick {
-    width: 0.75rem;
-    background: var(--accent);
-  }
-
-  /* One link per audience on marks whose section changes with the switcher. */
-  .gauge__link--research,
-  .gauge__link--website {
-    display: none;
-  }
-
-  :global(.home:has(#aud-research:checked)) .gauge__link--hire,
-  :global(.home:has(#aud-website:checked)) .gauge__link--hire {
-    display: none;
-  }
-
-  :global(.home:has(#aud-research:checked)) .gauge__link--research,
-  :global(.home:has(#aud-website:checked)) .gauge__link--website {
-    display: flex;
-  }
-
-  /* Light theme over dark water: the dark-water inks, the same ones the bands use. Each part of
-     the gauge (the readout, every mark, the meter) reads the band directly under it, so the
-     gauge stays legible while it straddles a band edge. */
-  :global(:root:not([data-theme='dark'])) .gauge [data-deep] {
-    --text: #e4f0f5;
-    --text-soft: #c3d6df;
-    --muted: #adc6d2;
-    --accent: #7ccbe6;
-    --accent-ink: #93d5ec;
-    --amber-line: #f0a940;
-    --amber-ink: #f5c27a;
-    --line: rgb(228 240 245 / 0.16);
-    --line-strong: rgb(228 240 245 / 0.3);
-  }
-
-  .gauge__marker {
+  .gauge__dot {
     position: absolute;
-    left: -0.3rem;
-    top: calc(var(--pos, 0) * 100%);
-    width: 0.55rem;
-    height: 0.55rem;
-    border: 1.5px solid var(--amber-line);
+    left: -4px;
+    top: calc(var(--depth, 0) * 100%);
+    width: 7px;
+    height: 7px;
+    margin-top: -3.5px;
     border-radius: 50%;
-    background: var(--amber-line);
-    translate: 0 -50%;
-    transition: top 0.25s var(--ease-out-expo);
-  }
-
-  .gauge__meter {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.64rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-  }
-
-  .gauge__bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 1rem;
-  }
-
-  .gauge__bars i {
-    width: 3px;
-    border-radius: 1px;
-    background: var(--line-strong);
-    transition: background-color 0.3s;
-  }
-
-  .gauge__bars i:nth-child(1) { height: 20%; }
-  .gauge__bars i:nth-child(2) { height: 40%; }
-  .gauge__bars i:nth-child(3) { height: 60%; }
-  .gauge__bars i:nth-child(4) { height: 80%; }
-  .gauge__bars i:nth-child(5) { height: 100%; }
-
-  .gauge__meter[data-bars='1'] i:nth-child(-n + 1),
-  .gauge__meter[data-bars='2'] i:nth-child(-n + 2),
-  .gauge__meter[data-bars='3'] i:nth-child(-n + 3),
-  .gauge__meter[data-bars='4'] i:nth-child(-n + 4),
-  .gauge__meter[data-bars='5'] i {
     background: var(--accent);
-  }
-
-  .gauge__meter[data-locked] i {
-    background: var(--amber-line);
-  }
-
-  .gauge__meter[data-locked] .gauge__meter-label {
-    color: var(--amber-ink);
-  }
-
-  /* Phones and tablets: depth as a thin bar across the very top. */
-  .depthbar {
-    position: fixed;
-    z-index: 60;
-    inset: 0 0 auto;
-    height: 3px;
-    pointer-events: none;
-  }
-
-  .depthbar span {
-    display: block;
-    height: 100%;
-    background: var(--accent);
-    transform-origin: 0 50%;
-    transform: scaleX(var(--p, 0));
-    transition: background-color 0.3s;
-  }
-
-  .depthbar[data-locked] span {
-    background: var(--amber-line);
+    transition: top 0.25s ease-out;
   }
 </style>
 
 <script>
-  import { orders, slots, sectionNames, formatDepth, DEEP_FROM, type Audience } from '../lib/depth';
-  import { prefersReducedMotion } from '../scripts/preferences';
+  import { MAX_DEPTH, zones } from '../lib/depth';
 
   const gauge = document.querySelector<HTMLElement>('[data-gauge]');
-  const bar = document.querySelector<HTMLElement>('[data-depthbar]');
-  const marker = gauge?.querySelector<HTMLElement>('[data-gauge-marker]');
-  const depthEl = gauge?.querySelector<HTMLElement>('[data-gauge-depth]');
-  const zoneEl = gauge?.querySelector<HTMLElement>('[data-gauge-zone]');
-  const sectionEl = gauge?.querySelector<HTMLElement>('[data-gauge-section]');
-  const meter = gauge?.querySelector<HTMLElement>('[data-meter]');
-  const meterLabel = gauge?.querySelector<HTMLElement>('[data-meter-label]');
-  const links = [...(gauge?.querySelectorAll<HTMLAnchorElement>('.gauge__link') ?? [])];
+  const label = document.querySelector<HTMLElement>('[data-nav-label]');
+  const root = document.querySelector<HTMLElement>('[data-under]');
+  const sections = zones.map((z) => ({ z, el: document.getElementById(z.id) })).filter((s) => s.el);
 
-  let tops: number[] = [];
-  let locked = false;
   let queued = false;
-
-  const audience = () => (document.querySelector<HTMLInputElement>('input[name="audience"]:checked')?.value ?? 'hire') as Audience;
-
-  // The gauge is fixed, so where its parts sit in the viewport only changes on resize.
-  let inked: { el: HTMLElement; x: number; y: number }[] = [];
-  let edges: { top: number; wave: number; shift: number }[] = [];
-
-  // The wave edge each band rises with (the mask in global.css): this curve across a 1440 by 40
-  // tile, shifted 317px per band. waveAt gives the edge's depth into the band at a page x, so
-  // each line of the gauge can take the ink of the water that is really behind it.
-  const WAVE: [number, number][][] = [
-    [[0, 22], [160, 8], [300, 6], [470, 18]],
-    [[470, 18], [640, 30], [760, 38], [960, 26]],
-    [[960, 26], [1160, 14], [1280, 8], [1440, 22]],
-  ];
-  const waveLut = (() => {
-    const pts: [number, number][] = [];
-    for (const [a, b, c, d] of WAVE)
-      for (let i = 0; i <= 48; i++) {
-        const t = i / 48, u = 1 - t;
-        const f = (k: 0 | 1) => u * u * u * a[k] + 3 * u * u * t * b[k] + 3 * u * t * t * c[k] + t * t * t * d[k];
-        pts.push([f(0), f(1)]);
-      }
-    return pts;
-  })();
-  const waveAt = (x: number) => {
-    const tx = ((x % 1440) + 1440) % 1440;
-    let i = 1;
-    while (i < waveLut.length - 1 && waveLut[i][0] < tx) i++;
-    const [x0, y0] = waveLut[i - 1], [x1, y1] = waveLut[i];
-    return (y0 + ((y1 - y0) * (tx - x0)) / (x1 - x0 || 1)) / 40;
-  };
-
-  function measure() {
-    inked = [...(gauge?.querySelectorAll<HTMLElement>('[data-ink]') ?? [])].map((el) => {
-      const r = el.getBoundingClientRect();
-      return { el, x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    });
-    tops = orders[audience()].map((id) => {
-      const el = document.getElementById(id);
-      return el ? el.getBoundingClientRect().top + scrollY : Infinity;
-    });
-    edges = orders[audience()].map((id, k) => {
-      const el = document.getElementById(id);
-      return { top: tops[k], wave: el ? parseFloat(getComputedStyle(el).borderTopWidth || '0') : 0, shift: -317 * slots[k].band };
-    });
-    update();
-  }
-
   function update() {
     queued = false;
-    const n = slots.length;
-    // All reads first, then only writes, so updating never forces a layout.
-    const max = document.documentElement.scrollHeight - innerHeight;
-    const probe = scrollY + innerHeight * 0.4;
-    const atEnd = scrollY + innerHeight >= max + innerHeight - 2;
-    let i = 0;
-    while (i < n - 1 && tops[i + 1] <= probe) i++;
-    if (atEnd) i = n - 1;
-    // The marker glides between marks with motion and jumps per section without it. The numbers
-    // always name the section the reading line is in, the same slot its own label comes from.
-    const span = i < n - 1 ? tops[i + 1] - tops[i] : 1;
-    const frac = prefersReducedMotion() || i === n - 1 ? 0 : Math.max(0, Math.min(1, (probe - tops[i]) / span));
-    const pos = (i + frac) / (n - 1);
-
-    marker?.style.setProperty('--pos', String(pos));
-    if (depthEl) depthEl.textContent = formatDepth(slots[i].depth);
-    if (zoneEl) zoneEl.textContent = slots[i].zone;
-    if (sectionEl) sectionEl.textContent = sectionNames[orders[audience()][i]];
-    links.forEach((a) => (Number(a.dataset.slot) === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
-
-    // Each part of the gauge takes the ink of the band under its own center.
-    inked.forEach(({ el, x, y }) => {
-      const at = scrollY + y;
-      let j = 0;
-      while (j < n - 1 && edges[j + 1].top <= at) j++;
-      // Inside a band's wave edge, the band above still shows wherever the wave has not reached.
-      const e = edges[j];
-      if (j > 0 && at - e.top < e.wave * waveAt(x - e.shift)) j--;
-      el.toggleAttribute('data-deep', slots[j].band >= DEEP_FROM);
-    });
-
-    // Signal strength drops with depth until the receiver on the seafloor locks on.
-    const bars = Math.max(1, 5 - Math.floor(pos * 4.6));
-    if (meter) meter.dataset.bars = String(bars);
-
-    const p = prefersReducedMotion() ? pos : max > 0 ? scrollY / max : 0;
-    bar?.style.setProperty('--p', String(p));
+    const line = innerHeight * 0.4;
+    let depth = 0;
+    for (const { z, el } of sections) {
+      const r = el!.getBoundingClientRect();
+      if (r.top > line) break;
+      const t = Math.min(1, (line - r.top) / Math.max(1, r.height));
+      depth = z.from + t * (z.to - z.from);
+    }
+    const m = Math.round(depth);
+    if (label) label.textContent = `depth ${m} m`;
+    gauge?.style.setProperty('--depth', String(depth / MAX_DEPTH));
+    root?.style.setProperty('--depth', String(depth / MAX_DEPTH));
   }
-
-  function setLocked(on: boolean) {
-    locked = on;
-    if (meter) meter.toggleAttribute('data-locked', on);
-    if (meterLabel) meterLabel.textContent = on ? 'Lock' : 'Sig';
-    bar?.toggleAttribute('data-locked', on);
-  }
-
-  if (gauge || bar) {
-    addEventListener('scroll', () => {
-      if (!queued) {
-        queued = true;
-        requestAnimationFrame(update);
-      }
-    }, { passive: true });
-    // The observer's first callback comes after the first layout, so that is the first measure.
-    new ResizeObserver(measure).observe(document.body);
-    document.querySelectorAll('input[name="audience"]').forEach((r) => r.addEventListener('change', () => requestAnimationFrame(measure)));
-    addEventListener('motionchange', update);
-    addEventListener('rxlock', (e) => setLocked((e as CustomEvent<boolean>).detail));
-    if (locked) setLocked(true);
-  }
+  const onScroll = () => {
+    if (!queued) (queued = true), requestAnimationFrame(update);
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  update();
 </script>

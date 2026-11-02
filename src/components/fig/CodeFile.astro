@@ -1,0 +1,60 @@
+---
+// The Code tab: the whole file, line by line, with a link to it on GitHub.
+import { whole, type Lang } from '@/lib/excerpt';
+
+interface Props {
+  source: string;
+  lang: Lang;
+  file: string;
+  url: string;
+  /** Where the file comes from, when it is a port or a vendored copy. */
+  note?: string;
+}
+
+const { source, lang, file, url, note } = Astro.props;
+const lines = whole(source, lang);
+---
+
+<div class="cfile">
+  <div class="cfile__top">
+    <p class="mono cfile__name">{file} · {lines.length} lines</p>
+    <a class="link cfile__gh" href={url}>View on GitHub</a>
+  </div>
+  {note && <p class="cfile__note">{note}</p>}
+  <pre class="code cfile__code" tabindex="0" aria-label={`The whole of ${file}`}><code class="code__inner">{lines.map((l) => <span class="code__line" data-n={l.n}><span class="code__txt" set:html={l.html} /></span>)}</code></pre>
+</div>
+
+<style>
+  .cfile {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  .cfile__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  .cfile__name {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .cfile__gh {
+    font-size: 0.875rem;
+  }
+
+  .cfile__note {
+    font-size: 0.875rem;
+    color: var(--text-soft);
+  }
+
+  .cfile__code {
+    max-height: 32rem;
+    border: 1px solid var(--line);
+  }
+</style>

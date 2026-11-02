@@ -1,61 +1,68 @@
-# Design system: Descent
+# Design system: the bench
 
-A signal sent down through the ocean. The home page is one transmission: my name goes out at the surface as a real signal, the page is the water, and the footer is the receiver on the seafloor. Thin teal lines, one amber highlight, and monospace instrument labels, so the research side and the design side read as one person. The concept, zone map and every piece are written up in [REDESIGN.md](REDESIGN.md).
-
-Both themes keep a leaf green for living things only: the live-site dots and the contour lines on the About page.
+A communications engineer's test report. The home page is the surface: navy hero and footer, white paper for the body, one muted buoy orange, wide Archivo headings, and figures that read like instrument readouts and timing diagrams. Only /research/ goes underwater. The concept, what changed and what was removed are in [REDESIGN.md](REDESIGN.md#redesign-3-bench-on-the-surface-water-below).
 
 The live reference is `/styleguide/` (not linked or indexed). Toggle the theme to check both palettes.
 
 ## Color
 
-Tokens live in `src/styles/global.css` as CSS variables, redefined under `[data-theme='dark']`. Tailwind reads them through `@theme`, so utilities like `text-muted` and `bg-surface` follow the theme.
+Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme='dark']`. Tailwind reads them through `@theme` in `global.css`, so utilities like `text-muted` and `bg-surface` follow the theme.
 
-The full table, the twelve depth shades and the measured contrast for each are in [REDESIGN.md](REDESIGN.md#palette). In short: `--z-top` and `--z-floor` are the two ends of the descent, a `.zone` mixes its shade between them from its `--slot`, and surfaces and lines are derived from whatever `--bg` is in scope. Text tokens are fixed and pass AA on every shade in both themes. Light `--accent` and `--amber-line` are for strokes only; text uses `--accent-ink` and `--amber-ink`.
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `--navy` | `#0b1f3a` | same | hero, nav, footer, research ground |
+| `--navy-deep`, `--navy-deeper` | `#071527`, `#040c18` | same | gradients that darken downward |
+| `--bg`, `--surface` | `#ffffff` | `#071527`, `#0e2340` | page and paper cards |
+| `--ground-alt` | `#eef1f5` with a dot grid | `#0a1a30` | alternate sections (`.ground-alt`) |
+| `--text` | `#0b1f3a` | `#f4f6fa` | ink |
+| `--muted` | `#5b6778` | `#a9b6cc` | labels, meta |
+| `--line` | `#cbd3df` | `#2a3f5e` | 1px borders |
+| `--accent` | `#de6a41` | same | fills and strokes only: primary buttons, the marquee, active traces, callouts |
+| `--accent-ink` | `#b4502a` | `#ef8d66` | text in the accent color (passes 4.5:1) |
+
+On navy (`.on-navy`) the inks are `#f4f6fa`, `#a9b6cc` and lines at 22% white, in both themes. White on the accent is 3.4:1, so white text on it is always 19px bold (large text): the primary button and the marquee. A small primary button turns into a solid ink button instead.
 
 ## Type
 
-- **Space Grotesk** for headings: semibold, tight tracking (`-0.02em` to `-0.045em`).
-- **Inter** for body text at 17px with a 1.65 line height.
-- **JetBrains Mono** for labels, chips, dates and data. It's uppercase with wide tracking for eyebrows.
+One family, Archivo (variable weight and width), self-hosted from Fontsource, Latin only. Headings: weight 800, `'wdth' 112`, letter-spacing -0.03em, line-height 0.94. Body 17px/1.5. IBM Plex Mono for code (14px), readouts and depth labels. Both are preloaded, and each has a fallback face sized to its metrics (`src/styles/fonts.css`, measured with `scripts/measure-fallback.mjs`), so the swap does not move the layout. No pixel or dot-matrix fonts.
 
-All three are variable fonts, self-hosted through Fontsource, with only the Latin subset downloaded. The Latin files are preloaded, and each face has a metric-matched local fallback in `global.css` (`size-adjust` plus ascent and descent overrides against Arial or Courier New), so the swap to the web font does not move the layout.
+## Shape
+
+Square corners on cards and buttons. Buttons: 2px border, 50px tall, weight 700. Paper cards: 1px border and a soft shadow. Numbered callouts are the only round things.
 
 ## Motion
 
-Every animation respects `prefers-reduced-motion` and the site's own "Reduce motion" toggle (footer and command palette), which sets `html[data-motion='reduce']`.
+Everything respects `prefers-reduced-motion` and the site's own "Reduce motion" toggle (`html[data-motion='reduce']`).
 
-- **Hero spectrogram** (`src/scripts/spectrogram.ts`, signal in `src/lib/tx-signal.ts`): a 2D canvas with no libraries, one pixel per FFT bin and one per frame, scaled by CSS. It loads with a dynamic import after the page is idle, pauses off-screen and in background tabs, shows a still frame under reduced motion and on low-power devices, and only makes sound after a click. Until it loads, a still drawn at build time from the same plan holds its place.
-- **Depth gauge and footer lock**: the gauge marker and meter follow scroll with short transitions, and jump per section under reduced motion. The footer frame's preamble sweeps once when it comes into view; under reduced motion it simply reads OK.
-- **Scroll reveals**: CSS scroll-driven animations (`animation-timeline: view()`) where supported, with an IntersectionObserver fallback that staggers each visual row left to right. Nothing is hidden unless motion is allowed and the browser can bring it back.
-- **Entrances**: CSS only. The headline and lede never start invisible, which keeps Largest Contentful Paint fast.
-- **Decode effect** (`src/scripts/decode.ts`): characters resolve out of random glyphs. Used on the hero eyebrow and on the field notes, whose values start masked and decode as they scroll into view; a tap replays one. The label above each value never masks, so the card always says what the fact is about.
+- **Decode headings** (`src/scripts/decode-headings.ts`): headings with `data-decode` resolve out of random glyphs once, in 400 ms, as they come into view. The real text stays in the DOM; a layer hidden from screen readers draws the glyphs.
+- **Plotter draw-in** (`initDrawIn` in `src/scripts/motion.ts`): `[data-draw]` plots sweep in left to right over a second the first time they are on screen. Plots already on screen at load are never hidden.
+- **Signal panel**: still unless the mouse moves. Touch screens get one slow drift in. Sound only on a press.
+- **Marquee**: slow, decorative, `aria-hidden`, still with reduced motion.
+- **Scroll reveals**: CSS scroll-driven animations with an IntersectionObserver fallback.
+
+No animation library (see below).
 
 ### Why no GSAP
 
-The original plan used GSAP for the hero. In practice the only effect that needed it was the eyebrow scramble, and GSAP plus the plugin cost about 80 KB and a second of main-thread time on a throttled phone. A 20-line helper does the same job, so the site ships no animation library.
+The original plan used GSAP for the hero. In practice the only effect that needed it was a text scramble, and GSAP plus the plugin cost about 80 KB and a second of main-thread time on a throttled phone. A 20-line helper does the same job, so the site ships no animation library.
 
 ## Components
 
 | Component | Notes |
 |---|---|
-| `Header` | Inline nav from 768px. Below that, a native `<details>` Menu with the same links and a search entry, so it works before JavaScript loads |
-| `Hero` | name, role and CTAs as HTML, the audience switcher, and the TX spectrogram panel with its readout and Hear it button |
-| `DepthGauge` | home only. Fixed scale from 1360px with one link per depth per audience (CSS picks the visible one), signal meter, and a top bar below 1360px |
-| `Footer` | the received data frame: preamble, header, payload links, and a CRC computed at build time |
-| `SoundSpeed` | textbook sound speed profile in the research panel, no project data |
-| `AudienceSwitcher` | radio group. Section order is CSS `:has()`, and JS only syncs the URL (`?for=research`) and the main CTA |
-| `ProjectTile` | used in the bento grid and on /work. The whole card is clickable through a stretched link, and the "Live site" link sits above it |
-| `BrowserFrame` | static screenshot with a URL bar, plus an optional phone shot. Client sites are never iframed |
-| `Timeline` | native `<details>`, so it works by keyboard with no JS. "Expand all" is a progressive extra |
-| `CommandPalette` | native `<dialog>` with a combobox and listbox. Ctrl K, Cmd K or `/` opens it, and a visible header button covers touch |
-| `FieldNotes` | static cards: a label, a number or short value, and the story behind it. Nothing to click, just the shared scroll reveal |
-| `Testimonials` | renders only quotes with `approved: true`, as a `figure` with `blockquote` and `figcaption` |
-| `ContactForm` | Web3Forms when a key is set, otherwise mailto. Honeypot, inline validation, live status |
-| `ProjectArt` | project signatures: drawn SVG covers in one line style for projects without screenshots. Research art is abstract on purpose. Moves gently only while its tile is hovered or focused |
-| `demos/*` | each demo loads only on its own case study page |
+| `Header` | navy on every page. Name, five links, a small label at the right (`surface` on home, the live depth on /research/), search and theme. A native `<details>` menu below 860px |
+| `Hero` | the headline as HTML, and the signal panel (`src/scripts/signal-panel.ts`, signal in `src/lib/preamble.ts`) |
+| `fig/FigureCard` | a project spotlight: a 7/5 paper card with a figure label row and Live, How it works and Code tabs. The code views widen to the full card |
+| `fig/TimingFig`, `ChainFig`, `MatrixFig` | the three live figures, each run by the project's real code in `src/lib` |
+| `fig/CodeHow`, `fig/CodeFile` | code panels cut at build time from the real files (`src/lib/excerpt.ts`), with real line numbers |
+| `Marquee`, `StatusStrip`, `BelowSurface`, `HomeSkills` | home page sections |
+| `WebsitesShowcase` | the client sites two by two, only those with `client.permission` |
+| `DepthGauge`, `FieldNotes` | /research/ only |
+| `Footer` | "Say hi." and the links; the research variant has "Back to the surface" |
+| `ProjectTile`, `ProjectArt` | /work/ and services |
+| `CommandPalette` | native `<dialog>`; Ctrl K, Cmd K or `/` |
+| `demos/*` | each demo loads only on its own case study |
 
 ## Layout
 
-- Content width is 76rem with a `clamp(1rem, 4vw, 2.5rem)` gutter (16px on phones).
-- Designed at 390px first. The bento stacks to one column, the timeline is already an accordion, the spectrogram sits under the hero text, and the depth gauge becomes a thin bar across the top.
-- Section rhythm comes from `.section` padding (`clamp(3rem, 7vw, 6rem)`). On the home page the sections are depth bands, so a change of shade replaces the divider line.
+Content width 76rem with a `clamp(1rem, 4vw, 2.5rem)` gutter (16px on phones). Designed at 390px first: the hero headline wraps cleanly and the signal panel stacks under it, figure cards stack figure over words, and code panels scroll sideways instead of wrapping below 60 characters.

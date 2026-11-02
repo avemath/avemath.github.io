@@ -1,5 +1,7 @@
 # Redesign: a signal sent down through the ocean
 
+Redesign 3, at the end of this file, replaced most of what is described here. The sections before it are kept as the record of redesigns 1 and 2.
+
 Work in progress on the `redesign` branch. GitHub Pages only deploys `main`, so nothing here is live until it is merged.
 
 ## The concept
@@ -228,3 +230,47 @@ Case studies start where their kind of work lives (`caseStart` in `depth.ts`): c
 
 - Space Grotesk is shared with Nicholas's site. Swapping the display face would make the two sites more distinct, but it means new fallback metrics and a font download change.
 - Later, not now: a sonar ping button on the gauge, bioluminescent specks near the cursor in the deep zones, case studies starting at their section's depth color.
+
+## Redesign 3: bench on the surface, water below
+
+Branch `redesign-3`. The ocean stays, but only on one page. The rest of the site is "the bench": a communications engineer's test report, with figure labels, timing diagrams, block diagrams you can hover and numbered callouts. The mockups are `Final direction home page.pdf` and `Final direction research page (underwater).pdf` (kept out of git).
+
+### What changed
+
+- **Tokens and type** (`src/styles/tokens.css`, `fonts.css`): navy `#0b1f3a` for the hero, nav, footer and research page, white paper cards with a 1px border, one accent `#de6a41`. Archivo for everything (headings at width 112, weight 800), IBM Plex Mono for code and readouts. Square corners; callouts are the only round things. Light and dark themes both stay; the navy is the same in both.
+- **Hero**: the headline sentence, the subline and two buttons, beside a signal panel that replaces the spectrogram of my name. It draws a 32-chip FH-BFSK preamble in the JANUS band (`src/lib/preamble.ts`, using the band plan in `src/lib/fhbfsk.ts`). Scope cursors follow the mouse and snap to chip and tone; the arrow keys move them too. "Hear it, 2 s" plays the 200 ms preamble ten times slower, from chip 0, with 6 ms raised-cosine ramps (checked for clicks in `scripts/check-comms.mjs`). The hop order is my own, since the real JANUS pattern is not public, and the caption says so.
+- **Home page**, in order: hero, accent marquee, the Right now / Research / Open to strip, Projects (three figure cards and three small cards), the "Below the surface" band, Websites (two by two), Skills, footer.
+- **Figure cards** (`src/components/fig/`): each has Live, How it works and Code tabs. How it works shows real lines from the file that runs, with notes that light up their lines; Code shows the whole file. Both widen to the full card.
+  - Fig. 01, RAMpage timing diagram: drawn from the firmware constants, fired by the firmware port. The trigger row is RC channel 6, because channel 5 is the kill switch in `pico_direct.py`.
+  - Fig. 02, V2V receiver chain: eight focusable stages in signal order (detect, timing, CFO, Costas, FFT, MMSE, Viterbi, BSM). The CFO and Costas stages run on the preamble before the FFT, as in `V2V_TXRXf.m`, so the order differs from the mockup. The browser port has no Viterbi decoder, and the Viterbi stage says so.
+  - Fig. 03, LED matrix: the firmware port on the mic, the clip or the idle glow, in the accent on navy. Typing a name scrolls it; the letters the firmware font lacks come from a standard 5x7 set, marked as not from the firmware.
+- **Research page** (`/research/`): the only page underwater. Four depth bands (0 to 20, 20 to 50, 50 to 80 and 80 to 100 m) from `src/lib/depth.ts`, a depth gauge, the depth in the nav, a background that darkens downward and a layer that darkens with depth. Fig. R2 plots every BELLHOP arrival from the bellhopSim comms scenario (`src/data/bellhop-arrivals.json`, recomputed with the repo's own export settings; the counts match its `figures.json`). Fig. R1 and R3 are labeled as drawings, not data. The field notes moved here, three per row.
+- **Everywhere**: section headings decode once as they come into view, and figure plots draw in left to right the first time they are seen. Both are skipped with reduced motion.
+- **Social cards and icons**: navy with the accent and a short hop pattern; a new favicon. The résumé PDF prints in Archivo, slightly narrowed so it stays one page.
+
+### What was removed
+
+The spectrogram hero and its How it works walkthrough (`tx-raster.ts`, `tx-signal.ts`, `spectrogram.ts`, `how-it-works.ts` and `.css`), the audience switcher, the depth bands, wave edges, light rays, marine snow and signal trace on every page, the old depth gauge and packet footer, the sound speed figure (`SoundSpeed`, `sound-channel.ts`), the home Research section, the spotlight rows and the RAMpage, V2V, LED and Landspace live tiles (with `vendor/landspace` and `vendor/led-audio-spectrum`, which only those tiles used). The Signals, Because of ADAM and Grace Mae live versions stay. All of it is in git history.
+
+### Where the ocean went
+
+`src/lib/depth.ts` now holds only the research page's four zones. `DepthGauge` and `FieldNotes` render only there. `BelowSurface` is the one ocean element on the home page: the way down.
+
+### Placeholders for Ave (`grep -rn "TODO(ave)" src`)
+
+- The LED clip: "Play the clip" plays the firmware demo's generated track; swap in a recording if you want one: `src/scripts/fig/matrix.ts`.
+- Client quotes: drafts for Rickey (PLV) and Grace (Grace Mae) are in `src/data/testimonials.json` with `"approved": false`. Each shows on its site card once the owner okays the wording and it is set to true.
+- The pool alarm name: the NAME comments in `src/pages/research.astro` and `acoustic-pool-alarm.md`.
+
+### Copy that differs from the mockups, and why
+
+- The R1 tooltip numbers (2 kbps, 1.8 s, 40 MB) are not used: they would read as ONR project figures. The nodes describe each kind of platform in general terms.
+- R2 is titled "Arrivals, 15 km, sandy bottom" with a 730 ms window: the real values from bellhopSim. No 200 m or 11.4 ms run exists.
+- The pool alarm says it is at the prior-work and planning stage, as `acoustic-pool-alarm.md` does, instead of "the signal chain, a recording rig, and a dataset".
+- The field notes are the six existing ones from `facts.json`.
+- Skills are the full two groups from `skills.json`, one line per area, so they match the résumé.
+- The footer email is the personal one in `site.json`, by Ave's choice.
+
+### Checks
+
+`npm run verify` and `npm run test:a11y` pass (24 pages, 156 scans, now including each figure card's How it works and Code views). Mobile Lighthouse on `astro preview`: home 99 / 100 / 96 / 100, research 99 / 100 / 96 / 100 (performance, accessibility, best practices, SEO), CLS 0 and TBT 0 ms on both. Best practices loses 4 points only to the analytics beacon, which is blocked on localhost.

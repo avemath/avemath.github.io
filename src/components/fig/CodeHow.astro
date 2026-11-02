@@ -1,0 +1,127 @@
+---
+// The How it works tab: real lines from the file that runs, with their real line numbers, and
+// numbered notes beside them. Hovering or focusing a note highlights its lines.
+import type { Excerpt } from '@/lib/excerpt';
+
+interface Props {
+  excerpt: Excerpt;
+  file: string;
+  url: string;
+  notes: { text: string; lines: [number, number] }[];
+}
+
+const { excerpt, file, url, notes } = Astro.props;
+---
+
+<div class="how" data-how>
+  <div class="how__code">
+    <p class="how__file mono">{file}, lines {excerpt.from} to {excerpt.from + excerpt.lines.length - 1}</p>
+    <pre class="code" tabindex="0" aria-label={`Code from ${file}`}><code class="code__inner">{excerpt.lines.map((html, i) => <span class="code__line" data-n={excerpt.from + i}><span class="code__txt" set:html={html} /></span>)}</code></pre>
+  </div>
+  <ol class="how__notes">
+    {
+      notes.map((n, i) => (
+        <li>
+          <button type="button" class="how__note" data-lines={`${n.lines[0]}-${n.lines[1]}`}>
+            <span class="callout" aria-hidden="true">{i + 1}</span>
+            <span>
+              {n.text} <span class="how__at mono">Lines {n.lines[0]} to {n.lines[1]}.</span>
+            </span>
+          </button>
+        </li>
+      ))
+    }
+  </ol>
+  <a class="link how__src" href={url}>View on GitHub</a>
+</div>
+
+<style>
+  .how {
+    display: grid;
+    gap: 1rem 1.5rem;
+    padding: 1rem;
+  }
+
+  @media (min-width: 1000px) {
+    .how {
+      grid-template-columns: minmax(0, 1fr) 17rem;
+      align-items: start;
+    }
+  }
+
+  .how__code {
+    min-width: 0;
+  }
+
+  .how__file {
+    margin-bottom: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .how .code {
+    border: 1px solid var(--line);
+    max-height: 30rem;
+  }
+
+  .how__notes {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .how__note {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    text-align: left;
+    color: var(--text);
+    cursor: default;
+  }
+
+  .how__note:hover,
+  .how__note:focus-visible,
+  .how__note[aria-pressed='true'] {
+    border-color: var(--accent);
+  }
+
+  .how__at {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .how__src {
+    justify-self: start;
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  // A note lights up its lines while hovered or focused.
+  document.querySelectorAll<HTMLElement>('[data-how]').forEach((how) => {
+    const lines = [...how.querySelectorAll<HTMLElement>('.code__line')];
+    const show = (range: string | null) => {
+      const [a, b] = range ? range.split('-').map(Number) : [0, -1];
+      lines.forEach((l) => l.toggleAttribute('data-hot', Number(l.dataset.n) >= a && Number(l.dataset.n) <= b));
+    };
+    how.querySelectorAll<HTMLElement>('[data-lines]').forEach((note) => {
+      const on = () => {
+        show(note.dataset.lines!);
+        const first = lines.find((l) => l.hasAttribute('data-hot'));
+        const pre = first?.closest('pre');
+        if (first && pre) pre.scrollTop = Math.max(0, first.offsetTop - pre.clientHeight / 3);
+      };
+      note.addEventListener('mouseenter', on);
+      note.addEventListener('focus', on);
+      note.addEventListener('mouseleave', () => show(null));
+      note.addEventListener('blur', () => show(null));
+    });
+  });
+</script>

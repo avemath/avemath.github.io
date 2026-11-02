@@ -7,13 +7,6 @@ import skills from '@/data/skills.json';
 import { getProjects, projectHref } from '@/lib/projects';
 import { areas, skillMap } from '@/lib/skills';
 
-interface Props {
-  /** Band variables from depth.ts, so the section sits in the page's descent. */
-  zoneStyle?: string;
-}
-
-const { zoneStyle } = Astro.props;
-
 const projects = await getProjects();
 const usedIn = (skill: string) => {
   const terms = skillMap[skill]?.terms ?? [];
@@ -29,7 +22,7 @@ const all = [...known.items.map((skill) => ({ skill, known: true })), ...built.i
 const byArea = areas.map((a) => ({ ...a, skills: all.filter((s) => skillMap[s.skill]?.area === a.id) })).filter((a) => a.skills.length);
 ---
 
-<section id="skills" class="section section--tight zone" style={zoneStyle} aria-labelledby="skills-title" data-section="skills">
+<section id="skills" class="section section--tight" aria-labelledby="skills-title" data-section="skills">
   <div class="wrap">
     <p class="eyebrow">Skills</p>
     <h2 id="skills-title" class="section-title section-title--sm">What I know and what I've built with</h2>

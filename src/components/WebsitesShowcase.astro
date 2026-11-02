@@ -1,285 +1,214 @@
 ---
+// The client sites, two by two, on paper cards. Only sites whose owner gave permission
+// (client.permission in the content collection) are shown. Because of ADAM and Grace Mae each
+// carry a working piece of the site, run from its real code (see src/components/live).
 import BrowserFrame from './BrowserFrame.astro';
 import Icon from './Icon.astro';
 import AdamLive from './live/AdamLive.astro';
 import GraceLive from './live/GraceLive.astro';
 import { getProjects, isWebsite, projectHref } from '@/lib/projects';
+import testimonials from '@/data/testimonials.json';
 
-const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live);
-// Sites with a working piece of them that runs here, from their real code (see src/components/live).
+const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live && p.data.client?.permission);
 const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
+// The kind of client, short: the part of the kind line before the place.
+const kindOf = (kind = '') => kind.split(',')[0].replace(/^./, (c) => c.toLowerCase());
+// A client's quote shows on their card once it is approved. The PLV and Grace Mae quotes in
+// src/data/testimonials.json are drafts: each owner reads the wording and okays it (or edits it)
+// before "approved" goes to true, so nothing appears under their name that they did not say.
+// TODO(ave): send Rickey and Grace their drafts, then set "approved": true on the ones they okay.
+const quoteFor = (id: string) => testimonials.find((t) => 'project' in t && t.project === id && t.approved);
 ---
 
-<section id="websites" class="section home-section zone" aria-labelledby="websites-title" data-section="websites">
-  <span class="spine" aria-hidden="true"></span>
+<section id="websites" class="section web" aria-labelledby="websites-title">
   <div class="wrap">
-    <p class="eyebrow">Client work</p>
-    <h2 id="websites-title" class="section-title">Live sites built for real clients</h2>
-    <p class="section-lede sites-lede">Each entry has what the business needed, what I did, and a few numbers. The case study has the rest.</p>
+    <div class="web__head">
+      <h2 id="websites-title" class="section-title web__title" data-decode>Websites for people with better things to do</h2>
+      <p class="web__lede">
+        Small businesses, a nonprofit and one engineer. Static, fast, accessible, and cheap enough to keep running for years. Owners edit
+        their own content.
+      </p>
+    </div>
 
-    <ol class="sites">
+    <ul class="sites">
       {
-        sites.map((p, i) => {
+        sites.map((p) => {
           const Live = live[p.id];
           return (
-          <li class="site" data-reveal data-live-host={Live ? '' : undefined}>
-            <div class="site__media">
-              <BrowserFrame
-                src={p.data.cover!}
-                mobile={p.data.mobile}
-                alt={p.data.coverAlt ?? ''}
-                url={p.data.links.live}
-                widths={[240, 480, 680, 960, 1280]}
-                sizes="(min-width: 960px) 40vw, (min-width: 720px) calc(100vw - 5rem), 8rem"
-                live={!!Live}
-              >
-                {Live && <Live />}
-              </BrowserFrame>
-            </div>
-            <div class="site__copy">
-              <p class="label">
-                <span class="mono text-accent">{String(i + 1).padStart(2, '0')}</span> · {p.data.client?.kind}
-              </p>
-              <h3 class="site__title">{p.data.title}</h3>
+            <li class="site" data-live-host={Live ? '' : undefined}>
+              <div class="site__media">
+                <BrowserFrame
+                  src={p.data.cover!}
+                  alt={p.data.coverAlt ?? ''}
+                  url={p.data.links.live}
+                  widths={[400, 560, 720, 960, 1200]}
+                  sizes="(min-width: 1216px) 37rem, (min-width: 760px) calc(50vw - 3rem), calc(100vw - 2rem)"
+                  live={!!Live}
+                >
+                  {Live && <Live />}
+                </BrowserFrame>
+              </div>
+              <div class="site__row">
+                <h3 class="site__title">
+                  <a href={projectHref(p)}>{p.data.title}</a>
+                </h3>
+                <p class="site__kind">{kindOf(p.data.client?.kind)}</p>
+              </div>
               <p class="site__summary">{p.data.summary}</p>
-              <div class="site__facts">
-                <dl class="site__did">
-                  <dt class="label">What I did</dt>
-                  <dd>{p.data.role}</dd>
-                </dl>
-                {p.data.metrics && (
-                  <dl class="site__metrics">
-                    {p.data.metrics.map((m) => (
-                      <div>
-                        <dt class="label">{m.label}</dt>
-                        <dd class="site__metric">{m.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-              </div>
-              <div class="site__links mt-6 flex flex-wrap gap-3">
-                <a class="btn btn--small" href={projectHref(p)}>
-                  Read the case study <Icon name="arrow-right" />
+              {(() => {
+                const q = quoteFor(p.id);
+                return (
+                  q && (
+                    <figure class="site__quote">
+                      <blockquote>{q.quote}</blockquote>
+                      <figcaption>
+                        {q.name}, {q.title}
+                      </figcaption>
+                    </figure>
+                  )
+                );
+              })()}
+              <p class="site__links">
+                <a class="link" href={projectHref(p)}>
+                  Case study
                 </a>
-                <a class="link inline-flex items-center gap-1 text-sm" href={p.data.links.live}>
-                  {p.data.linkLabel ?? `Visit ${new URL(p.data.links.live!).host}`} <Icon name="arrow-up-right" class="h-[0.9em] w-[0.9em]" />
+                <a class="link" href={p.data.links.live}>
+                  {p.data.linkLabel ?? `Visit ${new URL(p.data.links.live!).host}`} <Icon name="arrow-up-right" class="inline h-[0.85em] w-[0.85em]" />
                 </a>
-              </div>
-            </div>
-          </li>
+              </p>
+            </li>
           );
         })
       }
-    </ol>
+    </ul>
 
-    <div class="sites__how">
-      <p>
-        Five steps from the first conversation to the written guide, with a quote before I start and a preview link while I build. The
-        services page has the details and the questions people ask.
-      </p>
-      <div class="flex flex-wrap gap-3">
-        <a class="btn btn--primary" href="/services/">See how I work <Icon name="arrow-right" /></a>
-        <a class="btn" href="/contact/?topic=website">Start a project</a>
-      </div>
-    </div>
+    <p class="web__how">
+      Five steps from the first conversation to the written guide, with a quote before I start.
+      <a class="link" href="/services/">See how I work</a>
+      or <a class="link" href="/contact/?topic=website">start a project</a>.
+    </p>
   </div>
 </section>
 
 <style>
+  .web__head {
+    display: grid;
+    gap: 1rem 3rem;
+  }
+
+  @media (min-width: 960px) {
+    .web__head {
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      align-items: end;
+    }
+  }
+
+  .web__title {
+    margin-top: 0;
+    font-size: clamp(2.5rem, 4.6vw, 3.75rem);
+  }
+
+  .web__lede {
+    max-width: 30rem;
+    color: var(--muted);
+  }
+
   .sites {
     display: grid;
-    gap: clamp(4rem, 8vw, 6.5rem);
-    margin-top: clamp(2.5rem, 5vw, 4rem);
+    gap: 2.5rem 1.5rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  @media (min-width: 760px) {
+    .sites {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* A site running its live version keeps its row neighbor at its own height. */
+    .sites:has([data-live-on]) {
+      align-items: start;
+    }
   }
 
   .site {
-    display: grid;
-    gap: 2.25rem;
-    align-items: center;
+    min-width: 0;
   }
 
-  @media (min-width: 960px) {
-    .site {
-      grid-template-columns: 1.25fr 1fr;
-      gap: 4rem;
-    }
-
-    .site:nth-child(even) .site__media {
-      order: 2;
-    }
+  /* The browser frame becomes a paper card: square, a 1px border, the soft shadow. */
+  .site__media :global(.frame__window) {
+    border-radius: 0;
+    border-color: var(--line);
+    box-shadow: var(--shadow);
   }
 
-  /* Phones: each site is a compact row. A small screenshot sits beside the name and the kind of
-     business, the numbers run underneath, then the two links. The summary and "What I did" stay
-     on wider screens and in the case study. */
-  @media (max-width: 719px) {
-    .sites {
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    .site {
-      grid-template-columns: 8rem minmax(0, 1fr);
-      gap: 0.9rem;
-      align-items: start;
-      padding: 0.8rem;
-      border: 1px solid var(--line);
-      border-radius: 0.8rem;
-      background: var(--surface);
-    }
-
-    .sites-lede,
-    .site__media :global(.frame__bar),
-    .site__media :global(.frame__phone),
-    .site__summary,
-    .site__did {
-      display: none;
-    }
-
-    .site__media :global(.frame__window) {
-      border-radius: 0.45rem;
-    }
-
-    .site__copy {
-      display: contents;
-    }
-
-    .site__media {
-      grid-column: 1;
-      grid-row: 1 / 3;
-      order: 0 !important;
-    }
-
-    .site__copy > .label {
-      grid-column: 2;
-      grid-row: 1;
-      font-size: 0.64rem;
-      line-height: 1.45;
-    }
-
-    .site__title {
-      grid-column: 2;
-      grid-row: 2;
-      margin-top: 0;
-      font-size: 1.15rem;
-    }
-
-    .site__facts {
-      grid-column: 1 / -1;
-      margin-top: 0;
-      padding-top: 0.7rem;
-    }
-
-    .site__metric {
-      font-size: 1.35rem !important;
-    }
-
-    .site__links {
-      grid-column: 1 / -1;
-      margin-top: 0;
-    }
-
-    /* The other cards in the row keep their own height while one runs a live version. */
-    .sites:has([data-live-on]) {
-      align-items: flex-start;
-    }
-
-    /* A live version needs the card's full width: it moves below the title while it runs. */
-    .site[data-live-on] .site__media {
-      grid-column: 1 / -1;
-      grid-row: 3;
-    }
-
-    .site[data-live-on] .site__copy > .label,
-    .site[data-live-on] .site__title {
-      grid-column: 1 / -1;
-    }
-
-    /* At rest the small screenshot is the button's whole frame. */
-    .site__media :global(.live__try) {
-      right: 0.3rem;
-      bottom: 0.3rem;
-      padding-inline: 0.5rem;
-      font-size: 0.64rem;
-    }
-  }
-
-  /* The phone mockup covers the bottom right corner, so Try it sits bottom left. */
-  @media (min-width: 720px) {
-    .site__media :global(.live__try) {
-      right: auto;
-      left: 0.7rem;
-    }
+  .site__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    margin-top: 0.9rem;
   }
 
   .site__title {
-    margin-top: 0.6rem;
-    font-size: clamp(1.6rem, 3vw, 2.25rem);
-    font-weight: 600;
+    font-size: 1.0625rem;
+    font-weight: 800;
+    font-variation-settings: 'wdth' 100;
+    letter-spacing: 0;
+  }
+
+  .site__title a {
+    text-decoration: none;
+  }
+
+  .site__title a:hover {
+    text-decoration: underline;
+  }
+
+  .site__kind {
+    color: var(--muted);
+    font-size: 0.9375rem;
   }
 
   .site__summary {
-    margin-top: 0.85rem;
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
     color: var(--text-soft);
   }
 
-  .site__facts {
-    display: grid;
-    gap: 1.1rem;
-    margin-top: 1.5rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--line);
+  .site__quote {
+    margin: 0.75rem 0 0;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--accent);
   }
 
-  .site__facts dd {
-    margin-top: 0.25rem;
-    font-size: 0.95rem;
+  .site__quote blockquote {
+    font-size: 1rem;
+    color: var(--text);
   }
 
-  .site__metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+  .site__quote figcaption {
+    margin-top: 0.3rem;
+    font-size: 0.875rem;
+    color: var(--muted);
   }
 
-  .site__metrics > div {
+  .site__links {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
   }
 
-  .site__metrics .site__metric {
-    margin-top: auto;
-    padding-top: 0.25rem;
+  .site__links a {
+    padding-block: 0.3rem;
   }
 
-  .site__metric {
-    font-family: var(--font-display);
-    font-size: clamp(1.75rem, 2.6vw, 2.25rem) !important;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: -0.035em;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .sites__how {
-    display: grid;
-    gap: 1.25rem;
-    margin-top: clamp(3rem, 6vw, 4.5rem);
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .sites__how p {
-    max-width: 44rem;
+  .web__how {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--text);
     color: var(--text-soft);
-  }
-
-  @media (min-width: 960px) {
-    .sites__how {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 2rem;
-    }
   }
 </style>

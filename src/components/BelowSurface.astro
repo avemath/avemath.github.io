@@ -1,0 +1,117 @@
+---
+// The way down: a navy band that darkens toward the bottom, three faint eigenray lines, and a
+// small depth gauge. The research page is the only page that goes underwater.
+---
+
+<section class="below on-navy" aria-labelledby="below-title">
+  <svg class="below__rays" viewBox="0 0 1440 420" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 150 L1440 300" />
+    <path d="M0 330 L1440 120" />
+    <path d="M520 0 L1440 220" class="below__ray--hot" />
+  </svg>
+  <div class="wrap below__grid">
+    <div>
+      <p class="eyebrow">Below the surface</p>
+      <h2 id="below-title" class="section-title below__title" data-decode>The research lives on its own page, and it goes underwater.</h2>
+      <p class="below__text">
+        Underwater acoustic channels, the ONR data management work, bellhopSim, and the pool alarm. The page darkens with depth as you
+        scroll, and the field notes decode when you tap them.
+      </p>
+      <a class="btn below__btn" href="/research/">Go below</a>
+    </div>
+    <div class="below__gauge" aria-hidden="true">
+      <span class="below__mark" style="--at:0">0 m</span>
+      <span class="below__mark" style="--at:0.5">50 m</span>
+      <span class="below__mark" style="--at:1">100 m</span>
+      <span class="below__bob"></span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .below {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(3.5rem, 8vw, 6rem);
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 55%, var(--navy-deeper) 100%);
+  }
+
+  .below__rays {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .below__rays path {
+    fill: none;
+    stroke: rgb(244 246 250 / 0.16);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .below__rays .below__ray--hot {
+    stroke: rgb(222 106 65 / 0.55);
+  }
+
+  .below__grid {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 860px) {
+    .below__grid {
+      grid-template-columns: minmax(0, 1fr) 6rem;
+      align-items: center;
+    }
+  }
+
+  .below__title {
+    max-width: 14ch;
+    font-size: clamp(2.3rem, 5vw, 3.75rem);
+  }
+
+  .below__text {
+    margin-top: 1.25rem;
+    max-width: 36rem;
+    color: var(--muted);
+  }
+
+  .below__btn {
+    margin-top: 1.75rem;
+    --btn-line: var(--on-navy);
+  }
+
+  .below__gauge {
+    position: relative;
+    display: none;
+    height: 13rem;
+    border: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--muted);
+  }
+
+  @media (min-width: 860px) {
+    .below__gauge {
+      display: block;
+    }
+  }
+
+  .below__mark {
+    position: absolute;
+    left: 0.5rem;
+    top: calc(0.5rem + var(--at) * (100% - 1.75rem));
+  }
+
+  .below__bob {
+    position: absolute;
+    right: 0.6rem;
+    top: 0.5rem;
+    width: 0.45rem;
+    height: 2.5rem;
+    background: var(--accent);
+  }
+</style>

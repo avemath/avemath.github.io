@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { bandVars } from '@/lib/depth';
 import Icon from '@/components/Icon.astro';
 import experience from '@/data/experience.json';
 import skills from '@/data/skills.json';
@@ -16,7 +15,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
   title="Résumé"
   description="Résumé for Avery Matherne: M.S. ECE student and graduate research assistant at LSU, with embedded, communications and web work."
 >
-  <div class="zone resume-zone" style={bandVars(1)}>
+  <div class="resume-zone">
   <div class="wrap resume-tools no-print">
     <div class="flex flex-wrap items-center justify-between gap-4 py-8">
       <div>
@@ -208,7 +207,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
   }
 
   .r-contact a:hover {
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 
   .r-sec {
@@ -227,7 +226,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
   }
 
   :global([data-theme='dark']) .r-h {
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 
   .r-item {
@@ -338,7 +337,13 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       padding: 0;
       border: 0;
       box-shadow: none;
-      font-family: 'Inter Variable', Arial, sans-serif;
+      font-family: var(--font-sans);
+      /* Archivo a touch narrower than on screen, so the page holds to one sheet. */
+      font-variation-settings: 'wdth' 90;
+    }
+
+    .resume :is(h1, h2, h3) {
+      font-variation-settings: 'wdth' 96;
     }
 
     .r-head {

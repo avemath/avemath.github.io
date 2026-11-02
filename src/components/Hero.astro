@@ -1,494 +1,231 @@
 ---
-import Icon from './Icon.astro';
-import AudienceSwitcher from './AudienceSwitcher.astro';
 import site from '@/data/site.json';
-import { slotVars } from '@/lib/depth';
-import { BIN_HZ, CHIRP, FIRST_BIN, FRAME_HZ, LEAD, LINES, SHOW_BINS, STILL, STRETCH, TEXT_BINS, VIEW_ROWS, holdFrame } from '@/lib/tx-signal';
-
-// The still picture that shows until the live display takes over (and without JavaScript): the
-// name where the live display holds it, centered, with the sweep below it. It uses the build-time
-// estimate of the raster, so the cross-fade to the computed picture barely moves.
-const hold = holdFrame(STILL.rows);
-const top = VIEW_ROWS / 2 - STILL.rows / 2;
-const mid = FIRST_BIN + TEXT_BINS / 2;
-// Raster units: the group below stretches them by STRETCH in rows, as the live raster is.
-const lines = LINES.map((text, i) => ({ text, y: 1 + STILL.cap + i * (STILL.cap + STILL.gap) }));
-const chirp = { x1: CHIRP.f0 / BIN_HZ, y1: hold - LEAD, x2: CHIRP.f1 / BIN_HZ, y2: hold - (LEAD + CHIRP.frames) };
-const kHz = [0, 1, 2, 3, 4];
-const seconds = [0, 1, 2, 3, 4, 5, 6];
-const rowsPerSecond = FRAME_HZ;
+import { CHIPS, CHIP_MS, DURATION_MS } from '@/lib/preamble';
+import { F_HIGH, F_LOW, PAIRS } from '@/lib/fhbfsk';
 ---
 
-<section id="top" class="hero zone sunlit" aria-labelledby="hero-title" style={slotVars(0)}>
-  <span class="spine" aria-hidden="true"></span>
+<section id="top" class="hero on-navy dot-grid" aria-labelledby="hero-title">
   <div class="wrap hero__grid">
     <div class="hero__text">
-      <p class="eyebrow" data-hero-eyebrow>{site.eyebrow}</p>
-      <h1 id="hero-title" class="hero__title" data-hero-title>{site.name}</h1>
-      <p class="hero__line" data-hero-line>{site.headline}</p>
-
-      <div class="hero__ctas" data-hero-ctas>
-        <a class="btn btn--primary" href="#featured" data-primary-cta>
-          <span data-primary-cta-label>See my work</span>
-          <Icon name="arrow-right" />
-        </a>
-        <a class="btn" href="/resume/" data-secondary-cta>
-          <span data-secondary-cta-label>Résumé</span>
-        </a>
-      </div>
-
-      <div data-hero-switcher>
-        <AudienceSwitcher />
+      <h1 id="hero-title" class="hero__title">{site.headline}</h1>
+      <p class="hero__sub">
+        M.S. student in Electrical and Computer Engineering. Research assistant on an ONR project about distributed naval platforms.
+        Co-founder of Because of ADAM, a drowning awareness nonprofit.
+      </p>
+      <div class="hero__ctas">
+        <a class="btn btn--primary" href="#projects">See the projects</a>
+        <a class="btn hero__resume" href={site.resumePdf}>Résumé (PDF)</a>
       </div>
     </div>
 
-    <figure class="tx" data-tx>
-      <div class="tx__bar">
-        <p class="tx__title"><span class="tx__dot" aria-hidden="true"></span>TX · Spectrogram</p>
-        <button type="button" class="tx__play" data-tx-play aria-pressed="false" hidden>
-          <Icon name="volume" class="tx__icon tx__icon--on" />
-          <Icon name="stop" class="tx__icon tx__icon--off" />
-          <span data-tx-play-label>Hear it</span>
+    <figure class="sig" data-sig aria-labelledby="sig-cap">
+      <div class="sig__screen" data-sig-screen>
+        <canvas class="sig__canvas" aria-hidden="true"></canvas>
+        <div class="sig__scope" data-sig-scope tabindex="0" role="img" aria-label={`A frequency hopping preamble: ${CHIPS} chips of ${CHIP_MS} ms, each one tone between ${F_LOW} and ${F_HIGH} Hz. Use the arrow keys to read chip by chip.`}></div>
+        <span class="sig__cur sig__cur--v" data-sig-v aria-hidden="true"></span>
+        <span class="sig__cur sig__cur--h" data-sig-h aria-hidden="true"></span>
+        <p class="sig__read mono" data-sig-read aria-hidden="true"></p>
+        <p class="sig__cap mono" id="sig-cap">FH-BFSK preamble, JANUS band, 2 kHz / div</p>
+        <p class="sig__hint" data-sig-hint>move the mouse to read the signal</p>
+        <button type="button" class="sig__play" data-sig-play aria-pressed="false">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1.5v9l8-4.5z" fill="currentColor"></path></svg>
+          <span data-sig-play-label>Hear it, 2 s</span>
         </button>
       </div>
-      <div class="tx__tabs" role="tablist" aria-label="Spectrogram view" data-tx-tabs>
-        <button type="button" role="tab" id="tx-tab-display" aria-controls="tx-view-display" aria-selected="true" tabindex="0">Display</button>
-        <button type="button" role="tab" id="tx-tab-how" aria-controls="tx-view-how" aria-selected="false" tabindex="-1">How it works</button>
-      </div>
-      <div class="tx__view" id="tx-view-display" role="tabpanel" aria-labelledby="tx-tab-display">
-      <div class="tx__plot">
-        <div class="tx__time" aria-hidden="true">
-          {seconds.map((t) => <span style={`--at:${(t * rowsPerSecond) / VIEW_ROWS}`}>{t === 6 ? '6 s' : t}</span>)}
-        </div>
-        <div class="tx__screen" data-tx-screen>
-          <svg class="tx__still" viewBox={`0 0 ${SHOW_BINS} ${VIEW_ROWS}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
-            <g transform={`translate(0 ${top}) scale(1 ${STRETCH})`}>
-              {
-                lines.map((l, i) => (
-                  <text x={mid} y={l.y} font-size={STILL.font} text-anchor="middle" {...(i === 1 ? { textLength: TEXT_BINS - 2, lengthAdjust: 'spacingAndGlyphs' } : {})}>
-                    {l.text}
-                  </text>
-                ))
-              }
-            </g>
-            <line x1={chirp.x1} y1={chirp.y1} x2={chirp.x2} y2={chirp.y2} />
-          </svg>
-          <canvas class="tx__canvas" width={SHOW_BINS} height={VIEW_ROWS} aria-hidden="true"></canvas>
-          <span class="tx__grid" aria-hidden="true"></span>
-          <span class="tx__cross" data-tx-cross aria-hidden="true" hidden></span>
-        </div>
-        <div class="tx__axis" aria-hidden="true">
-          {kHz.map((t) => <span style={`--at:${t / 4}`}>{t === 4 ? '4 kHz' : t}</span>)}
-        </div>
-      </div>
-      <div class="tx__foot">
-        <p class="tx__readout" data-tx-readout aria-hidden="true">Point at the display to read it</p>
-        <p class="sr-only" aria-live="polite" data-tx-live></p>
-      </div>
-      </div>
-      {/* Filled in from src/scripts/how-it-works.ts the first time the tab opens. */}
-      <div class="tx__view tx__how" id="tx-view-how" role="tabpanel" aria-labelledby="tx-tab-how" tabindex="0" hidden data-tx-how>
-        <p class="tx__how-loading">Loading the walkthrough.</p>
-      </div>
-      <figcaption class="tx__caption">My name, sent as a real signal and drawn by an FFT as it arrives.</figcaption>
+      <p class="sr-only" aria-live="polite" data-sig-live></p>
+      <figcaption class="sig__note">
+        {DURATION_MS} ms on air, played ten times slower so you can hear every hop. The band, the {PAIRS} tone pairs and the chip length
+        are JANUS; the hop order is my own.
+      </figcaption>
     </figure>
   </div>
-
 </section>
 
 <style>
   .hero {
-    isolation: isolate;
-    overflow: hidden;
-    padding-block: clamp(3.25rem, 7vw, 5.5rem) clamp(4.5rem, 8vw, 6.5rem);
+    padding-block: clamp(2.5rem, 4.5vw, 4rem) clamp(3rem, 6vw, 4.5rem);
   }
 
   .hero__grid {
     display: grid;
-    gap: 2.5rem;
+    gap: 2.75rem;
     align-items: center;
   }
 
   @media (min-width: 1024px) {
     .hero__grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: clamp(2.5rem, 5vw, 4.5rem);
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(2rem, 4vw, 4rem);
     }
   }
 
+  /* About 84px on a wide screen. Archivo at width 112 is wide, so phones get a size that keeps
+     "communication" on one line at 390px. */
   .hero__title {
-    margin-top: 1.25rem;
-    font-size: clamp(3rem, 7.4vw, 5.75rem);
-    font-weight: 600;
-    line-height: 0.95;
-    letter-spacing: -0.045em;
+    font-size: clamp(2.3rem, 1.2rem + 5.2vw, 5.25rem);
+    text-wrap: initial;
+    hyphens: none;
   }
 
-  /* On phones the name stays on one line in both the fallback and the web font, sized to the
-     screen, so the font swap cannot rewrap it and push the page down. */
-  @media (max-width: 639px) {
-    .hero__title {
-      font-size: min(3rem, calc((100vw - 2 * var(--gutter)) / 8));
-      white-space: nowrap;
-    }
-  }
-
-  .hero__line {
-    margin-top: 1.5rem;
+  .hero__sub {
+    margin-top: 1.75rem;
     max-width: 36rem;
-    font-size: clamp(1.15rem, 2vw, 1.4rem);
-    line-height: 1.5;
-    color: var(--text-soft);
+    font-size: 1.0625rem;
+    color: var(--muted);
   }
 
   .hero__ctas {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem 1rem;
-    margin-top: 2.25rem;
+    gap: 0.75rem;
+    margin-top: 2rem;
   }
 
-  /* ---- The transmitter's display ---- */
-  .tx {
-    --tx-ink: var(--accent);
-    --tx-hot: var(--amber-line);
-    --tx-screen: #061523;
+  /* Same weight and size as the accent button beside it, so the pair lines up. */
+  .hero__resume {
+    font-size: 1.1875rem;
+    --btn-line: var(--on-navy);
+  }
+
+  /* ---- The signal panel ---- */
+  .sig {
     margin: 0;
-    padding: 0.85rem 0.85rem 1rem;
-    border: 1px solid var(--line);
-    border-radius: 1rem;
-    background: color-mix(in oklab, var(--surface), transparent 35%);
-    box-shadow: var(--shadow);
     min-width: 0;
   }
 
-
-  .tx__bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    /* Room for the Hear it button before it is shown, so showing it moves nothing. */
-    min-height: calc(2.25rem + 0.7rem);
-    padding: 0 0.15rem 0.7rem;
-  }
-
-  .tx__title,
-  .tx__readout {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .tx__title {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-  }
-
-  .tx__dot {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: var(--amber);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--amber) 28%, transparent);
-  }
-
-  .tx__play {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    min-height: 2.25rem;
-    padding: 0.35rem 0.75rem;
-    border: 1px solid var(--line-strong);
-    border-radius: 0.45rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text);
-    cursor: pointer;
-    transition: border-color 0.2s, background-color 0.2s;
-  }
-
-  .tx__play:hover {
-    border-color: var(--accent);
-  }
-
-  .tx__play[aria-pressed='true'] {
-    border-color: var(--amber-line);
-    background: color-mix(in oklab, var(--amber) 16%, transparent);
-  }
-
-  .tx__play[hidden] {
-    display: none;
-  }
-
-  .tx__play :global(.tx__icon) {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .tx__play :global(.tx__icon--off),
-  .tx__play[aria-pressed='true'] :global(.tx__icon--on) {
-    display: none;
-  }
-
-  .tx__play[aria-pressed='true'] :global(.tx__icon--off) {
-    display: block;
-  }
-
-  /* Display and How it works, as tabs. They need JavaScript, so they only show once the head
-     script has marked the page, before first paint. */
-  .tx__tabs {
-    display: none;
-    gap: 0.25rem;
-    margin: -0.1rem 0 0.75rem;
-    padding: 0.2rem;
-    border: 1px solid var(--line);
-    border-radius: 0.55rem;
-    width: max-content;
-    max-width: 100%;
-  }
-
-  :global(html.js) .tx__tabs {
-    display: flex;
-  }
-
-  .tx__tabs button {
-    min-height: 2rem;
-    padding: 0.3rem 0.8rem;
-    border-radius: 0.4rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-soft);
-    cursor: pointer;
-  }
-
-  .tx__tabs button[aria-selected='true'] {
-    background: var(--accent-ink);
-    color: var(--bg);
-  }
-
-  .tx__tabs button:focus-visible {
-    outline: 2px solid var(--amber-line);
-    outline-offset: 1px;
-  }
-
-  .tx__view[hidden] {
-    display: none;
-  }
-
-  .tx__how:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-  }
-
-  .tx__how-loading {
-    padding: 2rem 0;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-
-  /* Time down the left (newest at the top), frequency along the bottom. */
-  .tx__plot {
-    display: grid;
-    grid-template-columns: 1.6rem minmax(0, 1fr);
-    grid-template-areas: 'time screen' '. freq';
-  }
-
-  /* 256 bins by 160 frames, scaled up: square pixels at this aspect ratio. */
-  .tx__screen {
-    grid-area: screen;
+  .sig__screen {
     position: relative;
-    aspect-ratio: 256 / 160;
+    aspect-ratio: 5 / 4;
+    border: 1px solid var(--line);
+    background: rgb(4 12 24 / 0.35);
     overflow: hidden;
-    border: 1px solid color-mix(in oklab, #56b6d8 30%, transparent);
-    border-radius: 0.4rem;
-    background: var(--tx-screen);
     touch-action: pan-y;
-    cursor: crosshair;
   }
 
-  .tx__screen:focus-visible {
-    outline-offset: 2px;
+  /* The focusable layer over the plot, for reading it by keyboard. The button sits above it. */
+  .sig__scope {
+    position: absolute;
+    inset: 0;
   }
 
-  .tx__still,
-  .tx__canvas,
-  .tx__grid {
+  .sig__scope:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .sig__canvas {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
   }
 
-  .tx__still {
-    font-family: var(--font-display);
-    font-weight: 600;
-    fill: #4fb3c9;
-    stroke: #f0a940;
-    stroke-opacity: 0.8;
-    stroke-width: 0.8;
-    paint-order: stroke;
-    transition: opacity 0.6s ease;
-  }
-
-  .tx__still text {
-    stroke: none;
-  }
-
-  .tx__canvas {
-    opacity: 0;
-    transition: opacity 0.7s ease;
-  }
-
-  [data-live] .tx__canvas {
-    opacity: 1;
-  }
-
-  [data-live] .tx__still {
-    opacity: 0;
-  }
-
-  /* Between cycles the picture fades out, then the next transmission starts on quiet water. */
-  .tx__screen[data-fade] .tx__canvas {
-    opacity: 0;
-  }
-
-  /* A faint grid: one line per kilohertz, one per second. */
-  .tx__grid {
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(90deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px 25%),
-      repeating-linear-gradient(180deg, rgb(150 210 230 / 0.09) 0 1px, transparent 1px calc(100% * 16000 / 608 / 160));
-  }
-
-  .tx__cross {
+  .sig__cur {
     position: absolute;
-    inset: 0;
+    display: none;
     pointer-events: none;
-    background:
-      linear-gradient(#e4f0f5, #e4f0f5) var(--x) 0 / 1px 100% no-repeat,
-      linear-gradient(#e4f0f5, #e4f0f5) 0 var(--y) / 100% 1px no-repeat;
-    opacity: 0.45;
+    background: rgb(244 246 250 / 0.7);
   }
 
-  .tx__axis {
-    grid-area: freq;
-    position: relative;
-    height: 1.4rem;
-    margin-top: 0.35rem;
+  .sig__cur--v {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
   }
 
-  .tx__axis span,
-  .tx__time span {
+  .sig__cur--h {
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+  }
+
+  .sig__screen[data-reading] .sig__cur {
+    display: block;
+  }
+
+  .sig__read {
     position: absolute;
-    white-space: nowrap;
-    text-transform: none;
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.04em;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .tx__axis span {
-    top: 0.2rem;
-    left: calc(var(--at) * 100%);
-    translate: calc(var(--at) * -100%) 0;
-  }
-
-  .tx__time {
-    grid-area: time;
-    position: relative;
-  }
-
-  .tx__time span {
-    right: 0.4rem;
-    top: calc(var(--at) * 100%);
-    translate: 0 calc(var(--at) * -100%);
-  }
-
-  .tx__foot {
-    padding-left: 1.6rem;
-    min-height: 1.3rem;
-    margin-top: 0.15rem;
-  }
-
-  /* Units keep their real case: kHz and dBFS, not KHZ. */
-  .tx__readout {
-    text-transform: none;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
+    top: 0;
+    left: 0;
+    display: none;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--on-navy-line-strong);
+    background: var(--navy);
+    font-size: 0.75rem;
+    line-height: 1.45;
     white-space: pre;
-    color: var(--text-soft);
+    color: var(--on-navy);
+    pointer-events: none;
     font-variant-numeric: tabular-nums;
   }
 
-  .tx__caption {
-    margin-top: 0.6rem;
-    padding-top: 0.7rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.86rem;
-    line-height: 1.5;
-    color: var(--text-soft);
+  .sig__screen[data-reading] .sig__read {
+    display: block;
   }
 
-  /* No entrance animation: the eyebrow, name, role line, buttons and switcher paint once, in
-     their final state, so the first screen is ready as soon as the page renders. */
+  .sig__cap,
+  .sig__hint {
+    position: absolute;
+    left: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .sig__cap {
+    top: 0.6rem;
+  }
+
+  .sig__hint {
+    bottom: 0.85rem;
+  }
+
+  /* Touch screens have no cursors to move. */
+  @media (hover: none) {
+    .sig__hint {
+      visibility: hidden;
+    }
+  }
+
+  .sig__play {
+    position: absolute;
+    z-index: 1;
+    right: 0.75rem;
+    bottom: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    padding: 0.35rem 0.8rem;
+    border: 2px solid var(--on-navy);
+    background: var(--navy);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--on-navy);
+    cursor: pointer;
+  }
+
+  .sig__play svg {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
+
+  .sig__play[aria-pressed='true'] {
+    border-color: var(--accent);
+  }
+
+  .sig__note {
+    margin-top: 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
 </style>
 
 <script>
-  import { prefersReducedMotion } from '../scripts/preferences';
-  import { decode } from '../scripts/decode';
-  import { whenSettled } from '../scripts/motion';
+  import { mountSignalPanel } from '../scripts/signal-panel';
 
-  // Tabs: Display and How it works, with arrow keys, Home and End. The walkthrough and its code
-  // load only the first time its tab opens.
-  const tablist = document.querySelector<HTMLElement>('[data-tx-tabs]');
-  if (tablist) {
-    const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-    let loaded = false;
-    const select = (i: number, focus = false) => {
-      tabs.forEach((t, j) => {
-        const on = i === j;
-        t.setAttribute('aria-selected', String(on));
-        t.tabIndex = on ? 0 : -1;
-        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
-      });
-      if (focus) tabs[i].focus();
-      const how = document.querySelector<HTMLElement>('[data-tx-how]');
-      if (i === 1 && how && !loaded) {
-        loaded = true;
-        import('../scripts/how-it-works').then((m) => m.mountHowItWorks(how));
-      }
-    };
-    tabs.forEach((t, i) => t.addEventListener('click', () => select(i)));
-    tablist.addEventListener('keydown', (e) => {
-      const at = tabs.indexOf(document.activeElement as HTMLButtonElement);
-      const to = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[e.key];
-      if (to === undefined || at < 0) return;
-      e.preventDefault();
-      select((to + tabs.length) % tabs.length, true);
-    });
-  }
-
-  // The first screen shows the still frame (the name centered) and stays still. The live display
-  // is decorative, so its code loads only once the page has settled after the load event.
-  const tx = document.querySelector<HTMLElement>('[data-tx]');
-  if (tx) whenSettled(() => import('../scripts/spectrogram').then((m) => m.mountSpectrogram(tx)));
-
-  // The eyebrow paints as plain text, then "acquires signal" once the page has settled.
-  const eyebrow = document.querySelector<HTMLElement>('[data-hero-eyebrow]');
-  if (eyebrow) {
-    const text = eyebrow.textContent ?? '';
-    whenSettled(() => !prefersReducedMotion() && decode(eyebrow, text, 1100));
-  }
+  // The panel draws after the first paint, so the headline is the first thing on screen.
+  const fig = document.querySelector<HTMLElement>('[data-sig]');
+  if (fig) requestAnimationFrame(() => setTimeout(() => mountSignalPanel(fig), 0));
 </script>

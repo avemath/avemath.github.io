@@ -1,0 +1,247 @@
+---
+// Fig. 01: one plow strike as a timing diagram, drawn from the firmware's own constants. The
+// trigger is RC channel 6 (channel 5 is the kill switch in pico_direct.py). The valve traces show
+// each valve open (high) or closed (low); both valves are active low on the board, and the main
+// valve rests open as an exhaust. "Fire the plow" runs src/lib/rampage-firmware.ts, the line for
+// line port of pico_direct.py, so the cooldown, the air budget and the lockout are the firmware's.
+import { LOOP_MS, MAX_WEAPON_ACTIVATIONS, SOLENOID_ACTIVATION_TIME, SOLENOID_SEQUENCE_DELAY } from '@/lib/rampage-firmware';
+
+const X0 = 150;
+const X1 = 624;
+const SPAN = 700; // ms shown
+const x = (ms: number) => X0 + (ms / SPAN) * (X1 - X0);
+const HI = 18;
+const PRESS = 160; // how long the Fire button holds the switch
+// The firmware sees the switch on its next 20 ms loop and starts the sequence.
+const t0 = LOOP_MS;
+const closeMain = t0 + SOLENOID_SEQUENCE_DELAY;
+const openPiston = closeMain + SOLENOID_SEQUENCE_DELAY;
+const done = openPiston + SOLENOID_ACTIVATION_TIME;
+
+const rows = [
+  {
+    key: 'rc',
+    name: 'RC channel 6',
+    y: 52,
+    high: [[0, PRESS]],
+    fill: 'none',
+    tip: ['trigger switch, RC channel 6', 'read on GP19 by a pin interrupt; one strike per flip'],
+  },
+  {
+    key: 'main',
+    name: 'GP14 main valve',
+    y: 104,
+    high: [
+      [0, closeMain],
+      [done, SPAN],
+    ],
+    fill: 'var(--text)',
+    tip: ['main valve, GP14', `open ${SOLENOID_SEQUENCE_DELAY} ms to fill, closed while the plow extends`],
+  },
+  {
+    key: 'piston',
+    name: 'GP15 piston',
+    y: 156,
+    high: [[openPiston, done]],
+    fill: 'var(--accent)',
+    tip: ['piston valve, GP15', `open ${SOLENOID_ACTIVATION_TIME} ms, full extension`],
+  },
+];
+
+const trace = (y: number, high: number[][]) => {
+  let d = `M${X0} ${y}`;
+  for (const [a, b] of high) d += ` H${x(a)} V${y - HI} H${x(b)} V${y}`;
+  return d + ` H${X1}`;
+};
+
+const cellW = (X1 - X0) / MAX_WEAPON_ACTIVATIONS;
+const cells = Array.from({ length: MAX_WEAPON_ACTIVATIONS }, (_, i) => X0 + i * cellW);
+const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
+---
+
+<div class="tf" data-tf>
+  <div class="tf__plot" data-draw>
+    <svg viewBox="0 0 640 262" class="tf__svg" role="group" aria-label="Timing diagram of one plow strike. Tab to each trace to read it.">
+      <defs>
+        <clipPath id="tf-clip"><rect x="0" y="0" width="640" height="200" data-tf-clip></rect></clipPath>
+      </defs>
+      {ticks.map((t) => <line class="tf__grid" x1={x(t)} x2={x(t)} y1="22" y2="226" />)}
+      {
+        ticks.map((t) => (
+          <text class="tf__tick" x={x(t)} y="252" text-anchor="middle">
+            {t === SPAN ? `${t} ms` : t}
+          </text>
+        ))
+      }
+      <g clip-path="url(#tf-clip)">
+        {
+          rows.map((r) => (
+            <g class="tf__row" tabindex="0" role="img" aria-label={`${r.tip[0]}: ${r.tip[1]}.`} data-tip={r.tip.join('\n')} data-y={r.y - HI}>
+              <rect class="tf__hit" x="0" y={r.y - HI - 10} width="640" height={HI + 20} />
+              {r.high.map(([a, b]) => r.fill !== 'none' && <rect x={x(a)} y={r.y - HI} width={x(b) - x(a)} height={HI} fill={r.fill} />)}
+              <path class="tf__line" d={trace(r.y, r.high)} />
+              <text class="tf__name" x="0" y={r.y - 4}>
+                {r.name}
+              </text>
+            </g>
+          ))
+        }
+      </g>
+      <g class="tf__row" tabindex="0" role="img" aria-label={`Air budget: ${MAX_WEAPON_ACTIVATIONS} shots, counted in firmware, locks out at zero.`} data-tip={`air budget\n${MAX_WEAPON_ACTIVATIONS} shots, counted in firmware, locks out at zero`} data-y="190" data-budget-row>
+        <rect class="tf__hit" x="0" y="190" width="640" height="34" />
+        <text class="tf__name" x="0" y="208">air budget</text>
+        {cells.map((cx, i) => <rect class="tf__cell" x={cx + 1.5} y="196" width={cellW - 3} height="14" data-cell={i} />)}
+      </g>
+      <g aria-hidden="true" class="tf__callouts">
+        <circle cx={x(t0) + (x(closeMain) - x(t0)) / 2} cy="66" r="9" /><text x={x(t0) + (x(closeMain) - x(t0)) / 2} y="70">1</text>
+        <circle cx={x(openPiston) + (x(done) - x(openPiston)) / 2} cy="118" r="9" /><text x={x(openPiston) + (x(done) - x(openPiston)) / 2} y="122">2</text>
+        <circle cx={X1 - 4} cy="182" r="9" /><text x={X1 - 4} y="186">3</text>
+      </g>
+    </svg>
+    <p class="tf__tip mono" data-tf-tip aria-hidden="true"></p>
+  </div>
+  <div class="fig__note tf__legend">
+    <p>
+      <span class="tf__k">1</span> fill {SOLENOID_SEQUENCE_DELAY} ms
+      <span class="tf__k">2</span> extend {SOLENOID_ACTIVATION_TIME} ms
+      <span class="tf__k">3</span> <span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} shots used
+    </p>
+    <p class="tf__state" aria-live="polite"><span class="sr-only">Firmware: </span><span data-tf-state>Armed</span></p>
+  </div>
+  <p class="tf__hint">hover a trace to read it</p>
+</div>
+
+<style>
+  .tf__plot {
+    position: relative;
+    padding: 1rem 1rem 0.25rem;
+  }
+
+  .tf__svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--font-sans);
+  }
+
+  .tf__grid {
+    stroke: var(--line);
+    stroke-dasharray: 2 4;
+  }
+
+  .tf__tick {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    fill: var(--muted);
+  }
+
+  .tf__name {
+    font-size: 13px;
+    fill: var(--text-soft);
+  }
+
+  .tf__line {
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 1.5;
+  }
+
+  .tf__hit {
+    fill: transparent;
+  }
+
+  .tf__row {
+    outline: none;
+  }
+
+  .tf__row:hover .tf__name,
+  .tf__row:focus-visible .tf__name {
+    fill: var(--text);
+    font-weight: 700;
+  }
+
+  .tf__row:focus-visible .tf__hit {
+    stroke: var(--focus);
+    stroke-width: 2;
+  }
+
+  .tf__cell {
+    fill: var(--surface);
+    stroke: var(--text);
+    stroke-width: 1;
+  }
+
+  .tf__cell[data-used] {
+    fill: var(--text);
+  }
+
+  .tf__callouts circle {
+    fill: var(--accent);
+  }
+
+  .tf__callouts text {
+    fill: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+
+  .tf__tip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    max-width: 17rem;
+    padding: 0.4rem 0.55rem;
+    background: var(--navy);
+    color: var(--on-navy);
+    font-size: 0.75rem;
+    line-height: 1.45;
+    white-space: pre-line;
+    pointer-events: none;
+  }
+
+  .tf__tip[data-on] {
+    display: block;
+  }
+
+  .tf__legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    color: var(--text-soft);
+  }
+
+  .tf__k {
+    margin-left: 0.6rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+  }
+
+  .tf__k:first-child {
+    margin-left: 0;
+  }
+
+  .tf__state {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .tf__hint {
+    padding: 0 0.9rem 0.7rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  @media (hover: none) {
+    .tf__hint {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountTiming } from '../../scripts/fig/timing';
+  document.querySelectorAll<HTMLElement>('[data-tf]').forEach(mountTiming);
+</script>
