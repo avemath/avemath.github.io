@@ -259,8 +259,9 @@ The spectrogram hero and its How it works walkthrough (`tx-raster.ts`, `tx-signa
 ### Placeholders for Ave (`grep -rn "TODO(ave)" src`)
 
 - The LED clip: "Play the clip" plays the firmware demo's generated track; swap in a recording if you want one: `src/scripts/fig/matrix.ts`.
-- Client quotes: drafts for Rickey (PLV) and Grace (Grace Mae) are in `src/data/testimonials.json` with `"approved": false`. Each shows on its site card once the owner okays the wording and it is set to true.
 - The pool alarm name: the NAME comments in `src/pages/research.astro` and `acoustic-pool-alarm.md`.
+
+Client quotes from Rickey (PLV) and Grace (Grace Mae) are on their site cards, approved by each owner.
 
 ### Copy that differs from the mockups, and why
 

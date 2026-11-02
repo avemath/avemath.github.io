@@ -13,10 +13,8 @@ const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover &
 const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
 // The kind of client, short: the part of the kind line before the place.
 const kindOf = (kind = '') => kind.split(',')[0].replace(/^./, (c) => c.toLowerCase());
-// A client's quote shows on their card once it is approved. The PLV and Grace Mae quotes in
-// src/data/testimonials.json are drafts: each owner reads the wording and okays it (or edits it)
-// before "approved" goes to true, so nothing appears under their name that they did not say.
-// TODO(ave): send Rickey and Grace their drafts, then set "approved": true on the ones they okay.
+// A client's quote shows on their card once its owner has okayed the wording ("approved" in
+// src/data/testimonials.json).
 const quoteFor = (id: string) => testimonials.find((t) => 'project' in t && t.project === id && t.approved);
 ---
 
