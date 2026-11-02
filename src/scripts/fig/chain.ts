@@ -115,6 +115,13 @@ export function mountChain(root: HTMLElement) {
     plot(i);
   }
 
+  // A wire joins a stage to the next one only when both sit on the same row; at a row's end it
+  // would point at nothing.
+  const items = buttons.map((b) => b.closest('li')!);
+  const fitWires = () => wires.forEach((w, j) => { w.style.visibility = items[j + 1] && items[j + 1].offsetTop > items[j].offsetTop + 4 ? 'hidden' : ''; });
+  new ResizeObserver(fitWires).observe(root);
+  fitWires();
+
   buttons.forEach((b, i) => {
     b.addEventListener('click', () => select(i));
     b.addEventListener('mouseenter', () => select(i));
