@@ -657,6 +657,12 @@ const jsonLd = [
   .shot__img :global(video) {
     background: #05070c;
   }
+  /* The clips are about 860 to 960 px wide; shown any wider they turn soft, so they stop there. */
+  .shot:has(video) {
+    width: 100%;
+    max-width: 54rem;
+  }
+
 
   /* The frame clips anything outside it, so a video's focus ring sits inside its edge. */
   .shot__img :global(video:focus-visible) {
