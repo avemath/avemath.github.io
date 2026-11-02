@@ -23,9 +23,13 @@ export function mountSignalPanel(fig: HTMLElement) {
   const hCur = fig.querySelector<HTMLElement>('[data-sig-h]')!;
   const read = fig.querySelector<HTMLElement>('[data-sig-read]')!;
   const live = fig.querySelector<HTMLElement>('[data-sig-live]')!;
-  const play = fig.querySelector<HTMLButtonElement>('[data-sig-play]')!;
-  const playLabel = fig.querySelector<HTMLElement>('[data-sig-play-label]')!;
-  const chips = preamble();
+  const play = fig.querySelector<HTMLButtonElement>('[data-sig-play]');
+  const playLabel = fig.querySelector<HTMLElement>('[data-sig-play-label]');
+  // An empty panel (the 404 page) has the same scope and cursors, but no signal and no sound.
+  const empty = fig.hasAttribute('data-empty');
+  const chips = empty ? [] : preamble();
+  const middleTone = (F_MIN + F_MAX) / 2;
+  const hzAt = (chip: number) => chips[chip]?.hz ?? middleTone;
 
   let W = 0;
   let H = 0;
@@ -109,13 +113,13 @@ export function mountSignalPanel(fig: HTMLElement) {
       delete screen.dataset.reading;
       return;
     }
-    const c = chips[cur.chip];
-    const x = xOf(c.startMs);
+    const startMs = cur.chip * CHIP_MS;
+    const x = xOf(startMs);
     const y = yOf(tones[cur.tone]);
     screen.dataset.reading = '';
     vCur.style.transform = `translateX(${Math.round(x)}px)`;
     hCur.style.transform = `translateY(${Math.round(y)}px)`;
-    read.textContent = `t = ${fmtMs(c.startMs)}\nf = ${fmtHz(tones[cur.tone])}`;
+    read.textContent = empty ? 't = --\nf = --' : `t = ${fmtMs(startMs)}\nf = ${fmtHz(tones[cur.tone])}`;
     // The readout sits up and right of the crossing, flipped when it would leave the screen.
     const rw = read.offsetWidth;
     const rh = read.offsetHeight;
@@ -158,6 +162,10 @@ export function mountSignalPanel(fig: HTMLElement) {
 
   const announce = () => {
     if (!cur) return;
+    if (empty) {
+      live.textContent = 'No signal at this time or frequency.';
+      return;
+    }
     const c = chips[cur.chip];
     const onTone = Math.abs(tones[cur.tone] - c.hz) < 1;
     live.textContent = `Chip ${c.index + 1} of ${CHIPS}, ${fmtMs(c.startMs)}. Cursor at ${fmtHz(tones[cur.tone])}${onTone ? ', on this chip’s tone' : `; this chip is at ${fmtHz(c.hz)}`}.`;
@@ -165,7 +173,7 @@ export function mountSignalPanel(fig: HTMLElement) {
 
   scope.addEventListener('focus', () => {
     if (cur) return;
-    cur = { chip: 0, tone: nearestTone(chips[0].hz) };
+    cur = { chip: 0, tone: nearestTone(hzAt(0)) };
     place();
     announce();
   });
@@ -179,12 +187,12 @@ export function mountSignalPanel(fig: HTMLElement) {
     const k = e.key;
     if (k === 'ArrowRight' || k === 'ArrowLeft') {
       const chip = Math.min(CHIPS - 1, Math.max(0, cur.chip + (k === 'ArrowRight' ? 1 : -1)));
-      cur = { chip, tone: nearestTone(chips[chip].hz) };
+      cur = { chip, tone: empty ? cur.tone : nearestTone(hzAt(chip)) };
     } else if (k === 'ArrowUp' || k === 'ArrowDown') {
       cur = { ...cur, tone: Math.min(tones.length - 1, Math.max(0, cur.tone + (k === 'ArrowUp' ? 1 : -1))) };
     } else if (k === 'Home' || k === 'End') {
       const chip = k === 'Home' ? 0 : CHIPS - 1;
-      cur = { chip, tone: nearestTone(chips[chip].hz) };
+      cur = { chip, tone: empty ? cur.tone : nearestTone(hzAt(chip)) };
     } else return;
     e.preventDefault();
     place();
@@ -204,12 +212,12 @@ export function mountSignalPanel(fig: HTMLElement) {
     src = null;
     cancelAnimationFrame(raf);
     playing = -1;
-    play.style.setProperty('--p', '0');
-    play.setAttribute('aria-pressed', 'false');
-    playLabel.textContent = 'Hear it, 2 s';
+    play?.style.setProperty('--p', '0');
+    play?.setAttribute('aria-pressed', 'false');
+    if (playLabel) playLabel.textContent = 'Hear it, 2 s';
     draw();
   };
-  play.addEventListener('click', async () => {
+  play?.addEventListener('click', async () => {
     if (src) return stop();
     audio ??= new AudioContext();
     if (audio.state === 'suspended') await audio.resume();
@@ -222,12 +230,12 @@ export function mountSignalPanel(fig: HTMLElement) {
     const t0 = audio.currentTime + 0.05;
     src.start(t0);
     src.onended = stop;
-    play.setAttribute('aria-pressed', 'true');
-    playLabel.textContent = 'Stop';
+    play!.setAttribute('aria-pressed', 'true');
+    playLabel!.textContent = 'Stop';
     const chipS = (CHIP_MS * LISTEN_STRETCH) / 1000;
     const ac = audio;
     const tick = () => {
-      play.style.setProperty('--p', String(Math.min(1, Math.max(0, (ac.currentTime - t0) / (chipS * CHIPS)))));
+      play!.style.setProperty('--p', String(Math.min(1, Math.max(0, (ac.currentTime - t0) / (chipS * CHIPS)))));
       const k = Math.floor((ac.currentTime - t0) / chipS);
       if (k !== playing && k < CHIPS) {
         playing = k;
@@ -243,7 +251,7 @@ export function mountSignalPanel(fig: HTMLElement) {
   resize();
 
   // Touch screens: the preamble drifts in from the right once, slowly, and stops.
-  if (matchMedia('(hover: none)').matches && !prefersReducedMotion()) {
+  if (!empty && matchMedia('(hover: none)').matches && !prefersReducedMotion()) {
     const start = performance.now();
     const T = 3200;
     const step = (now: number) => {
