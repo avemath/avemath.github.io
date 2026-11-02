@@ -53,7 +53,7 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
           </div>
           {s.id === 'websites' && <WebsitesShowcase rowsOnly firstFig={webStart} />}
           {(s.id === 'websites' ? s.projects.filter((p) => !showcased(p)) : s.projects).length > 0 && (
-            <div class="work-grid">
+            <div class:list={['work-grid', s.id === 'websites' && 'work-grid--after-sites']}>
               {(s.id === 'websites' ? s.projects.filter((p) => !showcased(p)) : s.projects).map((p) => (
                 <WorkCard project={p} fig={figOf.get(p.id)!} />
               ))}
@@ -176,6 +176,11 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
     gap: 1.25rem;
     margin-top: 1.5rem;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  }
+
+  /* After the website rows, a card gets the same space the rows keep between themselves. */
+  .work-grid--after-sites {
+    margin-top: clamp(4rem, 8vw, 6.5rem);
   }
 
   .work-end {
