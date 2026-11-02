@@ -34,7 +34,7 @@ Square corners on cards and buttons. Buttons: 2px border, 50px tall, weight 700.
 
 Everything respects `prefers-reduced-motion` and the site's own "Reduce motion" toggle (`html[data-motion='reduce']`).
 
-- **Decode headings** (`src/scripts/decode-headings.ts`): headings with `data-decode` resolve out of random glyphs once, in 400 ms, as they come into view. The real text stays in the DOM; a layer hidden from screen readers draws the glyphs.
+- **Decode headings** (`src/scripts/decode-headings.ts`): headings with `data-decode` resolve out of random glyphs once, in about 900 ms, letter by letter from the left (each settles about 25 ms after the one before), as they come into view. The real text stays in the DOM; a layer hidden from screen readers draws the glyphs.
 - **Plotter draw-in** (`initDrawIn` in `src/scripts/motion.ts`): `[data-draw]` plots sweep in left to right over a second the first time they are on screen. Plots already on screen at load are never hidden.
 - **Signal panel**: still unless the mouse moves. Touch screens get one slow drift in. Sound only on a press.
 - **Marquee**: slow, decorative, `aria-hidden`, still with reduced motion.
