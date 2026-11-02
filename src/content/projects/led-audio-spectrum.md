@@ -40,8 +40,8 @@ I built two of them, one for each of my sisters. Each one scrolls that sister's 
 **Three parts and one supply.** A 5 V, 10 A supply feeds the LED matrix directly, since 256 LEDs can pull up to about 5 A depending on brightness. The ESP32 runs on USB, drives the matrix data line from GPIO 5, and powers the microphone from its 3.3 V pin. All the grounds are tied together, so the data signal and the supply share one reference.
 
 <figure class="wiring">
-  <div class="wiring__frame">
-    <svg viewBox="0 0 360 612" role="img" aria-labelledby="wiring-title wiring-desc">
+  <div class="wiring__frame" data-hscroll="Wiring diagram">
+    <svg viewBox="0 0 360 612" style="--fig-w:360px" role="img" aria-labelledby="wiring-title wiring-desc">
       <title id="wiring-title">Wiring diagram for the LED spectrum visualizer</title>
       <desc id="wiring-desc">A 5 volt, 10 amp power supply connects its +5 V terminal to the LED matrix VCC and its ground to the matrix ground and to an ESP32 ground, so all grounds are common. ESP32 GPIO 5 drives the matrix data input. The ESP32 is powered over USB. A MAX4466 microphone takes VCC from the ESP32 3.3 V pin, ground from an ESP32 ground pin, and sends its output to ESP32 GPIO 34. Two parts are drawn dashed as recommended but not in the first build: a 300 to 500 ohm resistor in series on the data line close to the matrix input, and a 1000 microfarad capacitor across the matrix 5 V and ground. A note says the ESP32 VIN pin can take 5 V, but it should never be powered from USB and VIN at the same time.</desc>
       <rect class="wiring__box" x="16" y="16" width="328" height="56" rx="8" />

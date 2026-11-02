@@ -150,8 +150,8 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             </div>
           </div>
           <div id="r2-live" role="tabpanel" aria-labelledby="r2-tab-live">
-          <div class="rfig__plot" data-draw>
-            <svg viewBox="0 0 600 230" class="arr" role="img" aria-label={`${ch.arrivals.length} arrivals of one ping at 15 km over ${(maxDelay / 1000).toFixed(1)} seconds. ${ch.n_within_20db} are within 20 dB of the strongest, spread over ${Math.round(windowMs)} ms.`}>
+          <div class="rfig__plot" data-draw data-hscroll="Arrivals plot">
+            <svg viewBox="0 0 600 230" class="arr" style="--fig-w:600px" role="img" aria-label={`${ch.arrivals.length} arrivals of one ping at 15 km over ${(maxDelay / 1000).toFixed(1)} seconds. ${ch.n_within_20db} are within 20 dB of the strongest, spread over ${Math.round(windowMs)} ms.`}>
               <rect class="arr__win" x={ax(firstStrong)} y={R2.y0 - 6} width={ax(firstStrong + windowMs) - ax(firstStrong)} height={R2.y1 - R2.y0 + 6} />
               <text class="arr__lab" x={ax(firstStrong) + 6} y={R2.y0 - 14}>20 dB window: {Math.round(windowMs)} ms</text>
               {[0, -10, -20, -30, -40].map((d) => <text class="arr__tick" x={R2.x0 - 10} y={ay(d) + 5} text-anchor="end">{d}</text>)}

@@ -388,6 +388,15 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
     fill: var(--accent);
   }
 
+  /* On a phone the art shrinks and its captions would fall far below a readable size; they are
+     decoration, so they go. */
+  @media (max-width: 559px) {
+    .art-label,
+    .art-chip {
+      display: none;
+    }
+  }
+
   /* Each signature plays a short animation once while its tile is hovered or focused: the
      constellation settles in, bars rise, rays grow out along their paths, the hop pattern steps
      through, ripples spread. Transform and opacity only, under a second, nothing at rest, and

@@ -15,13 +15,16 @@ interface Props {
 }
 
 const { label, title, viewBox, legend, note } = Astro.props;
+const width = Number(viewBox.split(/\s+/)[2]);
 ---
 
 <div class="dw">
-  <svg class="dw__svg" viewBox={viewBox} role="img" aria-label={label} data-sketch>
-    <title>{title}</title>
-    <slot />
-  </svg>
+  <div data-hscroll={title}>
+    <svg class="dw__svg" viewBox={viewBox} role="img" aria-label={label} data-sketch style={`--fig-w:${width}px`}>
+      <title>{title}</title>
+      <slot />
+    </svg>
+  </div>
   <ol class="dw__legend">
     {
       legend.map((l, i) => (

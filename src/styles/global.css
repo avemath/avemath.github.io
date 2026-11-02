@@ -950,6 +950,36 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Wide figures on phones (src/scripts/hscroll.ts): below 560px a drawing keeps its own width, so
+   its 13-unit labels stay at 13px or more, and the frame scrolls sideways instead. */
+@media (max-width: 559px) {
+  [data-hscroll] {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  [data-hscroll] > svg {
+    min-width: var(--fig-w, 100%);
+  }
+}
+
+[data-hscroll]:focus-visible {
+  outline-offset: -3px;
+}
+
+.hscroll-hint {
+  display: none;
+  padding: 0.35rem 1rem 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+[data-hscroll][data-scrolls] + .hscroll-hint {
+  display: block;
+}
+
 /* Wiring diagrams drawn inline in case study prose, so they follow the theme tokens. */
 .wiring {
   margin-block: 2rem;
