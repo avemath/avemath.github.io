@@ -3,7 +3,7 @@
 // something to wait through here), then runs, 4x slower than real by default (16x or real time
 // by choice), only while a strike plays out.
 // Nothing moves while nobody is pressing anything.
-import { createFirmware, LOOP_MS, MAX_WEAPON_ACTIVATIONS, SOLENOID_ACTIVATION_TIME, SOLENOID_SEQUENCE_DELAY } from '../../lib/rampage-firmware';
+import { createFirmware, LOOP_MS, MAX_WEAPON_ACTIVATIONS } from '../../lib/rampage-firmware';
 
 const WINDOW_MS = 700;
 
@@ -72,24 +72,28 @@ export function mountTiming(root: HTMLElement) {
   const x1 = Number(head.dataset.x1);
   const span = Number(head.dataset.span);
   const xAt = (ms: number) => x0 + (Math.min(ms, span) / span) * (x1 - x0);
-  const STROKE_MS = SOLENOID_SEQUENCE_DELAY * 2 + SOLENOID_ACTIVATION_TIME; // fill, settle, plow out
 
+  // The word follows the valves themselves, so it can never run ahead of the drawing: exhaust open
+  // (plow home), exhaust closed (settle), inlets open (plow out), then exhaust open again (vent).
+  let closedSeen = false;
   const showStrike = (firedAt: number, elapsed: number) => {
     const fired = firedAt >= 0;
-    const rel = elapsed - firedAt;
+    if (!fired) closedSeen = false;
+    else if (!fw.mainOpen) closedSeen = true;
+    const venting = fired && closedSeen && fw.mainOpen && !fw.pistonOpen;
     if (pn) {
       // The firmware's main_solenoid is the exhaust (GP14); piston_solenoid is both inlets (GP15).
       pn.dataset.exhaust = fw.mainOpen ? 'open' : 'closed';
       pn.dataset.inlets = fw.pistonOpen ? 'open' : 'closed';
-      pn.dataset.vent = fired && fw.mainOpen && rel >= STROKE_MS ? 'on' : 'off';
+      pn.dataset.vent = venting ? 'on' : 'off';
       if (pnMain) pnMain.textContent = fw.mainOpen ? 'open' : 'closed';
       if (pnPiston) pnPiston.textContent = fw.pistonOpen ? 'open' : 'closed';
     }
     let word = fw.activations >= MAX_WEAPON_ACTIVATIONS ? 'Out of air' : 'Ready';
-    if (fired && rel < SOLENOID_SEQUENCE_DELAY) word = 'Filling';
-    else if (fired && rel < SOLENOID_SEQUENCE_DELAY * 2) word = 'Settling';
-    else if (fired && rel < STROKE_MS) word = 'Plow out';
-    else if (fired && elapsed < WINDOW_MS) word = 'Venting';
+    if (fired && fw.pistonOpen) word = 'Plow out';
+    else if (fired && !fw.mainOpen) word = 'Settling';
+    else if (venting && elapsed < WINDOW_MS) word = 'Venting';
+    else if (fired && !closedSeen) word = 'Filling';
     // The chip under the timing rows says the same word as the drawing.
     if (pnStatus && pnStatus.textContent !== word) pnStatus.textContent = word;
     if (state.textContent !== word) state.textContent = word;
