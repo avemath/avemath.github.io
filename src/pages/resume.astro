@@ -17,7 +17,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
 >
   <div class="resume-zone">
   <div class="wrap resume-tools no-print">
-    <div class="flex flex-wrap items-center justify-between gap-4 py-8">
+    <div class="resume-tools__row flex flex-wrap items-center justify-between gap-4 py-8">
       <div>
         <p class="eyebrow">Résumé</p>
         <p class="mt-2 text-soft">The same content as the PDF, kept in sync from one data file.</p>
@@ -157,6 +157,12 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
 </BaseLayout>
 
 <style>
+  /* The intro and its buttons sit over the sheet, on the sheet's edges. */
+  .resume-tools__row {
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+
   .resume {
     max-width: 52rem;
     margin-inline: auto;
