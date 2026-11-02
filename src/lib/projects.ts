@@ -38,9 +38,12 @@ export type WorkSection = 'engineering' | 'research' | 'websites';
 export const workSections: { id: WorkSection; label: string; intro: string }[] = [
   { id: 'engineering', label: 'Engineering', intro: 'Hardware, radio and software I built, most with something you can run in the browser.' },
   { id: 'research', label: 'Research', intro: 'The research side: sponsored work, described in public wording only, and one question of my own.' },
-  { id: 'websites', label: 'Websites', intro: 'Sites I built for small businesses, a nonprofit and one engineer, each still live.' },
+  { id: 'websites', label: 'Websites and client tools', intro: 'Sites I built for small businesses, a nonprofit and one engineer, each still live, and tools I built for two small businesses.' },
 ];
-export const workSection = (p: Project): WorkSection => (isWebsite(p) ? 'websites' : p.data.type === 'research' ? 'research' : 'engineering');
+// Tools built for a client's business are filed with the websites, not with engineering.
+const clientTools = new Set(['little-explorer-swim', 'plv-abstract-builder']);
+export const workSection = (p: Project): WorkSection =>
+  isWebsite(p) || clientTools.has(p.id) ? 'websites' : p.data.type === 'research' ? 'research' : 'engineering';
 
 /** Every project in /work/ order: engineering, then research, then websites. */
 export async function getWorkOrder() {

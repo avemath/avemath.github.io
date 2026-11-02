@@ -4,7 +4,7 @@ import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import ProjectArt from '@/components/ProjectArt.astro';
 import Icon from '@/components/Icon.astro';
-import { type Project, typeLabels, statusLabels, projectHref, workSection } from '@/lib/projects';
+import { type Project, typeLabels, statusLabels, projectHref, workSection, workSections } from '@/lib/projects';
 import { formatRange } from '@/lib/format';
 import site from '@/data/site.json';
 
@@ -81,7 +81,7 @@ const jsonLd = [
         <nav aria-label="Breadcrumb" class="crumbs no-print">
           <ol>
             <li><a href="/work/" class="link">Work</a></li>
-            <li><a href={`/work/#${sec}`} class="link">{sec === 'websites' ? 'Websites' : sec === 'research' ? 'Research' : 'Engineering'}</a></li>
+            <li><a href={`/work/#${sec}`} class="link">{workSections.find((s) => s.id === sec)!.label}</a></li>
             <li aria-current="page">{d.title}</li>
           </ol>
         </nav>
