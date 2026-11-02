@@ -66,8 +66,38 @@ const figOf = new Map(order.map((p, i) => [p.id, i + 1]));
   </section>
 </BaseLayout>
 
+<script>
+  // The nav marks the section in view: Projects for Engineering, Research for Research, Websites
+  // for Websites. A hash on load (/work/#websites) counts from the start.
+  const keyOf: Record<string, string> = { engineering: 'projects', research: 'research', websites: 'websites' };
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-nav-key]')];
+  const mark = (section: string) => {
+    const key = keyOf[section] ?? 'projects';
+    links.forEach((a) => (a.dataset.navKey === key ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+  };
+  mark(location.hash.slice(1));
+  const sections = ['engineering', 'research', 'websites'].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+  // A section counts as in view once its top passes 35% down the screen.
+  // While the page is still jumping to a hash, the observer's first report would be stale.
+  let settled = !location.hash;
+  addEventListener('load', () => setTimeout(() => (settled = true), 400));
+  const io = new IntersectionObserver(
+    () => {
+      if (!settled) return;
+      const line = innerHeight * 0.35;
+      const current = sections.filter((s) => s.getBoundingClientRect().top <= line).pop();
+      mark(current?.id ?? 'engineering');
+    },
+    { rootMargin: '-35% 0px -64% 0px' },
+  );
+  sections.forEach((s) => io.observe(s));
+  addEventListener('hashchange', () => mark(location.hash.slice(1)));
+</script>
+
 <style>
+  /* The heading starts about 56px under the nav. */
   .work-head {
+    padding-top: 3.5rem;
     padding-bottom: 1.5rem;
   }
 
@@ -104,7 +134,7 @@ const figOf = new Map(order.map((p, i) => [p.id, i + 1]));
 
   .filter__n {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 400;
   }
 

@@ -41,8 +41,12 @@
   --line: #cbd3df;
   --line-strong: #8e9aad;
   --focus: #0b1f3a;
-  --shadow: 0 10px 24px -18px rgb(11 31 58 / 0.35);
-  --shadow-lift: 0 16px 32px -20px rgb(11 31 58 / 0.45);
+  /* Paper: a contact shadow and a soft drop. Lifted, both deepen a little. */
+  --shadow: 0 1px 2px rgb(11 31 58 / 0.06), 0 12px 32px -20px rgb(11 31 58 / 0.35);
+  --shadow-lift: 0 2px 4px rgb(11 31 58 / 0.08), 0 18px 40px -20px rgb(11 31 58 / 0.45);
+  /* The tint behind a figure, so the drawing area reads apart from the words beside it. */
+  --fig-tint: #f7f9fc;
+  --accent-bright: #f27a4c;
 
   --danger: #a3261b;
   --ok: #1e6b3e;
@@ -85,8 +89,11 @@
   --line-strong: #5a6f8f;
   --focus: #ef8d66;
   --accent-ink: #ef8d66;
-  --shadow: 0 10px 24px -18px rgb(0 0 0 / 0.7);
-  --shadow-lift: 0 16px 32px -20px rgb(0 0 0 / 0.8);
+  /* On dark grounds a shadow does not read, so paper gets a faint light ring instead. */
+  --shadow: 0 0 0 1px rgb(244 246 250 / 0.05);
+  --shadow-lift: 0 0 0 1px rgb(244 246 250 / 0.16);
+  --fig-tint: #0b1d36;
+  --accent-bright: #ff8a5c;
 
   --danger: #ff8a7a;
   --ok: #6fd39a;

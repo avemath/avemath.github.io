@@ -17,9 +17,10 @@ const nav = [
   { href: '/work/#engineering', label: 'Projects', key: 'projects' },
   { href: '/work/#websites', label: 'Websites', key: 'websites' },
   { href: '/research/', label: 'Research', key: 'research' },
+  { href: '/about/', label: 'About', key: 'about' },
   { href: '/#contact', label: 'Contact', key: 'contact' },
 ];
-const isCurrent = (key: string) => key === section || (key === 'research' && path === '/research');
+const isCurrent = (key: string) => key === section || (key === 'research' && path === '/research') || (key === 'about' && path === '/about');
 ---
 
 <header class="site-header on-navy no-print" data-header>
@@ -31,7 +32,8 @@ const isCurrent = (key: string) => key === section || (key === 'research' && pat
         {
           nav.map((item) => (
             <li>
-              <a href={item.href} class="nav-link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' ? 'page' : 'true') : undefined}>
+              <a href={item.href} class="nav-link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' || path === '/about' ? 'page' : 'true') : undefined}
+                data-nav-key={item.key}>
                 {item.label}
               </a>
             </li>
@@ -62,7 +64,8 @@ const isCurrent = (key: string) => key === section || (key === 'research' && pat
             {
               nav.map((item) => (
                 <li>
-                  <a href={item.href} class="mnav__link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' ? 'page' : 'true') : undefined}>
+                  <a href={item.href} class="mnav__link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' || path === '/about' ? 'page' : 'true') : undefined}
+                data-nav-key={item.key}>
                     {item.label}
                   </a>
                 </li>
@@ -159,9 +162,9 @@ const isCurrent = (key: string) => key === section || (key === 'research' && pat
   .nav-label {
     min-width: 8ch;
     margin-right: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     text-align: right;
-    color: var(--muted);
+    color: var(--text-soft);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }

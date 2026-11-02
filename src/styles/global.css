@@ -220,8 +220,8 @@
 .corner {
   display: none;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--muted);
+  font-size: 0.875rem;
+  color: var(--text-soft);
 }
 
 @media (min-width: 1100px) {
@@ -255,7 +255,7 @@
 .eyebrow {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.3;
   color: var(--accent-ink);
@@ -286,9 +286,9 @@
 /* Depth ranges, axis labels and readouts: IBM Plex Mono, the instrument face. */
 .label {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1.4;
-  color: var(--muted);
+  color: var(--text-soft);
 }
 
 .link {
@@ -400,7 +400,7 @@
   padding: 0.2rem 0.55rem;
   border: 1px solid var(--line);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--text-soft);
   background: var(--surface);
@@ -434,6 +434,43 @@
   border-radius: 0;
   background: var(--surface);
   box-shadow: var(--shadow);
+}
+
+/* Paper lifts 2px on hover or focus within, with its shadow deepening. The skills matrix is
+   paper too, but a whole table should not move. */
+.paper {
+  transition:
+    transform 0.16s ease-out,
+    box-shadow 0.16s ease-out;
+}
+
+.paper:not(.sm):hover,
+.paper:not(.sm):focus-within {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* A project card under the pointer: its accent strokes brighten, and the "Try:" word pulses once. */
+.paper:hover .s--hot,
+.paper:hover .pn__plow {
+  stroke: var(--accent-bright);
+}
+
+.paper:hover .f--hot {
+  fill: var(--accent-bright);
+}
+
+.paper:hover .fig__try::before {
+  display: inline-block;
+  margin-right: 0.3em;
+  animation: try-pulse 0.6s ease-out 1;
+}
+
+@keyframes try-pulse {
+  40% {
+    transform: scale(1.18);
+    color: var(--accent-bright);
+  }
 }
 
 .card--lift {
@@ -476,8 +513,8 @@
 }
 
 .fig__label {
-  font-size: 0.8125rem;
-  color: var(--muted);
+  font-size: 0.875rem;
+  color: var(--text-soft);
 }
 
 /* "What to try": one imperative line in a figure's footer row. Hover wording for a mouse, tap
@@ -485,7 +522,7 @@
 .fig__try {
   padding: 0.6rem 0.9rem;
   border-top: 1px solid var(--line);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--text);
 }
@@ -512,8 +549,8 @@
 .fig__note {
   padding: 0.7rem 0.9rem;
   border-top: 1px solid var(--line);
-  font-size: 0.8125rem;
-  color: var(--muted);
+  font-size: 0.9375rem;
+  color: var(--text-soft);
 }
 
 .tabset {
@@ -526,7 +563,7 @@
   padding: 0.3rem 0.7rem;
   border: 1px solid var(--line);
   background: var(--surface);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--text);
   cursor: pointer;
@@ -551,7 +588,7 @@
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   line-height: 1;
 }
@@ -647,7 +684,7 @@
 }
 
 .dw__svg .t {
-  font-size: 11px;
+  font-size: 13px;
   fill: var(--text);
 }
 
@@ -657,7 +694,7 @@
 
 .dw__svg .t--mono {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .dw__svg .t--hot {
@@ -669,7 +706,7 @@
 }
 
 .dw__svg .co text {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   fill: #fff;
   text-anchor: middle;
@@ -692,8 +729,8 @@
 
 .dw__note {
   margin-top: 0.6rem;
-  font-size: 0.8125rem;
-  color: var(--muted);
+  font-size: 0.875rem;
+  color: var(--text-soft);
 }
 
 /* The draw-in's starting state: set by the script only, never with reduced motion. The script
@@ -874,7 +911,7 @@
 .wiring figcaption {
   margin-top: 0.85rem;
   font-size: 0.9rem;
-  color: var(--muted);
+  color: var(--text-soft);
 }
 
 .wiring__box {
@@ -893,7 +930,7 @@
 .wiring__s,
 .wiring__note,
 .wiring__pin {
-  font-size: 11.5px;
+  font-size: 13px;
 }
 
 .wiring__s {

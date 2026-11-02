@@ -3,6 +3,10 @@
     "slug": "because-of-adam",
     "url": "https://becauseofadam.org",
     "pagespeedMobile": 99,
+    "accessibility": 100,
+    "pageWeightKb": 101,
+    "liveSince": "Sep 2026",
+    "ownerEdits": "family adds events and news",
     "measuredOn": "2026-11-01",
     "quote": "",
     "quoteBy": ""
@@ -10,7 +14,11 @@
   {
     "slug": "grace-mae-alterations",
     "url": "https://gracemaealterations.com",
-    "pagespeedMobile": 94,
+    "pagespeedMobile": 91,
+    "accessibility": 100,
+    "pageWeightKb": 496,
+    "liveSince": "Sep 2026",
+    "ownerEdits": "owner edits about 435 fields",
     "measuredOn": "2026-11-01",
     "quote": "Brides come in already knowing what a bustle is, and the inquiry forms arrive with everything I need to give a quote.",
     "quoteBy": "Grace, Grace Mae Alterations"
@@ -18,7 +26,11 @@
   {
     "slug": "petro-land-ventures",
     "url": "https://plvinc.com",
-    "pagespeedMobile": 86,
+    "pagespeedMobile": 87,
+    "accessibility": 100,
+    "pageWeightKb": 287,
+    "liveSince": "Sep 2026",
+    "ownerEdits": "owner edits every page",
     "measuredOn": "2026-11-01",
     "quote": "Avery built us a site that speaks to oil companies and landowners at the same time, and I can update it myself without calling her.",
     "quoteBy": "Rickey, Petro Land Ventures"
@@ -26,7 +38,11 @@
   {
     "slug": "nicholas-domke",
     "url": "https://nmdomke.github.io",
-    "pagespeedMobile": 88,
+    "pagespeedMobile": 90,
+    "accessibility": 100,
+    "pageWeightKb": 400,
+    "liveSince": "Oct 2026",
+    "ownerEdits": "owner edits one content file",
     "measuredOn": "2026-11-01",
     "quote": "",
     "quoteBy": ""

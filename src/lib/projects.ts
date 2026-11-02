@@ -48,14 +48,22 @@ export async function getWorkOrder() {
   return workSections.flatMap((s) => all.filter((p) => workSection(p) === s.id));
 }
 
-/** Projects with a schematic drawing on the site (src/components/drawings). */
-export const drawn = new Set(['rampage', 'v2v-bsm-ofdm', 'led-audio-spectrum', 'signals-playground', 'bellhop-sim', 'acoustic-pool-alarm']);
+/** Where each project's schematic drawing is: a hash naming its tab panel opens that tab. */
+export const drawings: Record<string, string> = {
+  rampage: '/#rampage-drawing',
+  'v2v-bsm-ofdm': '/#v2v-drawing',
+  'led-audio-spectrum': '/#led-drawing',
+  'signals-playground': '/#sig-drawing',
+  'bellhop-sim': '/research/#r2-drawing',
+  'acoustic-pool-alarm': '/research/#pool-alarm',
+};
 
-/** What a project's card offers: a live version, a drawing, the code. Quiet labels, in that order. */
+/** What a project's card offers, as links: a live version, its drawing, its code. */
 export function offers(p: Project) {
-  const out: string[] = [];
-  if (p.data.demo || p.data.links.live) out.push('Live');
-  if (drawn.has(p.id)) out.push('Drawing');
-  if (p.data.links.repo && p.data.confidentiality !== 'limited') out.push('Code');
+  const out: { label: string; href: string }[] = [];
+  if (p.data.demo) out.push({ label: 'Live', href: `${projectHref(p)}#demo` });
+  else if (p.data.links.live) out.push({ label: 'Live', href: p.data.links.live });
+  if (drawings[p.id]) out.push({ label: 'Drawing', href: drawings[p.id] });
+  if (p.data.links.repo && p.data.confidentiality !== 'limited') out.push({ label: 'Code', href: p.data.links.repo });
   return out;
 }

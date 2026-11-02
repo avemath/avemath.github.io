@@ -4,7 +4,7 @@
 // the links. The whole card opens the case study.
 import { Image } from 'astro:assets';
 import ProjectArt from './ProjectArt.astro';
-import { type Project, typeLabels, projectHref, offers } from '@/lib/projects';
+import { type Project, typeLabels, projectHref, offers, isWebsite } from '@/lib/projects';
 import { displayUrl } from '@/lib/format';
 
 interface Props {
@@ -16,11 +16,13 @@ interface Props {
 const { project, fig, eager = false } = Astro.props;
 const d = project.data;
 const has = offers(project);
+// Websites are named by their address; everything else by its kind of work.
+const kind = isWebsite(project) && d.links.live ? displayUrl(d.links.live) : typeLabels[d.type];
 ---
 
 <article class="wc paper" aria-labelledby={`wc-${project.id}`}>
   <div class="fig__bar wc__bar">
-    <p class="fig__label">Fig. {String(fig).padStart(2, '0')} / {typeLabels[d.type]}</p>
+    <p class="fig__label">Fig. {String(fig).padStart(2, '0')} / {kind}</p>
     {d.confidentiality === 'limited' && <p class="fig__label">public wording only</p>}
   </div>
   <div class="wc__media">
@@ -47,9 +49,12 @@ const has = offers(project);
     </h3>
     {
       has.length > 0 && (
-        <p class="wc__offers">
-          <span class="sr-only">Offers: </span>
-          {has.join(' · ')}
+        <p class="wc__offers above-stretch">
+          {has.map((o) => (
+            <a href={o.href} aria-label={`${o.label}: ${d.title}`}>
+              {o.label}
+            </a>
+          ))}
         </p>
       )
     }
@@ -123,9 +128,19 @@ const has = offers(project);
   }
 
   .wc__offers {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .wc__offers a {
+    padding-block: 0.2rem;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.25em;
   }
 
   .wc__summary {

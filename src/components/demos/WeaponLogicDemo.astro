@@ -80,7 +80,7 @@ import DemoShell from './DemoShell.astro';
 
     <div class="wl__log card">
       <p class="label">Serial console</p>
-      <div class="log mono" role="log" aria-label="Firmware console output" data-log-box><ol data-log></ol></div>
+      <div class="log mono" role="log" aria-label="Firmware console output" tabindex="0" data-log-box><ol data-log></ol></div>
     </div>
   </div>
 
@@ -193,8 +193,8 @@ import DemoShell from './DemoShell.astro';
 
   .sw__ch {
     display: block;
-    font-size: 0.72rem;
-    color: var(--muted);
+    font-size: 0.875rem;
+    color: var(--text-soft);
   }
 
   .wl__state {
@@ -321,7 +321,7 @@ import DemoShell from './DemoShell.astro';
     border-radius: 0.6rem;
     background: #05070c;
     color: #9fb3d1;
-    font-size: 0.72rem;
+    font-size: 0.875rem;
     line-height: 1.6;
     overflow-y: auto;
   }
