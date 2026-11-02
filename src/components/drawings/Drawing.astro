@@ -1,0 +1,38 @@
+---
+// The shared frame for every schematic drawing: one SVG in the site's drawing style (1.5 px ink
+// strokes, the accent for the one path that matters, numbered callouts) and its legend. Strokes
+// marked with pathLength="1" draw in the first time the drawing is on screen
+// (src/scripts/sketch.ts). These are schematics of signal paths and hardware, not CAD.
+interface Props {
+  /** One sentence describing the drawing, for screen readers. */
+  label: string;
+  title: string;
+  viewBox: string;
+  /** The legend, in callout order: item 1 explains callout 1. */
+  legend: string[];
+  /** A short note under the legend, for anything that is a guess or a simplification. */
+  note?: string;
+}
+
+const { label, title, viewBox, legend, note } = Astro.props;
+---
+
+<div class="dw">
+  <svg class="dw__svg" viewBox={viewBox} role="img" aria-label={label} data-sketch>
+    <title>{title}</title>
+    <slot />
+  </svg>
+  <ol class="dw__legend">
+    {
+      legend.map((l, i) => (
+        <li>
+          <span class="callout" aria-hidden="true">
+            {i + 1}
+          </span>
+          <span>{l}</span>
+        </li>
+      ))
+    }
+  </ol>
+  {note && <p class="dw__note">{note}</p>}
+</div>

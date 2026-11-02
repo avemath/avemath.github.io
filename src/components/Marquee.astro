@@ -51,6 +51,11 @@ const items = [
     white-space: nowrap;
   }
 
+  /* Hovering holds it still, so a name can be read. */
+  .mq:hover .mq__track {
+    animation-play-state: paused;
+  }
+
   @keyframes mq {
     to {
       transform: translateX(-50%);

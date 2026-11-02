@@ -9,19 +9,24 @@ interface Props {
   kind: string;
   /** Figure on the right instead of the left, from 960px up. */
   flip?: boolean;
+  /** The figure takes the card's full width and the words sit under it, at every size. */
+  wide?: boolean;
   eyebrow: string;
   title: string;
+  /** What the card offers, as a quiet row under the title. */
+  offers?: string[];
 }
 
-const { id, fig, kind, flip = false, eyebrow, title } = Astro.props;
+const { id, fig, kind, flip = false, wide = false, eyebrow, title, offers = ['Live', 'Drawing', 'Code'] } = Astro.props;
 const views = [
   { key: 'live', label: 'Live' },
+  { key: 'drawing', label: 'Drawing' },
   { key: 'how', label: 'How it works' },
   { key: 'code', label: 'Code' },
 ];
 ---
 
-<article class:list={['fc paper', flip && 'fc--flip']} id={id} aria-labelledby={`${id}-title`} data-fc>
+<article class:list={['fc paper', flip && 'fc--flip', wide && 'fc--wide']} id={id} aria-labelledby={`${id}-title`} data-fc>
   <div class="fc__fig">
     <div class="fig__bar">
       <p class="fig__label">Fig. {fig} / {kind}</p>
@@ -46,6 +51,9 @@ const views = [
     <div class="fc__view" id={`${id}-live`} role="tabpanel" aria-labelledby={`${id}-tab-live`}>
       <slot />
     </div>
+    <div class="fc__view" id={`${id}-drawing`} role="tabpanel" aria-labelledby={`${id}-tab-drawing`} hidden>
+      <slot name="drawing" />
+    </div>
     <div class="fc__view" id={`${id}-how`} role="tabpanel" aria-labelledby={`${id}-tab-how`} hidden>
       <slot name="how" />
     </div>
@@ -57,6 +65,7 @@ const views = [
   <div class="fc__text">
     <p class="eyebrow fc__eyebrow">{eyebrow}</p>
     <h3 id={`${id}-title`} class="fc__title" data-decode>{title}</h3>
+    <p class="fc__offers"><span class="sr-only">Offers: </span>{offers.join(' · ')}</p>
     <div class="fc__body"><slot name="text" /></div>
     <div class="fc__actions"><slot name="actions" /></div>
   </div>
@@ -86,15 +95,52 @@ const views = [
       border-right: 1px solid var(--line);
     }
 
-    /* The code views take the whole card; the words move under them. */
+    /* The code views take the whole card; the words move under them. A wide card always does. */
+    .fc--wide,
     .fc[data-wide] {
       grid-template-columns: minmax(0, 1fr);
     }
 
+    .fc--wide .fc__fig,
     .fc[data-wide] .fc__fig {
       order: 0;
       border-inline: 0;
       border-bottom: 1px solid var(--line);
+    }
+  }
+
+  /* Under a wide figure, the words run in two columns: title and body, then the actions. */
+  @media (min-width: 960px) {
+    .fc--wide .fc__text,
+    .fc[data-wide] .fc__text {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'eyebrow actions' 'title actions' 'body actions';
+      column-gap: 3rem;
+      align-items: start;
+    }
+
+    .fc--wide .fc__eyebrow,
+    .fc[data-wide] .fc__eyebrow {
+      grid-area: eyebrow;
+    }
+
+    .fc--wide .fc__title,
+    .fc[data-wide] .fc__title {
+      grid-area: title;
+    }
+
+    .fc--wide .fc__body,
+    .fc[data-wide] .fc__body {
+      grid-area: body;
+      max-width: 46rem;
+    }
+
+    .fc--wide .fc__actions,
+    .fc[data-wide] .fc__actions {
+      grid-area: actions;
+      align-self: end;
+      margin-top: 0;
     }
   }
 
@@ -137,6 +183,19 @@ const views = [
     line-height: 0.98;
   }
 
+  .fc__offers {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .fc--wide .fc__offers,
+  .fc[data-wide] .fc__offers {
+    grid-area: body;
+    align-self: start;
+  }
+
   .fc__body {
     margin-top: 1rem;
     color: var(--text-soft);
@@ -169,7 +228,8 @@ const views = [
         t.tabIndex = on ? 0 : -1;
         document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
       });
-      card.toggleAttribute('data-wide', tabs[i].dataset.view !== 'live');
+      const view = tabs[i].dataset.view;
+      card.toggleAttribute('data-wide', view === 'how' || view === 'code');
       if (focus) tabs[i].focus();
       card.dispatchEvent(new CustomEvent('viewchange', { detail: tabs[i].dataset.view }));
     };

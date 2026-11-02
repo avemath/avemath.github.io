@@ -1,0 +1,36 @@
+---
+// The three kinds of path BELLHOP traces between a source and a receiver in shallow water: the
+// direct path, a bounce off the surface and a bounce off the bottom. A schematic, not output.
+import Drawing from './Drawing.astro';
+---
+
+<Drawing
+  title="bellhopSim: three ways sound gets from source to receiver"
+  label="A source and a receiver in shallow water, with three sound paths between them: direct, off the surface, and off the bottom."
+  viewBox="0 0 640 240"
+  legend={[
+    'Direct: the shortest path, and usually the first to arrive.',
+    'Surface bounce: off the top, a little later, with its phase flipped.',
+    'Bottom bounce: off the seabed, later still, weaker by however much the bottom absorbs.',
+  ]}
+  note="A schematic. BELLHOP traces hundreds of these rays; Fig. R2 shows the arrivals from one real run."
+>
+  <path class="s" pathLength="1" d="M16 30 H624"></path>
+  <text class="t t--muted" x="16" y="22">surface</text>
+  <path class="s s--soft" pathLength="1" d="M16 210 H624"></path>
+  <path class="s s--soft s--dash" pathLength="1" d="M16 218 H624"></path>
+  <text class="t t--muted" x="16" y="232">bottom (sand)</text>
+
+  <path class="s s--hot" pathLength="1" d="M90 90 L550 120"></path>
+  <path class="s" pathLength="1" d="M90 90 L300 30 L550 120"></path>
+  <path class="s" pathLength="1" d="M90 90 L340 210 L550 120"></path>
+
+  <rect class="s f--hot" pathLength="1" x="82" y="82" width="16" height="16"></rect>
+  <text class="t" x="70" y="118" text-anchor="middle">source</text>
+  <rect class="s f" pathLength="1" x="542" y="112" width="16" height="16"></rect>
+  <text class="t" x="560" y="148" text-anchor="middle">receiver</text>
+
+  <g class="co"><circle cx="330" cy="92" r="9"></circle><text x="330" y="96">1</text></g>
+  <g class="co"><circle cx="300" cy="46" r="9"></circle><text x="300" y="50">2</text></g>
+  <g class="co"><circle cx="340" cy="194" r="9"></circle><text x="340" y="198">3</text></g>
+</Drawing>

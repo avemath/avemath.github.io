@@ -1,14 +1,13 @@
 // Fig. 01: tooltips on the traces, and "Fire the plow", which runs the real firmware port. The
 // firmware boots on its virtual clock in an instant (its 3 s startup interlock is behavior, not
-// something to wait through here), then runs in real time only while a strike plays out. Nothing
-// moves while nobody is pressing anything.
-import { createFirmware, LOOP_MS, MAX_WEAPON_ACTIVATIONS } from '../../lib/rampage-firmware';
-import { prefersReducedMotion } from '../preferences';
+// something to wait through here), then runs, 4x slower than real, only while a strike plays out.
+// Nothing moves while nobody is pressing anything.
+import { createFirmware, LOOP_MS, MAX_WEAPON_ACTIVATIONS, SOLENOID_ACTIVATION_TIME, SOLENOID_SEQUENCE_DELAY } from '../../lib/rampage-firmware';
 
 const WINDOW_MS = 700;
 
 export function mountTiming(root: HTMLElement) {
-  const svg = root.querySelector<SVGSVGElement>('svg')!;
+  const svg = root.querySelector<SVGSVGElement>('.tf__svg')!;
   const tip = root.querySelector<HTMLElement>('[data-tf-tip]')!;
   const clip = root.querySelector<SVGRectElement>('[data-tf-clip]')!;
   const used = root.querySelector<HTMLElement>('[data-tf-used]')!;
@@ -55,16 +54,40 @@ export function mountTiming(root: HTMLElement) {
     fire.textContent = out ? 'Refill (new match)' : 'Fire the plow';
   };
 
-  // Redraws the traces left to right in real time, as the valves would switch.
-  const sweep = () => {
-    if (prefersReducedMotion()) return clip.setAttribute('width', '640');
-    const start = performance.now();
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / WINDOW_MS);
-      clip.setAttribute('width', String(150 + t * 490));
-      if (t < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
+  // ---- One strike, played 4x slower than real so the 50 ms steps can be seen ----
+  // The firmware runs on its virtual clock at a quarter of real speed. A playhead sweeps the
+  // timing rows, the traces redraw behind it, and the pneumatics drawing and its status word
+  // follow the valves exactly as the firmware switches them.
+  const SLOW = 4;
+  const pn = card?.querySelector<HTMLElement>('[data-pn]') ?? null;
+  const pnMain = pn?.querySelector<SVGTextElement>('[data-pn-main]');
+  const pnPiston = pn?.querySelector<SVGTextElement>('[data-pn-piston]');
+  const pnStatus = pn?.querySelector<HTMLElement>('[data-pn-status]');
+  const head = svg.querySelector<SVGLineElement>('[data-tf-head]')!;
+  const x0 = Number(head.dataset.x0);
+  const x1 = Number(head.dataset.x1);
+  const span = Number(head.dataset.span);
+  const xAt = (ms: number) => x0 + (Math.min(ms, span) / span) * (x1 - x0);
+  const STROKE_MS = SOLENOID_SEQUENCE_DELAY * 2 + SOLENOID_ACTIVATION_TIME; // fill, settle, plow out
+
+  const showStrike = (firedAt: number, elapsed: number) => {
+    const fired = firedAt >= 0;
+    const rel = elapsed - firedAt;
+    if (pn) {
+      pn.dataset.main = fw.mainOpen ? 'open' : 'closed';
+      pn.dataset.piston = fw.pistonOpen ? 'open' : 'closed';
+      pn.dataset.pressure = fired && rel < STROKE_MS ? 'on' : 'off';
+      pn.dataset.vent = fired && fw.mainOpen && rel >= STROKE_MS ? 'on' : 'off';
+      if (pnMain) pnMain.textContent = fw.mainOpen ? 'open' : 'closed';
+      if (pnPiston) pnPiston.textContent = fw.pistonOpen ? 'open' : 'closed';
+    }
+    if (!pnStatus) return;
+    let word = fw.activations >= MAX_WEAPON_ACTIVATIONS ? 'Out of air' : 'Ready';
+    if (fired && rel < SOLENOID_SEQUENCE_DELAY) word = 'Filling';
+    else if (fired && rel < SOLENOID_SEQUENCE_DELAY * 2) word = 'Settling';
+    else if (fired && rel < STROKE_MS) word = 'Plow out';
+    else if (fired && elapsed < WINDOW_MS) word = 'Venting';
+    if (pnStatus.textContent !== word) pnStatus.textContent = word;
   };
 
   let busy = false;
@@ -73,28 +96,43 @@ export function mountTiming(root: HTMLElement) {
     if (fw.activations >= MAX_WEAPON_ACTIVATIONS) {
       boot();
       paint();
+      showStrike(-1, 0);
       return;
     }
     busy = true;
+    root.dataset.running = '';
     const before = fw.activations;
     fw.tx.trigger = true;
     let elapsed = 0;
-    let swept = false;
+    let firedAt = -1;
+    let acc = 0;
     let last = performance.now();
+    head.setAttribute('x1', String(x0));
+    head.setAttribute('x2', String(x0));
     const run = (now: number) => {
-      let dt = Math.min(100, now - last);
+      acc += Math.min(100, now - last) / SLOW;
       last = now;
-      while (dt >= LOOP_MS && elapsed < WINDOW_MS) {
+      while (acc >= LOOP_MS && elapsed < WINDOW_MS) {
         fw.step();
         elapsed += LOOP_MS;
-        dt -= LOOP_MS;
+        acc -= LOOP_MS;
         if (elapsed >= 160) fw.tx.trigger = false;
-        if (!swept && fw.activations !== before) (swept = true), sweep();
+        // The strike started on this loop; the traces redraw from here, behind the playhead.
+        if (firedAt < 0 && fw.activations !== before) firedAt = elapsed - LOOP_MS;
       }
-      last -= dt;
+      const x = String(xAt(elapsed));
+      head.setAttribute('x1', x);
+      head.setAttribute('x2', x);
+      if (firedAt >= 0) clip.setAttribute('width', x);
       paint();
+      showStrike(firedAt, elapsed);
       if (elapsed < WINDOW_MS) requestAnimationFrame(run);
-      else busy = false;
+      else {
+        busy = false;
+        delete root.dataset.running;
+        clip.setAttribute('width', '640');
+        showStrike(-1, elapsed);
+      }
     };
     requestAnimationFrame(run);
   });

@@ -12,6 +12,10 @@ import CodeFile from '@/components/fig/CodeFile.astro';
 import SignalsLive from '@/components/live/SignalsLive.astro';
 import BelowSurface from '@/components/BelowSurface.astro';
 import MarginNote from '@/components/MarginNote.astro';
+import RampageSystem from '@/components/drawings/RampageSystem.astro';
+import V2vLink from '@/components/drawings/V2vLink.astro';
+import LedChain from '@/components/drawings/LedChain.astro';
+import SignalsHop from '@/components/drawings/SignalsHop.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import HomeSkills from '@/components/HomeSkills.astro';
 import site from '@/data/site.json';
@@ -70,8 +74,9 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
       </div>
 
       <div class="projects__cards">
-        <FigureCard id="rampage" fig="01" kind="Timing diagram" eyebrow="Senior design capstone, 1st place" title="RAMpage">
+        <FigureCard id="rampage" fig="01" kind="Timing diagram" wide eyebrow="Senior design capstone, 1st place" title="RAMpage">
           <TimingFig />
+          <RampageSystem slot="drawing" />
           <CodeHow slot="how" excerpt={picoHow} file="pico_direct.py" url={`${RAMPAGE}#L${picoHow.from}-L${picoHow.from + 44}`} notes={picoNotes} />
           <CodeFile
             slot="code"
@@ -96,6 +101,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
         <FigureCard id="v2v" fig="02" kind="Receiver chain" flip eyebrow="EE 4003, with Jason Phan" title="V2V collision warning over OFDM">
           <ChainFig />
+          <V2vLink slot="drawing" />
           <CodeHow slot="how" excerpt={rxHow} file="src/lib/ofdm-rx.ts" url={`${SELF}/src/lib/ofdm-rx.ts#L${rxHow.from}`} notes={rxNotes} />
           <CodeFile
             slot="code"
@@ -120,6 +126,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
         <FigureCard id="led" fig="03" kind="16 by 16 matrix" eyebrow="Personal project, one built for each sister" title="LED audio spectrum">
           <MatrixFig />
+          <LedChain slot="drawing" />
           <CodeHow slot="how" excerpt={ledHow} file="src/lib/led-firmware.ts" url={`${SELF}/src/lib/led-firmware.ts#L${ledHow.from}`} notes={ledNotes} />
           <CodeFile
             slot="code"
@@ -156,6 +163,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           </div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/bellhop-sim/" class="stretched">bellhopSim</a></h3>
+            <p class="mini__offers"><span class="sr-only">Offers: </span>Figures · Drawing · Code</p>
             <p class="mini__text">BELLHOP (a standard model of how sound travels underwater) for shallow water, with the three physics bugs I found and fixed.</p>
           </div>
           <p class="fig__try">Open the figures and the fixes.</p>
@@ -164,8 +172,12 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
         <li class="mini paper" data-live-host>
           <div class="fig__bar mini__bar">
             <p class="fig__label">Fig. 05 / Hop pattern</p>
-            <p class="fig__label">Live, with sound</p>
+            <div class="tabset" role="tablist" aria-label="Signals playground: views" data-tabs>
+              <button type="button" role="tab" id="sig-tab-live" aria-controls="sig-live" aria-selected="true" tabindex="0">Live</button>
+              <button type="button" role="tab" id="sig-tab-drawing" aria-controls="sig-drawing" aria-selected="false" tabindex="-1">Drawing</button>
+            </div>
           </div>
+          <div id="sig-live" role="tabpanel" aria-labelledby="sig-tab-live">
           <div class="mini__fig mini__fig--live" data-live-media data-draw>
             <svg viewBox="0 0 320 120" class="mini__hops" aria-hidden="true">
               {
@@ -176,12 +188,17 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             </svg>
             <SignalsLive />
           </div>
+          <p class="fig__try">Press Try it, then Play, and listen.</p>
+          </div>
+          <div id="sig-drawing" role="tabpanel" aria-labelledby="sig-tab-drawing" hidden>
+            <SignalsHop />
+          </div>
           <div class="mini__note"><MarginNote where="signals" /></div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/signals-playground/">Signals playground</a></h3>
+            <p class="mini__offers"><span class="sr-only">Offers: </span>Live · Drawing · Code</p>
             <p class="mini__text">A JANUS style FH-BFSK preamble, one chip at a time. You can hear each hop.</p>
           </div>
-          <p class="fig__try">Press Try it, then Play, and listen.</p>
         </li>
 
         <li class="mini paper mini--accent">
@@ -358,6 +375,13 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   .mini__wt {
     font-weight: 400;
     font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .mini__offers {
+    margin-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     color: var(--muted);
   }
 

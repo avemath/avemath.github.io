@@ -1,0 +1,110 @@
+---
+// RAMpage's pneumatics as a schematic that moves with the firmware: the air reservoir, the main
+// valve (GP14), the piston valve (GP15), the piston and the plow. Its state is set from
+// src/lib/rampage-firmware.ts by src/scripts/fig/timing.ts, so the valves open and close exactly
+// when the firmware switches them. The labels follow the README's sequence: the main valve opens
+// to let air in, pressure builds, the piston valve extends the plow, and the main valve vents.
+// TODO(ave): confirm the plumbing. The sources disagree on the main valve (the code calls it the
+// exhaust, the README says it fills the system and later vents it), the README says one reservoir
+// where a photo caption says two air tanks, and the number of pistons is not stated.
+---
+
+<div class="pn" data-pn data-main="open" data-piston="closed" data-pressure="off" data-vent="off">
+  <svg class="dw__svg pn__svg" viewBox="0 0 360 210" role="img" aria-label="The plow's pneumatics: an air reservoir, the main valve, the piston valve, and the piston that pushes the plow out." data-sketch>
+    <title>RAMpage pneumatics</title>
+    <rect class="s f" pathLength="1" x="12" y="60" width="64" height="96" rx="20"></rect>
+    <text class="t" x="44" y="176" text-anchor="middle">air reservoir</text>
+
+    <path class="s" pathLength="1" d="M76 108 H112"></path>
+    <rect class="s pn__valve pn__valve--main" pathLength="1" x="112" y="90" width="44" height="36"></rect>
+    <text class="t t--mono" x="134" y="82" text-anchor="middle">GP14</text>
+    <text class="t" x="134" y="146" text-anchor="middle">main valve</text>
+    <text class="t t--muted pn__state pn__state--main" x="134" y="160" text-anchor="middle" data-pn-main>open</text>
+    <path class="s pn__vent" pathLength="1" d="M134 90 V54 M126 62 L134 52 L142 62"></path>
+    <text class="t t--muted pn__venttext" x="148" y="58">vent</text>
+
+    <path class="s pn__pipe" pathLength="1" d="M156 108 H200"></path>
+    <rect class="s pn__valve pn__valve--piston" pathLength="1" x="200" y="90" width="44" height="36"></rect>
+    <text class="t t--mono" x="222" y="82" text-anchor="middle">GP15</text>
+    <text class="t" x="222" y="146" text-anchor="middle">piston valve</text>
+    <text class="t t--muted pn__state" x="222" y="160" text-anchor="middle" data-pn-piston>closed</text>
+
+    <path class="s pn__pipe2" pathLength="1" d="M244 108 H262 V176"></path>
+    <rect class="s f" pathLength="1" x="232" y="176" width="64" height="24"></rect>
+    <text class="t" x="232" y="170">piston</text>
+    <g class="pn__rod">
+      <path class="s" pathLength="1" d="M276 188 H322"></path>
+      <path class="s s--hot f--hot pn__plow" pathLength="1" d="M322 168 L340 168 L350 206 L322 206 Z"></path>
+    </g>
+    <text class="t" x="300" y="160">plow</text>
+  </svg>
+  <p class="pn__status" aria-live="polite"><span class="sr-only">Plow: </span><span data-pn-status>Ready</span></p>
+</div>
+
+<style>
+  .pn {
+    min-width: 0;
+  }
+
+  .pn__svg {
+    max-width: 24rem;
+  }
+
+  .pn__valve {
+    fill: var(--surface);
+    transition: fill 0.12s;
+  }
+
+  .pn[data-main='open'] .pn__valve--main,
+  .pn[data-piston='open'] .pn__valve--piston {
+    fill: var(--accent);
+  }
+
+  .pn[data-main='open'] .pn__state--main {
+    fill: var(--accent-ink);
+  }
+
+  .pn__pipe,
+  .pn__pipe2 {
+    transition: stroke 0.12s;
+  }
+
+  .pn[data-pressure='on'] .pn__pipe,
+  .pn[data-piston='open'] .pn__pipe2 {
+    stroke: var(--accent);
+    stroke-width: 3;
+  }
+
+  .pn__vent,
+  .pn__venttext {
+    opacity: 0.25;
+    transition: opacity 0.12s;
+  }
+
+  .pn[data-vent='on'] .pn__vent,
+  .pn[data-vent='on'] .pn__venttext {
+    opacity: 1;
+    stroke: var(--accent);
+  }
+
+  .pn__rod {
+    transition: transform 0.3s ease-out;
+  }
+
+  /* Retracted, the plow sits against the piston; extended, it is pushed out 26 units. */
+  .pn[data-piston='closed'] .pn__rod {
+    transform: translateX(-26px);
+  }
+
+  .pn[data-piston='open'] .pn__rod {
+    transform: translateX(0);
+  }
+
+  .pn__status {
+    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+</style>

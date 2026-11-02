@@ -598,6 +598,142 @@
 }
 
 /* ------------------------------------------------------------------
+   Drawings (src/components/drawings): schematics in one style. Ink
+   strokes at 1.5 px, the accent for the key path, numbered callouts,
+   labels in the body face. Strokes with pathLength="1" draw in once.
+   ------------------------------------------------------------------ */
+.dw {
+  padding: 1rem;
+}
+
+.dw__svg {
+  width: 100%;
+  height: auto;
+  font-family: var(--font-sans);
+}
+
+.dw__svg .s {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.dw__svg .s--hot {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.dw__svg .s--soft {
+  stroke: var(--line-strong);
+}
+
+.dw__svg .s--dash {
+  stroke-dasharray: 4 4;
+}
+
+.dw__svg .f {
+  fill: var(--surface);
+}
+
+.dw__svg .f--hot {
+  fill: var(--accent);
+}
+
+.dw__svg .f--ink {
+  fill: var(--text);
+}
+
+.dw__svg .t {
+  font-size: 11px;
+  fill: var(--text);
+}
+
+.dw__svg .t--muted {
+  fill: var(--muted);
+}
+
+.dw__svg .t--mono {
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.dw__svg .t--hot {
+  fill: var(--accent-ink);
+}
+
+.dw__svg .co circle {
+  fill: var(--accent);
+}
+
+.dw__svg .co text {
+  font-size: 10px;
+  font-weight: 700;
+  fill: #fff;
+  text-anchor: middle;
+}
+
+.dw__legend {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-soft);
+}
+
+.dw__legend li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.dw__note {
+  margin-top: 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* The draw-in: set by the script only, never with reduced motion. */
+.sketch-pending [pathLength] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.sketch-pending .t,
+.sketch-pending .co,
+.sketch-pending .f--hot {
+  opacity: 0;
+}
+
+.sketch-run [pathLength] {
+  stroke-dasharray: 1;
+  animation: sketch-line 1s cubic-bezier(0.45, 0, 0.25, 1) both;
+}
+
+.sketch-run .t,
+.sketch-run .co,
+.sketch-run .f--hot {
+  animation: sketch-fade 0.4s 0.7s both;
+}
+
+@keyframes sketch-line {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sketch-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------
    Code panels (How it works and Code tabs): IBM Plex Mono at 14px with
    line numbers. Never narrower than 60 characters; narrower screens
    scroll the panel sideways instead of wrapping the code.

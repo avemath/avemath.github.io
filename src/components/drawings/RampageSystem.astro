@@ -1,0 +1,63 @@
+---
+// RAMpage as built: two controllers that never wait on each other. From the README and the
+// firmware: the FlySky FS-iA6B drives the ESCs directly on CH1 to CH4, the Pico W reads CH5 (kill)
+// on GP18 and CH6 (trigger) on GP19 with pin interrupts and drives the valves on GP14 and GP15,
+// and the Pi 4B streams JPEG frames over UDP port 5000 to video_direct.py on the driver's laptop,
+// over Tailscale. There is no link between the Pico W and the Pi.
+import Drawing from './Drawing.astro';
+---
+
+<Drawing
+  title="RAMpage: two independent controllers"
+  label="RAMpage's system: the RC receiver drives the ESCs directly and feeds the Pico W, which fires the valves, while a Pi 4B streams camera video over UDP to the driver's laptop."
+  viewBox="0 0 640 300"
+  legend={[
+    'The Pico W reads the kill switch (CH5, GP18) and the trigger (CH6, GP19) with hardware pin interrupts.',
+    'It runs the valve sequence on GP14 and GP15: fill 50 ms, settle 50 ms, plow out 400 ms, vent.',
+    'Video goes its own way: the Pi 4B sends JPEG frames over UDP to the driver laptop, so a video crash never touches the weapon.',
+  ]}
+  note="No wire joins the Pico W and the Pi. The README calls the two systems independent."
+>
+  <rect class="s f" pathLength="1" x="16" y="30" width="150" height="56"></rect>
+  <text class="t" x="28" y="54">RC receiver</text>
+  <text class="t t--muted" x="28" y="72">FlySky FS-iA6B</text>
+
+  <rect class="s f" pathLength="1" x="246" y="18" width="150" height="56"></rect>
+  <text class="t" x="258" y="42">Pico W</text>
+  <text class="t t--muted" x="258" y="60">weapon and safety</text>
+
+  <rect class="s f" pathLength="1" x="474" y="18" width="150" height="56"></rect>
+  <text class="t" x="486" y="42">Valves</text>
+  <text class="t t--muted" x="486" y="60">main GP14, piston GP15</text>
+
+  <rect class="s f" pathLength="1" x="246" y="110" width="150" height="50"></rect>
+  <text class="t" x="258" y="132">ESCs</text>
+  <text class="t t--muted" x="258" y="149">CH1 to CH4, direct</text>
+
+  <rect class="s f" pathLength="1" x="474" y="110" width="150" height="50"></rect>
+  <text class="t" x="486" y="140">Drive motors</text>
+
+  <path class="s s--hot" pathLength="1" d="M166 46 H246"></path>
+  <text class="t t--mono t--hot" x="172" y="40">CH5, CH6</text>
+  <path class="s s--hot" pathLength="1" d="M396 46 H474"></path>
+  <path class="s" pathLength="1" d="M120 86 V135 H246"></path>
+  <path class="s" pathLength="1" d="M396 135 H474"></path>
+
+  <rect class="s f" pathLength="1" x="16" y="206" width="150" height="62"></rect>
+  <text class="t" x="28" y="230">Pi 4B and camera</text>
+  <text class="t t--muted" x="28" y="248">Picamera2, 800 x 600</text>
+
+  <rect class="s f" pathLength="1" x="474" y="206" width="150" height="62"></rect>
+  <text class="t" x="486" y="230">Driver laptop</text>
+  <text class="t t--muted t--mono" x="486" y="248">video_direct.py</text>
+
+  <path class="s s--dash" pathLength="1" d="M166 237 H474"></path>
+  <text class="t t--mono" x="232" y="229">UDP port 5000, via Tailscale</text>
+
+  <path class="s s--soft s--dash" pathLength="1" d="M200 185 H600"></path>
+  <text class="t t--muted" x="200" y="200">weapon above, video below: nothing crosses this line</text>
+
+  <g class="co"><circle cx="206" cy="62" r="9"></circle><text x="206" y="66">1</text></g>
+  <g class="co"><circle cx="435" cy="62" r="9"></circle><text x="435" y="66">2</text></g>
+  <g class="co"><circle cx="320" cy="252" r="9"></circle><text x="320" y="256">3</text></g>
+</Drawing>

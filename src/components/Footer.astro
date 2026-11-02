@@ -12,10 +12,11 @@ const year = new Date().getFullYear();
 // The revision: the date of the last commit, read at build time. Falls back to the build date
 // where git is not available.
 let rev = new Date().toISOString().slice(0, 10);
+let commit = '';
 try {
-  rev = execSync('git log -1 --format=%cs', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || rev;
+  [rev, commit] = execSync('git log -1 --format=%cs%n%H', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().split('\n');
 } catch {
-  // No git here: keep the build date.
+  // No git here: keep the build date, with no link.
 }
 ---
 
@@ -60,7 +61,15 @@ try {
       <p class="foot__small">
         © <span data-year>{year}</span> {site.name}. Built with Astro, hosted on GitHub Pages.
         <a href="https://github.com/avemath/avemath.github.io">Source</a>
-        <span class="foot__rev mono">rev {rev}</span>
+        {
+          commit ? (
+            <a class="foot__rev mono" href={`https://github.com/avemath/avemath.github.io/commit/${commit}`}>
+              rev {rev}
+            </a>
+          ) : (
+            <span class="foot__rev mono">rev {rev}</span>
+          )
+        }
       </p>
       <script is:inline>
         // The build-time year is the fallback; this keeps it current between deploys.

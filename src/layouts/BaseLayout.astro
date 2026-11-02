@@ -76,10 +76,14 @@ const { bare = false, navLabel, section, footer = 'default', ...seo } = Astro.pr
       import { initPreferenceControls } from '../scripts/preferences';
       import { initReveals, initDrawIn } from '../scripts/motion';
       import { initDecodeHeadings } from '../scripts/decode-headings';
+      import { initSketches } from '../scripts/sketch';
+      import { initTabs } from '../scripts/tabs';
       initPreferenceControls();
       initReveals();
       initDecodeHeadings();
       initDrawIn();
+      initTabs();
+      initSketches();
     </script>
 
     {

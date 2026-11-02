@@ -1,0 +1,61 @@
+---
+// The LED spectrum's signal path, from the firmware and the write-up: a MAX4466 mic on GPIO 34,
+// sampled at 10 kHz into a 128-point FFT on the ESP32, bins 2 to 51 averaged into 16
+// log-spaced bands (edges 2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 20, 24, 28, 33, 38, 44, 52), drawn as
+// 16 bars on a 16 by 16 WS2812B matrix on GPIO 5. On power-up it scrolls its owner's name.
+import Drawing from './Drawing.astro';
+
+const EDGES = [2, 3, 4, 5, 6, 7, 9, 11, 14, 17, 20, 24, 28, 33, 38, 44, 52];
+const BIN_X = (b: number) => 214 + (b - 2) * 4; // bins 2 to 51, 4 px apart
+const BAR_X = (i: number) => 214 + i * 12.5;
+---
+
+<Drawing
+  title="LED spectrum: from microphone to matrix"
+  label="A microphone feeds the ESP32, which takes a 128-point FFT and averages its bins into 16 log-spaced bands, one per column of a 16 by 16 LED matrix."
+  viewBox="0 0 640 300"
+  legend={[
+    'Mic input: a MAX4466 electret mic on GPIO 34, read by the 12-bit ADC at 10 kHz.',
+    'FFT: 128 samples, a Hamming window, 64 frequency bins about 78 Hz apart.',
+    'Log bands: bins 2 to 51 fan into 16 bands, narrow at the bass end and wide at the top, about 156 Hz to 4 kHz.',
+    'Boot message: on power-up the matrix scrolls its owner\'s name three times, then shows the idle glow.',
+  ]}
+>
+  <rect class="s f" pathLength="1" x="16" y="40" width="110" height="50"></rect>
+  <text class="t" x="28" y="62">Mic</text>
+  <text class="t t--muted" x="28" y="79">MAX4466</text>
+  <path class="s s--hot" pathLength="1" d="M126 65 H160"></path>
+  <text class="t t--mono t--hot" x="128" y="58">GPIO 34</text>
+
+  <rect class="s f" pathLength="1" x="160" y="24" width="300" height="82"></rect>
+  <text class="t" x="172" y="46">ESP32</text>
+  <text class="t t--muted" x="172" y="64">10 kHz samples, 128-point FFT, Hamming window</text>
+  <text class="t t--muted t--mono" x="172" y="88">bins 2 to 51 used (of 64)</text>
+
+  {Array.from({ length: 50 }, (_, k) => <path class="s s--soft" pathLength="1" d={`M${BIN_X(k + 2)} 130 v10`} />)}
+  <text class="t t--muted" x="16" y="142">FFT bins</text>
+  {
+    EDGES.slice(0, -1).map((e, i) => {
+      const mid = (BIN_X(e) + BIN_X(EDGES[i + 1] - 1)) / 2;
+      return <path class:list={['s', i % 5 === 2 ? 's--hot' : 's--soft']} pathLength="1" d={`M${mid} 142 L${BAR_X(i) + 5} 196`} />;
+    })
+  }
+  {
+    EDGES.slice(0, -1).map((_, i) => (
+      <rect class="s f" pathLength="1" x={BAR_X(i)} y={196} width="10" height={8 + ((i * 7) % 5) * 4} />
+    ))
+  }
+  <text class="t t--muted" x="16" y="210">16 bands</text>
+
+  <rect class="s f" pathLength="1" x="474" y="140" width="150" height="120"></rect>
+  <text class="t" x="486" y="162">16 x 16 matrix</text>
+  <text class="t t--muted" x="486" y="180">WS2812B, data on GPIO 5</text>
+  <path class="s" pathLength="1" d="M420 205 H474"></path>
+  <text class="t t--mono t--hot" x="486" y="236">LEA</text>
+  <text class="t t--muted" x="486" y="252">scrolls on boot</text>
+
+  <g class="co"><circle cx="16" cy="40" r="9"></circle><text x="16" y="44">1</text></g>
+  <g class="co"><circle cx="160" cy="24" r="9"></circle><text x="160" y="28">2</text></g>
+  <g class="co"><circle cx="214" cy="196" r="9"></circle><text x="214" y="200">3</text></g>
+  <g class="co"><circle cx="474" cy="224" r="9"></circle><text x="474" y="228">4</text></g>
+</Drawing>
