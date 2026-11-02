@@ -177,7 +177,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       {/* NAME: working title until Avery picks one. Update the title here and in acoustic-pool-alarm.md then, and delete this comment. */}
       <div class="zone-r__grid zone-r__grid--flip">
         <div class="zone-r__fig">
-        <figure class="rfig rfig--boxed">
+        <figure class="rfig rfig--boxed rfig--pool">
           <div class="fig__bar">
             <p class="fig__label">Fig. R3 / Pool, side view</p>
             <p class="fig__label">in progress</p>
@@ -326,6 +326,12 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     min-width: 0;
   }
 
+  /* The pool drawing sits in a narrow column at about 0.72 of its viewBox; 18 units read as 13px. */
+  .rfig--pool :global(.dw__svg .t),
+  .rfig--pool :global(.dw__svg .t--mono) {
+    font-size: 18px;
+  }
+
   .rfig--boxed {
     border: 1px solid var(--line);
     background: rgb(4 12 24 / 0.3);
@@ -453,13 +459,13 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .arr__lab {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 17px;
     fill: var(--on-navy-soft);
   }
 
   .arr__tick {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 17px;
     fill: var(--on-navy-muted);
   }
 

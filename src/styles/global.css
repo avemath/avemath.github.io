@@ -908,13 +908,13 @@
 .prose p:has(> img) + p {
   margin-top: 0.6rem;
   max-width: 44rem;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
 }
 
 .prose p:has(> img) + p > em:first-child {
   font-family: var(--font-mono);
   font-style: normal;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   color: var(--text);
 }
 
@@ -935,7 +935,7 @@
 
 .prose th {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--text);
 }
