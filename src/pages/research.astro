@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DepthGauge from '@/components/DepthGauge.astro';
-import FieldNotes from '@/components/FieldNotes.astro';
+import MarginNote from '@/components/MarginNote.astro';
 import { rangeLabel, zoneById } from '@/lib/depth';
 import arrivalsData from '@/data/bellhop-arrivals.json';
 
@@ -57,6 +57,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             anything that moves. I work on getting data through them anyway, and on one question of my own about what a pool sounds like.
           </p>
         </div>
+        <div class="zone-r__fig">
         <figure class="rfig">
           <div class="rfig__plot" data-draw>
             <svg viewBox="0 0 320 170" class="rays" role="img" aria-label="Three paths from a source to a receiver: one direct, one off the surface, one off the bottom.">
@@ -71,11 +72,14 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           </div>
           <figcaption class="rfig__cap mono">source, surface bounce, bottom bounce, direct</figcaption>
         </figure>
+          <MarginNote where="below" />
+        </div>
       </div>
     </section>
 
     <section id="onr" class="wrap zone-r" aria-labelledby="onr-title">
       <div class="zone-r__grid zone-r__grid--flip">
+        <div class="zone-r__fig">
         <figure class="rfig rfig--boxed">
           <div class="fig__bar">
             <p class="fig__label">Fig. R1 / Platform network</p>
@@ -97,6 +101,8 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           </div>
           <p class="fig__note">A drawing of the kind of network the project is about, not project data. Solid lines are radio, orange lines acoustic.</p>
         </figure>
+          <MarginNote where="onr" />
+        </div>
         <div>
           <p class="range mono">{rangeLabel(zoneById('onr'))}</p>
           <h2 id="onr-title" class="research__h2" data-decode>Intelligent data management for distributed naval platforms</h2>
@@ -104,7 +110,8 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             ONR funded, with Integer Technologies. Many platforms, thin and unreliable links between them, and far more data than the links
             can carry. I work with the communications group, on the end to end chain that carries data from underwater acoustic links to the links above the water. Thesis track, expected May 2028.
           </p>
-          <p class="zone-r__small">Advisor: Dr. Shuangqing Wei, LSU. Details limited to what is public.</p>
+          <p class="zone-r__small">Advisor: Dr. Shuangqing Wei, LSU.</p>
+          <p class="zone-r__small">Details are limited to what the project has published. Ask me about the methods, not the data.</p>
           <p class="zone-r__links">
             <a class="link" href="/work/onr-intelligent-data-management/">What I can share</a>
             <a class="link" href="https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php">The public announcement</a>
@@ -119,7 +126,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           <p class="range mono">{rangeLabel(zoneById('bellhop'))}</p>
           <h2 id="bellhop-title" class="research__h2" data-decode>bellhopSim</h2>
           <p class="zone-r__text">
-            A Python wrapper around BELLHOP for shallow water channels: eigenrays, arrival structure, delay spread within 20 dB of the
+            A Python wrapper around BELLHOP (a standard model of how sound travels underwater) for shallow water channels: eigenrays (the paths sound takes from source to receiver), arrival structure, delay spread within 20 dB of the
             strongest arrival, and a BER sweep. While documenting it I found three physics bugs (range units, bottom density units, the BER
             model) and fixed them with regression tests.
           </p>
@@ -128,6 +135,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             <a class="link" href="https://github.com/avemath/bellhopSim">Code</a>
           </div>
         </div>
+        <div class="zone-r__fig">
         <figure class="rfig rfig--boxed">
           <div class="fig__bar">
             <p class="fig__label">Fig. R2 / Arrivals, 15 km, sandy bottom</p>
@@ -150,12 +158,15 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             orange; {ch.n_within_20db} fall within 20 dB of it.
           </p>
         </figure>
+          <MarginNote where="bellhop" />
+        </div>
       </div>
     </section>
 
     <section id="pool-alarm" class="wrap zone-r" aria-labelledby="pool-title">
       {/* NAME: working title until Avery picks one. Update the title here and in acoustic-pool-alarm.md then, and delete this comment. */}
       <div class="zone-r__grid zone-r__grid--flip">
+        <div class="zone-r__fig">
         <figure class="rfig rfig--boxed">
           <div class="fig__bar">
             <p class="fig__label">Fig. R3 / Pool, side view</p>
@@ -177,6 +188,8 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           </div>
           <p class="fig__note">A drawing of the plan, not a measurement. Nothing is built yet.</p>
         </figure>
+          <MarginNote where="pool-alarm" />
+        </div>
         <div>
           <p class="range mono">{rangeLabel(zoneById('pool-alarm'))}</p>
           <h2 id="pool-title" class="research__h2">Acoustic Pool Alarm <span class="research__wt">(working title)</span></h2>
@@ -193,9 +206,6 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       </div>
     </section>
 
-    <div class="wrap zone-r zone-r--notes">
-      <FieldNotes />
-    </div>
   </div>
 </BaseLayout>
 
@@ -234,8 +244,12 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     padding-top: clamp(2rem, 5vw, 3.5rem);
   }
 
-  .zone-r--notes {
+  .zone-r:last-of-type {
     border-bottom: 0;
+  }
+
+  .zone-r__fig {
+    min-width: 0;
   }
 
   .zone-r__grid {
@@ -256,7 +270,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   }
 
   @media (max-width: 959px) {
-    .zone-r__grid--flip > figure {
+    .zone-r__grid--flip > .zone-r__fig {
       order: 2;
     }
   }

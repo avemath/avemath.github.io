@@ -61,7 +61,9 @@ How to add work and keep the site current, plus the rules every page follows.
 | Right now, Research, Open to (home) | `src/components/StatusStrip.astro` |
 | Experience, education, résumé | `src/data/experience.json` (the HTML résumé and PDF both read it) |
 | Skills | `src/data/skills.json` |
-| Field notes (/research/) | `src/data/facts.json` (keep the count at six, so the rows of three stay full) |
+| Field notes | `src/data/facts.json`. Each note has a `where`: the research band (`below`, `onr`, `bellhop`, `pool-alarm`) or `signals` for the home page Signals card. One note per place. |
+| Website scores and client quotes | `src/data/sites.json` (`pagespeedMobile`, `measuredOn`, and `quote` / `quoteBy`, shown only when filled, with the owner's OK) |
+| Skills matrix (home, Fig. 06) | `usedIn` in `src/lib/skills.ts`: one entry per project where a tracked file shows the skill |
 | Quotes | `src/data/testimonials.json` (only entries with `"approved": true` render) |
 | Email, socials, form key, analytics token | `src/data/site.json` |
 

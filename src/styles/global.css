@@ -479,6 +479,35 @@
   color: var(--muted);
 }
 
+/* "What to try": one imperative line in a figure's footer row. Hover wording for a mouse, tap
+   wording for a finger. */
+.fig__try {
+  padding: 0.6rem 0.9rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fig__try::before {
+  content: 'Try: ';
+  color: var(--accent-ink);
+}
+
+.on-touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .on-mouse {
+    display: none;
+  }
+
+  .on-touch {
+    display: inline;
+  }
+}
+
 .fig__note {
   padding: 0.7rem 0.9rem;
   border-top: 1px solid var(--line);

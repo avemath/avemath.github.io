@@ -1,0 +1,120 @@
+---
+// A field note in the margin: one small card beside or under the figure it is about. Its value
+// starts masked and decodes as it comes into view; a tap replays it (src/scripts/field-notes.ts).
+// The notes and where each one sits are in src/data/facts.json.
+import facts from '@/data/facts.json';
+
+interface Props {
+  /** Which note: the `where` of its entry in facts.json. */
+  where: string;
+}
+
+const note = facts.find((f) => f.where === Astro.props.where);
+---
+
+{
+  note && (
+    <aside class="mnote" aria-label={`Field note: ${note.label}`}>
+      <button type="button" class="mnote__card" data-note>
+        <span class="mnote__top">
+          <span class="mnote__tag">Field note</span>
+          <span class="mnote__label">{note.label}</span>
+        </span>
+        <span class="sr-only">{note.value}</span>
+        <span class="mnote__value" data-note-value data-text={note.value} aria-hidden="true">
+          {note.value}
+        </span>
+        <span class="mnote__detail">{note.detail}</span>
+        <span class="mnote__hint" aria-hidden="true">
+          <span class="mnote__tap">tap to decode</span>
+          <span class="mnote__done">decoded</span>
+        </span>
+      </button>
+    </aside>
+  )
+}
+
+<style>
+  .mnote {
+    margin-top: 1rem;
+  }
+
+  .mnote__card {
+    display: grid;
+    gap: 0.35rem;
+    width: 100%;
+    padding: 0.8rem 0.9rem 0.85rem;
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    text-align: left;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .mnote__card:hover {
+    border-color: var(--line-strong);
+    border-left-color: var(--accent);
+  }
+
+  .mnote__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .mnote__tag {
+    color: var(--accent-ink);
+  }
+
+  /* The value keeps one height while it decodes, so the note never moves what is under it. */
+  .mnote__value {
+    min-height: 1.6rem;
+    font-family: var(--font-sans);
+    font-size: 1.375rem;
+    font-weight: 800;
+    font-variation-settings: 'wdth' 112;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .mnote__card[data-masked] .mnote__value {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-variation-settings: normal;
+    font-size: 1.25rem;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .mnote__detail {
+    color: var(--text-soft);
+  }
+
+  .mnote__hint {
+    font-size: 0.75rem;
+  }
+
+  .mnote__tap {
+    color: var(--accent-ink);
+  }
+
+  .mnote__done {
+    color: var(--muted);
+  }
+
+  .mnote__card:not([data-masked]) .mnote__tap,
+  .mnote__card[data-masked] .mnote__done {
+    display: none;
+  }
+</style>
+
+<script>
+  import '../scripts/field-notes';
+</script>

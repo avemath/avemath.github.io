@@ -12,6 +12,7 @@ import CodeHow from '@/components/fig/CodeHow.astro';
 import CodeFile from '@/components/fig/CodeFile.astro';
 import SignalsLive from '@/components/live/SignalsLive.astro';
 import BelowSurface from '@/components/BelowSurface.astro';
+import MarginNote from '@/components/MarginNote.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import HomeSkills from '@/components/HomeSkills.astro';
 import site from '@/data/site.json';
@@ -58,7 +59,7 @@ const hops = hopSequence(8, 87);
 const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 ---
 
-<BaseLayout navLabel="surface" jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
+<BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
   <Hero />
   <Marquee />
   <StatusStrip />
@@ -108,9 +109,9 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           />
           <Fragment slot="text">
             <p>
-              A BPSK-OFDM link modeled on 802.11p, running between two PlutoSDRs. I built the receiver: packet detection, timing recovery,
-              CFO correction, a Costas loop, MMSE equalization and Viterbi decoding. Two cars trade safety messages and the receiver
-              computes time to collision.
+              A BPSK-OFDM link modeled on 802.11p (the car version of Wi-Fi), running between two PlutoSDRs, which are software radios. I
+              built the receiver: packet detection, timing recovery, CFO correction, a Costas loop (it tracks leftover phase drift), MMSE
+              equalization and Viterbi decoding. Two cars trade safety messages and the receiver computes time to collision.
             </p>
           </Fragment>
           <Fragment slot="actions">
@@ -144,6 +145,8 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
         </FigureCard>
       </div>
 
+      <p class="projects__more">Three more below, then the research.</p>
+
       <ul class="minis">
         <li class="mini paper">
           <div class="fig__bar mini__bar">
@@ -155,8 +158,9 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           </div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/bellhop-sim/" class="stretched">bellhopSim</a></h3>
-            <p class="mini__text">BELLHOP ray tracing for shallow water, with the three physics bugs I found and fixed.</p>
+            <p class="mini__text">BELLHOP (a standard model of how sound travels underwater) for shallow water, with the three physics bugs I found and fixed.</p>
           </div>
+          <p class="fig__try">Open the figures and the fixes.</p>
         </li>
 
         <li class="mini paper" data-live-host>
@@ -174,10 +178,12 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             </svg>
             <SignalsLive />
           </div>
+          <div class="mini__note"><MarginNote where="signals" /></div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/signals-playground/">Signals playground</a></h3>
             <p class="mini__text">A JANUS style FH-BFSK preamble, one chip at a time. You can hear each hop.</p>
           </div>
+          <p class="fig__try">Press Try it, then Play, and listen.</p>
         </li>
 
         <li class="mini paper mini--accent">
@@ -198,6 +204,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             <h3 class="mini__title"><a href="/research/#pool-alarm" class="stretched">Acoustic Pool Alarm</a> <span class="mini__wt">(working title)</span></h3>
             <p class="mini__text">Can a hydrophone tell a swimmer from a child in trouble? My own project with Because of ADAM.</p>
           </div>
+          <p class="fig__try">Go below to see the plan.</p>
         </li>
       </ul>
     </div>
@@ -232,6 +239,12 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     display: grid;
     gap: 1.75rem;
     margin-top: 1.75rem;
+  }
+
+  .projects__more {
+    margin-top: 1.75rem;
+    font-size: 0.9375rem;
+    color: var(--muted);
   }
 
   .projects__cs {
@@ -316,7 +329,12 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     stroke: var(--accent);
   }
 
+  .mini__note {
+    padding: 0 1rem;
+  }
+
   .mini__body {
+    flex: 1;
     padding: 1rem 1rem 1.15rem;
   }
 
