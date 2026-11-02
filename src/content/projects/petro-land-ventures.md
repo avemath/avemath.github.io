@@ -27,7 +27,7 @@ gallery:
     caption: Annotated sample deliverables, so a client can see the work before they call.
 metrics:
   - { label: Service pages, value: "6" }
-  - { label: Basins mapped, value: "5" }
+  - { label: Regions mapped, value: "5" }
 client:
   name: Petro Land Ventures, Inc.
   kind: Land services firm, Duncansville, PA
@@ -36,7 +36,7 @@ client:
 
 ## Context
 
-A lot of the people who find Petro Land Ventures are landowners and heirs holding a letter about minerals they didn't know they owned. The firm's clients are energy companies. It does title research, leasing and due diligence across the Appalachian, Gulf Coast, Permian and Michigan basins.
+A lot of the people who find Petro Land Ventures are landowners and heirs holding a letter about minerals they didn't know they owned. The firm's clients are energy companies. It does title research, leasing and due diligence across the Appalachian, Gulf Coast, Permian and Michigan basins, plus solar and wind land work in the Pacific Northwest.
 
 Those two visitors want completely different things. I also do contract land work for the firm, so I knew the questions both sides ask.
 
