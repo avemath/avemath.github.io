@@ -52,18 +52,17 @@ How to add work and keep the site current, plus the rules every page follows.
 
 | What | Where |
 |---|---|
-| Portrait on About | `src/assets/portrait.jpg` (square, at least 800px). Replace the file to change it. |
-| Graduation pair on About | `src/assets/about/grad-taylor-hall.jpg` and `grad-tiger.jpg`, 4:5 crops, referenced in `src/pages/about.astro` |
+| Portrait (home page About teaser) | `src/assets/portrait.jpg` (square, at least 800px). Replace the file to change it. |
+| Graduation pair on About | `src/assets/about/grad-taylor-hall.jpg` and `grad-tiger.jpg`, 4:5 crops shown as square Polaroids, referenced in `src/pages/about.astro` |
 | Gallery clips | an mp4 and a WebVTT captions file in `public/media/`, a poster image beside the project's photos, and a `video:` entry in the project's `gallery` (see `rampage.md`). Transcode to H.264 at 720p or less, strip audio unless it matters, and keep each clip under about 5 MB. Clips never autoplay. |
 | Wiring photos | skip any where the wiring looks messy. A close-up of a board with its leads is fine; a tangle inside a chassis or sprawled across a bench is not. |
-| "Off the clock" on About | `src/data/offclock.json` for the words. Photos go in `src/assets/offclock/`, named in each entry's `photo`, with an `alt`. Entries without a photo render as text cards. |
-| "Now" strip on About | `src/data/now.json` |
+| About: datasheet pins, characteristics, Integer feature | `src/data/about.json`. Pin photos go in `src/assets/offclock/`, named in the pin's `photo` as a path under `src/assets/`, with an `alt` and a short marker `caption`. A pin with no photo shows its line drawing (`art`). Pin text can link with `[words](/path/)`. |
 | Right now, Research, Open to (home) | `src/components/StatusStrip.astro` |
 | Experience, education, résumé | `src/data/experience.json` (the HTML résumé and PDF both read it) |
 | Skills | `src/data/skills.json` |
 | Field notes | `src/data/facts.json`. Each note has a `where`: the research band (`below`, `onr`, `bellhop`, `pool-alarm`) or `signals` for the home page Signals card. One note per place. |
 | Website facts and client quotes | `src/data/sites.json`: `pagespeedMobile`, `accessibility`, `pageWeightKb` (home page, transferred), `liveSince`, `ownerEdits`, `measuredOn`, and `quote` / `quoteBy`, shown only when filled, with the owner's OK. No commit counts or file counts: only facts a visitor can judge. |
-| Skills matrix (home, Fig. 10) | `usedIn` in `src/lib/skills.ts`: one entry per project where a tracked file shows the skill |
+| Toolbox (home) | `toolbox` in `src/lib/skills.ts`: each chip's rows, the project it links to and one real file per project, taken from `usedIn` |
 | Quotes | `src/data/testimonials.json` (only entries with `"approved": true` render) |
 | Email, socials, form key, analytics token | `src/data/site.json` |
 

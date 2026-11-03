@@ -13,14 +13,14 @@ type Item = { id: string; group: string; label: string; hint?: string; href?: st
 const homeSections: Item[] = [
   ['projects', 'Projects'],
   ['websites', "Websites I've built"],
-  ['skills', 'Skills'],
+  ['toolbox', 'Toolbox'],
 ].map(([id, label]) => ({ id: `s-${id}`, group: 'On this page', label, href: onHome ? `#${id}` : `/#${id}` }));
 
-// Experience, skills and recommendations are sections of the About page.
+// The datasheet, experience and recommendations are sections of the About page.
 const onAbout = Astro.url.pathname.replace(/\/$/, '') === '/about';
 const aboutSections: Item[] = [
+  ['datasheet', 'Datasheet'],
   ['experience', 'Experience'],
-  ['skills', 'Skills'],
   ['recommendations', 'Recommendations'],
 ]
   .filter(([id]) => id !== 'recommendations' || hasRecommendations)
