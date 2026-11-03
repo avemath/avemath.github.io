@@ -1,0 +1,92 @@
+---
+// A photo on the About page, printed as a Polaroid: a square image in an off-white frame with a
+// thin border on three sides and the deep strip at the bottom (88 by 107 for the frame, 79 by 79
+// for the image), a caption written in marker, a soft shadow and a slight tilt that straightens
+// on hover or focus. With no photo yet, the pin's line drawing goes in the frame instead.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import PrintArt from './PrintArt.astro';
+
+interface Props {
+  photo?: ImageMetadata;
+  alt?: string;
+  art?: 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar' | 'pool' | 'listen';
+  /** A label for a drawing that carries meaning on its own; pin drawings are decorative. */
+  artLabel?: string;
+  caption: string;
+  /** Degrees; alternate the sign from print to print. */
+  tilt?: number;
+  sizes?: string;
+  /** Where the crop sits in a non-square photo, as object-position. */
+  focus?: string;
+  class?: string;
+}
+
+const { photo, alt = '', art, artLabel, caption, tilt = 2, sizes = '20rem', focus = '50% 50%', class: cls } = Astro.props;
+---
+
+<figure class:list={['pol', cls]} style={`--tilt:${tilt}deg`}>
+  <div class="pol__img">
+    {
+      photo ? (
+        <Image src={photo} alt={alt} widths={[320, 480, 640]} sizes={sizes} format="webp" quality={80} loading="lazy" style={`object-position:${focus}`} />
+      ) : (
+        art && <PrintArt name={art} label={artLabel} />
+      )
+    }
+  </div>
+  <figcaption class="pol__cap">{caption}</figcaption>
+</figure>
+
+<style>
+  .pol {
+    width: 100%;
+    margin: 0;
+    padding: 5.1% 5.1% 0;
+    background: #fbfaf6;
+    box-shadow:
+      0 1px 2px rgb(28 42 37 / 0.18),
+      0 12px 24px -12px rgb(28 42 37 / 0.45);
+    rotate: var(--tilt);
+    container-type: inline-size;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not([data-motion='reduce'])) .pol {
+      transition: rotate 0.25s ease;
+    }
+  }
+
+  .pol:hover,
+  .pol:focus-within {
+    rotate: 0deg;
+  }
+
+  .pol__img {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #e6ede6;
+  }
+
+  .pol__img :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* The deep bottom strip: 23.5 of the frame's 88 wide, with the caption written in it. A long
+     caption on a small print may take two lines; the strip grows rather than clip it. */
+  .pol__cap {
+    display: flex;
+    align-items: center;
+    min-height: 26.7cqw;
+    padding-block: 0.2em;
+    padding-inline: 0.15em;
+    font-family: 'Kalam', 'Segoe Print', 'Bradley Hand', cursive;
+    font-size: 1.25rem;
+    line-height: 1.1;
+    color: #1c2a25;
+    overflow-wrap: anywhere;
+  }
+</style>

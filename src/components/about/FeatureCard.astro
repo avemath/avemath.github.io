@@ -1,0 +1,100 @@
+---
+// Integer Technologies' Women in STEM post, as a native card instead of LinkedIn's embed (which is
+// 1600px tall and brings LinkedIn's scripts and cookies). Reads `feature` in src/data/about.json.
+// With no quote yet it says only that the post exists; with no photo it has no photo column.
+// It never shows a placeholder.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import about from '@/data/about.json';
+
+const f = about.feature;
+const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/about/*.{jpg,jpeg,png,webp}', { eager: true });
+const photo = f.photo ? Object.entries(photos).find(([p]) => p.endsWith(`/${f.photo}`))?.[1].default : undefined;
+---
+
+<aside class:list={['feat g-card', { 'feat--photo': photo }]} aria-labelledby="feat-label">
+  {photo && <Image src={photo} alt={f.photoAlt} widths={[150, 300]} sizes="150px" format="webp" quality={80} class="feat__photo" />}
+  <div class="feat__body">
+    <p id="feat-label" class="feat__label">Featured by {f.org}</p>
+    {
+      f.quote ? (
+        <>
+          <p class="feat__quote">“{f.quote}”</p>
+          {f.date && <p class="feat__meta">{f.series} spotlight, {f.date}</p>}
+        </>
+      ) : (
+        <p class="feat__line">{f.org} featured me in their {f.series} series.</p>
+      )
+    }
+    <a class="feat__link" href={f.url} target="_blank" rel="noopener">Read the full post on LinkedIn<span class="sr-only"> (opens in a new tab)</span></a>
+  </div>
+</aside>
+
+<style>
+  .feat {
+    display: grid;
+    gap: 1.125rem;
+    align-items: start;
+    padding: 1.375rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+  }
+
+  .feat--photo {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+
+  .feat__photo {
+    width: 150px;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .feat__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .feat__label {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--accent-ink);
+  }
+
+  .feat__quote {
+    font-size: 1.1875rem;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .feat__line {
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+
+  .feat__meta {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .feat__link {
+    align-self: start;
+    padding-block: 0.35rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text);
+    text-underline-offset: 0.2em;
+  }
+
+  @media (max-width: 479px) {
+    .feat--photo {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

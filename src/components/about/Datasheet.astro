@@ -1,0 +1,487 @@
+---
+// Fig. 01 on /about/: the AVE-26 datasheet. A ten-pin DIP drawn in HTML, a description panel for
+// the selected pin, and the characteristics table with that pin's row lit. Every pin, row and
+// photo is in src/data/about.json. The pins are real buttons; src/scripts/datasheet.ts keeps the
+// pin, description and row in step (hover, click, focus, arrow keys, Home and End).
+import type { ImageMetadata } from 'astro';
+import about from '@/data/about.json';
+import Polaroid from './Polaroid.astro';
+
+type Art = 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar';
+
+// Pin photos live in src/assets/offclock/ (and one in the LED project's folder), named by path.
+const files = import.meta.glob<{ default: ImageMetadata }>(['/src/assets/offclock/*.{jpg,jpeg,png,webp}', '/src/assets/projects/led-audio-spectrum/*.jpg'], { eager: true });
+const photoAt = (path: string) => (path ? files[`/src/assets/${path}`]?.default : undefined);
+
+// Pin text may hold [words](/link/) for a link; everything else is plain text.
+const parts = (text: string) =>
+  text.split(/(\[[^\]]+\]\([^)]+\))/).map((s) => {
+    const m = s.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    return m ? { text: m[1], href: m[2] } : { text: s };
+  });
+
+const pins = about.pins.map((p, i) => ({
+  ...p,
+  n: String(i + 1).padStart(2, '0'),
+  i,
+  photo: photoAt(p.photo),
+  rowIndex: about.rows.findIndex((r) => r.key === p.row),
+}));
+const left = pins.slice(0, 5);
+const right = pins.slice(5);
+---
+
+<section id="datasheet" class="ds wrap" aria-labelledby="ds-title">
+  <div class="ds__head">
+    <div>
+      <p class="ds__fig">Fig. 01</p>
+      <h2 id="ds-title" class="ds__title">AVE-26 datasheet</h2>
+    </div>
+    <p class="ds__note">The work lives on the Projects and Websites pages. This is everything else. <span class="on-mouse">Hover</span><span class="on-touch">Tap</span> a pin.</p>
+  </div>
+
+  <div class="ds__card" data-ds>
+    <div class="ds__pinout">
+      <p class="ds__k">Pinout, top view</p>
+      <div class="dip" role="group" aria-label="AVE-26 pins">
+        <ul class="dip__side dip__side--l">
+          {
+            left.map((p) => (
+              <li>
+                <button type="button" class="pin" data-pin={p.i} aria-pressed={p.i === 0 ? 'true' : 'false'} aria-controls="ds-desc">
+                  <span class="pin__lbl">{p.label}</span>
+                  <span class="pin__leg" aria-hidden="true" />
+                  <span class="pin__num">
+                    <span class="sr-only">pin </span>
+                    {p.n}
+                  </span>
+                </button>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="dip__body" aria-hidden="true">
+          <span class="dip__notch"></span>
+          <span class="dip__dot"></span>
+          <span class="dip__name">AVE-26</span>
+          <span class="dip__sub">side quests<br />included</span>
+        </div>
+        <ul class="dip__side dip__side--r">
+          {
+            right.map((p) => (
+              <li>
+                <button type="button" class="pin" data-pin={p.i} aria-pressed="false" aria-controls="ds-desc">
+                  <span class="pin__num">
+                    <span class="sr-only">pin </span>
+                    {p.n}
+                  </span>
+                  <span class="pin__leg" aria-hidden="true" />
+                  <span class="pin__lbl">{p.label}</span>
+                </button>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="ds__desc" id="ds-desc">
+      {
+        pins.map((p) => (
+          <article class="pd" data-desc={p.i} hidden={p.i !== 0} aria-labelledby={`pd-${p.i}`}>
+            <p class="ds__k">Pin {p.n} description</p>
+            <Polaroid photo={p.photo} alt={p.alt} art={(p as { art?: Art }).art} caption={p.caption} tilt={p.i % 2 ? 2 : -2} sizes="(min-width: 960px) 16rem, 70vw" class="pd__print" />
+            <p class="pd__label">{p.label}</p>
+            <h3 id={`pd-${p.i}`} class="pd__title">{p.title}</h3>
+            <p class="pd__text">
+              {parts(p.text).map((s) => (s.href ? <a class="link" href={s.href}>{s.text}</a> : s.text))}
+            </p>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="ds__chars">
+      <table class="ch">
+        <caption class="ds__k ch__cap">Characteristics</caption>
+        <tbody>
+          {
+            about.rows.map((r, j) => (
+              <tr data-row={j} class:list={{ 'is-on': pins[0].rowIndex === j }}>
+                <th scope="row">{r.key}</th>
+                <td>{r.value}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script type="application/json" data-ds-rows set:html={JSON.stringify(pins.map((p) => p.rowIndex))} />
+</section>
+
+<script>
+  import { initDatasheet } from '../../scripts/datasheet';
+  initDatasheet();
+</script>
+
+<style>
+  .ds {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-block: 4.5rem 1.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .ds__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+  }
+
+  .ds__fig {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--accent-ink);
+  }
+
+  .ds__title {
+    margin-top: 0.5rem;
+    font-size: clamp(2.25rem, 4vw, 2.75rem);
+  }
+
+  .ds__note {
+    max-width: 30em;
+    font-size: 1rem;
+    color: var(--muted);
+  }
+
+  .ds__card {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .ds__k {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .ds__pinout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1.375rem 1.125rem;
+  }
+
+  /* The chip: five pins a side around a body that stretches to their height. */
+  .dip {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 7.5rem minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .dip__side {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dip__body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    align-self: stretch;
+    margin-block: 4px;
+    padding: 0.75rem 0.375rem;
+    border: 2px solid #1c2a25;
+    border-radius: 6px;
+    background: #1f3a32;
+    color: #f3f6f1;
+  }
+
+  .dip__notch {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 26px;
+    height: 13px;
+    margin-left: -13px;
+    border: 2px solid #1c2a25;
+    border-top: 0;
+    border-radius: 0 0 13px 13px;
+    background: var(--surface);
+  }
+
+  .dip__dot {
+    position: absolute;
+    top: 20px;
+    left: 12px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f3f6f1;
+  }
+
+  .dip__name {
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 800;
+    font-variation-settings: 'wdth' 112;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .dip__sub {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    text-align: center;
+    color: #a9bdb3;
+  }
+
+  .pin {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .dip__side--l .pin__lbl {
+    text-align: right;
+  }
+
+  .pin__lbl {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .pin__leg {
+    flex: none;
+    width: 28px;
+    height: 2px;
+    background: #8fa197;
+  }
+
+  .pin__num {
+    flex: none;
+    width: 22px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .pin:hover .pin__lbl,
+  .pin:focus-visible .pin__lbl {
+    border-color: var(--accent-ink);
+  }
+
+  .pin:focus-visible {
+    outline: none;
+  }
+
+  .pin:focus-visible .pin__lbl {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .pin[aria-pressed='true'] .pin__lbl {
+    border-color: #1f3a32;
+    background: #1f3a32;
+    color: #f3f6f1;
+  }
+
+  .pin[aria-pressed='true'] .pin__leg {
+    background: #1f3a32;
+  }
+
+  /* On the dark card the deep band is close to the ground, so the selected pin gets a rose edge. */
+  :global([data-theme='dark']) .pin[aria-pressed='true'] .pin__lbl {
+    border-color: var(--accent-ink);
+  }
+
+  :global([data-theme='dark']) .pin[aria-pressed='true'] .pin__leg {
+    background: #e6eee9;
+  }
+
+  .ds__desc {
+    padding: 1.375rem;
+    background: var(--ds-desc);
+  }
+
+  .pd {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .pd :global(.pd__print) {
+    width: min(16rem, 78%);
+    margin: 0.5rem 0 0.75rem 0.5rem;
+  }
+
+  .pd__label {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--accent-ink);
+  }
+
+  .pd__title {
+    margin-top: -0.375rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.25;
+    font-variation-settings: 'wdth' 100;
+    letter-spacing: 0;
+  }
+
+  .pd__text {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .ds__chars {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ch {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ch__cap {
+    padding: 1.375rem 0.875rem 0.625rem;
+    text-align: left;
+  }
+
+  .ch tr {
+    border-top: 1px solid var(--line);
+  }
+
+  .ch th,
+  .ch td {
+    padding: 0.75rem 0.875rem;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .ch th {
+    width: 150px;
+    padding-right: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .ch td {
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+
+  .ch tr.is-on {
+    border-top-color: var(--accent);
+    background: var(--highlight);
+  }
+
+  .ch tr.is-on th {
+    color: var(--text);
+  }
+
+  /* Three panels side by side from 960px, 5 to 4 to 4. Below, they stack in the same order. */
+  @media (min-width: 960px) {
+    .ds__card {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) minmax(0, 4fr);
+    }
+
+    .ds__pinout,
+    .ds__desc {
+      border-right: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 959px) {
+    .ds__pinout,
+    .ds__desc {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .ds__desc {
+      scroll-margin-top: 5rem;
+    }
+
+    .dip {
+      max-width: 30rem;
+      margin-inline: auto;
+      width: 100%;
+    }
+  }
+
+  /* On a phone the chip narrows: shorter leads and a smaller name, labels stay 14px. */
+  @media (max-width: 479px) {
+    .ds__pinout {
+      padding-inline: 0.5rem;
+    }
+
+    .dip {
+      grid-template-columns: minmax(0, 1fr) 5rem minmax(0, 1fr);
+    }
+
+    .dip__body {
+      padding-inline: 4px;
+    }
+
+    .pin__leg {
+      width: 10px;
+    }
+
+    .pin__num {
+      width: 20px;
+    }
+
+    .pin__lbl {
+      padding-inline: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .dip__name {
+      font-size: 0.9375rem;
+    }
+
+    .ch th {
+      width: 8.5rem;
+    }
+  }
+</style>

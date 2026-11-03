@@ -1,0 +1,121 @@
+/* ------------------------------------------------------------------
+   "Garden": the About page's own palette, scoped to html[data-page='about'] so nothing else
+   changes. Same nav, type, grid and figure language as the rest of the site; greens and a dusty
+   rose in place of the bench's navy and orange. The site tokens are redefined here, so every
+   component on the page picks them up. The navy nav keeps its own inks (.on-navy) and --accent,
+   so its underline stays orange; the rose is --g-accent.
+
+   --g-accent (#D8B3A8) is a fill only. Text on it is dark ink, never white. Text in the accent
+   color uses --accent-ink.
+   ------------------------------------------------------------------ */
+html[data-page='about'] {
+  --g-hero: #142a24;
+  --g-band: #1f3a32;
+  --g-chip: #17302a;
+  --g-accent: #d8b3a8;
+  --g-accent-hover: #cda194;
+  --g-on-dark: #f3f6f1;
+  --g-on-dark-soft: #dde6e0;
+  --g-on-dark-muted: #a9bdb3;
+
+  --bg: #f4f7f2;
+  --bg-contrast: #f4f7f2;
+  --surface: #ffffff;
+  --surface-2: #e6ede6;
+  --ground-alt: #e6ede6;
+  --text: #1c2a25;
+  --text-soft: #2f3d37;
+  --muted: #56645e;
+  --line: #cfdad2;
+  --line-strong: #8fa197;
+  --accent-ink: #8a5546;
+  --focus: #1c2a25;
+  --fig-tint: #fafcf9;
+  --highlight: #eadbd5;
+  --ds-desc: #fafcf9;
+  --dot: rgb(28 42 37 / 0.12);
+  --shadow: 0 1px 2px rgb(28 42 37 / 0.06), 0 14px 32px -22px rgb(28 42 37 / 0.4);
+  --shadow-lift: 0 2px 4px rgb(28 42 37 / 0.08), 0 18px 40px -20px rgb(28 42 37 / 0.45);
+  --accent-wash: rgb(216 179 168 / 0.25);
+}
+
+html[data-page='about'][data-theme='dark'] {
+  --bg: #0f1b17;
+  --bg-contrast: #0f1b17;
+  --surface: #16251f;
+  --surface-2: #1b2c25;
+  --ground-alt: #13211c;
+  --text: #e6eee9;
+  --text-soft: #cfdbd4;
+  --muted: #a3b3aa;
+  --line: #2a3d35;
+  --line-strong: #4b6158;
+  --accent-ink: #e2c3ba;
+  --focus: #e2c3ba;
+  --fig-tint: #1b2c25;
+  --highlight: #3a2e2b;
+  --ds-desc: #1b2c25;
+  --dot: rgb(230 238 233 / 0.08);
+  --shadow: 0 0 0 1px rgb(230 238 233 / 0.05);
+  --shadow-lift: 0 0 0 1px rgb(230 238 233 / 0.16);
+}
+
+/* Inside the page the accent fill is the rose too (timeline dots, the open entry's border).
+   The nav sits outside main and keeps its orange. */
+[data-page='about'] main {
+  --accent: var(--g-accent);
+  --accent-hover: var(--g-accent-hover);
+}
+
+/* Corners on About: 10px for buttons and cards; the rest of the site stays square. */
+[data-page='about'] main .btn,
+[data-page='about'] main .card {
+  border-radius: 10px;
+}
+
+/* The primary button is a rose fill with dark ink, at the normal button size. */
+[data-page='about'] main .btn--primary {
+  --btn-bg: var(--g-accent);
+  --btn-fg: #1c2a25;
+  --btn-line: var(--g-accent);
+  font-size: 0.9375rem;
+}
+
+[data-page='about'] main .btn--primary:hover {
+  --btn-bg: var(--g-accent-hover);
+  --btn-line: var(--g-accent-hover);
+}
+
+/* The hero, the Why underwater band and the closing band are dark green in both themes. */
+[data-page='about'] .g-dark {
+  --text: var(--g-on-dark);
+  --text-soft: var(--g-on-dark-soft);
+  --muted: var(--g-on-dark-muted);
+  --line: rgb(243 246 241 / 0.22);
+  --accent-ink: var(--g-accent);
+  --focus: var(--g-accent);
+  color: var(--text);
+}
+
+/* A card on a dark band takes the page's own inks back: white with dark ink in light mode,
+   the dark card in dark mode. */
+[data-page='about'] .g-dark .g-card {
+  --surface: #ffffff;
+  --text: #1c2a25;
+  --text-soft: #2f3d37;
+  --muted: #56645e;
+  --line: #cfdad2;
+  --accent-ink: #8a5546;
+  --focus: #1c2a25;
+  color: var(--text);
+}
+
+[data-page='about'][data-theme='dark'] .g-dark .g-card {
+  --surface: #16251f;
+  --text: #e6eee9;
+  --text-soft: #cfdbd4;
+  --muted: #a3b3aa;
+  --line: #2a3d35;
+  --accent-ink: #e2c3ba;
+  --focus: #e2c3ba;
+}

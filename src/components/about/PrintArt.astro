@@ -1,0 +1,135 @@
+---
+// Line drawings that stand in for photos on the About page's prints until a real one exists:
+// 1.5px ink strokes and one accent stroke, the site's figure style. Each fills a square.
+// Decorative unless a label is passed (the pin's text already says what it shows).
+interface Props {
+  name: 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar' | 'pool' | 'listen';
+  label?: string;
+}
+
+const { name, label } = Astro.props;
+---
+
+<svg class="art" viewBox="0 0 100 100" focusable="false" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>
+  {
+    name === 'latte' && (
+      <>
+        <path d="M26 44 H70 V60 C70 72 62 78 48 78 C34 78 26 72 26 60 Z" />
+        <path d="M70 49 C80 49 82 61 70 63" />
+        <path d="M18 82 H78" />
+        <path d="M38 34 C34 28 42 24 38 18 M50 34 C46 28 54 24 50 18 M62 34 C58 28 66 24 62 18" />
+        <path class="hot" d="M48 56 C44 50 38 54 42 58 L48 63 L54 58 C58 54 52 50 48 56" />
+      </>
+    )
+  }
+  {
+    name === 'snowboard' && (
+      <>
+        <path d="M8 80 L36 52 L48 62 L66 38 L92 70" />
+        <rect x="22" y="40" width="58" height="12" rx="6" transform="rotate(-24 51 46)" />
+        <path d="M38 47 L40 52 M58 38 L60 43" transform="rotate(-24 51 46) translate(0 0)" />
+        <path class="hot" d="M14 88 C30 84 46 90 62 86 S84 88 92 84" />
+        <circle cx="78" cy="20" r="3" />
+        <circle cx="20" cy="26" r="2" />
+      </>
+    )
+  }
+  {
+    name === 'softball' && (
+      <>
+        <path d="M18 84 L70 22 C73 18 79 22 76 26 L26 88 Z" />
+        <path d="M20 86 L14 92" />
+        <circle cx="64" cy="66" r="18" />
+        <path class="hot" d="M52 53 C58 60 58 72 52 79 M76 53 C70 60 70 72 76 79" />
+      </>
+    )
+  }
+  {
+    name === 'hanger' && (
+      <>
+        <path d="M50 38 V32 C50 26 58 26 58 20 C58 14 50 12 46 16" />
+        <path d="M50 38 L14 64 C10 67 12 72 17 72 H83 C88 72 90 67 86 64 Z" />
+        <path class="hot" d="M26 80 H74" />
+      </>
+    )
+  }
+  {
+    name === 'camera' && (
+      <>
+        <rect x="16" y="22" width="68" height="44" rx="6" />
+        <circle cx="50" cy="44" r="14" />
+        <circle cx="50" cy="44" r="7" />
+        <rect x="22" y="28" width="12" height="7" />
+        <circle cx="74" cy="30" r="3" />
+        <path class="hot" d="M28 66 V86 H72 V66" />
+        <path d="M32 70 H68 V80 H32 Z" />
+      </>
+    )
+  }
+  {
+    name === 'calendar' && (
+      <>
+        <rect x="12" y="22" width="76" height="62" />
+        <path class="hot" d="M12 36 H88" />
+        <path d="M30 16 V28 M70 16 V28" />
+        <path d="M22.9 36 V84 M33.7 36 V84 M44.6 36 V84 M55.4 36 V84 M66.3 36 V84 M77.1 36 V84" />
+        <path d="M12 60 H88" />
+      </>
+    )
+  }
+  {
+    name === 'pool' && (
+      <>
+        <path d="M8 30 V82 H92 V30" />
+        <path class="soft" d="M8 38 H92" />
+        <circle cx="50" cy="40" r="4" />
+        <circle class="dot" cx="16" cy="76" r="3.5" />
+        <circle class="dot" cx="84" cy="76" r="3.5" />
+        <path class="hot" d="M50 44 L18 74 M50 44 L82 74" />
+        <path class="soft" d="M50 44 L36 82 L18 76 M50 44 L92 66 L84 74" />
+      </>
+    )
+  }
+  {
+    name === 'listen' && (
+      <>
+        <path d="M8 34 H20 L24 14 L28 54 L32 20 L36 46 L40 28 L44 38 L48 32 L52 36 H92" />
+        <path class="soft" d="M8 72 H92" />
+        <path class="hot" d="M8 72 H40 L43 68 L46 76 L49 69 L52 74 L55 71 H92" />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #e6ede6;
+  }
+
+  .art :is(path, rect, circle) {
+    fill: none;
+    stroke: #1c2a25;
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .art .hot {
+    stroke: #8a5546;
+    stroke-width: 2px;
+  }
+
+  .art .soft {
+    stroke: #8fa197;
+    stroke-dasharray: 3 3;
+  }
+
+  .art .dot {
+    fill: #8a5546;
+    stroke: #8a5546;
+  }
+</style>
