@@ -1,0 +1,105 @@
+---
+// Recommendations on About, as a pull-quote band right after "The longer version": each approved
+// quote large, with who said it. Only quotes their writers approved render (see
+// docs/CONTENT-GUIDE.md); with none, the band does not render at all.
+import testimonials from '@/data/testimonials.json';
+
+const quotes = testimonials.filter((t) => t.approved);
+---
+
+{
+  quotes.length > 0 && (
+    <section id="recommendations" class="pq" aria-labelledby="pq-title">
+      <div class="wrap">
+        <h2 id="pq-title" class="pq__title">Recommendations</h2>
+        <ul class="pq__list">
+          {quotes.map((t) => (
+            <li>
+              <figure class="pq__item">
+                <blockquote class="pq__quote">
+                  <p>“{t.quote}”</p>
+                </blockquote>
+                <figcaption class="pq__who">
+                  <span class="pq__name">{t.name}</span>
+                  <span>{t.title}</span>
+                  <span class="pq__ctx">{t.context}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .pq {
+    margin-top: 4.5rem;
+    padding-block: clamp(3rem, 6vw, 4.5rem);
+    background: var(--surface-2);
+  }
+
+  .pq__title {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    font-variation-settings: 'wdth' 100;
+    color: var(--accent-ink);
+  }
+
+  .pq__list {
+    display: grid;
+    gap: 2.5rem 3.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 960px) {
+    .pq__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .pq__item {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+    margin: 0;
+    padding-left: 1.25rem;
+    border-left: 3px solid var(--g-accent);
+  }
+
+  .pq__quote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+
+  .pq__who {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-top: auto;
+    font-size: 0.9375rem;
+    color: var(--text-soft);
+  }
+
+  .pq__name {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .pq__ctx {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+</style>

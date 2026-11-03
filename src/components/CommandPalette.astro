@@ -5,7 +5,7 @@ import testimonials from '@/data/testimonials.json';
 
 const projects = await getProjects();
 const onHome = Astro.url.pathname === '/';
-// The Recommendations section only renders once a quote is approved (see Testimonials.astro).
+// The Recommendations band only renders once a quote is approved (see about/PullQuotes.astro).
 const hasRecommendations = testimonials.some((t) => t.approved);
 
 type Item = { id: string; group: string; label: string; hint?: string; href?: string; action?: string; keywords?: string };
@@ -16,11 +16,10 @@ const homeSections: Item[] = [
   ['toolbox', 'Toolbox'],
 ].map(([id, label]) => ({ id: `s-${id}`, group: 'On this page', label, href: onHome ? `#${id}` : `/#${id}` }));
 
-// The datasheet, experience and recommendations are sections of the About page.
+// The datasheet and the recommendations are sections of the About page.
 const onAbout = Astro.url.pathname.replace(/\/$/, '') === '/about';
 const aboutSections: Item[] = [
   ['datasheet', 'Datasheet'],
-  ['experience', 'Experience'],
   ['recommendations', 'Recommendations'],
 ]
   .filter(([id]) => id !== 'recommendations' || hasRecommendations)

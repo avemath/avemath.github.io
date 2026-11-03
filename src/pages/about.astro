@@ -1,28 +1,30 @@
 ---
 // About holds the person; Projects and Websites hold the work. Hero over the levee in pixels,
-// the AVE-26 datasheet (pins and photos in src/data/about.json), the longer version, why
-// underwater, experience and recommendations, and a closing band. Its "Garden" palette is in
+// the AVE-26 datasheet (pins and photos in src/data/about.json), the longer version, the
+// recommendations as pull quotes, why underwater, and a closing band. Its "Garden" palette is in
 // src/styles/about.css, scoped by data-page="about".
 import '@/styles/about.css';
 import '@/styles/hand.css';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
-import Timeline from '@/components/Timeline.astro';
-import Testimonials from '@/components/Testimonials.astro';
 import PixelScene from '@/components/about/PixelScene.astro';
 import FeatureCard from '@/components/about/FeatureCard.astro';
 import Datasheet from '@/components/about/Datasheet.astro';
 import Polaroid from '@/components/about/Polaroid.astro';
+import PullQuotes from '@/components/about/PullQuotes.astro';
 import site from '@/data/site.json';
 import gradHall from '@/assets/about/grad-taylor-hall.jpg';
 import gradTiger from '@/assets/about/grad-tiger.jpg';
 import tigerStadium from '@/assets/about/polaroid-tiger-stadium.jpg';
-// TODO(ave): confirm the family is OK with this photo on the site.
 import familyAdam from '@/assets/about/family-adam.jpg';
-// TODO(ave): confirm the boat was in Lafitte and who is with me; confirm the fish.
 import bayouBoat from '@/assets/about/polaroid-bayou-boat.jpg';
 import trout from '@/assets/about/polaroid-trout.jpg';
 import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
+import type { ImageMetadata } from 'astro';
+
+// Lafitte after Hurricane Ida: the fourth print in Why underwater, shown once the file is in
+// src/assets/about/. TODO(ave): add polaroid-ida.jpg, and the photo credit.
+const ida = Object.values(import.meta.glob<{ default: ImageMetadata }>('/src/assets/about/polaroid-ida.{jpg,jpeg,png,webp}', { eager: true }))[0]?.default;
 ---
 
 <BaseLayout
@@ -56,9 +58,10 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
   <section class="wrap ab-long" aria-labelledby="long-title">
     <div class="ab-long__text">
       <h2 id="long-title" class="ab-h2">The longer version</h2>
+      {/* TODO(ave): check the sentence about growing up around Adam's doctors, nurses and equipment. */}
       <p>
-        I grew up sure I would be a doctor. After my little brother's accident, my family's life ran on appointments with neurologists and
-        specialists, and I got hooked on how the brain works. I started at LSU on the pre-med track, found out I loved math, and realized what I
+        I grew up sure I would be a doctor. After my little brother's accident, I grew up around his doctors, nurses and equipment, and I even
+        learned to change his trach. I started at LSU on the pre-med track, found out I loved math, and realized what I
         liked about medicine was the systems behind a diagnosis. I wanted to build the solution instead of prescribing it, so I switched to
         computer engineering. I finished the B.S. in May 2026 and stayed for an M.S. in electrical and computer engineering, focused on
         communications and signal processing.
@@ -116,6 +119,8 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
     </figure>
   </section>
 
+  <PullQuotes />
+
   <section class="ab-why g-dark" aria-labelledby="why-title">
     <div class="wrap ab-why__grid">
       <div class="ab-why__text">
@@ -126,8 +131,9 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
           of ADAM to share everything we wish we'd known.
         </p>
         <p>
-          Water runs in the family. Both of my grandfathers worked the water in Lafitte, Louisiana, as fishermen, crabbers and trappers. Now I
-          study how to send signals through it.
+          Water runs in the family. Both of my grandfathers worked the water in Lafitte, Louisiana, as fishermen and crabbers. When Hurricane Ida
+          flooded Lafitte in 2021, my grandpa waded through his own backyard to check on his boats and crab traps. Now I study how sound travels
+          through water.
         </p>
         <p>
           A pool alarm listens for a splash. A child in trouble barely makes one. I want to know if a hydrophone can hear the difference, so that's
@@ -148,14 +154,25 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
         />
         <Polaroid
           photo={bayouBoat}
-          alt="Two girls in orange life jackets smiling from the front of a boat on a bayou."
-          caption="Lafitte"
+          alt="Avery and her sister Grace in orange life jackets, smiling from the front of a boat on the bayou in Lafitte."
+          caption="Lafitte, with Grace"
           tilt={2.5}
           sizes="(min-width: 960px) 15rem, 45vw"
         />
+        {
+          ida && (
+            <Polaroid
+              photo={ida}
+              alt="Avery's grandpa wading waist-deep across his flooded backyard toward his boat docks on the bayou after Hurricane Ida."
+              caption="Lafitte, after Hurricane Ida, 2021"
+              tilt={1.5}
+              sizes="(min-width: 960px) 15rem, 45vw"
+            />
+          )
+        }
         <Polaroid
           photo={trout}
-          alt="Avery in sunglasses kissing a speckled trout on a boat."
+          alt="Avery in sunglasses kissing a fish she just caught, on a boat near the Gulf."
           caption="June 2026"
           tilt={-1.5}
           sizes="(min-width: 960px) 15rem, 45vw"
@@ -164,8 +181,6 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
     </div>
   </section>
 
-  <Timeline />
-  <Testimonials />
 
   <section class="ab-end g-dark" aria-labelledby="end-title">
     <div class="wrap ab-end__row">
@@ -350,6 +365,11 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
     background: var(--g-band);
   }
 
+  /* Straight on from the recommendations band, with no strip of page between the two. */
+  :global(.pq) + .ab-why {
+    margin-top: 0;
+  }
+
   .ab-why__grid {
     display: grid;
     gap: 3rem;
@@ -383,7 +403,7 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
     color: var(--g-accent);
   }
 
-  /* Three prints, each the photo's own shape: two side by side, the third under them. */
+  /* The prints, each the photo's own shape, two by two; an odd last one sits centered under them. */
   .ab-why__prints {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -393,7 +413,7 @@ import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
     padding: 0.5rem;
   }
 
-  .ab-why__prints > :global(:last-child) {
+  .ab-why__prints > :global(:last-child:nth-child(odd)) {
     grid-column: 1 / -1;
     justify-self: center;
     width: calc(50% - 0.75rem);
