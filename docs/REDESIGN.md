@@ -453,7 +453,7 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 ### About
 
 - Removed: the skills list (`Skills.astro`), the "Four rules I keep" rail and its `principles`, the spinning ring portrait fallback, the topographic contours, the "Engineering", "Websites" and "Land work" prose, the "Off the clock" cards (`offclock.json`; its photos moved into the pinout), the Now strip (`NowStrip.astro`, `now.json`) and the RE+ photo. The meta description no longer says computer engineer.
-- Kept: Experience (`Timeline`) and Recommendations (`Testimonials`), between Why underwater and the closing band. They are not in the mockup; see the open question below.
+- Experience is off About (the résumé has it), and `Timeline.astro` is gone. Recommendations are a pull-quote band right after The longer version (`about/PullQuotes.astro`), which replaced `Testimonials.astro`. The RE+ photo is deleted.
 - Order: pixel hero with the Integer card, Fig. 01 the AVE-26 datasheet, The longer version, Why underwater, Experience, Recommendations, Say hi. The site footer on About shows only its links, since the page ends on its own "Say hi."
 - Palette: "Garden", in `src/styles/about.css`, scoped by `data-page="about"` on `<html>` (`BaseLayout`'s `page` prop). It redefines the site tokens there, so everything on the page follows; the navy nav keeps its own inks and orange. Buttons and cards get 10px corners on About only. axe reports no contrast problems in either theme.
 - The pixel scene (`src/components/about/PixelScene.astro`) is the mockup's `scene()`, run at build time into 768 inline rects; no script, `aria-hidden`. The hero is at least as tall as the scene. LCP is the hero paragraph, not the scene.
@@ -476,15 +476,14 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 
 ### TODO(ave)
 
-- THRIFT still has no photo (it shows the hanger drawing).
-- OUTSIDE (`outside-kayak.jpg`): which trip was this.
-- FIELD: the title says soccer and the text says flag football, pick one; and confirm the sport the team won.
-- FILM (`film-graduation-print.jpg`): who is cheek to cheek with me in the print. The alt text says "another person" until then.
-- FAIRE: who the boy in `polaroid-pirate.jpg` is, and check the FAIRE wording.
-- GND: confirm the turtle (`gnd-turtle.jpg`) was on the levee; if not, go back to `offclock/levee.jpg`.
-- Why underwater: confirm the family is OK with `family-adam.jpg` on the site; confirm the boat was in Lafitte and who is with me (`polaroid-bayou-boat.jpg`); confirm the fish (`polaroid-trout.jpg`).
-- RAMpage case study: confirm the teammates are OK with `rampage-team-2025.jpg`, and what the other robot in `rampage-arena-instax.jpg` is.
-- Confirm anyone else in an About photo is OK being on the site.
+- THRIFT: take a photo of the bellows camera. The pin shows a drawing of it until then.
+- FAIRE: check the wording.
+- The longer version: check the sentence about growing up around Adam's doctors, nurses and equipment and changing his trach.
+- Why underwater: add `src/assets/about/polaroid-ida.jpg` (it was not in the repo; the fourth print shows on its own once the file is there), and its photo credit.
+- Mom's "sky was blue" quote: ask Mom before using it.
+- Because of ADAM: which expansion of the name is current.
+- Contemporary Pediatrics, "How one child's tragedy is making us reconsider our approach to drowning prevention" (https://www.contemporarypediatrics.com/view/how-one-child-s-tragedy-is-making-us-reconsider-our-approach-to-drowning-prevention): fetched Nov 2. It is not about Adam. It is by Todd R. Porter, MD, and Nicole Hughes (June 16, 2021), about her 3-year-old son Levi, who drowned in June 2018 on a beach vacation. Do not link it as Adam's story.
+- Confirm anyone else in an About photo (the FAIRE friends, for one) is OK being on the site.
 
 ### Photos, November 2026
 
@@ -493,6 +492,3 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 - No image in the repo had EXIF or GPS data. Two video posters carry an ffmpeg encoder tag and one Landspace screenshot an ICC color profile; the built images carry no metadata at all.
 - The home teaser shows the new `portrait.jpg` whole. The old portrait (Tiger Stadium) is `about/polaroid-tiger-stadium.jpg`, the first print in The longer version.
 
-### Open question
-
-- Experience and Recommendations are still on About. The mockup ends without them, but the delete list did not name them, and Recommendations appears nowhere else on the site. Keep, move (Recommendations to the home page, Experience to the résumé only), or drop?
