@@ -3,7 +3,7 @@
 // 1.5px ink strokes and one accent stroke, the site's figure style. Each fills a square.
 // Decorative unless a label is passed (the pin's text already says what it shows).
 interface Props {
-  name: 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar' | 'pool' | 'listen';
+  name: 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar' | 'pool';
   label?: string;
 }
 
@@ -86,15 +86,6 @@ const { name, label } = Astro.props;
         <circle class="dot" cx="84" cy="76" r="3.5" />
         <path class="hot" d="M50 44 L18 74 M50 44 L82 74" />
         <path class="soft" d="M50 44 L36 82 L18 76 M50 44 L92 66 L84 74" />
-      </>
-    )
-  }
-  {
-    name === 'listen' && (
-      <>
-        <path d="M8 34 H20 L24 14 L28 54 L32 20 L36 46 L40 28 L44 38 L48 32 L52 36 H92" />
-        <path class="soft" d="M8 72 H92" />
-        <path class="hot" d="M8 72 H40 L43 68 L46 76 L49 69 L52 74 L55 71 H92" />
       </>
     )
   }

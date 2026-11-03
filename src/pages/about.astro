@@ -16,6 +16,9 @@ import Polaroid from '@/components/about/Polaroid.astro';
 import site from '@/data/site.json';
 import gradHall from '@/assets/about/grad-taylor-hall.jpg';
 import gradTiger from '@/assets/about/grad-tiger.jpg';
+import tigerStadium from '@/assets/about/polaroid-tiger-stadium.jpg';
+// TODO(ave): confirm the family is OK with this photo on the site.
+import familyAdam from '@/assets/about/family-adam.jpg';
 ---
 
 <BaseLayout
@@ -50,8 +53,11 @@ import gradTiger from '@/assets/about/grad-tiger.jpg';
     <div class="ab-long__text">
       <h2 id="long-title" class="ab-h2">The longer version</h2>
       <p>
-        I'm from Pennsylvania, and I came down to LSU for computer engineering. I finished the B.S. in May 2026 and stayed for an M.S. in electrical
-        and computer engineering, focused on communications and signal processing.
+        I grew up sure I would be a doctor. After my little brother's accident, my family's life ran on appointments with neurologists and
+        specialists, and I got hooked on how the brain works. I started at LSU on the pre-med track, found out I loved math, and realized what I
+        liked about medicine was the systems behind a diagnosis. I wanted to build the solution instead of prescribing it, so I switched to
+        computer engineering. I finished the B.S. in May 2026 and stayed for an M.S. in electrical and computer engineering, focused on
+        communications and signal processing.
       </p>
       <p>
         Since 2020 I've also done title research as a land agent, which mostly means reading old courthouse records until they agree with each
@@ -68,6 +74,14 @@ import gradTiger from '@/assets/about/grad-tiger.jpg';
       </p>
     </div>
     <figure class="ab-grad">
+      <Polaroid
+        photo={tigerStadium}
+        alt="Avery smiling in a white dress in front of Tiger Stadium."
+        caption="Tiger Stadium"
+        tilt={1.5}
+        sizes="(min-width: 960px) 15rem, 60vw"
+        class="ab-grad__lead"
+      />
       <div class="ab-grad__pair">
         <Polaroid
           photo={gradHall}
@@ -100,6 +114,10 @@ import gradTiger from '@/assets/about/grad-tiger.jpg';
           of ADAM to share everything we wish we'd known.
         </p>
         <p>
+          Water runs in the family. Both of my grandfathers worked the water in Lafitte, Louisiana, as fishermen, crabbers and trappers. Now I
+          study how to send signals through it.
+        </p>
+        <p>
           A pool alarm listens for a splash. A child in trouble barely makes one. I want to know if a hydrophone can hear the difference, so that's
           what I'm working on, on my own time.
         </p>
@@ -108,18 +126,18 @@ import gradTiger from '@/assets/about/grad-tiger.jpg';
           <a class="btn" href="https://becauseofadam.org" target="_blank" rel="noopener">becauseofadam.org<span class="sr-only"> (opens in a new tab)</span></a>
         </div>
       </div>
-      {/* TODO(ave): two family or event photos (no other families' children). Until then, two drawings of the idea. */}
       <div class="ab-why__prints">
+        <Polaroid
+          photo={familyAdam}
+          alt="Avery and her dad crouched beside her little brother Adam, who is wearing an LSU Tigers jersey and blue sunglasses, on a patio."
+          caption="Me, Dad and Adam"
+          tilt={-2}
+          sizes="(min-width: 960px) 15rem, 45vw"
+        />
         <Polaroid
           art="pool"
           artLabel="A drawing of a backyard pool in side view, with a hydrophone in each bottom corner hearing a swimmer at the surface directly and off the walls."
           caption="the plan"
-          tilt={-2}
-        />
-        <Polaroid
-          art="listen"
-          artLabel="Two sketched traces: a big spike for a splash, and a small, short wiggle for a child in trouble."
-          caption="loud vs. quiet"
           tilt={2.5}
         />
       </div>
@@ -262,6 +280,11 @@ import gradTiger from '@/assets/about/grad-tiger.jpg';
 
   .ab-grad {
     margin: 0;
+  }
+
+  .ab-grad :global(.ab-grad__lead) {
+    max-width: 15rem;
+    margin: 0 0 1.75rem 0.5rem;
   }
 
   .ab-grad__pair {

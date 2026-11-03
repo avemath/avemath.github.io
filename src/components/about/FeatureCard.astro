@@ -13,14 +13,14 @@ const photo = f.photo ? Object.entries(photos).find(([p]) => p.endsWith(`/${f.ph
 ---
 
 <aside class:list={['feat g-card', { 'feat--photo': photo }]} aria-labelledby="feat-label">
-  {photo && <Image src={photo} alt={f.photoAlt} widths={[150, 300]} sizes="150px" format="webp" quality={80} class="feat__photo" />}
+  {photo && <Image src={photo} alt={f.photoAlt} widths={[150, 300]} sizes="150px" format="webp" quality={80} loading="lazy" class="feat__photo" />}
   <div class="feat__body">
     <p id="feat-label" class="feat__label">Featured by {f.org}</p>
     {
       f.quote ? (
         <>
           <p class="feat__quote">“{f.quote}”</p>
-          {f.date && <p class="feat__meta">{f.series} spotlight, {f.date}</p>}
+          {f.date && <p class="feat__meta">{f.series}, {f.date}</p>}
         </>
       ) : (
         <p class="feat__line">{f.org} featured me in their {f.series} series.</p>
@@ -47,11 +47,10 @@ const photo = f.photo ? Object.entries(photos).find(([p]) => p.endsWith(`/${f.ph
     grid-template-columns: 150px minmax(0, 1fr);
   }
 
+  /* The whole photo, never cropped: fixed width, its own height. */
   .feat__photo {
     width: 150px;
     height: auto;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
     border-radius: 10px;
   }
 

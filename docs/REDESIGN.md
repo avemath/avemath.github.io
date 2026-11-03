@@ -457,7 +457,7 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 - Order: pixel hero with the Integer card, Fig. 01 the AVE-26 datasheet, The longer version, Why underwater, Experience, Recommendations, Say hi. The site footer on About shows only its links, since the page ends on its own "Say hi."
 - Palette: "Garden", in `src/styles/about.css`, scoped by `data-page="about"` on `<html>` (`BaseLayout`'s `page` prop). It redefines the site tokens there, so everything on the page follows; the navy nav keeps its own inks and orange. Buttons and cards get 10px corners on About only. axe reports no contrast problems in either theme.
 - The pixel scene (`src/components/about/PixelScene.astro`) is the mockup's `scene()`, run at build time into 768 inline rects; no script, `aria-hidden`. The hero is at least as tall as the scene. LCP is the hero paragraph, not the scene.
-- The Integer card (`FeatureCard.astro`) is native, not LinkedIn's embed. With no quote it says only that the post exists and links to it; with no photo it has no photo column.
+- The Integer card (`FeatureCard.astro`) is native, not LinkedIn's embed: Integer in Focus, International Women in Engineering Day, June 2026, with the quote and the lab coat photo, shown whole. With no quote it would say only that the post exists; with no photo it has no photo column.
 - Pin, row and feature data: `src/data/about.json`. Pin photos are paths under `src/assets/`; a pin with no photo shows its line drawing (`PrintArt.astro`). Pin text can link with `[words](/path/)`. The pins are buttons: hover, click, Enter, Space or an arrow key selects; Tab only moves focus, so a pin's links stay reachable; Home and End jump to pins 1 and 10.
 - Polaroids (`Polaroid.astro`): the pin photos, the graduation pair and the two Why underwater prints. Off-white frame in both themes, 88 by 107 with a 79 by 79 image, a 1 to 3 degree tilt that alternates and straightens on hover or focus (no motion with reduced motion). Captions are in Kalam (`src/styles/hand.css`, loaded by /about/ only, 20px). Pin 08 is now FILM; the old TASTE line moved into Compatibility.
 - Not done: the scattered Polaroids along The longer version. The right column already holds the graduation prints, and the only other photos are the pin photos, so extra prints would repeat them and crowd the column.
@@ -476,9 +476,8 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 
 ### TODO(ave)
 
-- Integer feature: paste the post text, pick the quote, add the date and the photo (`feature` in `about.json`).
 - Photos for SNOW, FIELD and THRIFT, and a scan of a Polaroid for FILM.
-- Two family or event photos for Why underwater, with no other families' children.
+- `family-adam.jpg` (Why underwater): confirm the family is OK with this photo on the site.
 - Confirm anyone else in an About photo is OK being on the site.
 
 ### Open question

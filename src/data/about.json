@@ -1,17 +1,17 @@
 {
   "_todo": [
-    "TODO(ave): feature: paste the post text, pick the quote, add the date and the photo (photo goes in src/assets/about/, name it in feature.photo).",
     "TODO(ave): pins with an empty photo show a drawing. SNOW, FIELD, THRIFT and FILM each have their own TODO below. photo is a path under src/assets/ (for example offclock/snow.jpg); add an alt too.",
     "TODO(ave): two family or event photos for Why underwater (no other families' children). Until then the two prints show drawings.",
-    "TODO(ave): confirm anyone else in a photo here is OK being on the site."
+    "TODO(ave): confirm anyone else in a photo here is OK being on the site.",
+    "TODO(ave): family-adam.jpg (Why underwater): confirm the family is OK with this photo on the site."
   ],
   "feature": {
     "org": "Integer Technologies",
-    "series": "Women in STEM",
-    "date": "",
-    "quote": "",
-    "photo": "",
-    "photoAlt": "",
+    "series": "Integer in Focus, International Women in Engineering Day",
+    "date": "June 2026",
+    "quote": "I decided that I wanted to be a part of building a solution instead of prescribing it.",
+    "photo": "integer-feature-lab-coat.jpg",
+    "photoAlt": "Avery as a little girl in an oversized white lab coat, grinning beside an X-ray on a lightbox.",
     "url": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7475180996028510208/"
   },
   "rows": [
