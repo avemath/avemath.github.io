@@ -477,13 +477,8 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 ### TODO(ave)
 
 - THRIFT: take a photo of the bellows camera. The pin shows a drawing of it until then.
-- FAIRE: check the wording.
-- The longer version: check the sentence about growing up around Adam's doctors, nurses and equipment and changing his trach.
-- Why underwater: add `src/assets/about/polaroid-ida.jpg` (it was not in the repo; the fourth print shows on its own once the file is there), and its photo credit.
-- Mom's "sky was blue" quote: ask Mom before using it.
-- Because of ADAM: which expansion of the name is current.
-- Contemporary Pediatrics, "How one child's tragedy is making us reconsider our approach to drowning prevention" (https://www.contemporarypediatrics.com/view/how-one-child-s-tragedy-is-making-us-reconsider-our-approach-to-drowning-prevention): fetched Nov 2. It is not about Adam. It is by Todd R. Porter, MD, and Nicole Hughes (June 16, 2021), about her 3-year-old son Levi, who drowned in June 2018 on a beach vacation. Do not link it as Adam's story.
-- Confirm anyone else in an About photo (the FAIRE friends, for one) is OK being on the site.
+
+Answered Nov 2: Mom's quote is under the prints in The longer version; the Ida print is in, with no credit line (Grandma Peggy took it); the FAIRE friends, the FAIRE text and the trach sentence are approved; the name is "Because of ADAM: Allies in the Drowning Awareness Movement". The Contemporary Pediatrics article is not about Adam: it is by Todd R. Porter, MD, and Nicole Hughes (June 16, 2021), about her son Levi, so it is not linked as Adam's story.
 
 ### Photos, November 2026
 
