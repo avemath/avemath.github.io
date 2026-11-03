@@ -38,7 +38,7 @@ client:
 
 ## Context
 
-On June 5, 2017, my little brother Adam drowned in our backyard pool. He was 14 months old, and the house was full of family. He survived. In 2020 my siblings and I turned what we learned into a nonprofit: Because of ADAM, Allies in the Drowning Awareness Movement.
+On June 5, 2017, my little brother Adam drowned in our backyard pool. He was 14 months old, and the house was full of family. He survived. In 2020 my siblings and I turned what we learned into a nonprofit, Because of ADAM: Allies in the Drowning Awareness Movement.
 
 For years the organization lived on a Facebook page. Facebook is good for events and bad for anything a parent needs to find again. We needed a home for the facts, one that would still be correct a year from now and that my family could keep up without me.
 
