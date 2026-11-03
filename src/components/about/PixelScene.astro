@@ -1,0 +1,68 @@
+---
+// The About hero's backdrop: the levee at dusk on a 48 by 16 grid of square "LEDs". Built here,
+// once, as one inline SVG of rects, so it costs no request and no script. Sky, a rose sun at
+// column 37 with a few stars, the treeline, the river with the sun's reflection, the levee, the
+// path and the grass, top to bottom. Each cell gets a thin darker edge in CSS so it reads as an LED.
+const W = 48;
+const H = 16;
+
+const mix = (a: string, b: string, t: number) => {
+  const p = (x: string) => [1, 3, 5].map((k) => parseInt(x.slice(k, k + 2), 16));
+  const A = p(a);
+  const B = p(b);
+  return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+};
+const rnd = (x: number, y: number) => {
+  const s = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+  return s - Math.floor(s);
+};
+
+const cells: { x: number; y: number; c: string }[] = [];
+for (let y = 0; y < H; y++) {
+  for (let x = 0; x < W; x++) {
+    let c: string;
+    const tree = 8 + Math.round(Math.sin(x * 0.7) * 0.6 + Math.sin(x * 0.23) * 0.8);
+    const sun = Math.hypot(x - 37, (y - 6.5) * 1.1);
+    if (y < 9) {
+      c = y < 5 ? mix('#11241F', '#2C463C', y / 5) : mix('#4A5A4C', '#B08A80', (y - 5) / 4);
+      if (sun < 2.6) c = sun < 1.6 ? '#F1DCD2' : '#D8B3A8';
+      if (y < 4 && rnd(x, y) > 0.94) c = '#7E978A';
+      if (y >= tree) c = '#0E211B';
+    } else if (y < 11) {
+      c = (x + y) % 5 === 0 ? '#3F6D66' : '#2F5A54';
+      if (Math.abs(x - 37) < 2 && rnd(x, y) > 0.35) c = '#C9A39A';
+    } else if (y < 13) {
+      c = rnd(x, y) > 0.8 ? '#4E7C57' : '#3E6A49';
+    } else if (y === 13) {
+      c = rnd(x, y) > 0.85 ? '#A3AC97' : '#8E9884';
+    } else {
+      c = rnd(x, y) > 0.75 ? '#3A6444' : '#2F5638';
+    }
+    cells.push({ x, y, c });
+  }
+}
+---
+
+<svg class="px" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMaxYMax slice" shape-rendering="crispEdges" aria-hidden="true" focusable="false">
+  {cells.map((p) => <rect x={p.x} y={p.y} width="1" height="1" fill={p.c} />)}
+</svg>
+
+<style>
+  .px {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: block;
+    width: 100%;
+    /* Full width at its own 3:1 shape on wide screens; on narrow ones it keeps a usable height and
+       crops from the left, so the sun at column 37 stays in view. */
+    height: max(100vw / 3, 16rem);
+    pointer-events: none;
+  }
+
+  /* A 1px stroke on the shared edge puts 0.5px of darker edge inside each cell, so each reads as an LED. */
+  .px rect {
+    stroke: rgb(0 0 0 / 0.18);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+</style>

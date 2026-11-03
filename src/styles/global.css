@@ -436,16 +436,15 @@
   box-shadow: var(--shadow);
 }
 
-/* Paper lifts 2px on hover or focus within, with its shadow deepening. The skills matrix is
-   paper too, but a whole table should not move. */
+/* Paper lifts 2px on hover or focus within, with its shadow deepening. */
 .paper {
   transition:
     transform 0.16s ease-out,
     box-shadow 0.16s ease-out;
 }
 
-.paper:not(.sm):hover,
-.paper:not(.sm):focus-within {
+.paper:hover,
+.paper:focus-within {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
 }

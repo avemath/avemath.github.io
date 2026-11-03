@@ -3,8 +3,9 @@ import { execSync } from 'node:child_process';
 import site from '@/data/site.json';
 
 interface Props {
-  /** The research page ends underwater, with a way back up instead of "Say hi." */
-  variant?: 'default' | 'research';
+  /** The research page ends underwater, with a way back up instead of "Say hi." About ends on its
+      own "Say hi." band, so its footer keeps only the links. */
+  variant?: 'default' | 'research' | 'links';
 }
 
 const { variant = 'default' } = Astro.props;
@@ -20,7 +21,7 @@ try {
 }
 ---
 
-<footer id="contact" class:list={['site-footer on-navy no-print', variant === 'research' && 'site-footer--deep']}>
+<footer id="contact" class:list={['site-footer on-navy no-print', variant === 'research' && 'site-footer--deep', variant === 'links' && 'site-footer--links']}>
   <div class="wrap foot">
     {
       variant === 'research' ? (
@@ -28,7 +29,7 @@ try {
           <a class="btn" href="/">Back to the surface</a>
           <a class="foot__link" href="/#websites">Or see the websites</a>
         </p>
-      ) : (
+      ) : variant === 'links' ? null : (
         <div>
           <p class="foot__hi">Say hi.</p>
           <p class="foot__where">{site.location}. I answer email.</p>
@@ -38,7 +39,7 @@ try {
     <ul class="foot__links">
       <li><a class="foot__link" href={`mailto:${site.email}`}>{site.email}</a></li>
       <li><a class="foot__link" href={site.socials.github} rel="me">GitHub</a></li>
-      {variant === 'default' && <li><a class="foot__link" href={site.socials.linkedin} rel="me">LinkedIn</a></li>}
+      {variant !== 'research' && <li><a class="foot__link" href={site.socials.linkedin} rel="me">LinkedIn</a></li>}
       <li><a class="foot__link foot__link--accent" href={site.resumePdf} download>Résumé (PDF)</a></li>
     </ul>
   </div>
@@ -97,6 +98,10 @@ try {
     justify-content: space-between;
     gap: 1.5rem 2.5rem;
     padding-block: clamp(2.75rem, 6vw, 4.5rem) 2.25rem;
+  }
+
+  .site-footer--links .foot {
+    padding-block: 2rem;
   }
 
   .site-footer--deep .foot {

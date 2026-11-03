@@ -8,8 +8,8 @@ import { F_HIGH, F_LOW, PAIRS, DF, hopSequence, toneHz } from '@/lib/fhbfsk';
 const N = 8;
 const bits = [1, 0, 1, 1, 0, 0, 1, 1];
 const hops = hopSequence(N, 87);
-const X0 = 44;
-const COL = 31;
+const X0 = 50;
+const COL = 30;
 const Y0 = 22;
 const H = 110;
 const y = (f: number) => Y0 + ((F_HIGH - f) / (F_HIGH - F_LOW)) * H;
@@ -51,6 +51,6 @@ const pairBot = (p: number) => y(F_LOW + 2 * p * DF);
   <text class="t t--muted" x={X0 + N * COL} y={Y0 + H + 18} text-anchor="end">time</text>
 
   <g class="co"><circle cx={X0 + COL / 2} cy={Y0 + H + 28} r="9"></circle><text x={X0 + COL / 2} y={Y0 + H + 32}>1</text></g>
-  <g class="co"><circle cx={X0 + N * COL + 18} cy={(pairTop(6) + pairBot(6)) / 2} r="9"></circle><text x={X0 + N * COL + 18} y={(pairTop(6) + pairBot(6)) / 2 + 4}>2</text></g>
+  <g class="co"><circle cx={X0 + N * COL + 16} cy={(pairTop(6) + pairBot(6)) / 2} r="9"></circle><text x={X0 + N * COL + 16} y={(pairTop(6) + pairBot(6)) / 2 + 4}>2</text></g>
   <g class="co"><circle cx={X0 + 10} cy={Y0 - 10} r="9"></circle><text x={X0 + 10} y={Y0 - 6}>3</text></g>
 </Drawing>

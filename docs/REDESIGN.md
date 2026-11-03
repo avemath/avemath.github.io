@@ -445,3 +445,42 @@ RAMpage and V2V, corrected from the source documents on branch `project-facts`.
 - How it works shows each stage's Run 4 figure, labeled with the report's figure number, and its lines in `V2V_TXRXf.m`. The Code tab is `V2V_TXRXf.m` itself (`vendor/v2v/`, line endings only changed), with MATLAB highlighting.
 - Role: "Final project for EE 4003 with lab partner Jason Phan. I designed and wrote the transmitter, receiver and warning logic, and ran all five hardware tests." No "co-author" and no "we built" or "we ran".
 - Figures also went to the V2V repo on branch `figures` (not pushed). Course helper files were not copied. The printout photos are printed code pages, so none were used, and no photo of a person is on the site.
+
+## About and Toolbox
+
+Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`, `toolbox-mockup.html`). New rule: Projects and Websites hold the work; About holds the person.
+
+### About
+
+- Removed: the skills list (`Skills.astro`), the "Four rules I keep" rail and its `principles`, the spinning ring portrait fallback, the topographic contours, the "Engineering", "Websites" and "Land work" prose, the "Off the clock" cards (`offclock.json`; its photos moved into the pinout), the Now strip (`NowStrip.astro`, `now.json`) and the RE+ photo. The meta description no longer says computer engineer.
+- Kept: Experience (`Timeline`) and Recommendations (`Testimonials`), between Why underwater and the closing band. They are not in the mockup; see the open question below.
+- Order: pixel hero with the Integer card, Fig. 01 the AVE-26 datasheet, The longer version, Why underwater, Experience, Recommendations, Say hi. The site footer on About shows only its links, since the page ends on its own "Say hi."
+- Palette: "Garden", in `src/styles/about.css`, scoped by `data-page="about"` on `<html>` (`BaseLayout`'s `page` prop). It redefines the site tokens there, so everything on the page follows; the navy nav keeps its own inks and orange. Buttons and cards get 10px corners on About only. axe reports no contrast problems in either theme.
+- The pixel scene (`src/components/about/PixelScene.astro`) is the mockup's `scene()`, run at build time into 768 inline rects; no script, `aria-hidden`. The hero is at least as tall as the scene. LCP is the hero paragraph, not the scene.
+- The Integer card (`FeatureCard.astro`) is native, not LinkedIn's embed. With no quote it says only that the post exists and links to it; with no photo it has no photo column.
+- Pin, row and feature data: `src/data/about.json`. Pin photos are paths under `src/assets/`; a pin with no photo shows its line drawing (`PrintArt.astro`). Pin text can link with `[words](/path/)`. The pins are buttons: hover, click, Enter, Space or an arrow key selects; Tab only moves focus, so a pin's links stay reachable; Home and End jump to pins 1 and 10.
+- Polaroids (`Polaroid.astro`): the pin photos, the graduation pair and the two Why underwater prints. Off-white frame in both themes, 88 by 107 with a 79 by 79 image, a 1 to 3 degree tilt that alternates and straightens on hover or focus (no motion with reduced motion). Captions are in Kalam (`src/styles/hand.css`, loaded by /about/ only, 20px). Pin 08 is now FILM; the old TASTE line moved into Compatibility.
+- Not done: the scattered Polaroids along The longer version. The right column already holds the graduation prints, and the only other photos are the pin photos, so extra prints would repeat them and crowd the column.
+
+### Toolbox
+
+- The home page's Fig. 10 skills matrix (`HomeSkills.astro`) is gone. `Toolbox.astro` replaces it in the site's navy and orange: Know well (Python, MATLAB, MicroPython and C, Digital communications, Git and Linux) and Have built with (Astro and TypeScript, BELLHOP, Apps Script, Web Audio, React, Supabase).
+- Data: `toolbox` in `src/lib/skills.ts`, built from `usedIn`, plus one file each for BELLHOP (`bellhopSim/src/environment_builder.py`) and Web Audio (`avemath.github.io/src/components/demos/signals/fhbfsk.ts`). Every file path was checked on GitHub. Apps Script, React and Supabase say "case study only" (the Little Explorer Swim and Landspace repos are private). `skills.ts` lost the matrix-only `areas` and `terms`.
+- Hover (after a short wait), focus or a first tap fills the panel; a second tap follows the chip's link, and the panel's project links work at once.
+
+### Labels
+
+- `scripts/check-labels.mjs`, run by `npm run test:a11y`, loads every page at 390, 768, 1366 and 1440 in both themes, opens every figure view, V2V stage, About pin and plow status, and fails on any SVG label that crosses its box or comes within 4px of it across (1px up and down), overlaps another label or a line from another group, or is clipped (callout circles included), and on HTML text that runs out of its box. It writes `audit/label-overflow.md`.
+- Fixed: the LED drawing (Mic box wider, ESP32 and matrix labels on two lines), the RAMpage Valves label (two lines), the Signals playground bit chips (taller) and axis title (inside the plot), the hop plot's 13.6k and 9.44k (wider margin, callout 2 back inside), the research callouts (larger circles), and the Grace Mae address in its browser bar at 390 (the window dots hide on phones).
+- Services: the heading spans the whole hero, three lines at 768 to 1440.
+
+### TODO(ave)
+
+- Integer feature: paste the post text, pick the quote, add the date and the photo (`feature` in `about.json`).
+- Photos for SNOW, FIELD and THRIFT, and a scan of a Polaroid for FILM.
+- Two family or event photos for Why underwater, with no other families' children.
+- Confirm anyone else in an About photo is OK being on the site.
+
+### Open question
+
+- Experience and Recommendations are still on About. The mockup ends without them, but the delete list did not name them, and Recommendations appears nowhere else on the site. Keep, move (Recommendations to the home page, Experience to the résumé only), or drop?

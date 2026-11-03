@@ -1,0 +1,141 @@
+{
+  "_todo": [
+    "TODO(ave): feature: paste the post text, pick the quote, add the date and the photo (photo goes in src/assets/about/, name it in feature.photo).",
+    "TODO(ave): pins with an empty photo show a drawing. SNOW, FIELD, THRIFT and FILM each have their own TODO below. photo is a path under src/assets/ (for example offclock/snow.jpg); add an alt too.",
+    "TODO(ave): two family or event photos for Why underwater (no other families' children). Until then the two prints show drawings.",
+    "TODO(ave): confirm anyone else in a photo here is OK being on the site."
+  ],
+  "feature": {
+    "org": "Integer Technologies",
+    "series": "Women in STEM",
+    "date": "",
+    "quote": "",
+    "photo": "",
+    "photoAlt": "",
+    "url": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7475180996028510208/"
+  },
+  "rows": [
+    {
+      "key": "Supply",
+      "value": "Lattes. Seasonal flavors preferred."
+    },
+    {
+      "key": "Operating environment",
+      "value": "Outdoors preferred. Performance improves noticeably after a bike ride."
+    },
+    {
+      "key": "Screen time",
+      "value": "Higher than I would like to admit. See OUTSIDE and GND for mitigation."
+    },
+    {
+      "key": "Known issues",
+      "value": "Buys project kits faster than she builds them."
+    },
+    {
+      "key": "Compatibility",
+      "value": "Equally into cute things and The Matrix. Gets along with cats, plants, and anyone who will talk about either."
+    }
+  ],
+  "pins": [
+    {
+      "label": "VCC",
+      "title": "Runs on lattes",
+      "text": "Usually a latte, and whatever the seasonal one is. A hot Americano when it is a long day.",
+      "photo": "",
+      "alt": "",
+      "art": "latte",
+      "caption": "fuel",
+      "row": "Supply"
+    },
+    {
+      "label": "OUTSIDE",
+      "title": "Plants and rivers",
+      "text": "Anywhere that is not a desk. This one is from a canoe trip with Bengals in the Wild, a club at LSU.",
+      "photo": "offclock/canoe.jpg",
+      "alt": "Avery in an LSU cap and a plaid shirt, grinning while leaning on the bow of a canoe at the edge of a clear river, with green bluffs behind.",
+      "caption": "river day",
+      "row": "Operating environment"
+    },
+    {
+      "label": "SNOW",
+      "title": "Snowboarding",
+      "text": "Any chance I get, which in Louisiana is not many.",
+      "photo": "",
+      "alt": "",
+      "art": "snowboard",
+      "caption": "snow, finally",
+      "row": "Operating environment",
+      "todo": "TODO(ave): photo for SNOW"
+    },
+    {
+      "label": "FIELD",
+      "title": "Soccer and softball",
+      "text": "I played intramural flag football and softball at LSU until most of my team graduated.",
+      "photo": "",
+      "alt": "",
+      "art": "softball",
+      "caption": "intramurals",
+      "row": "Operating environment",
+      "todo": "TODO(ave): photo for FIELD"
+    },
+    {
+      "label": "THRIFT",
+      "title": "Browsing counts",
+      "text": "I can spend an hour in a thrift store, leave with nothing and be completely happy.",
+      "photo": "",
+      "alt": "",
+      "art": "hanger",
+      "caption": "just looking",
+      "row": "Compatibility",
+      "todo": "TODO(ave): photo for THRIFT"
+    },
+    {
+      "label": "TYGA",
+      "title": "My cat",
+      "text": "Head of quality control. Supervises every project, contributes nothing to the commit history.",
+      "photo": "offclock/tyga.jpg",
+      "alt": "Tyga, a spotted cat with green eyes, sitting upright and looking straight at the camera.",
+      "caption": "Tyga, QC",
+      "row": "Compatibility"
+    },
+    {
+      "label": "SIDEQ",
+      "title": "Side quests",
+      "text": "[LED music visualizers](/work/led-audio-spectrum/) for my sisters at Christmas. [A pool alarm](/work/acoustic-pool-alarm/) on my own time. A box of soldering kits I will absolutely build someday.",
+      "photo": "projects/led-audio-spectrum/matrix-poster.jpg",
+      "alt": "A 16 by 16 LED matrix lit up with an audio spectrum, columns of light rising from red at the bottom to white peaks.",
+      "caption": "side quest no. 1",
+      "row": "Known issues"
+    },
+    {
+      "label": "FILM",
+      "title": "Polaroids, everywhere",
+      "text": "I always have my Polaroid camera and a stack of film on me. I have a bad memory, so the prints are how I hold on to the good times with the people I love.",
+      "photo": "",
+      "alt": "",
+      "art": "camera",
+      "caption": "always loaded",
+      "row": "Compatibility",
+      "todo": "TODO(ave): a scan of a Polaroid for FILM"
+    },
+    {
+      "label": "NC",
+      "title": "No connect",
+      "text": "Free time. Currently not connected, see Known issues.",
+      "photo": "",
+      "alt": "",
+      "art": "calendar",
+      "caption": "free time?",
+      "row": "Known issues"
+    },
+    {
+      "label": "GND",
+      "title": "The levee",
+      "text": "Bike rides along the river. It is how I ground out after a long day, and sometimes there is a turtle on the slope.",
+      "photo": "offclock/levee.jpg",
+      "alt": "A paved path running straight to the horizon between mown grass, under a blue sky full of clouds.",
+      "caption": "the levee",
+      "row": "Operating environment"
+    }
+  ]
+}
