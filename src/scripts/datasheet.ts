@@ -1,7 +1,8 @@
 // The About page's datasheet: one pin is selected at a time, and its description and its
-// characteristics row follow it. Hover, click or focus selects a pin; the arrow keys move between
-// the ten pins and Home and End jump to pins 1 and 10, as in a toolbar. On a phone, a tap scrolls
-// the description into view only when it is off screen.
+// characteristics row follow it. Hover, click, Enter or Space selects a pin; the arrow keys move
+// to the next pin and select it, and Home and End jump to pins 1 and 10. Tab only moves focus, so
+// a keyboard user can tab on past the pins into the selected pin's links. On a phone, a tap
+// scrolls the description into view only when it is off screen.
 export function initDatasheet() {
   const root = document.querySelector<HTMLElement>('[data-ds]');
   if (!root) return;
@@ -33,7 +34,6 @@ export function initDatasheet() {
     pin.addEventListener('pointerenter', (e) => {
       if (e.pointerType === 'mouse') select(i);
     });
-    pin.addEventListener('focus', () => select(i));
     pin.addEventListener('click', () => {
       select(i);
       reveal();
@@ -42,7 +42,9 @@ export function initDatasheet() {
       const to = { ArrowDown: i + 1, ArrowRight: i + 1, ArrowUp: i - 1, ArrowLeft: i - 1, Home: 0, End: pins.length - 1 }[e.key];
       if (to === undefined) return;
       e.preventDefault();
-      pins[(to + pins.length) % pins.length].focus();
+      const k = (to + pins.length) % pins.length;
+      pins[k].focus();
+      select(k);
     });
   });
 }

@@ -18,9 +18,13 @@ export function initToolbox() {
   for (const chip of chips) {
     const i = Number(chip.dataset.tool);
     chip.addEventListener('pointerdown', (e) => (touch = e.pointerType !== 'mouse'));
+    // A short wait before a hover counts, so moving the mouse down across the second row to the
+    // panel does not swap the panel on the way.
+    let wait = 0;
     chip.addEventListener('pointerenter', (e) => {
-      if (e.pointerType === 'mouse') show(i);
+      if (e.pointerType === 'mouse') wait = window.setTimeout(() => show(i), 120);
     });
+    chip.addEventListener('pointerleave', () => clearTimeout(wait));
     chip.addEventListener('focus', () => {
       if (!touch) show(i);
     });
