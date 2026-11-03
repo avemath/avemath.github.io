@@ -1,9 +1,7 @@
 {
   "_todo": [
-    "TODO(ave): THRIFT still has no photo (it shows the hanger drawing). photo is a path under src/assets/, for example about/thrift.jpg; add an alt too.",
-    "TODO(ave): confirm anyone else in a photo here is OK being on the site.",
-    "TODO(ave): family-adam.jpg (Why underwater): confirm the family is OK with this photo on the site.",
-    "TODO(ave): Why underwater: confirm the boat was in Lafitte and who is with me (polaroid-bayou-boat.jpg); confirm the fish (polaroid-trout.jpg)."
+    "TODO(ave): pins with no photo show a line drawing (art). photo is a path under src/assets/, for example about/thrift.jpg; add an alt too.",
+    "TODO(ave): confirm anyone else in a photo here is OK being on the site."
   ],
   "feature": {
     "org": "Integer Technologies",
@@ -50,12 +48,11 @@
     {
       "label": "OUTSIDE",
       "title": "Plants and rivers",
-      "text": "Anywhere that is not a desk. I've canoed with Bengals in the Wild, a club at LSU.",
+      "text": "Anywhere that is not a desk. I've canoed with Bengals in the Wild, a hiking club at LSU.",
       "photo": "about/outside-kayak.jpg",
       "alt": "Avery smiling from a kayak on dark water at golden hour, another kayaker behind her.",
       "caption": "river day",
-      "row": "Operating environment",
-      "todo": "TODO(ave): which trip was this."
+      "row": "Operating environment"
     },
     {
       "label": "SNOW",
@@ -69,23 +66,22 @@
     {
       "label": "FIELD",
       "title": "Soccer and softball",
-      "text": "I played intramural flag football and softball at LSU until most of my team graduated.",
+      "text": "Varsity soccer goalie and varsity softball in high school. At LSU, intramural flag football and softball until most of my team graduated.",
       "photo": "about/field-intramural-champs.jpg",
       "alt": "Avery's intramural team in matching champions shirts on a lit softball field at night.",
       "caption": "intramurals",
-      "row": "Operating environment",
-      "todo": "TODO(ave): the title says soccer and the text says flag football, pick one; and confirm the sport they won."
+      "row": "Operating environment"
     },
     {
       "label": "THRIFT",
-      "title": "Browsing counts",
-      "text": "I can spend an hour in a thrift store, leave with nothing and be completely happy.",
+      "title": "Old things",
+      "text": "Thrift stores and flea markets, for the objects more than the clothes. Antiques, old cameras, anything with some history. I grew up going to flea markets with my grandparents on my dad's side, and that's where I found my folding bellows camera, the kind with a big round flash reflector for the bulb.",
       "photo": "",
       "alt": "",
-      "art": "hanger",
-      "caption": "just looking",
+      "art": "bellows",
+      "caption": "flea market find",
       "row": "Compatibility",
-      "todo": "TODO(ave): photo for THRIFT"
+      "todo": "TODO(ave): take a photo of the bellows camera for THRIFT."
     },
     {
       "label": "TYGA",
@@ -110,10 +106,9 @@
       "title": "Polaroids, everywhere",
       "text": "I always have my Polaroid camera and a stack of film on me. I have a bad memory, so the prints are how I hold on to the good times with the people I love.",
       "photo": "about/film-graduation-print.jpg",
-      "alt": "An instant print of Avery in her 2026 cap and gown holding her LSU diploma and sunflowers, cheek to cheek with another person.",
+      "alt": "An instant print of Avery in her 2026 cap and gown holding her LSU diploma and sunflowers, cheek to cheek with her Grandma Joyce.",
       "caption": "always loaded",
       "row": "Compatibility",
-      "todo": "TODO(ave): who is cheek to cheek with me in the print; name them in the alt text once you say.",
       "frame": false
     },
     {
@@ -122,14 +117,14 @@
       "text": "Big fan. I go in costume, flower crown included.",
       "photo": "about/faire-renfest.jpg",
       "alt": "Avery in a blue Renaissance dress and flower crown, lying in the woods at a festival with friends and her dad.",
-      "caption": "faire day",
+      "caption": "Ren Fair Day",
       "row": "Compatibility",
       "extra": {
         "photo": "about/polaroid-pirate.jpg",
-        "alt": "Avery as a little girl in a pirate costume, frowning, next to a boy holding a toy sword.",
+        "alt": "Avery as a little girl in a pirate costume, frowning, next to her big brother Rickey holding a toy sword.",
         "caption": "Started early."
       },
-      "todo": "TODO(ave): who the boy in the pirate print is, and check the FAIRE wording."
+      "todo": "TODO(ave): check the FAIRE wording."
     },
     {
       "label": "GND",
@@ -138,8 +133,7 @@
       "photo": "about/gnd-turtle.jpg",
       "alt": "A turtle in tall green grass.",
       "caption": "turtle!",
-      "row": "Operating environment",
-      "todo": "TODO(ave): confirm the turtle was on the levee; if not, go back to offclock/levee.jpg."
+      "row": "Operating environment"
     }
   ]
 }
