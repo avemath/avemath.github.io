@@ -476,9 +476,22 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 
 ### TODO(ave)
 
-- Photos for SNOW, FIELD and THRIFT, and a scan of a Polaroid for FILM.
-- `family-adam.jpg` (Why underwater): confirm the family is OK with this photo on the site.
+- THRIFT still has no photo (it shows the hanger drawing).
+- OUTSIDE (`outside-kayak.jpg`): which trip was this.
+- FIELD: the title says soccer and the text says flag football, pick one; and confirm the sport the team won.
+- FILM (`film-graduation-print.jpg`): who is cheek to cheek with me in the print. The alt text says "another person" until then.
+- FAIRE: who the boy in `polaroid-pirate.jpg` is, and check the FAIRE wording.
+- GND: confirm the turtle (`gnd-turtle.jpg`) was on the levee; if not, go back to `offclock/levee.jpg`.
+- Why underwater: confirm the family is OK with `family-adam.jpg` on the site; confirm the boat was in Lafitte and who is with me (`polaroid-bayou-boat.jpg`); confirm the fish (`polaroid-trout.jpg`).
+- RAMpage case study: confirm the teammates are OK with `rampage-team-2025.jpg`, and what the other robot in `rampage-arena-instax.jpg` is.
 - Confirm anyone else in an About photo is OK being on the site.
+
+### Photos, November 2026
+
+- No photo is cropped anywhere. Polaroids take the photo's own shape (fixed width, height follows); the datasheet's pin panel keeps a square window and fits the whole photo inside it on the panel tint, so a tall photo gets side margins. The FILM pin shows the instant print as it is, border and all, with no frame added. FAIRE adds a small second print (`polaroid-pirate.jpg`) beside its photo, under it on phones.
+- About photos go through `<Picture>` as AVIF and WebP at 320 to 640px, lazy. The RAMpage case study's two inline photos are Markdown images inside a `<figure class="case__fig">`, which Astro sizes and serves as lazy WebP.
+- No image in the repo had EXIF or GPS data. Two video posters carry an ffmpeg encoder tag and one Landspace screenshot an ICC color profile; the built images carry no metadata at all.
+- The home teaser shows the new `portrait.jpg` whole. The old portrait (Tiger Stadium) is `about/polaroid-tiger-stadium.jpg`, the first print in The longer version.
 
 ### Open question
 
