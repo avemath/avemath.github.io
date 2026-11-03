@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Skills strip</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0;background:#fff}
+a{color:#0B1F3A}
+.sk-h{font-family:'Archivo',sans-serif;font-variation-settings:'wdth' 112;font-weight:800;letter-spacing:-0.03em;line-height:.98}
+.sk-chip{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1.5px solid #0B1F3A;background:#fff;color:#0B1F3A;font:inherit;font-size:17px;font-weight:600;text-decoration:none;cursor:pointer}
+.sk-chip:hover,.sk-chip:focus-visible{background:#0B1F3A;color:#fff;outline:none}
+.sk-chip--b{border-style:dashed;border-color:#5B6778}
+.sk-chip--b:hover,.sk-chip--b:focus-visible{background:#5B6778;border-style:solid}
+</style>
+</helmet>
+<div style="font-family:'Archivo',sans-serif;color:#0B1F3A;background:#fff;min-height:1300px;padding:72px 24px;box-sizing:border-box">
+<div style="max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+
+  <div style="display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:40px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <h2 class="sk-h" style="margin:0;font-size:48px">Toolbox</h2>
+      <p style="margin:0;font-size:17px;line-height:1.55;color:#5B6778">Every tool links to work that uses it. The top row I can explain at a whiteboard without notes.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:15px;font-weight:700;color:#B8532E">Know well</span>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <sc-for list="{{ known }}" as="s" hint-placeholder-count="5">
+            <a href="#" class="sk-chip" onMouseEnter="{{ s.show }}" onFocus="{{ s.show }}">{{ s.name }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:15px;font-weight:700;color:#5B6778">Have built with</span>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <sc-for list="{{ built }}" as="s" hint-placeholder-count="6">
+            <a href="#" class="sk-chip sk-chip--b" onMouseEnter="{{ s.show }}" onFocus="{{ s.show }}">{{ s.name }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border-left:3px solid #DE6A41;background:#F7F9FC;padding:14px 18px;min-height:52px;display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:13px;color:#5B6778">Used in</span>
+        <span style="font-size:17px;font-weight:600">{{ where }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#5B6778">{{ file }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #CBD3DF;padding-top:40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px">
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:16px;line-height:1.55">
+      <span style="font-size:15px;font-weight:700;color:#5B6778">Why this instead of the dot matrix</span>
+      <p style="margin:0">The matrix proved every skill with a file, but it read like a spreadsheet, and its empty cells looked like gaps. This keeps the proof (every chip links to work, and the panel names the file) in two lines a recruiter reads in five seconds.</p>
+      <p style="margin:0">Skills leave the About page entirely. The résumé keeps the full list.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span style="font-size:15px;font-weight:700;color:#5B6778">At phone width (390)</span>
+      <div style="width:342px;border:1px solid #CBD3DF;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px">
+        <div class="sk-h" style="font-size:32px">Toolbox</div>
+        <span style="font-size:14px;font-weight:700;color:#B8532E">Know well</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px"><span class="sk-chip" style="font-size:15px">Python</span><span class="sk-chip" style="font-size:15px">MATLAB</span><span class="sk-chip" style="font-size:15px">MicroPython and C</span><span class="sk-chip" style="font-size:15px">Digital comms</span><span class="sk-chip" style="font-size:15px">Git and Linux</span></div>
+        <span style="font-size:14px;font-weight:700;color:#5B6778">Have built with</span>
+        <div style="display:flex;flex-wrap:wrap;gap:8px"><span class="sk-chip sk-chip--b" style="font-size:15px">Astro and TypeScript</span><span class="sk-chip sk-chip--b" style="font-size:15px">BELLHOP</span><span class="sk-chip sk-chip--b" style="font-size:15px">Apps Script</span><span class="sk-chip sk-chip--b" style="font-size:15px">Web Audio</span><span class="sk-chip sk-chip--b" style="font-size:15px">React</span><span class="sk-chip sk-chip--b" style="font-size:15px">Supabase</span></div>
+        <span style="font-size:13px;color:#5B6778">tap a chip to see where it's used</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { i: 0 }; }
+  renderVals() {
+    const all = [
+      ['Python','bellhopSim, and the RAMpage video stream','bellhopSim/sim.py · RAMpage/pi4_direct.py','k'],
+      ['MATLAB','V2V receiver, all nine stages','v2v-bsm-ofdm/V2V_TXRXf.m','k'],
+      ['MicroPython and C','RAMpage weapon firmware, LED spectrum firmware','RAMpage/pico_direct.py · led-audio-spectrum/src/main.cpp','k'],
+      ['Digital communications','V2V over OFDM, Signals playground','V2V_TXRXf.m · src/lib/fhbfsk.ts','k'],
+      ['Git and Linux','Every repo, and this site’s build and deploy','.github/workflows/deploy.yml','k'],
+      ['Astro and TypeScript','This site and four client sites','avemath.github.io · plvinc · BcofADAM','b'],
+      ['BELLHOP','bellhopSim channel runs','bellhopSim/env/*.env','b'],
+      ['Apps Script','ISR session reports for a swim instructor','LittleExplorerSwimIntake/isr_reports.gs','b'],
+      ['Web Audio','Hear it, and the Signals playground','src/lib/tx-signal.ts','b'],
+      ['React','Landspace (private repo)','case study only','b'],
+      ['Supabase','Landspace sync with row-level security','case study only','b']
+    ];
+    const items = all.map((a, i) => ({ name: a[0], kind: a[3], show: () => this.setState({ i }) }));
+    const cur = all[this.state.i];
+    return {
+      known: items.filter(x => x.kind === 'k'),
+      built: items.filter(x => x.kind === 'b'),
+      where: cur[1],
+      file: cur[2]
+    };
+  }
+}
+</script>
+</body>
+</html>
