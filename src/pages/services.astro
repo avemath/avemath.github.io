@@ -67,9 +67,11 @@ const faqLd = {
 >
   <section class="section svc-hero">
     <div class="wrap svc-hero__grid">
-      <div>
+      <div class="svc-hero__head">
         <p class="eyebrow">Services</p>
         <h1 class="svc-title">A site that explains what you do, and that you can update yourself.</h1>
+      </div>
+      <div>
         <p class="section-lede">
           I design, build and launch websites for small businesses and nonprofits. You get a quote up front, a preview link while it's
           built, and a written guide when it's done. Every site I've shipped is live, and each one can be updated without touching the code.
@@ -192,9 +194,11 @@ const faqLd = {
     --amber-wash: color-mix(in oklab, var(--amber) 6%, transparent);
   }
 
+  /* The heading spans the whole hero, so at the shared title size it takes three lines, not five. */
   .svc-title {
     margin-top: 1rem;
-    max-width: 16ch;
+    max-width: 22ch;
+    text-wrap: balance;
     font-size: clamp(2.4rem, 6vw, 4.5rem);
     font-weight: 600;
     letter-spacing: -0.035em;
@@ -301,8 +305,12 @@ const faqLd = {
   @media (min-width: 1100px) {
     .svc-hero__grid {
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 4rem;
-      align-items: center;
+      gap: 2.5rem 4rem;
+      align-items: start;
+    }
+
+    .svc-hero__head {
+      grid-column: 1 / -1;
     }
 
   }
