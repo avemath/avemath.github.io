@@ -19,7 +19,7 @@ import V2vLink from '@/components/drawings/V2vLink.astro';
 import LedChain from '@/components/drawings/LedChain.astro';
 import SignalsHop from '@/components/drawings/SignalsHop.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
-import HomeSkills from '@/components/HomeSkills.astro';
+import Toolbox from '@/components/Toolbox.astro';
 import site from '@/data/site.json';
 import { cut, lineOf, region } from '@/lib/excerpt';
 import { hopSequence, toneHz, F_HIGH, F_LOW } from '@/lib/fhbfsk';
@@ -233,7 +233,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
   <BelowSurface />
   <div class="ground-alt"><WebsitesShowcase /></div>
-  <HomeSkills />
+  <Toolbox />
 </BaseLayout>
 
 <style>

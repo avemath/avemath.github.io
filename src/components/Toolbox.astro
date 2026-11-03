@@ -1,0 +1,241 @@
+---
+// The home page Toolbox: two rows of chips, "Know well" and "Have built with". Every chip links to
+// the main project that uses it; hovering or focusing one fills the panel under the rows with
+// where it was used and the real file, from `toolbox` in src/lib/skills.ts. On touch, the first
+// tap fills the panel and a second tap (or the panel's link) opens the project.
+import { toolbox } from '@/lib/skills';
+
+const rows = [
+  { level: 'know', label: 'Know well' },
+  { level: 'built', label: 'Have built with' },
+] as const;
+const tools = toolbox.map((t, i) => ({ ...t, i }));
+---
+
+<section id="toolbox" class="section tb" aria-labelledby="toolbox-title">
+  <div class="wrap tb__grid" data-tb>
+    <div class="tb__head">
+      <h2 id="toolbox-title" class="section-title tb__title" data-decode>Toolbox</h2>
+      <p class="tb__lede">Every tool links to work that uses it. The top row I can explain at a whiteboard without notes.</p>
+    </div>
+    <div class="tb__body">
+      {
+        rows.map((r) => (
+          <div class="tb__row">
+            <h3 class:list={['tb__label', `tb__label--${r.level}`]} id={`tb-${r.level}`}>
+              {r.label}
+            </h3>
+            <ul class="tb__chips" aria-labelledby={`tb-${r.level}`}>
+              {tools
+                .filter((t) => t.level === r.level)
+                .map((t) => (
+                  <li>
+                    <a class:list={['tb__chip', `tb__chip--${t.level}`]} href={t.uses[0].href} data-tool={t.i} aria-describedby={`tb-use-${t.i}`}>
+                      {t.name}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        ))
+      }
+      <div class="tb__panel">
+        {
+          tools.map((t) => (
+            <div class="tb__use" id={`tb-use-${t.i}`} data-use={t.i} hidden={t.i !== 0}>
+              <p class="tb__k">
+                Used in<span class="sr-only">, for {t.name}</span>
+              </p>
+              <ul class="tb__where">
+                {t.uses.map((u) => (
+                  <li>
+                    <a class="tb__proj" href={u.href}>
+                      {u.project}
+                    </a>
+                    {u.url ? (
+                      <a class="tb__file" href={u.url}>
+                        {u.file}
+                      </a>
+                    ) : (
+                      <span class="tb__file tb__file--none">case study only</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <p class="tb__hint"><span class="on-mouse">Hover</span><span class="on-touch">Tap</span> a tool to see where it's used.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initToolbox } from '../scripts/toolbox';
+  initToolbox();
+</script>
+
+<style>
+  .tb__grid {
+    display: grid;
+    gap: 2rem 2.5rem;
+    align-items: start;
+  }
+
+  @media (min-width: 960px) {
+    .tb__grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    }
+  }
+
+  .tb__title {
+    margin-top: 0;
+    font-size: clamp(2rem, 4.4vw, 3rem);
+  }
+
+  .tb__lede {
+    margin-top: 0.75rem;
+    max-width: 24em;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .tb__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .tb__row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tb__label {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    font-variation-settings: 'wdth' 100;
+  }
+
+  .tb__label--know {
+    color: var(--accent-ink);
+  }
+
+  .tb__label--built {
+    color: var(--muted);
+  }
+
+  .tb__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tb__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1.5px solid var(--text);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .tb__chip--built {
+    border-style: dashed;
+    border-color: var(--muted);
+  }
+
+  .tb__chip:hover,
+  .tb__chip:focus-visible,
+  .tb__chip[data-on] {
+    border-style: solid;
+    border-color: var(--text);
+    background: var(--text);
+    color: var(--bg-contrast);
+  }
+
+  .tb__chip--built:hover,
+  .tb__chip--built:focus-visible,
+  .tb__chip--built[data-on] {
+    border-color: var(--muted);
+    background: var(--muted);
+    color: var(--bg-contrast);
+  }
+
+  .tb__chip:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .tb__panel {
+    min-height: 5.5rem;
+    padding: 0.875rem 1.125rem;
+    border-left: 3px solid var(--accent);
+    background: var(--fig-tint);
+  }
+
+  .tb__k {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .tb__where {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tb__where li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.1rem 0.75rem;
+  }
+
+  .tb__proj {
+    padding-block: 0.15rem;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.2em;
+  }
+
+  .tb__file {
+    min-width: 0;
+    padding-block: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.2em;
+  }
+
+  .tb__file--none {
+    text-decoration: none;
+  }
+
+  .tb__hint {
+    margin-top: -0.75rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+</style>
