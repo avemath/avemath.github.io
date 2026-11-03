@@ -1,7 +1,6 @@
 {
   "_todo": [
-    "TODO(ave): pins with no photo show a line drawing (art). photo is a path under src/assets/, for example about/thrift.jpg; add an alt too.",
-    "TODO(ave): confirm anyone else in a photo here is OK being on the site."
+    "TODO(ave): pins with no photo show a line drawing (art). photo is a path under src/assets/, for example about/thrift.jpg; add an alt too."
   ],
   "feature": {
     "org": "Integer Technologies",
@@ -123,8 +122,7 @@
         "photo": "about/polaroid-pirate.jpg",
         "alt": "Avery as a little girl in a pirate costume, frowning, next to her big brother Rickey holding a toy sword.",
         "caption": "Started early."
-      },
-      "todo": "TODO(ave): check the FAIRE wording."
+      }
     },
     {
       "label": "GND",
