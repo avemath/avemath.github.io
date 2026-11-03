@@ -1,6 +1,6 @@
 ---
 // A short About on the home page, so the person behind the work is one scroll away: the About
-// page's portrait and the first lines of its opening, with a link to the rest.
+// portrait, whole, and the first lines of its opening, with a link to the rest.
 import { Image } from 'astro:assets';
 import portrait from '@/assets/portrait.jpg';
 import site from '@/data/site.json';
@@ -8,7 +8,7 @@ import site from '@/data/site.json';
 
 <section class="about-t ground-alt" aria-labelledby="about-t-title">
   <div class="wrap about-t__row">
-    <Image src={portrait} alt="Avery smiling in a white dress in front of Tiger Stadium." widths={[160, 320]} sizes="10rem" format="webp" quality={80} loading="lazy" class="about-t__photo" />
+    <Image src={portrait} alt="Avery in a white dress, smiling, in front of a light wood wall." widths={[160, 320]} sizes="10rem" format="webp" quality={80} loading="lazy" class="about-t__photo" />
     <div class="about-t__text">
       <h2 id="about-t-title" class="about-t__title">I like systems that work when it matters.</h2>
       <p>
@@ -38,17 +38,16 @@ import site from '@/data/site.json';
     }
   }
 
+  /* The whole photo, never cropped: fixed width, its own height. */
   .about-t__photo {
     width: 7rem;
-    height: 7rem;
-    object-fit: cover;
+    height: auto;
     border: 1px solid var(--line);
   }
 
   @media (min-width: 720px) {
     .about-t__photo {
       width: 10rem;
-      height: 10rem;
     }
   }
 

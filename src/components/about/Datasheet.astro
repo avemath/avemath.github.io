@@ -7,10 +7,12 @@ import type { ImageMetadata } from 'astro';
 import about from '@/data/about.json';
 import Polaroid from './Polaroid.astro';
 
-type Art = 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar';
+type Art = 'latte' | 'hanger';
+type Extra = { photo: string; alt: string; caption: string };
 
-// Pin photos live in src/assets/offclock/ (and one in the LED project's folder), named by path.
-const files = import.meta.glob<{ default: ImageMetadata }>(['/src/assets/offclock/*.{jpg,jpeg,png,webp}', '/src/assets/projects/led-audio-spectrum/*.jpg'], { eager: true });
+// Pin photos live in src/assets/about/ and src/assets/offclock/ (and one in the LED project's
+// folder), named by their path under src/assets/.
+const files = import.meta.glob<{ default: ImageMetadata }>(['/src/assets/about/*.{jpg,jpeg,png,webp}', '/src/assets/offclock/*.{jpg,jpeg,png,webp}', '/src/assets/projects/led-audio-spectrum/*.jpg'], { eager: true });
 const photoAt = (path: string) => (path ? files[`/src/assets/${path}`]?.default : undefined);
 
 // Pin text may hold [words](/link/) for a link; everything else is plain text.
@@ -25,6 +27,8 @@ const pins = about.pins.map((p, i) => ({
   n: String(i + 1).padStart(2, '0'),
   i,
   photo: photoAt(p.photo),
+  frame: (p as { frame?: boolean }).frame !== false,
+  extra: (p as { extra?: Extra }).extra,
   rowIndex: about.rows.findIndex((r) => r.key === p.row),
 }));
 const left = pins.slice(0, 5);
@@ -90,7 +94,20 @@ const right = pins.slice(5);
         pins.map((p) => (
           <article class="pd" data-desc={p.i} hidden={p.i !== 0} aria-labelledby={`pd-${p.i}`}>
             <p class="ds__k">Pin {p.n} description</p>
-            <Polaroid photo={p.photo} alt={p.alt} art={(p as { art?: Art }).art} caption={p.caption} tilt={p.i % 2 ? 2 : -2} sizes="(min-width: 960px) 16rem, 70vw" class="pd__print" />
+            <div class:list={['pd__prints', { 'pd__prints--two': p.extra }]}>
+              <Polaroid
+                photo={p.photo}
+                alt={p.alt}
+                art={(p as { art?: Art }).art}
+                caption={p.caption}
+                tilt={p.i % 2 ? 2 : -2}
+                fit="contain"
+                bare={!p.frame}
+                sizes="(min-width: 960px) 16rem, 70vw"
+                class="pd__print"
+              />
+              {p.extra && <Polaroid photo={photoAt(p.extra.photo)} alt={p.extra.alt} caption={p.extra.caption} tilt={3} sizes="(min-width: 960px) 8rem, 45vw" class="pd__extra" />}
+            </div>
             <p class="pd__label">{p.label}</p>
             <h3 id={`pd-${p.i}`} class="pd__title">{p.title}</h3>
             <p class="pd__text">
@@ -345,9 +362,47 @@ const right = pins.slice(5);
     gap: 0.875rem;
   }
 
+  .pd__prints {
+    margin: 0.5rem 0 0.75rem 0.5rem;
+  }
+
   .pd :global(.pd__print) {
     width: min(16rem, 78%);
-    margin: 0.5rem 0 0.75rem 0.5rem;
+  }
+
+  /* FAIRE carries a second, smaller print beside the first (below it on a phone), never on top. */
+  .pd__prints--two {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.25rem;
+  }
+
+  .pd__prints--two :global(.pd__print) {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+
+  .pd :global(.pd__extra) {
+    flex: 0 0 38%;
+  }
+
+  @media (max-width: 479px) {
+    .pd__prints--two {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .pd__prints--two :global(.pd__print) {
+      flex: none;
+      width: 78%;
+    }
+
+    .pd :global(.pd__extra) {
+      flex: none;
+      width: 46%;
+      margin-left: 1.5rem;
+    }
   }
 
   .pd__label {

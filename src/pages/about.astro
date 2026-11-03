@@ -19,6 +19,10 @@ import gradTiger from '@/assets/about/grad-tiger.jpg';
 import tigerStadium from '@/assets/about/polaroid-tiger-stadium.jpg';
 // TODO(ave): confirm the family is OK with this photo on the site.
 import familyAdam from '@/assets/about/family-adam.jpg';
+// TODO(ave): confirm the boat was in Lafitte and who is with me; confirm the fish.
+import bayouBoat from '@/assets/about/polaroid-bayou-boat.jpg';
+import trout from '@/assets/about/polaroid-trout.jpg';
+import rampageBuild from '@/assets/about/polaroid-rampage-build.jpg';
 ---
 
 <BaseLayout
@@ -63,11 +67,21 @@ import familyAdam from '@/assets/about/family-adam.jpg';
         Since 2020 I've also done title research as a land agent, which mostly means reading old courthouse records until they agree with each
         other. It turns out that's decent training for signal processing. The answer is usually in the part nobody wanted to read.
       </p>
-      <p>
-        The work that hooked me was <a class="link" href="/work/rampage/">RAMpage</a>, a combat robot where I wrote the code that fired the plow,
-        and a <a class="link" href="/work/v2v-bsm-ofdm/">radio link</a> I built on two software-defined radios for my communications design course.
-        That radio project is why Dr. Aldo Duarte recommended me for the <a class="link" href="/work/onr-intelligent-data-management/">Office of Naval Research project</a> I work on now.
-      </p>
+      <div class="ab-long__rp">
+        <p>
+          The work that hooked me was <a class="link" href="/work/rampage/">RAMpage</a>, a combat robot where I wrote the code that fired the plow,
+          and a <a class="link" href="/work/v2v-bsm-ofdm/">radio link</a> I built on two software-defined radios for my communications design course.
+          That radio project is why Dr. Aldo Duarte recommended me for the <a class="link" href="/work/onr-intelligent-data-management/">Office of Naval Research project</a> I work on now.
+        </p>
+        <Polaroid
+          photo={rampageBuild}
+          alt="Four RAMpage teammates bent over the robot's open chassis at a kitchen counter."
+          caption="Build night, 2025"
+          tilt={2}
+          sizes="(min-width: 720px) 11rem, 55vw"
+          class="ab-long__print"
+        />
+      </div>
       <p>
         Websites happened on the side. I built one for our family's nonprofit, then for a few small businesses, and now I keep four of them
         running.
@@ -88,7 +102,6 @@ import familyAdam from '@/assets/about/family-adam.jpg';
           alt="Avery in an LSU graduation gown tossing a cap into the air in front of Patrick F. Taylor Hall."
           caption="Taylor Hall"
           tilt={-2.5}
-          focus="50% 30%"
           sizes="(min-width: 960px) 13rem, 45vw"
         />
         <Polaroid
@@ -96,7 +109,6 @@ import familyAdam from '@/assets/about/family-adam.jpg';
           alt="Avery in a graduation gown hugging the bronze tiger statue on campus."
           caption="the tiger"
           tilt={2}
-          focus="50% 35%"
           sizes="(min-width: 960px) 13rem, 45vw"
         />
       </div>
@@ -135,10 +147,18 @@ import familyAdam from '@/assets/about/family-adam.jpg';
           sizes="(min-width: 960px) 15rem, 45vw"
         />
         <Polaroid
-          art="pool"
-          artLabel="A drawing of a backyard pool in side view, with a hydrophone in each bottom corner hearing a swimmer at the surface directly and off the walls."
-          caption="the plan"
+          photo={bayouBoat}
+          alt="Two girls in orange life jackets smiling from the front of a boat on a bayou."
+          caption="Lafitte"
           tilt={2.5}
+          sizes="(min-width: 960px) 15rem, 45vw"
+        />
+        <Polaroid
+          photo={trout}
+          alt="Avery in sunglasses kissing a speckled trout on a boat."
+          caption="June 2026"
+          tilt={-1.5}
+          sizes="(min-width: 960px) 15rem, 45vw"
         />
       </div>
     </div>
@@ -278,6 +298,30 @@ import familyAdam from '@/assets/about/family-adam.jpg';
     line-height: 1.65;
   }
 
+  /* The RAMpage paragraph with its build-night print beside it; under it on a phone. */
+  .ab-long__rp {
+    display: grid;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .ab-long__rp :global(.ab-long__print) {
+    width: min(55%, 13rem);
+    margin-left: 0.5rem;
+  }
+
+  @media (min-width: 720px) {
+    .ab-long__rp {
+      grid-template-columns: minmax(0, 1fr) 11rem;
+      gap: 1.75rem;
+    }
+
+    .ab-long__rp :global(.ab-long__print) {
+      width: 100%;
+      margin: 0.25rem 0 0;
+    }
+  }
+
   .ab-grad {
     margin: 0;
   }
@@ -339,12 +383,20 @@ import familyAdam from '@/assets/about/family-adam.jpg';
     color: var(--g-accent);
   }
 
+  /* Three prints, each the photo's own shape: two side by side, the third under them. */
   .ab-why__prints {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
     gap: 1.5rem;
     max-width: 32rem;
     padding: 0.5rem;
+  }
+
+  .ab-why__prints > :global(:last-child) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 0.75rem);
   }
 
   /* Closing band. */

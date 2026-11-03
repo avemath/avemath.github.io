@@ -1,9 +1,9 @@
 {
   "_todo": [
-    "TODO(ave): pins with an empty photo show a drawing. SNOW, FIELD, THRIFT and FILM each have their own TODO below. photo is a path under src/assets/ (for example offclock/snow.jpg); add an alt too.",
-    "TODO(ave): two family or event photos for Why underwater (no other families' children). Until then the two prints show drawings.",
+    "TODO(ave): THRIFT still has no photo (it shows the hanger drawing). photo is a path under src/assets/, for example about/thrift.jpg; add an alt too.",
     "TODO(ave): confirm anyone else in a photo here is OK being on the site.",
-    "TODO(ave): family-adam.jpg (Why underwater): confirm the family is OK with this photo on the site."
+    "TODO(ave): family-adam.jpg (Why underwater): confirm the family is OK with this photo on the site.",
+    "TODO(ave): Why underwater: confirm the boat was in Lafitte and who is with me (polaroid-bayou-boat.jpg); confirm the fish (polaroid-trout.jpg)."
   ],
   "feature": {
     "org": "Integer Technologies",
@@ -50,33 +50,31 @@
     {
       "label": "OUTSIDE",
       "title": "Plants and rivers",
-      "text": "Anywhere that is not a desk. This one is from a canoe trip with Bengals in the Wild, a club at LSU.",
-      "photo": "offclock/canoe.jpg",
-      "alt": "Avery in an LSU cap and a plaid shirt, grinning while leaning on the bow of a canoe at the edge of a clear river, with green bluffs behind.",
+      "text": "Anywhere that is not a desk. I've canoed with Bengals in the Wild, a club at LSU.",
+      "photo": "about/outside-kayak.jpg",
+      "alt": "Avery smiling from a kayak on dark water at golden hour, another kayaker behind her.",
       "caption": "river day",
-      "row": "Operating environment"
+      "row": "Operating environment",
+      "todo": "TODO(ave): which trip was this."
     },
     {
       "label": "SNOW",
       "title": "Snowboarding",
       "text": "Any chance I get, which in Louisiana is not many.",
-      "photo": "",
-      "alt": "",
-      "art": "snowboard",
+      "photo": "about/snow-snowboard.jpg",
+      "alt": "Avery as a kid, flat on her back in the snow in pink snow pants, her snowboard beside her.",
       "caption": "snow, finally",
-      "row": "Operating environment",
-      "todo": "TODO(ave): photo for SNOW"
+      "row": "Operating environment"
     },
     {
       "label": "FIELD",
       "title": "Soccer and softball",
       "text": "I played intramural flag football and softball at LSU until most of my team graduated.",
-      "photo": "",
-      "alt": "",
-      "art": "softball",
+      "photo": "about/field-intramural-champs.jpg",
+      "alt": "Avery's intramural team in matching champions shirts on a lit softball field at night.",
       "caption": "intramurals",
       "row": "Operating environment",
-      "todo": "TODO(ave): photo for FIELD"
+      "todo": "TODO(ave): the title says soccer and the text says flag football, pick one; and confirm the sport they won."
     },
     {
       "label": "THRIFT",
@@ -111,31 +109,37 @@
       "label": "FILM",
       "title": "Polaroids, everywhere",
       "text": "I always have my Polaroid camera and a stack of film on me. I have a bad memory, so the prints are how I hold on to the good times with the people I love.",
-      "photo": "",
-      "alt": "",
-      "art": "camera",
+      "photo": "about/film-graduation-print.jpg",
+      "alt": "An instant print of Avery in her 2026 cap and gown holding her LSU diploma and sunflowers, cheek to cheek with another person.",
       "caption": "always loaded",
       "row": "Compatibility",
-      "todo": "TODO(ave): a scan of a Polaroid for FILM"
+      "todo": "TODO(ave): who is cheek to cheek with me in the print; name them in the alt text once you say.",
+      "frame": false
     },
     {
-      "label": "NC",
-      "title": "No connect",
-      "text": "Free time. Currently not connected, see Known issues.",
-      "photo": "",
-      "alt": "",
-      "art": "calendar",
-      "caption": "free time?",
-      "row": "Known issues"
+      "label": "FAIRE",
+      "title": "Renaissance festivals",
+      "text": "Big fan. I go in costume, flower crown included.",
+      "photo": "about/faire-renfest.jpg",
+      "alt": "Avery in a blue Renaissance dress and flower crown, lying in the woods at a festival with friends and her dad.",
+      "caption": "faire day",
+      "row": "Compatibility",
+      "extra": {
+        "photo": "about/polaroid-pirate.jpg",
+        "alt": "Avery as a little girl in a pirate costume, frowning, next to a boy holding a toy sword.",
+        "caption": "Started early."
+      },
+      "todo": "TODO(ave): who the boy in the pirate print is, and check the FAIRE wording."
     },
     {
       "label": "GND",
       "title": "The levee",
       "text": "Bike rides along the river. It is how I ground out after a long day, and sometimes there is a turtle on the slope.",
-      "photo": "offclock/levee.jpg",
-      "alt": "A paved path running straight to the horizon between mown grass, under a blue sky full of clouds.",
-      "caption": "the levee",
-      "row": "Operating environment"
+      "photo": "about/gnd-turtle.jpg",
+      "alt": "A turtle in tall green grass.",
+      "caption": "turtle!",
+      "row": "Operating environment",
+      "todo": "TODO(ave): confirm the turtle was on the levee; if not, go back to offclock/levee.jpg."
     }
   ]
 }

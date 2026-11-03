@@ -3,7 +3,7 @@
 // 1.5px ink strokes and one accent stroke, the site's figure style. Each fills a square.
 // Decorative unless a label is passed (the pin's text already says what it shows).
 interface Props {
-  name: 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar' | 'pool';
+  name: 'latte' | 'hanger';
   label?: string;
 }
 
@@ -23,69 +23,11 @@ const { name, label } = Astro.props;
     )
   }
   {
-    name === 'snowboard' && (
-      <>
-        <path d="M8 58 L30 30 L42 42 L60 20 L92 58" />
-        <path class="soft" d="M24 38 L30 30 L36 36 M54 27 L60 20 L68 30" />
-        <path class="hot" d="M8 58 C30 54 60 62 92 58" />
-        <rect x="14" y="72" width="72" height="12" rx="6" />
-        <path d="M34 72 V67 H42 V72 M58 72 V67 H66 V72" />
-      </>
-    )
-  }
-  {
-    name === 'softball' && (
-      <>
-        <path d="M18 84 L70 22 C73 18 79 22 76 26 L26 88 Z" />
-        <path d="M20 86 L14 92" />
-        <circle cx="64" cy="66" r="18" />
-        <path class="hot" d="M52 53 C58 60 58 72 52 79 M76 53 C70 60 70 72 76 79" />
-      </>
-    )
-  }
-  {
     name === 'hanger' && (
       <>
         <path d="M50 38 V32 C50 26 58 26 58 20 C58 14 50 12 46 16" />
         <path d="M50 38 L14 64 C10 67 12 72 17 72 H83 C88 72 90 67 86 64 Z" />
         <path class="hot" d="M26 80 H74" />
-      </>
-    )
-  }
-  {
-    name === 'camera' && (
-      <>
-        <rect x="16" y="22" width="68" height="44" rx="6" />
-        <circle cx="50" cy="44" r="14" />
-        <circle cx="50" cy="44" r="7" />
-        <rect x="22" y="28" width="12" height="7" />
-        <circle cx="74" cy="30" r="3" />
-        <path class="hot" d="M28 66 V86 H72 V66" />
-        <path d="M32 70 H68 V80 H32 Z" />
-      </>
-    )
-  }
-  {
-    name === 'calendar' && (
-      <>
-        <rect x="12" y="22" width="76" height="62" />
-        <path class="hot" d="M12 36 H88" />
-        <path d="M30 16 V28 M70 16 V28" />
-        <path d="M22.9 36 V84 M33.7 36 V84 M44.6 36 V84 M55.4 36 V84 M66.3 36 V84 M77.1 36 V84" />
-        <path d="M12 60 H88" />
-      </>
-    )
-  }
-  {
-    name === 'pool' && (
-      <>
-        <path d="M8 30 V82 H92 V30" />
-        <path class="soft" d="M8 38 H92" />
-        <circle cx="50" cy="40" r="4" />
-        <circle class="dot" cx="16" cy="76" r="3.5" />
-        <circle class="dot" cx="84" cy="76" r="3.5" />
-        <path class="hot" d="M50 44 L18 74 M50 44 L82 74" />
-        <path class="soft" d="M50 44 L36 82 L18 76 M50 44 L92 66 L84 74" />
       </>
     )
   }
@@ -113,13 +55,4 @@ const { name, label } = Astro.props;
     stroke-width: 2px;
   }
 
-  .art .soft {
-    stroke: #8fa197;
-    stroke-dasharray: 3 3;
-  }
-
-  .art .dot {
-    fill: #8a5546;
-    stroke: #8a5546;
-  }
 </style>

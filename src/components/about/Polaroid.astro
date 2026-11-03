@@ -1,42 +1,55 @@
 ---
-// A photo on the About page, printed as a Polaroid: a square image in an off-white frame with a
-// thin border on three sides and the deep strip at the bottom (88 by 107 for the frame, 79 by 79
-// for the image), a caption written in marker, a soft shadow and a slight tilt that straightens
-// on hover or focus. With no photo yet, the pin's line drawing goes in the frame instead.
-import { Image } from 'astro:assets';
+// A photo on the About page, printed as a Polaroid: an off-white frame with a thin border on three
+// sides and a deep strip at the bottom (an 88-wide frame with a 23.5 strip), a caption written in
+// marker, a soft shadow and a slight tilt that straightens on hover or focus. With no photo yet,
+// the pin's line drawing goes in a square instead.
+// Photos are never cropped. By default the frame takes the photo's own shape: fixed width, height
+// follows. With fit="contain" (the datasheet's pin panel) the window stays square so the panel
+// keeps its height, and the whole photo sits inside it on the panel tint, with side margins for a
+// tall photo. With bare, a photo that is already a print (with its own border) shows as it is.
+import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import PrintArt from './PrintArt.astro';
 
 interface Props {
   photo?: ImageMetadata;
   alt?: string;
-  art?: 'latte' | 'snowboard' | 'softball' | 'hanger' | 'camera' | 'calendar' | 'pool';
+  art?: 'latte' | 'hanger';
   /** A label for a drawing that carries meaning on its own; pin drawings are decorative. */
   artLabel?: string;
-  caption: string;
+  caption?: string;
   /** Degrees; alternate the sign from print to print. */
   tilt?: number;
   sizes?: string;
-  /** Where the crop sits in a non-square photo, as object-position. */
-  focus?: string;
+  fit?: 'natural' | 'contain';
+  bare?: boolean;
   class?: string;
 }
 
-const { photo, alt = '', art, artLabel, caption, tilt = 2, sizes = '20rem', focus = '50% 50%', class: cls } = Astro.props;
+const { photo, alt = '', art, artLabel, caption = '', tilt = 2, sizes = '20rem', fit = 'natural', bare = false, class: cls } = Astro.props;
+const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.height}` : '';
 ---
 
-<figure class:list={['pol', cls]} style={`--tilt:${tilt}deg`}>
-  <div class="pol__img">
-    {
-      photo ? (
-        <Image src={photo} alt={alt} widths={[320, 480, 640]} sizes={sizes} format="webp" quality={80} loading="lazy" style={`object-position:${focus}`} />
-      ) : (
-        art && <PrintArt name={art} label={artLabel} />
-      )
-    }
-  </div>
-  <figcaption class="pol__cap">{caption}</figcaption>
-</figure>
+{
+  bare && photo ? (
+    <figure class:list={['pol-bare', cls]} style={`--tilt:${tilt}deg`}>
+      <div class="pol-bare__box">
+        <Picture src={photo} alt={alt} formats={['avif', 'webp']} widths={[320, 480, 640]} sizes={sizes} quality={80} loading="lazy" />
+      </div>
+    </figure>
+  ) : (
+    <figure class:list={['pol', `pol--${fit}`, cls]} style={`--tilt:${tilt}deg`}>
+      <div class="pol__img" style={shape}>
+        {photo ? (
+          <Picture src={photo} alt={alt} formats={['avif', 'webp']} widths={[320, 480, 640]} sizes={sizes} quality={80} loading="lazy" />
+        ) : (
+          art && <PrintArt name={art} label={artLabel} />
+        )}
+      </div>
+      <figcaption class="pol__cap">{caption}</figcaption>
+    </figure>
+  )
+}
 
 <style>
   .pol {
@@ -52,13 +65,14 @@ const { photo, alt = '', art, artLabel, caption, tilt = 2, sizes = '20rem', focu
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    :global(html:not([data-motion='reduce'])) .pol {
+    :global(html:not([data-motion='reduce'])) :is(.pol, .pol-bare) {
       transition: rotate 0.25s ease;
     }
   }
 
   .pol:hover,
-  .pol:focus-within {
+  .pol:focus-within,
+  .pol-bare:hover {
     rotate: 0deg;
   }
 
@@ -68,11 +82,23 @@ const { photo, alt = '', art, artLabel, caption, tilt = 2, sizes = '20rem', focu
     background: #e6ede6;
   }
 
+  .pol__img :global(picture) {
+    display: contents;
+  }
+
   .pol__img :global(img) {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+  }
+
+  /* The pin panel: a square window, the whole photo inside it on the panel tint. */
+  .pol--contain .pol__img {
+    background: var(--ds-desc, #fafcf9);
+  }
+
+  .pol--contain .pol__img :global(img) {
+    object-fit: contain;
   }
 
   /* The deep bottom strip: 23.5 of the frame's 88 wide, with the caption written in it. A long
@@ -88,5 +114,34 @@ const { photo, alt = '', art, artLabel, caption, tilt = 2, sizes = '20rem', focu
     line-height: 1.1;
     color: #1c2a25;
     overflow-wrap: anywhere;
+  }
+
+  /* A print that already has its own white border: no frame added, the whole print in a square
+     window so the panel keeps its height, with the print's own shadow. */
+  .pol-bare {
+    margin: 0;
+    rotate: var(--tilt);
+  }
+
+  .pol-bare__box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+  }
+
+  .pol-bare__box :global(picture) {
+    display: contents;
+  }
+
+  .pol-bare__box :global(img) {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    box-shadow:
+      0 1px 2px rgb(28 42 37 / 0.18),
+      0 12px 24px -12px rgb(28 42 37 / 0.45);
   }
 </style>
