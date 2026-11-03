@@ -562,6 +562,38 @@ const jsonLd = [
     margin-top: 0;
   }
 
+  /* A photo placed in the text (written as a <figure> in the Markdown): the whole photo, never
+     cropped, with its caption under it. An instant print keeps its own white border, smaller. */
+  .case__prose :global(.case__fig) {
+    margin: 2rem 0;
+  }
+
+  .case__prose :global(.case__fig p) {
+    margin: 0;
+  }
+
+  .case__prose :global(.case__fig img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+  }
+
+  .case__prose :global(.case__fig--print) {
+    max-width: 17rem;
+  }
+
+  .case__prose :global(.case__fig--print img) {
+    border: 0;
+    box-shadow: var(--shadow);
+  }
+
+  .case__prose :global(.case__fig figcaption) {
+    margin-top: 0.6rem;
+    font-size: 0.875rem;
+    color: var(--text-soft);
+  }
+
   /* The gallery spans the contents rail and the reading column (62rem), from the container's edge. */
   .case__gallery-wrap {
     padding-bottom: clamp(3rem, 6vw, 5rem);

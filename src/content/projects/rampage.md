@@ -53,6 +53,14 @@ Combat is a rough place for electronics: vibration, interference, flaky radio li
 
 The team was Avery Matherne (control software and systems integration), Chris Cashen, Nicholas Woodroffe, Matthew van Winkle and Miles Mouton. The mechanical design and the pneumatic analysis were the mechanical team's work. I wrote the three programs: `pico_direct.py` (weapon and safety firmware on the Pico W), `pi4_direct.py` (the video pipeline on the Pi 4B) and `video_direct.py` (the receiver on the driver's laptop), plus the scripts we used to test latency and heat.
 
+<!-- TODO(ave): confirm the teammates are OK with this photo on the site. -->
+<figure class="case__fig">
+
+![Five students, Avery holding the controller and a teammate holding RAMpage.](../../assets/projects/rampage/rampage-team-2025.jpg)
+
+<figcaption>The RAMpage team, April 2025</figcaption>
+</figure>
+
 ## Approach
 
 **Split by criticality.** Drive never touches either computer: the RC receiver feeds the speed controllers directly, so a software crash can't take away steering. The Pico W reads only two switch channels and runs the weapon. The Pi 4B only does video. Neither one waits on the other.
@@ -74,6 +82,14 @@ The team was Avery Matherne (control software and systems integration), Chris Ca
 ## Outcome
 
 RAMpage took first place in the senior design combat robotics competition.
+
+<!-- TODO(ave): what is the other robot? -->
+<figure class="case__fig case__fig--print">
+
+![An instant photo of RAMpage beside another combat robot on the arena floor.](../../assets/projects/rampage/rampage-arena-instax.jpg)
+
+<figcaption>RAMpage, left, before a match</figcaption>
+</figure>
 
 ## What I'd do next
 
