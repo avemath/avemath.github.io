@@ -115,7 +115,7 @@ export function init(panel: HTMLElement) {
       if (f !== F_LOW && f !== F_HIGH) h += `<text x="${L - 8}" y="${yy + 4}" text-anchor="end"${f === fc ? ' class="t-ink"' : ''}>${(f / 1000).toFixed(2)}</text>`;
     }
     h += `<line x1="${L}" x2="${x1}" y1="${y(fc)}" y2="${y(fc)}" stroke="var(--muted)" stroke-dasharray="2 4" stroke-width="0.8"/>`;
-    h += `<text x="12" y="${T + plotH / 2}" transform="rotate(-90 12 ${T + plotH / 2})" text-anchor="middle">frequency, kHz</text>`;
+    h += `<text x="18" y="${T + plotH / 2}" transform="rotate(-90 18 ${T + plotH / 2})" text-anchor="middle">frequency, kHz</text>`;
     h += `<text x="${L}" y="${T - 10}">center 11520 Hz, dotted</text>`;
     h += `<text x="${x1 + 6}" y="${T - 10}">pair</text>`;
 
@@ -137,7 +137,7 @@ export function init(panel: HTMLElement) {
       h += `<rect x="${x + colW / 2 - 7}" y="${on - 7}" width="14" height="14" fill="${col}" stroke="var(--text)"/>`;
       h += `<line x1="${x}" x2="${x}" y1="${T}" y2="${T + plotH}" stroke="var(--line)"/>`;
       h += `<text x="${x + colW / 2}" y="${T + plotH + 14}" text-anchor="middle">${i}</text>`;
-      h += `<rect x="${x + 7}" y="${rowY - 12}" width="${colW - 14}" height="20" rx="4" fill="${col}"/>`;
+      h += `<rect x="${x + 7}" y="${rowY - 14}" width="${colW - 14}" height="24" rx="4" fill="${col}"/>`;
       h += `<text x="${x + colW / 2}" y="${rowY + 3}" text-anchor="middle" style="fill:var(--surface);font-weight:600">${b}</text>`;
       h += `</g>`;
       h += `<g class="fh-col" data-p="${i}" tabindex="0" role="button" aria-label="Play chip ${i}">`;

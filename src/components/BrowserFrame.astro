@@ -82,6 +82,13 @@ const host = url ? displayUrl(url) : '';
     gap: 0.35rem;
   }
 
+  /* On a phone the bar is short of room once Try it sits in it; the address needs it more than the dots. */
+  @media (max-width: 479px) {
+    .frame__dots {
+      display: none;
+    }
+  }
+
   .frame__dots i {
     width: 0.55rem;
     height: 0.55rem;

@@ -21,15 +21,16 @@ const BAR_X = (i: number) => 214 + i * 12.5;
     'Boot message: on power-up the matrix scrolls its owner\'s name three times, then shows the idle glow.',
   ]}
 >
-  <rect class="s f" pathLength="1" x="16" y="40" width="110" height="50"></rect>
+  <rect class="s f" pathLength="1" x="16" y="40" width="140" height="50"></rect>
   <text class="t" x="28" y="62">Mic</text>
   <text class="t t--muted" x="28" y="79">MAX4466, GPIO 34</text>
-  <path class="s s--hot" pathLength="1" d="M126 65 H160"></path>
+  <path class="s s--hot" pathLength="1" d="M156 65 H172"></path>
 
-  <rect class="s f" pathLength="1" x="160" y="24" width="300" height="82"></rect>
-  <text class="t" x="172" y="46">ESP32</text>
-  <text class="t t--muted" x="172" y="64">10 kHz samples, 128-point FFT, Hamming window</text>
-  <text class="t t--muted t--mono" x="172" y="88">bins 2 to 51 used (of 64)</text>
+  <rect class="s f" pathLength="1" x="172" y="18" width="250" height="100"></rect>
+  <text class="t" x="184" y="40">ESP32</text>
+  <text class="t t--muted" x="184" y="58">10 kHz samples, 128-point FFT,</text>
+  <text class="t t--muted" x="184" y="75">Hamming window</text>
+  <text class="t t--muted t--mono" x="184" y="102">bins 2 to 51 used (of 64)</text>
 
   {Array.from({ length: 50 }, (_, k) => <path class="s s--soft" pathLength="1" d={`M${BIN_X(k + 2)} 130 v10`} />)}
   <text class="t t--muted" x="16" y="142">FFT bins</text>
@@ -48,13 +49,14 @@ const BAR_X = (i: number) => 214 + i * 12.5;
 
   <rect class="s f" pathLength="1" x="474" y="140" width="150" height="120"></rect>
   <text class="t" x="486" y="162">16 x 16 matrix</text>
-  <text class="t t--muted" x="486" y="180">WS2812B, data on GPIO 5</text>
+  <text class="t t--muted" x="486" y="180">WS2812B,</text>
+  <text class="t t--muted" x="486" y="197">data on GPIO 5</text>
   <path class="s" pathLength="1" d="M420 205 H474"></path>
   <text class="t t--mono t--hot" x="486" y="236">LEA</text>
   <text class="t t--muted" x="486" y="252">scrolls on boot</text>
 
   <g class="co"><circle cx="16" cy="40" r="9"></circle><text x="16" y="44">1</text></g>
-  <g class="co"><circle cx="160" cy="24" r="9"></circle><text x="160" y="28">2</text></g>
+  <g class="co"><circle cx="172" cy="18" r="9"></circle><text x="172" y="22">2</text></g>
   <g class="co"><circle cx="214" cy="196" r="9"></circle><text x="214" y="200">3</text></g>
   <g class="co"><circle cx="474" cy="224" r="9"></circle><text x="474" y="228">4</text></g>
 </Drawing>
