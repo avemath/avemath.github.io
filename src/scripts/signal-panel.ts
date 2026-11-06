@@ -3,6 +3,7 @@
 // follow the pointer, snapping to chip and tone boundaries, and the tones near them brighten; by
 // keyboard the arrow keys step the same cursors. Touch screens get one slow drift in, then rest.
 // "Hear it" plays the same chips through Web Audio, only when pressed.
+import { navyAlpha } from '../lib/navy-client';
 import { CHIPS, CHIP_MS, DURATION_MS, LISTEN_STRETCH, preamble, synthesize, tones } from '../lib/preamble';
 import { prefersReducedMotion } from './preferences';
 
@@ -51,6 +52,8 @@ export function mountSignalPanel(fig: HTMLElement) {
   let cur: { chip: number; tone: number } | null = null;
   let playing = -1;
   let drift = 0;
+  // The label plates are the site's navy, read once rather than on every frame.
+  const plate = navyAlpha(0.92);
 
   function draw() {
     const dpr = Math.min(2, devicePixelRatio || 1);
@@ -96,7 +99,7 @@ export function mountSignalPanel(fig: HTMLElement) {
       const label = `${f / 1000} kHz`;
       const y = yOf(f) - 8;
       const tw = ctx.measureText(label).width;
-      ctx.fillStyle = 'rgba(11,31,58,0.92)';
+      ctx.fillStyle = plate;
       ctx.fillRect(b.x1 - 6 - tw, y - 7, tw + 4, 14);
       ctx.fillStyle = 'rgba(169,182,204,0.9)';
       ctx.fillText(label, b.x1 - 4, y);

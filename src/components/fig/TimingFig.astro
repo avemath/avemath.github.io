@@ -66,8 +66,20 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
 ---
 
 <div class="tf" data-tf>
+  <!-- The controls sit on top of the drawing, so Fire and the plow are on screen together. -->
+  <div class="tf__bar" role="group" aria-label="Plow controls">
+    <button type="button" class="btn btn--small btn--primary tf__fire" data-fire>Fire</button>
+    <fieldset class="tf__speed">
+      <legend>Slow-mo</legend>
+      <label><input type="radio" name="tf-speed" value="1" data-speed /> Off</label>
+      <label><input type="radio" name="tf-speed" value="4" checked data-speed /> 4x</label>
+      <label><input type="radio" name="tf-speed" value="16" data-speed /> 16x</label>
+    </fieldset>
+    <button type="button" class="btn btn--small tf__reset" data-reset>Reset</button>
+    <p class="tf__chip" aria-live="polite"><span class="sr-only">Plow: </span><span data-tf-state>Ready</span></p>
+  </div>
   <div class="tf__wrap">
-  <div class="tf__pn"><RampagePneumatics /></div>
+  <div class="tf__pn" tabindex="0" role="group" aria-label="Plow drawing. Press Space or Enter to fire." aria-keyshortcuts="Space Enter" data-tf-pn><RampagePneumatics /></div>
   <div class="tf__plot" data-draw data-hscroll="Timing diagram">
     <svg viewBox="0 0 640 262" class="tf__svg" style="--fig-w:640px" role="group" aria-label="Timing diagram of one plow strike. Tab to each trace to read it.">
       <defs>
@@ -110,16 +122,6 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     <p class="tf__tip mono" data-tf-tip aria-hidden="true"></p>
   </div>
   </div>
-  <div class="tf__controls">
-    <button type="button" class="btn btn--small btn--primary tf__fire" data-fire>Fire</button>
-    <fieldset class="tf__speed">
-      <legend>Speed</legend>
-      <label><input type="radio" name="tf-speed" value="4" checked data-speed /> 4x slower</label>
-      <label><input type="radio" name="tf-speed" value="16" data-speed /> 16x slower</label>
-      <label><input type="radio" name="tf-speed" value="1" data-speed /> Real time</label>
-    </fieldset>
-    <p class="tf__chip" aria-live="polite"><span class="sr-only">Plow: </span><span data-tf-state>Ready</span></p>
-  </div>
   <div class="fig__note tf__legend">
     <p>
       <span class="tf__item"><span class="callout" aria-hidden="true">1</span> exhaust open {SOLENOID_SEQUENCE_DELAY} ms, plow home</span>
@@ -148,12 +150,12 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
   }
 
   .tf__pn {
-    padding: 1rem 1rem 0;
+    padding: 0.75rem 0.75rem 0;
   }
 
   @container (min-width: 760px) {
     .tf__wrap {
-      grid-template-columns: minmax(18rem, 27rem) minmax(0, 1fr);
+      grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
     }
 
     .tf__pn {
@@ -274,14 +276,38 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     display: block;
   }
 
-  /* Fire, the speed and the plow's state, right under the drawing and the timing rows. */
-  .tf__controls {
+  /* Fire, slow-mo, reset and the plow's state: a toolbar on top of the drawing, sticky under the
+     site header while the figure is on screen, so pressing Fire never scrolls the plow away. */
+  .tf__bar {
+    position: sticky;
+    top: 4rem;
+    z-index: 2;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.6rem 1.25rem;
-    padding: 0.75rem 0.9rem;
-    border-top: 1px solid var(--line);
+    gap: 0.5rem 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--fig-tint);
+  }
+
+  .tf__bar .btn {
+    min-height: 44px;
+  }
+
+  /* Header (4rem), toolbar (about 3.5rem on one row, 6.5rem when it wraps on a phone) and a margin. */
+  .tf {
+    --pn-max-h: calc(100svh - 4rem - 6.5rem - 2rem);
+  }
+
+  @container (min-width: 560px) {
+    .tf__wrap {
+      --pn-max-h: calc(100svh - 4rem - 3.5rem - 2rem);
+    }
+  }
+
+  .tf__pn {
+    outline-offset: -3px;
   }
 
   .tf__speed {
@@ -305,7 +331,7 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     position: relative;
     display: inline-flex;
     align-items: center;
-    min-height: 2.5rem;
+    min-height: 44px;
     padding: 0.3rem 0.7rem;
     border: 1px solid var(--line-strong);
     font-size: 0.875rem;

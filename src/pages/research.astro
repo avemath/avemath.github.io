@@ -110,7 +110,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
         </div>
         <div>
           <p class="range mono">{rangeLabel(zoneById('onr'))}</p>
-          <h2 id="onr-title" class="research__h2" data-decode>Intelligent data management for distributed naval platforms</h2>
+          <h2 id="onr-title" class="research__h2" data-decode>Intelligent data management for distributed naval&nbsp;platforms</h2>
           <p class="zone-r__text">
             ONR funded, with Integer Technologies. Many platforms, thin and unreliable links between them, and far more data than the links
             can carry. I work with the communications group, on the end to end chain that carries data from underwater acoustic links to the links above the water. Thesis track, expected May 2028.
@@ -209,19 +209,19 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 </BaseLayout>
 
 <style>
-  /* The page is the water: lighter navy at the surface, near black at the bottom. A second layer
-     darkens the whole screen a little more as the depth grows. */
+  /* The page is the water: the site's navy at the surface, near black at the bottom. A second
+     layer darkens the whole screen a little more as the depth grows. */
   .under {
     position: relative;
     isolation: isolate;
-    background: linear-gradient(180deg, #14325c 0%, var(--navy) 22%, var(--navy-deep) 58%, var(--navy-deeper) 100%);
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy) 14%, var(--navy-deep) 58%, var(--navy-deeper) 100%);
   }
 
   .under__dark {
     position: fixed;
     inset: 0;
     z-index: -1;
-    background: #02060d;
+    background: color-mix(in srgb, var(--navy) 15%, #000);
     opacity: calc(var(--depth, 0) * 0.35);
     pointer-events: none;
   }
@@ -231,7 +231,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   }
 
   :global(body:has([data-under]) .site-header) {
-    background: #14325c;
+    background: var(--navy);
   }
 
   .zone-r {
@@ -337,7 +337,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .rfig--boxed {
     border: 1px solid var(--line);
-    background: rgb(4 12 24 / 0.3);
+    background: color-mix(in srgb, var(--navy-deeper) 30%, transparent);
   }
 
   .rfig__plot {

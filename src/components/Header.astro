@@ -20,7 +20,13 @@ const nav = [
   { href: '/about/', label: 'About', key: 'about' },
   { href: '/#contact', label: 'Contact', key: 'contact' },
 ];
-const isCurrent = (key: string) => key === section || (key === 'research' && path === '/research') || (key === 'about' && path === '/about');
+// The contact page lights Contact, and the services page (website work) lights Websites.
+const isCurrent = (key: string) =>
+  key === section ||
+  (key === 'research' && path === '/research') ||
+  (key === 'about' && path === '/about') ||
+  (key === 'contact' && path === '/contact') ||
+  (key === 'websites' && path === '/services');
 ---
 
 <header class="site-header on-navy no-print" data-header>

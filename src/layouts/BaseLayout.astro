@@ -1,4 +1,5 @@
 ---
+import { NAVY } from '@/lib/navy';
 import '@/styles/global.css';
 import SEO from '@/components/SEO.astro';
 import Header from '@/components/Header.astro';
@@ -38,7 +39,7 @@ const { bare = false, navLabel, section, footer = 'default', page, ...seo } = As
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#0b1f3a" />
+    <meta name="theme-color" content={NAVY} />
     <script is:inline>
       // Apply saved or system theme and motion settings before first paint.
       (function () {

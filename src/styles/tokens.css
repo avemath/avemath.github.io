@@ -9,20 +9,28 @@
    marquee, the active trace, callouts. Text in the accent color uses
    --accent-ink, which passes 4.5:1 on its ground. White on the accent
    is 3.4:1, so white text on it is set large (19px bold) only.
+
+   --navy is the one value to change to retint the site. Everything
+   navy below (the deeper bands, raised surfaces on navy, the light
+   ink, the dark theme's grounds, shadows and dots) is mixed from it.
+   The few places outside CSS that need the hex (theme-color, the
+   favicon, the social cards, two canvases) read it from here too.
+   On navy, the accent (3.8:1) is for fills, icons and text 24px and
+   up; small orange text on navy uses --accent-on-navy (5.2:1).
    ------------------------------------------------------------------ */
 :root {
-  --navy: #0b1f3a;
-  --navy-deep: #071527;
-  --navy-deeper: #040c18;
+  --navy: #16325a;
+  --navy-deep: color-mix(in srgb, var(--navy) 65%, #000);
+  --navy-deeper: color-mix(in srgb, var(--navy) 38%, #000);
   /* Raised and sunken surfaces on navy. */
-  --navy-2: #102847;
-  --navy-3: #0d2241;
+  --navy-2: color-mix(in srgb, var(--navy) 96%, #fff);
+  --navy-3: color-mix(in srgb, var(--navy) 98%, #fff);
   --on-navy: #f4f6fa;
   --on-navy-soft: #d6dde8;
   --on-navy-muted: #a9b6cc;
   --on-navy-line: rgb(244 246 250 / 0.22);
   --on-navy-line-strong: rgb(244 246 250 / 0.45);
-  --accent-on-navy: #ef8d66;
+  --accent-on-navy: #f08a64;
 
   --accent: #de6a41;
   --accent-hover: #c95a33;
@@ -34,16 +42,16 @@
   --surface: #ffffff;
   --surface-2: #eef1f5;
   --ground-alt: #eef1f5;
-  --dot: rgb(11 31 58 / 0.12);
-  --text: #0b1f3a;
+  --dot: color-mix(in srgb, var(--navy) 12%, transparent);
+  --text: var(--navy);
   --text-soft: #26364f;
   --muted: #5b6778;
   --line: #cbd3df;
   --line-strong: #8e9aad;
-  --focus: #0b1f3a;
+  --focus: var(--navy);
   /* Paper: a contact shadow and a soft drop. Lifted, both deepen a little. */
-  --shadow: 0 1px 2px rgb(11 31 58 / 0.06), 0 12px 32px -20px rgb(11 31 58 / 0.35);
-  --shadow-lift: 0 2px 4px rgb(11 31 58 / 0.08), 0 18px 40px -20px rgb(11 31 58 / 0.45);
+  --shadow: 0 1px 2px color-mix(in srgb, var(--navy) 6%, transparent), 0 12px 32px -20px color-mix(in srgb, var(--navy) 35%, transparent);
+  --shadow-lift: 0 2px 4px color-mix(in srgb, var(--navy) 8%, transparent), 0 18px 40px -20px color-mix(in srgb, var(--navy) 45%, transparent);
   /* The tint behind a figure, so the drawing area reads apart from the words beside it. */
   --fig-tint: #f7f9fc;
   --accent-bright: #f27a4c;
@@ -54,13 +62,13 @@
   --leaf-ink: #2f5e3c;
 
   --code-bg: #f6f8fb;
-  --code-ink: #0b1f3a;
+  --code-ink: var(--navy);
   --code-num: #7b8698;
   --code-hot: rgb(222 106 65 / 0.12);
   --code-comment: #5b6778;
   --code-string: #8a3f1f;
   --code-number: #1d5c8a;
-  --code-keyword: #0b1f3a;
+  --code-keyword: var(--navy);
 
   /* Old names, kept so every page reads the new palette. */
   --accent-wash: rgb(222 106 65 / 0.1);
@@ -69,30 +77,31 @@
   --amber-line: var(--accent);
   --amber-ink: var(--accent-ink);
   --on-amber: #ffffff;
-  --grid: rgb(11 31 58 / 0.06);
+  --grid: color-mix(in srgb, var(--navy) 6%, transparent);
 
   --gutter: clamp(1rem, 4vw, 2.5rem);
   color-scheme: light;
 }
 
+/* Dark grounds sit just under the navy, so dark mode is no heavier than light. */
 [data-theme='dark'] {
-  --bg: #071527;
-  --bg-contrast: #071527;
-  --surface: #0e2340;
-  --surface-2: #0b1c33;
-  --ground-alt: #0a1a30;
+  --bg: color-mix(in srgb, var(--navy) 80%, #000);
+  --bg-contrast: color-mix(in srgb, var(--navy) 80%, #000);
+  --surface: color-mix(in srgb, var(--navy) 98%, #fff);
+  --surface-2: color-mix(in srgb, var(--navy) 90%, #000);
+  --ground-alt: color-mix(in srgb, var(--navy) 86%, #000);
   --dot: rgb(244 246 250 / 0.08);
   --text: #f4f6fa;
   --text-soft: #d6dde8;
   --muted: #a9b6cc;
-  --line: #2a3f5e;
-  --line-strong: #5a6f8f;
-  --focus: #ef8d66;
-  --accent-ink: #ef8d66;
+  --line: color-mix(in srgb, var(--navy) 86%, #fff);
+  --line-strong: color-mix(in srgb, var(--navy) 60%, #fff);
+  --focus: var(--accent-on-navy);
+  --accent-ink: var(--accent-on-navy);
   /* On dark grounds a shadow does not read, so paper gets a faint light ring instead. */
   --shadow: 0 0 0 1px rgb(244 246 250 / 0.05);
   --shadow-lift: 0 0 0 1px rgb(244 246 250 / 0.16);
-  --fig-tint: #0b1d36;
+  --fig-tint: color-mix(in srgb, var(--navy) 92%, #000);
   --accent-bright: #ff8a5c;
 
   --danger: #ff8a7a;
@@ -100,9 +109,9 @@
   --leaf: #8fd19e;
   --leaf-ink: #a9dfb5;
 
-  --code-bg: #0a1a30;
+  --code-bg: color-mix(in srgb, var(--navy) 86%, #000);
   --code-ink: #e6ebf3;
-  --code-num: #7d8ca5;
+  --code-num: #8b9ab2;
   --code-hot: rgb(222 106 65 / 0.2);
   --code-comment: #93a2ba;
   --code-string: #f2a888;

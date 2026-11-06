@@ -2,6 +2,7 @@
 // only on that click, and the audio never leaves the device), the clip, or the idle glow. Typing
 // a name scrolls it across the matrix the way setup() scrolls the owner's name on boot. Every
 // frame comes from src/lib/led-firmware.ts.
+import { navy, mixHex } from '../../lib/navy-client';
 import { createDemoTrack, createSpectrum, openMic, scrollFrame, scrollSteps, DEMO_FONT, FRAME_MS, FS, H, N, SCROLL_STEP_MS, W } from '../../lib/led-firmware';
 import { prefersReducedMotion } from '../preferences';
 
@@ -11,14 +12,15 @@ import { prefersReducedMotion } from '../preferences';
 const CLIP_SECONDS = 13;
 const CLIP_GAIN = 0.5;
 
-const NAVY = '#0b1f3a';
-const OFF = '#132a4a';
 const ON = '#de6a41';
 const PEAK = '#ffc2a8';
 
 type Source = 'none' | 'mic' | 'clip' | 'idle' | 'name';
 
 export function mountMatrix(root: HTMLElement) {
+  // The panel is the site's navy; an unlit LED is a step lighter.
+  const NAVY = navy();
+  const OFF = mixHex(NAVY, 0.94, '#ffffff');
   const canvas = root.querySelector<HTMLCanvasElement>('[data-mf-canvas]')!;
   const ctx = canvas.getContext('2d')!;
   const read = root.querySelector<HTMLElement>('[data-mf-read]')!;

@@ -36,7 +36,8 @@ export function mountChain(root: HTMLElement) {
   const cap = root.querySelector<HTMLElement>('[data-cf-cap]')!;
   const card = root.closest<HTMLElement>('[data-fc]');
   const stepBtn = card?.querySelector<HTMLButtonElement>('[data-step]');
-  const rx = createReceiver(42);
+  // The receiver (and the packet it decodes) is built on the first plot, not at page load.
+  let rx: ReturnType<typeof createReceiver> | null = null;
   const axes = svg.innerHTML;
   let shown: [number, number][] | null = null;
   let morph = 0;
@@ -45,6 +46,7 @@ export function mountChain(root: HTMLElement) {
   function plot(i: number) {
     const key = stages[i].key;
     const { on, view } = upTo[key];
+    rx ??= createReceiver(42);
     const r = rx.receive(CFO_HZ, SNR_DB, on);
     if (view === 'bsm') {
       shown = null;

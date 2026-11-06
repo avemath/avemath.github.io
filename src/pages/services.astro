@@ -69,7 +69,7 @@ const faqLd = {
     <div class="wrap svc-hero__grid">
       <div class="svc-hero__head">
         <p class="eyebrow">Services</p>
-        <h1 class="svc-title">A site that explains what you do, and that you can update yourself.</h1>
+        <h1 class="svc-title">A site that explains what you do, and that you can update&nbsp;yourself.</h1>
       </div>
       <div>
         <p class="section-lede">
@@ -202,6 +202,13 @@ const faqLd = {
     font-size: clamp(2.4rem, 6vw, 4.5rem);
     font-weight: 600;
     letter-spacing: -0.035em;
+  }
+
+  /* Past six lines balance gives up; pretty keeps the last word company on a phone. */
+  @media (max-width: 479px) {
+    .svc-title {
+      text-wrap: pretty;
+    }
   }
 
   /* Two by two on tablets and four across on desktop, so four cards never leave a lone one. */

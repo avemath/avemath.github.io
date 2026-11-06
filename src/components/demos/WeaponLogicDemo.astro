@@ -64,10 +64,12 @@ import DemoShell from './DemoShell.astro';
 
       <div class="wl__plow" aria-hidden="true">
         <svg viewBox="0 0 200 60">
-          <rect x="10" y="20" width="110" height="26" rx="5" class="plow__body"></rect>
+          <!-- The plow is one flat plate on two rods: it slides straight out and back, never tilts. -->
           <g class="plow__blade" data-plow>
-            <path d="M 120 46 L 150 46 L 182 14 L 168 10 Z"></path>
+            <path d="M 96 27 H 126 M 96 39 H 126" class="plow__rods"></path>
+            <rect x="126" y="10" width="7" height="42" class="plow__plate"></rect>
           </g>
+          <rect x="10" y="20" width="110" height="26" rx="5" class="plow__body"></rect>
           <line x1="20" y1="54" x2="190" y2="54" class="plow__floor"></line>
         </svg>
       </div>
@@ -283,17 +285,21 @@ import DemoShell from './DemoShell.astro';
     stroke: var(--line-strong);
   }
 
-  .plow__blade path {
+  .plow__plate {
     fill: var(--amber);
   }
 
+  .plow__rods {
+    stroke: var(--line-strong);
+    stroke-width: 3;
+  }
+
   .plow__blade {
-    transform-origin: 150px 46px;
-    transition: rotate 0.12s ease-out;
+    transition: transform 0.12s ease-out;
   }
 
   .plow__blade[data-up] {
-    rotate: -28deg;
+    transform: translateX(36px);
   }
 
   .plow__floor {

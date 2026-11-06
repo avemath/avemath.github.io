@@ -10,17 +10,18 @@ Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme=
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--navy` | `#0b1f3a` | same | hero, nav, footer, research ground |
-| `--navy-deep`, `--navy-deeper` | `#071527`, `#040c18` | same | gradients that darken downward |
-| `--bg`, `--surface` | `#ffffff` | `#071527`, `#0e2340` | page and paper cards |
-| `--ground-alt` | `#eef1f5` with a dot grid | `#0a1a30` | alternate sections (`.ground-alt`) |
-| `--text` | `#0b1f3a` | `#f4f6fa` | ink |
+| `--navy` | `#16325a` | same | hero, nav, footer, research ground. The one value to change: everything navy below is mixed from it |
+| `--navy-deep`, `--navy-deeper` | navy at 65% and 38% toward black | same | gradients that darken downward |
+| `--bg`, `--surface` | `#ffffff` | navy at 80% toward black, navy at 2% toward white | page and paper cards |
+| `--ground-alt` | `#eef1f5` with a dot grid | navy at 86% toward black | alternate sections (`.ground-alt`) |
+| `--text` | `var(--navy)` | `#f4f6fa` | ink |
 | `--muted` | `#5b6778` | `#a9b6cc` | labels, meta |
-| `--line` | `#cbd3df` | `#2a3f5e` | 1px borders |
+| `--line` | `#cbd3df` | navy at 14% toward white | 1px borders |
 | `--accent` | `#de6a41` | same | fills and strokes only: primary buttons, the marquee, active traces, callouts |
-| `--accent-ink` | `#b4502a` | `#ef8d66` | text in the accent color (passes 4.5:1) |
+| `--accent-ink` | `#b4502a` | `--accent-on-navy` | text in the accent color (passes 4.5:1) |
+| `--accent-on-navy` | `#f08a64` | same | small orange text on navy (5.2:1 on `#16325a`) |
 
-On navy (`.on-navy`) the inks are `#f4f6fa`, `#a9b6cc` and lines at 22% white, in both themes. White on the accent is 3.4:1, so white text on it is always 19px bold (large text): the primary button and the marquee. A small primary button turns into a solid ink button instead.
+On navy (`.on-navy`) the inks are `#f4f6fa` (11.9:1), `#a9b6cc` (6.3:1) and lines at 22% white, in both themes. The accent on navy is 3.8:1: fine for fills, icons and text 24px and up, never small text. Outside CSS, `src/lib/navy.ts` (theme-color), `src/lib/navy-client.ts` (canvases) and `scripts/render-assets.mjs` (favicon, social cards) read `--navy` from `tokens.css`, so retinting is a one-line change followed by `npm run assets`. White on the accent is 3.4:1, so white text on it is always 19px bold (large text): the primary button and the marquee. A small primary button turns into a solid ink button instead.
 
 ## Type
 

@@ -1,4 +1,5 @@
 ---
+import { keepLastPair } from '@/lib/format';
 import SignalPanel from './SignalPanel.astro';
 import Marquee from './Marquee.astro';
 import site from '@/data/site.json';
@@ -7,7 +8,7 @@ import site from '@/data/site.json';
 <section id="top" class="hero on-navy dot-grid" aria-labelledby="hero-title">
   <div class="wrap hero__grid">
     <div class="hero__text">
-      <h1 id="hero-title" class="hero__title">{site.headline}</h1>
+      <h1 id="hero-title" class="hero__title">{keepLastPair(site.headline)}</h1>
       <p class="hero__sub">
         M.S. student in Electrical and Computer Engineering. Research assistant on an ONR project about distributed naval platforms.
         Co-founder of Because of ADAM, a drowning awareness nonprofit.
@@ -56,6 +57,13 @@ import site from '@/data/site.json';
     line-height: 1.02;
     text-wrap: balance;
     hyphens: none;
+  }
+
+  /* Past six lines balance gives up; pretty keeps the last word company on a phone. */
+  @media (max-width: 479px) {
+    .hero__title {
+      text-wrap: pretty;
+    }
   }
 
   .hero__sub {

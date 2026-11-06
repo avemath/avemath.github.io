@@ -30,7 +30,7 @@ metrics:
   - { label: Hosting cost, value: "$0" }
 client:
   name: Because of ADAM
-  kind: 501(c)(3) nonprofit, Blair County, PA
+  kind: nonprofit, Blair County, PA
   permission: true
 # LATER: once acoustic-pool-alarm.md has a name and draft: false, link /work/acoustic-pool-alarm/ from "What I'd do next".
 # This is a YAML comment on purpose: an HTML comment in the body would ship in the page source.

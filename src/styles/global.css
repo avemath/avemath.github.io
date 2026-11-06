@@ -64,6 +64,15 @@
     color: var(--text);
   }
 
+  /* Balance only works up to six lines, so a long heading on a phone wraps "pretty" instead, which
+     keeps a single word off its last line. */
+  @media (max-width: 479px) {
+    h1,
+    h2 {
+      text-wrap: pretty;
+    }
+  }
+
   h3,
   h4 {
     line-height: 1.05;

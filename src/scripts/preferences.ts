@@ -19,7 +19,6 @@ export const currentTheme = (): Theme => (root.dataset.theme === 'dark' ? 'dark'
 export function setTheme(theme: Theme) {
   root.dataset.theme = theme;
   store('theme', theme);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0b1f3a');
   window.dispatchEvent(new CustomEvent('themechange', { detail: theme }));
 }
 

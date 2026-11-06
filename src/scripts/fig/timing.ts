@@ -1,7 +1,8 @@
 // Fig. 01: tooltips on the traces, and "Fire the plow", which runs the real firmware port. The
 // firmware boots on its virtual clock in an instant (its 3 s startup interlock is behavior, not
 // something to wait through here), then runs, 4x slower than real by default (16x or real time
-// by choice), only while a strike plays out.
+// by choice), only while a strike plays out. Reset stops a strike and refills the air. With the
+// drawing focused, Space or Enter fires.
 // Nothing moves while nobody is pressing anything.
 import { createFirmware, LOOP_MS, MAX_WEAPON_ACTIVATIONS } from '../../lib/rampage-firmware';
 
@@ -15,7 +16,7 @@ export function mountTiming(root: HTMLElement) {
   const state = root.querySelector<HTMLElement>('[data-tf-state]')!;
   const cells = [...root.querySelectorAll<SVGRectElement>('[data-cell]')];
   const card = root.closest<HTMLElement>('[data-fc]');
-  // Two Fire buttons do the same thing: the compact one under the figure, and the big one in
+  // Two Fire buttons do the same thing: the one in the toolbar on the drawing, and the big one in
   // the text column.
   const fires = [...(card ?? root).querySelectorAll<HTMLButtonElement>('[data-fire]')];
   const speedNote = root.querySelector<HTMLElement>('[data-tf-speed-note]');
@@ -94,12 +95,13 @@ export function mountTiming(root: HTMLElement) {
     else if (fired && !fw.mainOpen) word = 'Settling';
     else if (venting && elapsed < WINDOW_MS) word = 'Venting';
     else if (fired && !closedSeen) word = 'Filling';
-    // The chip under the timing rows says the same word as the drawing.
+    // The chip in the toolbar says the same word as the drawing.
     if (pnStatus && pnStatus.textContent !== word) pnStatus.textContent = word;
     if (state.textContent !== word) state.textContent = word;
   };
 
   let busy = false;
+  let runId = 0;
   const onFire = () => {
     if (busy) return;
     if (fw.activations >= MAX_WEAPON_ACTIVATIONS) {
@@ -109,6 +111,7 @@ export function mountTiming(root: HTMLElement) {
       return;
     }
     busy = true;
+    const id = ++runId;
     root.dataset.running = '';
     const before = fw.activations;
     const SLOW = slowness();
@@ -120,6 +123,7 @@ export function mountTiming(root: HTMLElement) {
     head.setAttribute('x1', String(x0));
     head.setAttribute('x2', String(x0));
     const run = (now: number) => {
+      if (id !== runId) return;
       acc += Math.min(100, now - last) / SLOW;
       last = now;
       while (acc >= LOOP_MS && elapsed < WINDOW_MS) {
@@ -147,6 +151,30 @@ export function mountTiming(root: HTMLElement) {
     requestAnimationFrame(run);
   };
   fires.forEach((b) => b.addEventListener('click', onFire));
+
+  // Reset: stop any strike in flight, refill the air and bring the plow home.
+  const reset = () => {
+    runId++;
+    busy = false;
+    delete root.dataset.running;
+    clip.setAttribute('width', '640');
+    head.setAttribute('x1', String(x0));
+    head.setAttribute('x2', String(x0));
+    fw.tx.trigger = false;
+    boot();
+    paint();
+    showStrike(-1, 0);
+  };
+  root.querySelector<HTMLButtonElement>('[data-reset]')?.addEventListener('click', reset);
+
+  // Space or Enter on the focused drawing fires, like the button.
+  root.querySelector<HTMLElement>('[data-tf-pn]')?.addEventListener('keydown', (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (!e.repeat) onFire();
+    }
+  });
 
   paint();
   showStrike(-1, 0);

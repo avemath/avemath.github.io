@@ -13,6 +13,13 @@ import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const DIST = 'dist';
 const site = JSON.parse(await readFile('src/data/site.json', 'utf8'));
+// The navy comes from the one token in src/styles/tokens.css, so the cards and icons follow it.
+const NAVY = /--navy:\s*(#[0-9a-fA-F]{6})/.exec(await readFile('src/styles/tokens.css', 'utf8'))[1];
+// The favicon's ground is that navy too: rewrite it in public/ and in the built copy.
+for (const f of ['public/favicon.svg', join(DIST, 'favicon.svg')]) {
+  const svg = await readFile(f, 'utf8');
+  await writeFile(f, svg.replace(/(<rect width="32" height="32" fill=")#[0-9a-fA-F]{6}/, `$1${NAVY}`));
+}
 const { server, base } = serveDist(DIST);
 
 const fonts = await readdir(join(DIST, '_astro'));
@@ -65,10 +72,10 @@ const html = (c) => `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:AR;src:url(${font('archivo-latin-wdth')}) format('woff2');font-weight:100 900;font-stretch:62% 125%}
 @font-face{font-family:PM;src:url(${font('ibm-plex-mono-latin-400')}) format('woff2')}
 *{margin:0;box-sizing:border-box}
-body{width:1200px;height:630px;background:#0b1f3a radial-gradient(rgb(244 246 250/.09) 1.2px,transparent 1.6px) 0 0/24px 24px;color:#f4f6fa;font-family:AR;position:relative;overflow:hidden}
+body{width:1200px;height:630px;background:${NAVY} radial-gradient(rgb(244 246 250/.09) 1.2px,transparent 1.6px) 0 0/24px 24px;color:#f4f6fa;font-family:AR;position:relative;overflow:hidden}
 .g{position:absolute;inset:0}
 .c{position:absolute;left:80px;top:72px;bottom:64px;width:640px;display:flex;flex-direction:column}
-.e{font-size:24px;font-weight:600;color:#ef8d66}
+.e{font-size:24px;font-weight:600;color:#f08a64}
 h1{font-weight:800;font-variation-settings:'wdth' 112;font-size:${c.title.length > 40 ? 58 : c.title.length > 24 ? 68 : 88}px;line-height:.96;letter-spacing:-.03em;margin-top:22px}
 p{margin-top:24px;font-size:26px;line-height:1.4;color:#a9b6cc;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .f{margin-top:auto;display:flex;align-items:center;gap:14px;font-family:PM;font-size:20px;color:#a9b6cc}
@@ -105,7 +112,7 @@ console.log(`social cards: ${cards.length}`);
 
 // ---- Apple touch icon ----
 await page.setViewportSize({ width: 180, height: 180 });
-await page.setContent(`<body style="margin:0;background:#0b1f3a"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
+await page.setContent(`<body style="margin:0;background:${NAVY}"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
 await page.waitForTimeout(200);
 await page.screenshot({ path: 'public/apple-touch-icon.png' });
 

@@ -18,8 +18,8 @@ const AXE = await readFile(require.resolve('axe-core/axe.min.js'), 'utf8');
 const DIST = 'dist';
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 const PASSES = [
-  { name: 'dark, desktop', colorScheme: 'dark', viewport: { width: 1280, height: 900 } },
-  { name: 'light, desktop', colorScheme: 'light', viewport: { width: 1280, height: 900 } },
+  { name: 'dark, desktop', colorScheme: 'dark', viewport: { width: 1440, height: 900 } },
+  { name: 'light, desktop', colorScheme: 'light', viewport: { width: 1440, height: 900 } },
   { name: 'dark, phone', colorScheme: 'dark', viewport: { width: 390, height: 844 } },
   { name: 'light, phone', colorScheme: 'light', viewport: { width: 390, height: 844 } },
 ];
