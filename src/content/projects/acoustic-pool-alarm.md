@@ -5,8 +5,8 @@ tags: [research, nonprofit]
 period: { start: "2026-10" }
 status: ongoing
 summary: "An alarm that listens underwater for a child falling into a backyard pool, built from my family's story and my background in underwater acoustics."
-role: "Solo. Early research and planning."
-keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "sonar"]
+role: "My own project. Early research and planning."
+keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "underwater sound"]
 stack: [Underwater acoustics, Signal processing, Prior-art review]
 ---
 

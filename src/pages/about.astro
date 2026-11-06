@@ -82,8 +82,8 @@ import ida from '@/assets/about/polaroid-ida.jpg';
         />
       </div>
       <p>
-        Websites happened on the side. I built one for our family's nonprofit, then for a few small businesses, and now I keep four of them
-        running.
+        Websites happened on the side. The first was for a bridal alterations studio, then a land services firm, our family's nonprofit and a
+        senior in mechanical engineering at LSU. Now I keep all four running.
       </p>
     </div>
     <div class="ab-side">
@@ -143,12 +143,12 @@ import ida from '@/assets/about/polaroid-ida.jpg';
           through water.
         </p>
         <p>
-          A pool alarm listens for a splash. A child in trouble barely makes one. I want to know if a hydrophone can hear the difference, so that's
+          A pool alarm listens for a splash. A child in trouble barely makes one. I want to know if listening underwater can catch the difference, so that's
           what I'm working on, on my own time.
         </p>
         <div class="ab-btns">
           <a class="btn btn--primary" href="/work/acoustic-pool-alarm/">The pool alarm project</a>
-          <a class="btn" href="https://becauseofadam.org" target="_blank" rel="noopener">becauseofadam.org<span class="sr-only"> (opens in a new tab)</span></a>
+          <a class="btn" href="https://becauseofadam.org">becauseofadam.org</a>
         </div>
       </div>
       <div class="ab-why__prints">
@@ -347,6 +347,13 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   .ab-grad :global(.ab-grad__lead) {
     max-width: 15rem;
     margin: 0 0 1.75rem 0.5rem;
+  }
+
+  /* In one column (below 960px) the lead print sits centered over the pair, not alone at the left. */
+  @media (max-width: 959px) {
+    .ab-grad :global(.ab-grad__lead) {
+      margin-inline: auto;
+    }
   }
 
   .ab-grad__pair {

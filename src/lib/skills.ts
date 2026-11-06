@@ -59,7 +59,10 @@ export const skillMap: Record<string, { usedIn: Use[] }> = {
   JavaScript: { usedIn: [{ project: 'landspace', detail: 'metes and bounds, metesAndBounds.js', file: 'apps/web/src/utils/metesAndBounds.js' }, { project: 'sites', detail: 'page renderer, render.js', file: 'assets/js/render.js', repo: 'ND-Site' }] },
   TypeScript: { usedIn: [{ project: 'signals', detail: 'BER simulation, comms.ts', file: 'src/lib/comms.ts' }, { project: 'sites', detail: 'contact API route, route.ts', file: 'src/app/api/contact/route.ts', repo: 'gracemaealterations' }] },
   MicroPython: { usedIn: [{ project: 'rampage', detail: 'Pico weapon control, pico_direct.py', file: 'pico_direct.py' }] },
-  'C and C++': { usedIn: [{ project: 'led', detail: 'C++ FFT firmware, LEA .txt sketch', file: 'Spectrum Analyzer Code (LEA).txt' }] },
+  C: { usedIn: [{ project: 'led', detail: 'C++ FFT firmware, LEA .txt sketch', file: 'Spectrum Analyzer Code (LEA).txt' }] },
+  'C++': { usedIn: [{ project: 'led', detail: 'C++ FFT firmware, LEA .txt sketch', file: 'Spectrum Analyzer Code (LEA).txt' }] },
+  BELLHOP: { usedIn: [{ project: 'bellhop', detail: 'BELLHOP environment files, environment_builder.py', file: 'src/environment_builder.py' }] },
+  'Web Audio': { usedIn: [{ project: 'signals', detail: 'the Hear it tones, fhbfsk.ts', file: 'src/components/demos/signals/fhbfsk.ts' }] },
   Astro: { usedIn: [{ project: 'signals', detail: 'playground UI, SignalsDemo.astro', file: 'src/components/demos/SignalsDemo.astro' }, { project: 'sites', detail: 'site layout, Base.astro', file: 'src/layouts/Base.astro', repo: 'plvinc' }] },
   React: { usedIn: [{ project: 'landspace', detail: 'map pane, MapPane.jsx', file: 'apps/web/src/map/MapPane.jsx' }, { project: 'sites', detail: 'carousel, TestimonialCarousel.tsx', file: 'src/components/ui/TestimonialCarousel.tsx', repo: 'gracemaealterations' }] },
   'Next.js': { usedIn: [{ project: 'sites', detail: 'App Router layout, layout.tsx', file: 'src/app/layout.tsx', repo: 'gracemaealterations' }] },
@@ -123,7 +126,7 @@ export interface Tool {
 export const toolbox: Tool[] = [
   { name: 'Python', level: 'know', uses: [use('Python', 'bellhop'), use('Python', 'rampage')].map(where) },
   { name: 'MATLAB', level: 'know', uses: [use('MATLAB', 'v2v')].map(where) },
-  { name: 'MicroPython and C', level: 'know', uses: [use('MicroPython', 'rampage'), use('C and C++', 'led')].map(where) },
+  { name: 'MicroPython and C', level: 'know', uses: [use('MicroPython', 'rampage'), use('C', 'led')].map(where) },
   {
     name: 'Digital communications',
     level: 'know',

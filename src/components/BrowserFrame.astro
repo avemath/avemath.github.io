@@ -89,6 +89,18 @@ const host = url ? displayUrl(url) : '';
     }
   }
 
+  /* At 320 the longest address (gracemaealterations.com) still fits beside Try it. */
+  @media (max-width: 359px) {
+    .frame__bar {
+      padding-left: 0.5rem;
+    }
+
+    .frame__bar .frame__url {
+      padding-inline: 0.35rem;
+      font-size: 0.75rem;
+    }
+  }
+
   .frame__dots i {
     width: 0.55rem;
     height: 0.55rem;

@@ -38,7 +38,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
       !rowsOnly && (
         <>
         <h2 id="websites-title" class="section-title web__title" data-decode>Websites I built and keep running</h2>
-        <p class="section-lede sites-lede">Small businesses, a nonprofit and one engineer. Fast, accessible, and the owners update their own content.</p>
+        <p class="section-lede sites-lede">Small businesses, a nonprofit and a senior in mechanical engineering at LSU. Fast, accessible, and the owners update their own content.</p>
         </>
       )
     }
@@ -323,6 +323,13 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
+  }
+
+  /* At 320 a third of the column is narrower than "Accessibility": two columns instead. */
+  @media (max-width: 359px) {
+    .site__metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   .site__metrics > div {

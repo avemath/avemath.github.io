@@ -29,6 +29,8 @@ import pico from '../../vendor/rampage/pico_direct.py?raw';
 import ledFw from '../lib/led-firmware.ts?raw';
 
 const SELF = 'https://github.com/avemath/avemath.github.io/blob/main';
+// The How it works excerpt links to line numbers, so it points at a commit where the file is the same.
+const SELF_PINNED = 'https://github.com/avemath/avemath.github.io/blob/6ad0c1f';
 const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/929c280/pico_direct.py';
 
 // Fig. 01, How it works: the strike itself, straight from the Pico's firmware.
@@ -41,7 +43,8 @@ const picoNotes: { text: string; lines: [number, number] }[] = [
 ];
 
 // Fig. 02: the MATLAB file that ran on the radios, and where each receiver stage sits in it.
-const V2V_FILE = 'https://github.com/avemath/v2v-bsm-ofdm/blob/main/V2V_TXRXf.m';
+// Pinned to a commit, like RAMPAGE, so the stage line ranges never drift from the vendored copy.
+const V2V_FILE = 'https://github.com/avemath/v2v-bsm-ofdm/blob/c5328e5/V2V_TXRXf.m';
 const v2vLines = v2vStages.map((st, i) => `${i + 1} ${st.name} ${st.lines[0]} to ${st.lines[1]}`).join('; ');
 
 // Fig. 03, How it works: FFT bins into 16 bands, AGC and smoothing, as in loop().
@@ -125,7 +128,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
         <FigureCard id="led" fig="03" kind="16 by 16 matrix" eyebrow="Personal project, one built for each sister" title="LED audio spectrum">
           <MatrixFig />
           <LedChain slot="drawing" />
-          <CodeHow slot="how" excerpt={ledHow} file="src/lib/led-firmware.ts" url={`${SELF}/src/lib/led-firmware.ts#L${ledHow.from}`} notes={ledNotes} />
+          <CodeHow slot="how" excerpt={ledHow} file="src/lib/led-firmware.ts" url={`${SELF_PINNED}/src/lib/led-firmware.ts#L${ledHow.from}`} notes={ledNotes} />
           <CodeFile
             slot="code"
             code="led-firmware"
@@ -165,7 +168,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
               <a href="/research/#bellhop">Drawing</a>
               <a href="https://github.com/avemath/bellhopSim">Code</a>
             </p>
-            <p class="mini__text">BELLHOP (a standard model of how sound travels underwater) for shallow water, with the three physics bugs I found and fixed.</p>
+            <p class="mini__text">An interactive BELLHOP (a standard model of how sound travels underwater) simulator, built around the Munk deep-ocean case, with the three physics bugs I found and fixed.</p>
           </div>
           <p class="fig__try">Open the figures and the fixes.</p>
         </li>
@@ -215,14 +218,13 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             <svg viewBox="0 0 320 120" class="mini__pool" aria-hidden="true">
               <path d="M30 30 H290 V100 H30 Z" />
               <path class="mini__water" d="M30 42 H290" />
-              <circle cx="46" cy="92" r="4" />
-              <circle cx="274" cy="92" r="4" />
-              <path class="mini__ray" d="M46 92 L160 58 L274 92" />
+              <circle cx="160" cy="42" r="4" />
+              <path class="mini__ray" d="M142 46 A18 18 0 0 0 178 46 M126 46 A34 34 0 0 0 194 46 M110 46 A50 50 0 0 0 210 46" />
             </svg>
           </div>
           <div class="mini__body">
             <h3 class="mini__title"><a href="/research/#pool-alarm" class="stretched">Acoustic Pool Alarm</a> <span class="mini__wt">(working title)</span></h3>
-            <p class="mini__text">Can a hydrophone tell a swimmer from a child in trouble? My own project with Because of ADAM.</p>
+            <p class="mini__text">Can an alarm that listens underwater tell a swimmer from a child in trouble? My own project.</p>
           </div>
           <p class="fig__try">Go below to see the plan.</p>
         </li>

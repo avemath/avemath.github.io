@@ -1,4 +1,4 @@
-// Fails if any figure label runs out of its box. Loads every built page at 390, 768, 1366 and 1440,
+// Fails if any figure label runs out of its box. Loads every built page at 320, 390, 768, 1366 and 1440,
 // light and dark, opens every figure view (Live, Drawing, How it works, Code), every V2V stage,
 // every About pin and every RAMpage plow status, and measures:
 //   - SVG text against the shape it sits in (rect, circle, ellipse, polygon or closed path): any
@@ -16,7 +16,7 @@ import { chromium } from 'playwright';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const DIST = 'dist';
-const WIDTHS = (process.env.LABEL_WIDTHS || '390,768,1366,1440').split(',').map(Number);
+const WIDTHS = (process.env.LABEL_WIDTHS || '320,390,768,1366,1440').split(',').map(Number);
 const THEMES = (process.env.LABEL_THEMES || 'light,dark').split(',');
 const ONLY = process.env.LABEL_PAGES ? process.env.LABEL_PAGES.split(',') : null;
 const PLOW = ['Ready', 'Filling', 'Plow out', 'Venting', 'Settling', 'Out of air'];

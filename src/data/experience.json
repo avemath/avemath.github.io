@@ -33,13 +33,13 @@
       "id": "web",
       "kind": "web",
       "title": "Web Designer and Developer",
-      "org": "Freelance",
+      "org": "Independent",
       "location": "Remote",
       "start": "2026-04",
       "end": null,
       "summary": "Design, build, content structure and launch for small businesses and nonprofits.",
       "bullets": [
-        "Shipped plvinc.com, gracemaealterations.com and becauseofadam.org, each with an editor the owner can use without me.",
+        "Built and run four sites: gracemaealterations.com, plvinc.com, becauseofadam.org and nmdomke.github.io.",
         "Accessible and fast by default: keyboard support, reduced motion, structured data and optimized images."
       ]
     },
@@ -84,7 +84,7 @@
       "bullets": [
         "Wrote the control software for a 30 lb combat robot: MicroPython on a Raspberry Pi Pico W and Python on a Raspberry Pi 4B.",
         "Designed a split architecture: the Pico W handles the weapon from direct RC PWM input, and the Pi 4B streams video on its own.",
-        "Built pneumatic weapon sequencing with a 17-shot air budget, a kill switch and signal-loss safety stops.",
+        "Built pneumatic weapon sequencing with a kill switch and signal-loss safety stops. The firmware allows 17 activations; the tanks give about 6 at full force.",
         "Streamed live video over UDP with OpenCV, stepping JPEG quality down so every frame fits in one datagram."
       ],
       "project": "rampage"

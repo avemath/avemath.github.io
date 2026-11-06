@@ -1,34 +1,32 @@
 ---
-// The pool alarm's plan in side view: two hydrophones in the bottom corners, a swimmer at the
-// surface, and the direct and reflected paths from the swimmer to each one. Nothing is built yet.
-// TODO(ave): confirm the plan. Two hydrophones in the bottom corners comes from the mockup; the
-// case study does not say how many there will be or where they go.
+// The pool alarm's idea in side view: a swimmer at the surface and the sound spreading through the
+// water, straight and off the walls and floor. It shows no sensors: how many there will be and
+// where they go is not decided, and the project stays at "listens underwater". Nothing is built yet.
 import Drawing from './Drawing.astro';
 ---
 
 <Drawing
-  title="Acoustic pool alarm: the plan, side view"
-  label="A backyard pool in side view with a hydrophone in each bottom corner, a swimmer at the surface, and sound from the swimmer reaching both hydrophones directly and off the walls."
+  title="Acoustic pool alarm: the idea, side view"
+  label="A backyard pool in side view with a swimmer at the surface and sound spreading through the water, directly and off the walls and floor."
   viewBox="0 0 640 250"
   legend={[
-    'Two hydrophones, one in each bottom corner, listening to the water rather than watching it.',
+    'The alarm listens to the water rather than watching it.',
     'A swimmer at the surface. The question is whether the sound of someone in trouble differs from the sound of someone swimming.',
     'Many echoes: in a pool every sound also arrives off the walls and the floor, a little later.',
   ]}
-  note="A drawing of the plan, not a measurement. Nothing is built yet."
+  note="A drawing of the idea, not a measurement. Nothing is built yet."
 >
   <path class="s" pathLength="1" d="M24 30 V222 H616 V30"></path>
   <path class="s s--soft s--dash" pathLength="1" d="M24 50 H616"></path>
   <text class="t t--muted" x="30" y="44">water line</text>
   <rect class="s f" pathLength="1" x="306" y="40" width="22" height="40"></rect>
-  <path class="s s--hot" pathLength="1" d="M317 82 L48 206"></path>
-  <path class="s s--hot" pathLength="1" d="M317 82 L592 206"></path>
-  <path class="s s--soft s--dash" pathLength="1" d="M317 82 L220 222 L48 206"></path>
-  <path class="s s--soft s--dash" pathLength="1" d="M317 82 L616 160 L592 206"></path>
-  <circle class="s f--hot" pathLength="1" cx="48" cy="206" r="7"></circle>
-  <circle class="s f--hot" pathLength="1" cx="592" cy="206" r="7"></circle>
+  <path class="s s--hot" pathLength="1" d="M277 82 A40 40 0 0 0 357 82"></path>
+  <path class="s s--hot" pathLength="1" d="M237 82 A80 80 0 0 0 397 82"></path>
+  <path class="s s--hot" pathLength="1" d="M197 82 A120 120 0 0 0 437 82"></path>
+  <path class="s s--soft s--dash" pathLength="1" d="M317 82 L220 222 L24 196"></path>
+  <path class="s s--soft s--dash" pathLength="1" d="M317 82 L560 222 L616 190"></path>
 
-  <g class="co"><circle cx="48" cy="182" r="10.5"></circle><text x="48" y="186">1</text></g>
+  <g class="co"><circle cx="520" cy="110" r="10.5"></circle><text x="520" y="114">1</text></g>
   <g class="co"><circle cx="350" cy="56" r="10.5"></circle><text x="350" y="60">2</text></g>
   <g class="co"><circle cx="220" cy="200" r="10.5"></circle><text x="220" y="204">3</text></g>
 </Drawing>

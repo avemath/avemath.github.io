@@ -7,7 +7,7 @@ featured: false
 order: 9
 period: { start: "2026-10" }
 status: live
-summary: A portfolio and long-form résumé for a mechanical engineering student, styled like an engineering drawing, with his real CAD as a 3D model.
+summary: A portfolio and long-form résumé for a senior in mechanical engineering at LSU, styled like an engineering drawing, with his real CAD as a 3D model.
 outcome: A portfolio drawn like an engineering sheet, with no build step and one file to edit.
 role: Design, build, content, 3D model pipeline, hosting.
 keywords: ["mechanical engineering", "portfolio", "three.js", "CAD", "dot matrix", "LSU"]
@@ -34,14 +34,14 @@ metrics:
   - { label: Build step, value: "None" }
 client:
   name: Nicholas Domke
-  kind: Mechanical engineering student portfolio, LSU
+  kind: Portfolio for a senior in mechanical engineering at LSU
   permission: true
 draft: false
 ---
 
 ## Context
 
-Nicholas is a mechanical engineering student at LSU applying to graduate programs for fall 2027. He needed a portfolio and a long-form résumé to send with his applications. I did the design, build and content, and I host it.
+Nicholas is a senior in mechanical engineering at LSU applying to graduate programs for fall 2027. He needed a portfolio and a long-form résumé to send with his applications. I did the design, build and content, and I host it.
 
 ## Approach
 

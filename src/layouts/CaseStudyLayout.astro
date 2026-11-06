@@ -499,6 +499,13 @@ const jsonLd = [
     text-wrap: balance;
   }
 
+  /* At 320 a half-width cell needs a little less padding to fit a word like "accessibility". */
+  @media (max-width: 359px) {
+    .case__metrics > div {
+      padding-inline: 1rem;
+    }
+  }
+
   .case__metric {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 3vw, 2.2rem);

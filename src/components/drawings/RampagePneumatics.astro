@@ -62,6 +62,19 @@
     margin-inline: auto;
   }
 
+  /* On the narrowest phones (320 wide) the drawing fits the screen instead of scrolling sideways:
+     it scales to about 0.9, so its labels are set a little larger in drawing units to stay at
+     13px or more on screen. The container is the figure (.tf in TimingFig). */
+  @container (max-width: 300px) {
+    .pn__svg {
+      min-width: 0;
+    }
+
+    .pn__svg .t {
+      font-size: 14.5px;
+    }
+  }
+
   .pn__valve {
     fill: var(--surface);
     transition: fill 0.12s;

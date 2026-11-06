@@ -2,11 +2,11 @@
   {
     "group": "Know well",
     "resume": "Proficient",
-    "items": ["Digital communications (BPSK, OFDM, synchronization)", "Software-defined radio (ADALM-PLUTO)", "MATLAB", "ESP32", "Raspberry Pi", "Embedded wiring and soldering", "Public records and title research", "Excel runsheets", "Client communication", "Project management", "Fundraising and outreach"]
+    "items": ["Digital communications (BPSK, OFDM, synchronization)", "Software-defined radio (ADALM-PLUTO)", "MATLAB", "Python", "MicroPython", "C", "Git and GitHub", "Linux", "ESP32", "Raspberry Pi", "Embedded wiring and soldering", "Public records and title research", "Excel runsheets", "Client communication", "Project management", "Fundraising and outreach"]
   },
   {
     "group": "Have built with",
     "resume": "Familiar",
-    "items": ["Python", "JavaScript", "TypeScript", "MicroPython", "C and C++", "Astro", "React", "Next.js", "Tailwind CSS", "Git and GitHub", "GitHub Actions", "Linux", "Playwright", "Cloudflare", "Vercel", "Supabase", "Leaflet", "OpenCV", "Accessibility (WCAG)", "SEO and structured data", "Headless CMS setup", "Signal processing (FFT, filtering, AGC)", "Channel coding (convolutional, Viterbi)", "Equalization (MMSE)", "HTML and CSS", "Performance and Core Web Vitals", "Google Apps Script", "Embedded control and safety logic", "System-level testing and latency debugging", "WS2812B LED matrices", "RC PWM and interrupts", "Solenoid and relay control"]
+    "items": ["JavaScript", "TypeScript", "C++", "Astro", "React", "Next.js", "Tailwind CSS", "GitHub Actions", "Playwright", "Cloudflare", "Vercel", "Supabase", "Leaflet", "OpenCV", "BELLHOP", "Web Audio", "Accessibility (WCAG)", "SEO and structured data", "Headless CMS setup", "Signal processing (FFT, filtering, AGC)", "Channel coding (convolutional, Viterbi)", "Equalization (MMSE)", "HTML and CSS", "Performance and Core Web Vitals", "Google Apps Script", "Embedded control and safety logic", "System-level testing and latency debugging", "WS2812B LED matrices", "RC PWM and interrupts", "Solenoid and relay control"]
   }
 ]

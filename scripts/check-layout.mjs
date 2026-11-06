@@ -2,7 +2,8 @@
 // below it scrolls the figure into view (the way a reader gets there), then checks that the Fire,
 // Slow-mo and Reset controls, the whole pneumatics drawing and the plow all sit inside the
 // viewport, that the toolbar's buttons are at least 44px tall, and that pressing Fire leaves the
-// plow on screen and moves it out. Space on the focused drawing must fire too.
+// plow on screen and moves it out. Space on the focused drawing must fire too. The drawing must fit
+// without scrolling sideways, with its labels at 13px or more on screen.
 // Run after a build: `npm run build && npm run test:layout`.
 // Needs Playwright's Chromium (`npx playwright install chromium`), or set CHROMIUM_PATH to a Chromium binary.
 import { chromium } from 'playwright';
@@ -14,6 +15,7 @@ const SIZES = [
   [1920, 1080],
   [390, 844],
   [375, 667],
+  [320, 568],
 ];
 
 const { server, base } = serveDist('dist');
@@ -70,6 +72,17 @@ for (const scheme of ['light', 'dark']) {
     });
     if (covered.fire) fail(`${label}: Fire is covered by another element`);
     if (covered.plow) fail(`${label}: the plow is covered by another element`);
+
+    // The drawing fits its frame (no sideways scroll) with labels at 13px or more on screen.
+    const fit = await page.evaluate(() => {
+      const frame = document.querySelector('#rampage .pn__frame');
+      const svg = document.querySelector('#rampage .pn__svg');
+      const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
+      const sizes = [...svg.querySelectorAll('text')].map((t) => parseFloat(getComputedStyle(t).fontSize) * scale);
+      return { scrolls: frame.scrollWidth > frame.clientWidth + 1, minPx: Math.min(...sizes) };
+    });
+    if (fit.scrolls) fail(`${label}: the drawing scrolls sideways`);
+    if (fit.minPx < 12.95) fail(`${label}: drawing labels render at ${fit.minPx.toFixed(1)}px, under 13px`);
 
     for (const [name, loc] of [
       ['Fire', fire],

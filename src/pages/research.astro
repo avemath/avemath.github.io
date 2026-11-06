@@ -109,14 +109,13 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           <MarginNote where="onr" />
         </div>
         <div>
-          <p class="range mono">{rangeLabel(zoneById('onr'))}</p>
           <h2 id="onr-title" class="research__h2" data-decode>Intelligent data management for distributed naval&nbsp;platforms</h2>
           <p class="zone-r__text">
-            ONR funded, with Integer Technologies. Many platforms, thin and unreliable links between them, and far more data than the links
-            can carry. I work with the communications group, on the end to end chain that carries data from underwater acoustic links to the links above the water. Thesis track, expected May 2028.
+            ONR funded, with Integer Technologies. In the words of the public contract announcement, the project is “the development of
+            decision-making tools for data management on board distributed naval platforms.” Thesis track, expected May 2028.
           </p>
           <p class="zone-r__small">Advisor: Dr. Shuangqing Wei, LSU.</p>
-          <p class="zone-r__small">Details are limited to what the project has published. Ask me about the methods, not the data.</p>
+          <p class="zone-r__small">Details are limited to what the project has published.</p>
           <p class="zone-r__links">
             <a class="link" href="/work/onr-intelligent-data-management/">What I can share</a>
             <a class="link" href="https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php">The public announcement</a>
@@ -131,7 +130,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           <p class="range mono">{rangeLabel(zoneById('bellhop'))}</p>
           <h2 id="bellhop-title" class="research__h2" data-decode>bellhopSim</h2>
           <p class="zone-r__text">
-            A Python wrapper around BELLHOP (a standard model of how sound travels underwater) for shallow water channels: eigenrays (the paths sound takes from source to receiver), arrival structure, delay spread within 20 dB of the
+            An interactive Python simulator around BELLHOP (a standard model of how sound travels underwater), built around the Munk deep-ocean case: eigenrays (the paths sound takes from source to receiver), arrival structure, delay spread within 20 dB of the
             strongest arrival, and a BER sweep. While documenting it I found three physics bugs (range units, bottom density units, the BER
             model) and fixed them with regression tests.
           </p>
@@ -151,7 +150,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           </div>
           <div id="r2-live" role="tabpanel" aria-labelledby="r2-tab-live">
           <div class="rfig__plot" data-draw data-hscroll="Arrivals plot">
-            <svg viewBox="0 0 600 230" class="arr" style="--fig-w:600px" role="img" aria-label={`${ch.arrivals.length} arrivals of one ping at 15 km over ${(maxDelay / 1000).toFixed(1)} seconds. ${ch.n_within_20db} are within 20 dB of the strongest, spread over ${Math.round(windowMs)} ms.`}>
+            <svg viewBox="0 0 600 230" class="arr" style="--fig-w:600px" role="img" aria-label={`${ch.arrivals.length} arrivals of one ping at 15 km over ${(ch.delay_spread_ms / 1000).toFixed(1)} seconds. ${ch.n_within_20db} are within 20 dB of the strongest, spread over ${Math.round(windowMs)} ms.`}>
               <rect class="arr__win" x={ax(firstStrong)} y={R2.y0 - 6} width={ax(firstStrong + windowMs) - ax(firstStrong)} height={R2.y1 - R2.y0 + 6} />
               <text class="arr__lab" x={ax(firstStrong) + 6} y={R2.y0 - 14}>20 dB window: {Math.round(windowMs)} ms</text>
               {[0, -10, -20, -30, -40].map((d) => <text class="arr__tick" x={R2.x0 - 10} y={ay(d) + 5} text-anchor="end">{d}</text>)}
@@ -193,7 +192,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           <p class="range mono">{rangeLabel(zoneById('pool-alarm'))}</p>
           <h2 id="pool-title" class="research__h2">Acoustic Pool Alarm <span class="research__wt">(working title)</span></h2>
           <p class="zone-r__text">
-            My own project, with Because of ADAM. Can hydrophones in a home pool tell the difference between a kid swimming and a kid in
+            My own project. Can listening underwater in a home pool tell the difference between a kid swimming and a kid in
             trouble, fast enough to matter? Right now: reviewing prior work and ASTM F2208, the standard for residential pool alarms, and
             planning the first bench tests.
           </p>
