@@ -8,10 +8,10 @@ order: 1
 period: { start: "2024-08", end: "2025-05" }
 status: complete
 summary: Senior design capstone (2024 to 2025). I wrote the control software for a 30 lb pneumatic combat robot, splitting weapon safety and live video across two controllers so neither could stall the other.
-outcome: First place in the LSU senior design combat robotics competition.
+outcome: First place overall in the Bengal Bot Brawl, LSU's combat robotics competition.
 role: Lead programmer and systems integration. I owned the Pico W weapon and safety firmware, the Pi 4B video pipeline, and the test scripts.
 team: "Avery Matherne (control software, systems integration), Chris Cashen, Nicholas Woodroffe, Matthew van Winkle and Miles Mouton, advised by Dr. Adrian Stein."
-seoDescription: "Control software for a 30 lb pneumatic combat robot: weapon safety on a Pico W, live video on a Pi 4B, and first place in LSU's senior design competition."
+seoDescription: "Control software for a 30 lb pneumatic combat robot: weapon safety on a Pico W, live video on a Pi 4B, and first place overall in LSU's Bengal Bot Brawl."
 keywords: ["robot", "combat robotics", "senior design", "capstone", "firmware", "pneumatic", "kill switch", "UDP video"]
 stack: [MicroPython, Python, Raspberry Pi Pico W, Raspberry Pi 4B, OpenCV, UDP, FlySky RC]
 links:
@@ -38,7 +38,7 @@ gallery:
     alt: The robot on a wooden shop bench with its painted lid on. A hacksaw, clamps and a roll of shop towels sit behind it.
     caption: Lid on, back on the shop bench.
 metrics:
-  - { label: Result, value: "1st place" }
+  - { label: Bengal Bot Brawl, value: "1st overall" }
   - { label: Activations allowed by firmware, value: "17" }
   - { label: Trigger to solenoid, average, value: "31.5 ms" }
   - { label: Max frame size, value: "65,000 B" }
@@ -47,7 +47,7 @@ demo: weapon-logic
 
 ## Context
 
-Combat is a rough place for electronics: vibration, interference, flaky radio links and a limited tank of air. RAMpage was a 30 lb combat robot with a pneumatic plow, built by a five-person team for LSU's senior design combat robotics competition. The software had two jobs that pull in opposite directions. The weapon and safety logic has to react on time, every time. Live video for the driver needs a full Linux computer, and Linux doesn't promise anything about timing.
+Combat is a rough place for electronics: vibration, interference, flaky radio links and a limited tank of air. RAMpage was a 30 lb combat robot with a pneumatic plow, built by a five-person team for the Bengal Bot Brawl, a competition between three LSU senior design teams and the LSU Bengal Bot club team. The software had two jobs that pull in opposite directions. The weapon and safety logic has to react on time, every time. Live video for the driver needs a full Linux computer, and Linux doesn't promise anything about timing.
 
 ## My role
 
@@ -68,7 +68,7 @@ The team was Avery Matherne (control software and systems integration), Chris Ca
 
 **The pneumatics, as built.** Two one-piece aluminum reservoirs rated 200 psi are charged before a match from an external compressor through a Schrader valve; there is no compressor on the robot, for vibration, power and weight. Each reservoir has its own quarter-inch inlet solenoid valve (12 V, 8.5 W), and both inlets open together on GP15. They feed one shared supply line, which drives two pneumatic cylinders, one above the other, each with its own rod and both pushing the one plow, about 80 lbf per cylinder at 200 psi. A half-inch exhaust solenoid valve (12 V, 16 W) on GP14 branches off the shared line to atmosphere. It sits open when idle so the plow stays pulled in, and it is forced open on any error or emergency stop.
 
-**Fire in a fixed sequence.** Each strike runs six steps: the exhaust stays open for 50 ms with the plow home, the exhaust closes, a 50 ms dwell, both inlets open for 400 ms to drive the plow out to full extension, the inlets close, and the exhaust reopens so the plow vents and retracts. Firing is edge-triggered, so holding the switch fires once, not repeatedly. There's a 500 ms cooldown and a hard limit of 17 activations in firmware, of which about the first six deliver full force before reservoir pressure drops. The team's air analysis predicted five cycles above 30 lbf; testing measured six.
+**Fire in a fixed sequence.** Each strike runs six steps: the exhaust stays open for 50 ms with the plow home, the exhaust closes, a 50 ms dwell, both inlets open for 400 ms to drive the plow out to full extension, the inlets close, and the exhaust reopens so the plow vents and retracts. Firing is edge-triggered, so holding the switch fires once, not repeatedly. There's a 500 ms cooldown and a hard limit of 17 activations in firmware, of which about the first six push with more than 30 lbf before reservoir pressure drops. The team's air analysis predicted five cycles above 30 lbf; testing measured six.
 
 **Fail safe three ways.** The kill switch is RC channel 5 and the weapon trigger is channel 6. A kill, a lost signal (either channel quiet for more than a second) or an error forces the exhaust open and cuts power to the FlySky receiver through a solid-state relay, which puts the motor controllers into failsafe. The kill switch also blocks firing if it is already on at power-up. The drive motors connect from the receiver straight to the ESC, with no software in the path. The status LED tells the pit crew which state the board is in from across the arena.
 
@@ -76,11 +76,11 @@ The team was Avery Matherne (control software and systems integration), Chris Ca
 
 **Electronics.** A 4-in-1 BLHeli_32 70 A ESC, 650 Kv brushless motors, a 5S LiPo, a 100 A maxi fuse, and a 5 V to 3.3 V level shifter between the Pico and the 5 V side.
 
-**Test what scares you.** I wrote a latency test that measures from the trigger pulse to the solenoid pin against a 50 ms target: it measured 28 to 36 ms, 31.5 ms on average. The kill switch cuts power within 35 ms. I also wrote a thermal logger for the Pi inside a sealed enclosure.
+**Test what scares you.** I wrote a latency test that measures from the trigger pulse to the solenoid pin against a 50 ms target: it measured 28 to 36 ms, 31.5 ms on average. The kill switch cuts power within 35 ms. I also wrote a thermal logger to check that the Pi stayed under 85 °C, its safe operating limit.
 
 ## Outcome
 
-RAMpage took first place in the senior design combat robotics competition.
+RAMpage took first place overall in the Bengal Bot Brawl.
 
 <figure class="case__fig case__fig--print">
 

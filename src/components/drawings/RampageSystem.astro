@@ -1,6 +1,6 @@
 ---
 // RAMpage as built, from the team's final presentation, the README and the firmware: the FlySky
-// receiver drives the 4-in-1 ESC directly on CH1 to CH4 with no software in the path; the Pico W
+// receiver drives the 4-in-1 ESC directly on CH2 and CH3 (left and right drive) with no software in the path; the Pico W
 // separately reads CH5 (kill, GP18) and CH6 (trigger, GP19) with pin interrupts, drives the
 // exhaust (GP14) and the inlets (GP15), and switches the receiver's power through a solid-state
 // relay; the Pi 4B streams JPEG frames over UDP port 5000 to video_direct.py on the driver's

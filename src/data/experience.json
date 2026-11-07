@@ -78,13 +78,13 @@
     {
       "id": "rampage",
       "title": "RAMpage Combat Robot, Senior Design Capstone",
-      "role": "Lead programmer and systems integration · 1st place, senior design combat robotics competition",
+      "role": "Lead programmer and systems integration · 1st place overall, Bengal Bot Brawl",
       "start": "2024-08",
       "end": "2025-05",
       "bullets": [
         "Wrote the control software for a 30 lb combat robot: MicroPython on a Raspberry Pi Pico W and Python on a Raspberry Pi 4B.",
         "Designed a split architecture: the Pico W handles the weapon from direct RC PWM input, and the Pi 4B streams video on its own.",
-        "Built pneumatic weapon sequencing with a kill switch and signal-loss safety stops. The firmware allows 17 activations; the tanks give about 6 at full force.",
+        "Built pneumatic weapon sequencing with a kill switch and signal-loss stops. The firmware allows 17 activations; the tanks give about 6 above 30 lbf.",
         "Streamed live video over UDP with OpenCV, stepping JPEG quality down so every frame fits in one datagram."
       ],
       "project": "rampage"
