@@ -5,7 +5,7 @@
 // open so the plow stays home, and both inlets (piston_solenoid, GP15) open together to drive it
 // out. "Fire the plow" runs src/lib/rampage-firmware.ts, the line for line port of pico_direct.py,
 // so the cooldown, the 17 activation limit and the lockout are the firmware's. The air budget row
-// also marks the team's air analysis: only about the first six cycles deliver more than 30 lbf.
+// also marks the team's air analysis: only about the first six cycles deliver at least 30 lbf.
 import RampagePneumatics from '../drawings/RampagePneumatics.astro';
 import { LOOP_MS, MAX_WEAPON_ACTIVATIONS, SOLENOID_ACTIVATION_TIME, SOLENOID_SEQUENCE_DELAY } from '@/lib/rampage-firmware';
 
@@ -57,7 +57,7 @@ const trace = (y: number, high: number[][]) => {
   return d + ` H${X1}`;
 };
 
-// The team's air analysis: about six cycles above 30 lbf before reservoir pressure drops too far
+// The team's air analysis: about six cycles of at least 30 lbf before reservoir pressure drops too far
 // (predicted five, measured six). The firmware still allows 17.
 const FULL_FORCE = 6;
 const cellW = (X1 - X0) / MAX_WEAPON_ACTIVATIONS;
@@ -107,7 +107,7 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
           ))
         }
       </g>
-      <g class="tf__row" tabindex="0" role="img" aria-label={`Air budget: about ${FULL_FORCE} cycles above 30 lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware, which locks out at zero.`} data-tip={`air budget\nabout ${FULL_FORCE} cycles above 30 lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware`} data-y="190" data-budget-row>
+      <g class="tf__row" tabindex="0" role="img" aria-label={`Air budget: about ${FULL_FORCE} cycles of at least 30 lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware, which locks out at zero.`} data-tip={`air budget\nabout ${FULL_FORCE} cycles of at least 30 lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware`} data-y="190" data-budget-row>
         <rect class="tf__hit" x="0" y="190" width="640" height="34" />
         <text class="tf__name" x="0" y="208">air budget</text>
         {cells.map((cx, i) => <rect class:list={['tf__cell', i >= FULL_FORCE && 'tf__cell--weak']} x={cx + 1.5} y="196" width={cellW - 3} height="14" data-cell={i} />)}
@@ -126,7 +126,7 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
     <p>
       <span class="tf__item"><span class="callout" aria-hidden="true">1</span> exhaust open {SOLENOID_SEQUENCE_DELAY} ms, plow home</span>
       <span class="tf__item"><span class="callout" aria-hidden="true">2</span> inlets open {SOLENOID_ACTIVATION_TIME} ms, plow out</span>
-      <span class="tf__item"><span class="callout" aria-hidden="true">3</span> <span><span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} used: about six cycles above 30 lbf, {MAX_WEAPON_ACTIVATIONS} allowed by firmware</span></span>
+      <span class="tf__item"><span class="callout" aria-hidden="true">3</span> <span><span data-tf-used>0</span> of {MAX_WEAPON_ACTIVATIONS} used: about six cycles of at least 30 lbf, {MAX_WEAPON_ACTIVATIONS} allowed by firmware</span></span>
     </p>
     <p class="tf__slow" data-tf-speed-note>played 4x slower than real</p>
   </div>
