@@ -1,6 +1,7 @@
 {
   "_todo": [
-    "TODO(ave): pins with no photo show a line drawing (art). photo is a path under src/assets/, for example about/thrift.jpg; add an alt too."
+    "TODO(ave): pins with no photo yet (VCC, THRIFT) show their line drawing (art) in the print frame. To add a photo, set photo to a path under src/assets/ (for example about/thrift.jpg) and add an alt.",
+    "TODO(ave): every pin's note is a draft in your voice. Check the wording of each one."
   ],
   "feature": {
     "org": "Integer Technologies",
@@ -36,84 +37,92 @@
   "pins": [
     {
       "label": "VCC",
-      "title": "Runs on lattes",
-      "text": "Usually a latte, and whatever the seasonal one is. A hot Americano when it is a long day.",
+      "title": "Lattes",
+      "note": "Runs on lattes. That's the whole spec.",
+      "todo": "TODO(ave): check wording. Add a latte photo when you have one.",
       "photo": "",
       "alt": "",
       "art": "latte",
-      "caption": "fuel",
+      "caption": "Lattes",
       "row": "Supply"
     },
     {
       "label": "OUTSIDE",
-      "title": "Plants and rivers",
-      "text": "Anywhere that is not a desk. I've canoed with Bengals in the Wild, a hiking club at LSU.",
+      "title": "Outside",
+      "note": "Anywhere that isn't a desk. This is me and my little sister Lea out on the kayaks. I've also canoed with Bengals in the Wild, a hiking club at LSU.",
+      "todo": "TODO(ave): check wording.",
       "photo": "about/outside-kayak.jpg",
-      "alt": "Avery smiling from a kayak on dark water at golden hour, another kayaker behind her.",
-      "caption": "river day",
+      "alt": "Avery and her little sister Lea smiling from kayaks on dark water at golden hour.",
+      "caption": "Outside",
       "row": "Operating environment"
     },
     {
       "label": "SNOW",
-      "title": "Snowboarding",
-      "text": "Any chance I get, which in Louisiana is not many.",
+      "title": "Snow",
+      "note": "Me vs. the snowboard. The snowboard won this round.",
+      "todo": "TODO(ave): check wording.",
       "photo": "about/snow-snowboard.jpg",
       "alt": "Avery as a kid, flat on her back in the snow in pink snow pants, her snowboard beside her.",
-      "caption": "snow, finally",
+      "caption": "Snow",
       "row": "Operating environment"
     },
     {
       "label": "FIELD",
-      "title": "Soccer and softball",
-      "text": "Varsity soccer goalie and varsity softball in high school. At LSU, intramural flag football and softball until most of my team graduated.",
+      "title": "Field",
+      "note": "Goalie for varsity soccer and varsity softball in high school. At LSU I played intramural flag football and softball until most of my team graduated. We won this one.",
+      "todo": "TODO(ave): check wording.",
       "photo": "about/field-intramural-champs.jpg",
       "alt": "Avery's intramural team in matching champions shirts on a lit softball field at night.",
-      "caption": "intramurals",
+      "caption": "Field",
       "row": "Operating environment"
     },
     {
       "label": "THRIFT",
       "title": "Old things",
-      "text": "Thrift stores and flea markets, for the objects more than the clothes. Antiques, old cameras, anything with some history. I grew up going to flea markets with my grandparents on my dad's side, and that's where I found my folding bellows camera, the kind with a big round flash reflector for the bulb.",
+      "note": "I go for the old stuff, not the clothes. My favorite find is a folding bellows camera from the flea markets I used to go to with my grandparents.",
+      "todo": "TODO(ave): check wording. Add a photo of the bellows camera.",
       "photo": "",
       "alt": "",
       "art": "bellows",
-      "caption": "flea market find",
-      "row": "Compatibility",
-      "todo": "TODO(ave): take a photo of the bellows camera for THRIFT."
+      "caption": "Old things",
+      "row": "Compatibility"
     },
     {
       "label": "TYGA",
-      "title": "My cat",
-      "text": "Head of quality control. Supervises every project, contributes nothing to the commit history.",
+      "title": "Tyga",
+      "note": "My Bengal. Head of quality control.",
+      "todo": "TODO(ave): check wording.",
       "photo": "offclock/tyga.jpg",
       "alt": "Tyga, a spotted cat with green eyes, sitting upright and looking straight at the camera.",
-      "caption": "Tyga, QC",
+      "caption": "Tyga",
       "row": "Compatibility"
     },
     {
       "label": "SIDEQ",
       "title": "Side quests",
-      "text": "[LED music visualizers](/work/led-audio-spectrum/) for my sisters at Christmas. [A pool alarm](/work/acoustic-pool-alarm/) on my own time. A box of soldering kits I will absolutely build someday.",
+      "note": "[LED visualizers](/work/led-audio-spectrum/) for my sisters, [a pool alarm](/work/acoustic-pool-alarm/) I want to build, and a pile of soldering kits I swear I'll get to.",
+      "todo": "TODO(ave): check wording.",
       "photo": "projects/led-audio-spectrum/matrix-poster.jpg",
       "alt": "A 16 by 16 LED matrix lit up with an audio spectrum, columns of light rising from red at the bottom to white peaks.",
-      "caption": "side quest no. 1",
+      "caption": "Side quests",
       "row": "Known issues"
     },
     {
       "label": "FILM",
-      "title": "Polaroids, everywhere",
-      "text": "I always have my Polaroid camera and a stack of film on me. I have a bad memory, so the prints are how I hold on to the good times with the people I love.",
+      "title": "Graduation, with Grandma Joyce",
+      "note": "My Polaroid comes everywhere with me. I like having something I can hold from the days that matter, like this one.",
+      "todo": "TODO(ave): check wording.",
       "photo": "about/film-graduation-print.jpg",
       "alt": "An instant print of Avery in her 2026 cap and gown holding her LSU diploma and sunflowers, cheek to cheek with her Grandma Joyce.",
-      "caption": "always loaded",
+      "caption": "",
       "row": "Compatibility",
       "frame": false
     },
     {
       "label": "FAIRE",
-      "title": "Renaissance festivals",
-      "text": "Big fan. I go in costume, flower crown included.",
+      "title": "Ren Fair Day",
+      "note": "Big fan. I go all in: costume, flower crown, the whole thing. Apparently I started early (that's me as a pirate with my big brother Rickey).",
+      "todo": "TODO(ave): check wording.",
       "photo": "about/faire-renfest.jpg",
       "alt": "Avery in a blue Renaissance dress and flower crown, lying in the woods at a festival with friends and her dad.",
       "caption": "Ren Fair Day",
@@ -126,11 +135,12 @@
     },
     {
       "label": "GND",
-      "title": "The levee",
-      "text": "Bike rides along the river. It is how I ground out after a long day, and sometimes there is a turtle on the slope.",
+      "title": "Ground",
+      "note": "The levee is where I go to reset. Sometimes a turtle is there too.",
+      "todo": "TODO(ave): check wording.",
       "photo": "about/gnd-turtle.jpg",
       "alt": "A turtle in tall green grass.",
-      "caption": "turtle!",
+      "caption": "Ground",
       "row": "Operating environment"
     }
   ]
