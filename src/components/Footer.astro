@@ -6,9 +6,12 @@ interface Props {
   /** The research page ends underwater, with a way back up instead of "Say hi." About ends on its
       own "Say hi." band, so its footer keeps only the links. */
   variant?: 'default' | 'research' | 'links';
+  /** The bit girl may stand on the footer's top edge. */
+  perch?: boolean;
 }
 
-const { variant = 'default' } = Astro.props;
+const { variant = 'default', perch = false } = Astro.props;
+const perchAttrs = perch ? { 'data-perch': 'foot', 'data-perch-x': '0.9' } : {};
 const year = new Date().getFullYear();
 // The revision: the date of the last commit, read at build time. Falls back to the build date
 // where git is not available.
@@ -21,7 +24,7 @@ try {
 }
 ---
 
-<footer id="contact" class:list={['site-footer no-print', variant === 'research' && 'site-footer--deep', variant === 'links' && 'site-footer--links']}>
+<footer id="contact" class:list={['site-footer no-print', variant === 'research' && 'site-footer--deep', variant === 'links' && 'site-footer--links']} {...perchAttrs}>
   <div class="wrap foot">
     {
       variant === 'research' ? (

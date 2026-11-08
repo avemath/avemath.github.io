@@ -24,10 +24,11 @@ import ida from '@/assets/about/polaroid-ida.jpg';
 <BaseLayout
   title="About"
   page="about"
+  bitGirl
   footer="links"
   description="About Avery Matherne: graduate researcher at LSU, web designer, nonprofit co-founder, and someone who would rather be outside."
 >
-  <section class="ab-hero ab-band">
+  <section class="ab-hero ab-band" data-perch="intro" data-perch-edge="bottom" data-perch-x="0.47 0.9" data-perch-start>
     <PixelScene />
     <div class="ab-hero__shade" aria-hidden="true"></div>
     <div class="wrap ab-hero__grid">
@@ -42,6 +43,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
           <a class="btn" href={site.resumePdf} download><Icon name="download" /> Résumé (PDF)</a>
         </div>
         <p class="ab-hero__cap">the scene behind this is the levee at dusk, drawn on a 48 by 16 LED grid</p>
+        <p class="hand ab-girl-count" data-girl-count aria-hidden="true"></p>
       </div>
       <FeatureCard />
     </div>
@@ -148,7 +150,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
           <a class="btn" href="https://becauseofadam.org">becauseofadam.org</a>
         </div>
       </div>
-      <div class="ab-why__prints">
+      <div class="ab-why__prints" data-perch="prints" data-perch-x="0.85 0.2">
         <Polaroid
           photo={familyAdam}
           alt="Avery and her dad crouched beside her little brother Adam, who is wearing an LSU Tigers jersey and blue sunglasses, on a patio."
@@ -182,7 +184,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   </section>
 
 
-  <section class="ab-end ab-band" aria-labelledby="end-title">
+  <section class="ab-end ab-band" aria-labelledby="end-title" data-perch="end" data-perch-x="0.9">
     <div class="wrap ab-end__row">
       <div>
         <h2 id="end-title" class="ab-h2 ab-h2--lg">Say hi.</h2>
@@ -197,6 +199,14 @@ import ida from '@/assets/about/polaroid-ida.jpg';
 </BaseLayout>
 
 <style>
+  /* The bit girl's counter, written in once you find her (src/scripts/bit-girl.ts). The line is
+     reserved so nothing moves when it fills in. */
+  .ab-girl-count {
+    min-height: 1.6em;
+    margin-top: 0.5rem;
+    font-size: 18px;
+  }
+
   /* The hero, Why underwater and the closing band sit on the sheet. */
   .ab-band {
     background: var(--sheet);

@@ -12,7 +12,7 @@ const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/about/*
 const photo = f.photo ? Object.entries(photos).find(([p]) => p.endsWith(`/${f.photo}`))?.[1].default : undefined;
 ---
 
-<aside class:list={['feat g-card', { 'feat--photo': photo }]} aria-labelledby="feat-label">
+<aside class:list={['feat g-card', { 'feat--photo': photo }]} aria-labelledby="feat-label" data-girl-avoid data-perch="intro-card" data-perch-x="0.88" data-perch-start>
   {photo && <Image src={photo} alt={f.photoAlt} widths={[150, 300]} sizes="150px" format="webp" quality={80} loading="lazy" class="feat__photo" />}
   <div class="feat__body">
     <p id="feat-label" class="feat__label">Featured by {f.org}</p>

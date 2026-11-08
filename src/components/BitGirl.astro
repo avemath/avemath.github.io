@@ -1,0 +1,29 @@
+---
+// The bit girl's canvas: fixed over the whole viewport, under the sticky header, never taking a
+// click and hidden from assistive tech (she is decoration). The page marks her perches with
+// data-perch attributes; src/scripts/bit-girl.ts explains them. Used on home, About and Research.
+---
+
+<canvas class="bit-girl" aria-hidden="true" data-bit-girl></canvas>
+
+<style>
+  .bit-girl {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  @media print {
+    .bit-girl {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountBitGirl } from '../scripts/bit-girl';
+  document.querySelectorAll<HTMLCanvasElement>('[data-bit-girl]').forEach(mountBitGirl);
+</script>

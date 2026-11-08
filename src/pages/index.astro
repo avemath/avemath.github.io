@@ -41,7 +41,7 @@ const hops = hopSequence(8, 87);
 const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 ---
 
-<BaseLayout jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
+<BaseLayout bitGirl jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
   <Hero />
   <StatusStrip />
   <AboutTeaser />

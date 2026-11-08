@@ -67,7 +67,7 @@ const right = pins.slice(5).reverse();
           ))
         }
       </ul>
-      <div class="dip__body" aria-hidden="true">
+      <div class="dip__body" aria-hidden="true" data-perch="chip" data-perch-x="0.5" data-perch-min="860">
         <strong>AVE-26</strong>
         <span>Matherne, A.<br />rev. 2026</span>
       </div>
@@ -193,9 +193,11 @@ const right = pins.slice(5).reverse();
     align-items: center;
   }
 
+  /* The extra room above leaves the bit girl space to stand on the chip. */
   @media (min-width: 860px) {
     .ds__main {
       grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      margin-top: 3.5rem;
     }
   }
 

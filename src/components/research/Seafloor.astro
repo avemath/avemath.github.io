@@ -15,8 +15,8 @@ const labelStill =
 const labelLive = `${labelStill} Drag or use the arrow keys to look around.`;
 ---
 
-<figure class="sea" aria-labelledby="sea-cap">
-  <div class="sea__view" role="img" aria-label={labelStill} data-seafloor data-label-still={labelStill} data-label-live={labelLive}>
+<figure class="sea" aria-labelledby="sea-cap" data-perch="sea" data-perch-x="0.9">
+  <div class="sea__view" data-perch="sea-floor" data-perch-edge="bottom" data-perch-x="0.86 0.55" data-perch-inside role="img" aria-label={labelStill} data-seafloor data-label-still={labelStill} data-label-live={labelLive}>
     {
       still && (
         <Image

@@ -3,6 +3,7 @@ import { PAPER } from '@/lib/theme';
 import '@/styles/global.css';
 import SEO from '@/components/SEO.astro';
 import Header from '@/components/Header.astro';
+import BitGirl from '@/components/BitGirl.astro';
 import Footer from '@/components/Footer.astro';
 import CommandPalette from '@/components/CommandPalette.astro';
 import site from '@/data/site.json';
@@ -27,9 +28,11 @@ interface Props {
   footer?: 'default' | 'research' | 'links';
   /** Set on <html> as data-page, for a page that scopes its own palette (About). */
   page?: string;
+  /** The bit girl lives on this page (home, About, Research); the footer is one of her perches. */
+  bitGirl?: boolean;
 }
 
-const { bare = false, navLabel, section, footer = 'default', page, ...seo } = Astro.props;
+const { bare = false, navLabel, section, footer = 'default', page, bitGirl = false, ...seo } = Astro.props;
 ---
 
 <!doctype html>
@@ -75,7 +78,8 @@ const { bare = false, navLabel, section, footer = 'default', page, ...seo } = As
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    {!bare && <Footer variant={footer} />}
+    {!bare && <Footer variant={footer} perch={bitGirl} />}
+    {bitGirl && <BitGirl />}
     <CommandPalette />
 
     <script>
