@@ -9,8 +9,9 @@ import CommandPalette from '@/components/CommandPalette.astro';
 import site from '@/data/site.json';
 // The Latin font files, preloaded so text can render in the right face on first paint.
 import bodoniUrl from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-wght-normal.woff2?url';
+import bodoniItalicUrl from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-wght-italic.woff2?url';
 
-const fontPreloads = [bodoniUrl];
+const fontPreloads = [bodoniUrl, bodoniItalicUrl];
 
 interface Props {
   title?: string;

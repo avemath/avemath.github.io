@@ -487,3 +487,70 @@ Answered Nov 2: Mom's quote is under the prints in The longer version; the Ida p
 - No image in the repo had EXIF or GPS data. Two video posters carry an ffmpeg encoder tag and one Landspace screenshot an ICC color profile; the built images carry no metadata at all.
 - The home teaser shows the new `portrait.jpg` whole. The old portrait (Tiger Stadium) is `about/polaroid-tiger-stadium.jpg`, the first print in The longer version.
 
+
+## Specimen (November 2026)
+
+Branch `specimen`, from `docs/mockups/specimen-study.html` and `docs/mockups/specimen-choices.html`. Approved from the study: type, palette, plate frames, the Plate I eigenray hero and the small line-art project plates. Not used: the signal mesh, the RAMpage CAD plate, the scan-line portrait and the record of prints. Approved from the choices: the seafloor, the chip prints with handwritten notes and the bit girl.
+
+### 1. Tokens and type
+
+- Palette in `src/styles/tokens.css`: paper, sheet, ink, muted, rule, lilac, sage, teal, gold, rose and photo, light and dark, with darker text inks (`--lilac-ink`, `--sage-ink`, `--gold-ink`, `--rose-ink`) where a color carries text. Screen, print, note, chip and bit tokens for the dark figures, the prints, the notes, the chip and the bit girl. The navy, orange and Garden colors are gone (`navy.ts`, `about.css`, `hand.css` deleted).
+- Type: Bodoni Moda (display, roman and italic), Hanken Grotesk (text), JetBrains Mono (labels), Kalam (handwriting), self-hosted, Latin only, `font-display: swap`. Both Bodoni files are preloaded (the h1's surname is italic, and it is the LCP element). Metric-matched fallbacks for every face; Hanken Grotesk also has Roboto and DejaVu Sans fallbacks, so phones without Arial do not reflow when the font arrives.
+- Plates: `.plate` frames with an inset hairline, "Plate N" heads and "Fig. N." captions in display italic. Buttons are pills.
+- Theme color, favicon, social cards, touch icon and the résumé PDF are regenerated (`npm run assets`). The PDF is still one page.
+
+### 2. Plate I, the eigenray hero
+
+- `src/scripts/eigenrays.ts` traces 21 rays through bellhopSim's Munk profile in the browser (no `.ray` file is committed; see SOURCES.md) and draws them as seven slices of a wedge. Drag or arrow keys rotate it; it turns slowly once the visitor has moved or scrolled, only while on screen; rays add up like light in dark mode; reduced motion draws one still frame.
+- The name is in Bodoni with the surname in lilac italic, then "I study how sound travels through water." Hear it is kept (`src/scripts/hear-it.ts`).
+
+### 3. Project plates
+
+- V2V (Plate III): the received constellation for BPSK, simulated from run 4's figure (see SOURCES.md). LED (Plate IV): a 16 by 16 matrix with bars and a pixel heart. RAMpage keeps its interactive figure and timing diagram (Plate II). The CAD redraw was not started.
+- The home page's V2V and LED interactive cards became these plates; the interactive figures are still on their case studies.
+
+### 4. The Research seafloor
+
+- The opening scene of /research/ (`src/components/research/Seafloor.astro`): you stand on a ledge halfway down a terraced seafloor. Lit terrace tops, darker risers, a glowing contour along the top edge of every riser, a slow shimmer, stacked-slab formations above and below you, sixteen line-drawn jellyfish (eight above eye level, eight below), four glowing blue crabs on the ledges near you, plankton. Caption: "The little blue crabs on the ledges are for my grandfathers."
+- Layout in `src/lib/seafloor.ts` (no three.js), drawing in `src/scripts/seafloor-scene.ts` (three.js from npm). `npm run test:seafloor` (part of verify) runs two minutes of drift and fails if any jellyfish, tentacle or crab ever enters a terrace or a formation, if the jellyfish are not half above and half below eye level, or if a crab leaves its ledge or walks into another crab.
+- Smooth risers: a polar mesh centered on the viewer, rings close together near the ledge and never more than 0.45 apart far away, and the riser takes 45% of each level instead of 22%. The contours are drawn from the smooth height field, not the mesh, so they stay curves.
+- Loading: the page ships a still image (`src/assets/research/seafloor-still.jpg`, rendered from the live scene by `npm run assets`). three.js is a separate chunk, imported only on /research/, only near the viewport, only with WebGL and motion allowed, and only after the visitor moves, scrolls, touches or types. It pauses off screen and when the tab is hidden. Without WebGL, or with reduced motion, the still is the scene.
+- Removed: the depth gauge, the "depth 0 m" nav label, the range labels and the darkening bands (`DepthGauge.astro`, `src/lib/depth.ts`). The home teaser no longer says the page darkens with depth.
+
+### 5. The About chip
+
+- `src/components/about/Datasheet.astro`: pins 01 to 05 down the left, 06 to 10 up the right. Each pin is a button with `aria-pressed`; pressing one slides its print out of the chip (no slide with reduced motion) with a taped, lined note in Kalam beside it, and lights its row in the Characteristics table. Pin 08 FILM is out to start. Arrow keys move focus the way the chip looks; Home and End jump to 01 and 10.
+- FAIRE shows the pirate print as a second, larger print (175px, 130px on phones) captioned "Started early." FILM shows the new cropped print whole, with no extra frame. VCC and THRIFT show their line drawings until there are photos. TYGA and SIDEQ already had photos (`offclock/tyga.jpg`, the LED matrix), so they keep them; there is no line drawing for either.
+- Notes are in `src/data/about.json`, each with a `TODO(ave): check wording`. The separate pin photo panel is gone. The "bad memory" line is gone from the site and the data (it was never on the résumé). The kayak alt names Lea.
+
+### 6. The bit girl
+
+- One fixed canvas over the viewport (`src/components/BitGirl.astro`, `src/scripts/bit-girl.ts`): pointer-events none, `aria-hidden`, under the sticky header, never takes a click. On home, About and Research (`bitGirl` on `BaseLayout`).
+- Perches are declared in the markup (`data-perch`, see the script's header). When she picks one she checks that her whole body would be clear of text, images and cards and inside the page, so phones only use perches with room. She starts just right of the About intro on desktop and on the Integer card on phones.
+- She turns to the cursor and waves after about 3 s left alone with the cursor on the page. The first approach on a perch may send her running once to another perch on the same ledge; the next scatters her into bits that fly to a perch off screen, never straight back to the one she just left. About shows the count in handwriting ("found her 2 times. She ran down the page."). Reduced motion: she fades out and back in, and holds still.
+- One rAF loop at about 30 frames a second while she is on screen, stopped when she is off screen and still; per frame it reads only the current (and, while moving, the target) perch's position.
+
+### 7. Checks
+
+- `npm run test:layout` adds, at 320, 390, 768 and 1440 in both themes: the chip and tray (ten 44px pins inside the page, each press showing its own print, no sideways scroll), the seafloor filling its band edge to edge, and the bit girl (her canvas never takes a click, a real click through it reaches the pin under it, every perch she may use is clear of text, at least two per page).
+- Lighthouse (local, gzip, Lighthouse 12): mobile / 95 (94 to 96 over five runs), /about/ 97, /research/ 96, /work/rampage/ 96; desktop 100 on all four. Accessibility, best practices and SEO 100 everywhere. three.js loads on none of them during the run (it waits for the visitor), and never on any page but /research/.
+- Screenshots of every page at 390 and 1440, light and dark: `docs/specimen/` (full length for home, About, Research and RAMpage; the first 1800px for the rest).
+
+### Changes from the mockups
+
+- Seafloor: the mockup's terrain filled the whole slope to the top level, so the viewer was not halfway down; the field is now a bowl with mounds. Jellyfish are placed by trying spots until each fits, so half really are below eye level (the mockup pushed most of them up). Crabs are smaller (0.9 of the drawing, not 1.3), further out, and walk sideways along a level ledge (the mockup turned them at random angles and walked them across risers). The caption sits inside the scene from 760px and under it on phones, led by "On a ledge above the deep."
+- Chip: hovering a pin no longer changes the print (only a press does); the note sits under the print on phones so it no longer covers the print's caption; the Characteristics table stays under the chip; there is extra room above the chip on wide screens for the bit girl to stand. The mockup's "draft, edit me" line is a TODO in the data instead.
+- Bit girl: perches come from the page and are checked for clearance at runtime instead of fixed coordinates; she waves at most once every 6 s; no wave with reduced motion.
+
+### TODO(ave), all of them
+
+- `src/data/about.json`: check the wording of each of the ten pin notes (VCC, OUTSIDE, SNOW, FIELD, THRIFT, TYGA, SIDEQ, FILM, FAIRE, GND).
+- `src/data/about.json`, `Datasheet.astro`: a latte photo for VCC and a photo of the bellows camera for THRIFT.
+- `src/lib/skills.ts`: Landspace's repo is private; make it public to link its files.
+- `src/scripts/fig/matrix.ts`: "Play the clip" plays the firmware's generated demo track; add a recorded clip if you want one.
+
+### Flagged, not changed
+
+- The Characteristics row "Known issues" says "than she builds them" (third person).
+- The style guide page (`/styleguide/`, not indexed) still calls itself "Signal design system" and lists the old role names.
+- The home teaser for Research still has a small decorative 0 to 100 m gauge.

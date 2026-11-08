@@ -38,6 +38,10 @@ Documents in `docs/sources/` are kept locally and are never committed or publish
 - **No received symbols are in the repo.** Run 4's post-MMSE constellation exists only as a figure (`figures/run4-fig9_bpsk_constellation.png` in v2v-bsm-ofdm), so the points are simulated (`src/components/plates/V2vConstellation.astro`, seeded): 140 per car, spread about 0.08 in I and 0.07 in Q, matching that figure (a symbol SNR near 19 dB, zero bit errors).
 - **The 7.5 dB SNR** in run 4's table (the case study and ChainFig) is the preamble correlation SNR, not the symbol SNR; simulating at 7.5 dB would draw clusters far wider than the radios produced.
 
+## The Research seafloor
+
+- **An illustration, not data.** The terraces, formations, jellyfish and crabs are drawn from a seeded layout (`src/lib/seafloor.ts`); no bathymetry or survey is behind it. The crabs are for Ave's grandfathers, who worked the water in Lafitte as fishermen and crabbers.
+
 ## Other projects
 
 - **Repo READMEs and code**: bellhopSim (its main case is the Munk deep-water profile; the arrivals and spreads in Fig. R2 come from `docs/figures/figures.json`), led-audio-spectrum (firmware constants; the boot scroll is "LEA"), the client site repos (gracemaealterations, plvinc, BcofADAM, nmdomke.github.io), and this repo for the Signals playground.

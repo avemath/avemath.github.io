@@ -109,7 +109,7 @@
   --on-amber: var(--paper);
 
   --font-display: 'Bodoni Moda Variable', 'Bodoni Fallback', 'Didot', 'Bodoni 72', Georgia, serif;
-  --font-sans: 'Hanken Grotesk Variable', 'Hanken Fallback', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Hanken Grotesk Variable', 'Hanken Fallback', 'Hanken Fallback Roboto', 'Hanken Fallback DejaVu', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono Variable', 'JetBrains Fallback', ui-monospace, Menlo, monospace;
   --font-hand: 'Kalam', 'Bradley Hand', 'Segoe Print', cursive;
 

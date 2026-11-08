@@ -92,6 +92,27 @@
   line-gap-override: 0%;
 }
 
+/* Where there is no Arial: Android has Roboto, many Linux systems only DejaVu Sans. Each gets its
+   own face, scaled so a line of body text in it takes the width it will take in Hanken Grotesk
+   (measured against the Fontsource Roboto and the system DejaVu Sans), so the swap moves nothing. */
+@font-face {
+  font-family: 'Hanken Fallback Roboto';
+  src: local('Roboto'), local('Roboto-Regular');
+  size-adjust: 101.2%;
+  ascent-override: 98.8%;
+  descent-override: 29.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Hanken Fallback DejaVu';
+  src: local('DejaVu Sans'), local('DejaVuSans');
+  size-adjust: 89.1%;
+  ascent-override: 112.2%;
+  descent-override: 33.7%;
+  line-gap-override: 0%;
+}
+
 @font-face {
   font-family: 'JetBrains Fallback';
   src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono'), local('Menlo'), local('Consolas');
