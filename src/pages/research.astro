@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import DepthGauge from '@/components/DepthGauge.astro';
 import MarginNote from '@/components/MarginNote.astro';
 import BellhopRays from '@/components/drawings/BellhopRays.astro';
 import PoolSide from '@/components/drawings/PoolSide.astro';
-import { rangeLabel, zoneById } from '@/lib/depth';
+import Seafloor from '@/components/research/Seafloor.astro';
 import arrivalsData from '@/data/bellhop-arrivals.json';
 
 // Fig. R2: every arrival from the bellhopSim comms scenario (1000 m of water, sand bottom, source
@@ -44,18 +43,18 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   title="Research"
   description="Underwater acoustic channels, my ONR research on data management for distributed naval platforms, bellhopSim, and an acoustic pool alarm."
   image="/og/research.png"
-  navLabel="depth 0 m"
   footer="research"
 >
-  <div class="under" data-under>
-    <div class="under__dark" aria-hidden="true"></div>
-    <DepthGauge />
+  <header class="wrap research__head">
+    <h1 id="research-title" class="research__h1">Research, below the <em>surface</em>.</h1>
+  </header>
 
-    <section id="below" class="wrap zone-r zone-r--first" aria-labelledby="research-title">
+  <Seafloor />
+
+  <div class="research">
+    <section id="below" class="wrap zone-r">
       <div class="zone-r__grid">
         <div>
-          <p class="range mono">{rangeLabel(zoneById('below'))}</p>
-          <h1 id="research-title" class="research__h1">Research, below the surface.</h1>
           <p class="zone-r__text">
             Underwater acoustic channels do everything a radio channel does, slower and worse: long delays, strong multipath, Doppler from
             anything that moves. I work on getting data through them anyway, and on one question of my own about what a pool sounds like.
@@ -103,7 +102,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             <p class="net__read" id="net-read" data-net-read aria-live="polite">Hover or focus a node.</p>
             <script type="application/json" data-net-nodes set:html={JSON.stringify(nodes.map(({ id, text }) => ({ id, text })))} />
           </div>
-          <p class="fig__note">A drawing of the kind of network the project is about, not project data. Solid lines are radio, orange lines acoustic.</p>
+          <p class="fig__note">A drawing of the kind of network the project is about, not project data. Solid lines are radio, lilac lines acoustic.</p>
           <p class="fig__try"><span class="on-mouse">Hover</span><span class="on-touch">Tap</span> a node to see how it links to the others.</p>
         </figure>
           <MarginNote where="onr" />
@@ -127,7 +126,6 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     <section id="bellhop" class="wrap zone-r" aria-labelledby="bellhop-title">
       <div class="zone-r__grid">
         <div>
-          <p class="range mono">{rangeLabel(zoneById('bellhop'))}</p>
           <h2 id="bellhop-title" class="research__h2" data-decode>bellhopSim</h2>
           <p class="zone-r__text">
             An interactive Python simulator around BELLHOP (a standard model of how sound travels underwater), built around the Munk deep-ocean case: eigenrays (the paths sound takes from source to receiver), arrival structure, delay spread within 20 dB of the
@@ -163,7 +161,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           </div>
           <p class="fig__note">
             {ch.arrivals.length} arrivals from BELLHOP: 1000 m of water, source at 50 m, receiver at 100 m, 3.5 kHz. The strongest is in
-            orange; {ch.n_within_20db} fall within 20 dB of it.
+            lilac; {ch.n_within_20db} fall within 20 dB of it.
           </p>
           </div>
           <div id="r2-drawing" role="tabpanel" aria-labelledby="r2-tab-drawing" hidden>
@@ -189,7 +187,6 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           <MarginNote where="pool-alarm" />
         </div>
         <div>
-          <p class="range mono">{rangeLabel(zoneById('pool-alarm'))}</p>
           <h2 id="pool-title" class="research__h2">Acoustic Pool Alarm <span class="research__wt">(working title)</span></h2>
           <p class="zone-r__text">
             My own project. Can listening underwater in a home pool tell the difference between a kid swimming and a kid in
@@ -208,29 +205,15 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 </BaseLayout>
 
 <style>
-  /* The research page on paper. (Phase 4 opens it with the seafloor scene.) */
-  .under {
-    position: relative;
-    isolation: isolate;
-    background: var(--bg);
-  }
-
-  .under__dark {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    display: none;
-    pointer-events: none;
+  /* The research page: the title, the seafloor scene full width, then the work on paper. */
+  .research__head {
+    padding-block: clamp(1.75rem, 4vw, 2.75rem) clamp(1.25rem, 3vw, 2rem);
   }
 
 
   .zone-r {
     padding-block: clamp(3rem, 7vw, 5.5rem);
     border-bottom: 1px solid var(--line);
-  }
-
-  .zone-r--first {
-    padding-top: clamp(2rem, 5vw, 3.5rem);
   }
 
   .zone-r:last-of-type {
@@ -264,13 +247,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     }
   }
 
-  .range {
-    font-size: 0.875rem;
-    color: var(--text-soft);
-  }
-
   .research__h1 {
-    margin-top: 0.75rem;
     font-size: clamp(2.75rem, 7vw, 5rem);
   }
 

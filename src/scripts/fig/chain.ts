@@ -104,7 +104,7 @@ export function mountChain(root: HTMLElement) {
       };
       step(t0);
     }
-    cap.textContent = decided ? `${r.errors} of ${r.bits.length} decisions wrong, in orange` : view === 'sync' ? 'preamble symbols after this stage' : 'data subcarriers after this stage';
+    cap.textContent = decided ? `${r.errors} of ${r.bits.length} decisions wrong, in lilac` : view === 'sync' ? 'preamble symbols after this stage' : 'data subcarriers after this stage';
   }
 
   function select(i: number) {

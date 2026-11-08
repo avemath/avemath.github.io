@@ -1,0 +1,155 @@
+---
+// The Research page's opening scene: you stand on a ledge halfway down a terraced, glowing
+// seafloor. It is a still image (src/assets/research/seafloor-still.jpg, rendered from the live
+// scene by `npm run assets`) until src/scripts/seafloor.ts swaps in the live three.js scene. With
+// reduced motion, or without WebGL, the still is the scene.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+// The still is generated from a build, so the very first build runs without it.
+const stills = import.meta.glob<{ default: ImageMetadata }>('../../assets/research/seafloor-still.jpg', { eager: true });
+const still = Object.values(stills)[0]?.default;
+
+const labelStill =
+  'A glowing seafloor of stacked terraces seen from a ledge halfway down, with rock formations, line-drawn jellyfish and two small blue crabs nearby.';
+const labelLive = `${labelStill} Drag or use the arrow keys to look around.`;
+---
+
+<figure class="sea" aria-labelledby="sea-cap">
+  <div class="sea__view" role="img" aria-label={labelStill} data-seafloor data-label-still={labelStill} data-label-live={labelLive}>
+    {
+      still && (
+        <Image
+          src={still}
+          alt=""
+          class="sea__still"
+          widths={[640, 960, 1280, 1600]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          quality={78}
+        />
+      )
+    }
+    <span class="hand sea__note" aria-hidden="true">drag to look up, down and around ♡</span>
+  </div>
+  <figcaption class="sea__cap" id="sea-cap">
+    <b>On a ledge above the deep.</b> The little blue crabs on the ledges are for my grandfathers.
+  </figcaption>
+</figure>
+
+<style>
+  .sea {
+    position: relative;
+    background: #03080b;
+    border-block: 1px solid var(--line);
+  }
+
+  .sea__view {
+    position: relative;
+    height: clamp(440px, 74vh, 780px);
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .sea__view[data-live] {
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .sea__view[data-live]:active {
+    cursor: grabbing;
+  }
+
+  .sea__view:focus-visible {
+    outline: 2px solid #c6b0ea;
+    outline-offset: -4px;
+  }
+
+  .sea__still,
+  .sea__view :global(.sea__gl) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .sea__still {
+    object-fit: cover;
+  }
+
+  /* The live canvas fades in over the still once its first frame is drawn. */
+  .sea__view :global(.sea__gl) {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .sea__view[data-live] :global(.sea__gl),
+  .sea__view[data-mode='still'] :global(.sea__gl) {
+    opacity: 1;
+  }
+
+  :global(html[data-motion='reduce']) .sea__view :global(.sea__gl) {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sea__view :global(.sea__gl) {
+      transition: none;
+    }
+  }
+
+  .sea__note {
+    position: absolute;
+    left: max(16px, env(safe-area-inset-left, 0px));
+    bottom: 16px;
+    font-size: 18px;
+    color: #ebd7e2;
+    text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .sea__view[data-live] .sea__note {
+    opacity: 1;
+  }
+
+  .sea__view[data-mode='still'] .sea__note {
+    display: none;
+  }
+
+  .sea__cap {
+    padding: 0.85rem max(16px, env(safe-area-inset-right, 0px)) 1rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: #e9e2ec;
+  }
+
+  .sea__cap b {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1rem;
+  }
+
+  /* From 760px the caption sits inside the scene, bottom right. */
+  @media (min-width: 760px) {
+    .sea__cap {
+      position: absolute;
+      right: max(16px, env(safe-area-inset-right, 0px));
+      bottom: 16px;
+      max-width: 40ch;
+      padding: 0;
+      text-align: right;
+      text-shadow: 0 1px 6px rgb(0 0 0 / 0.7);
+      pointer-events: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountSeafloor } from '../../scripts/seafloor';
+  document.querySelectorAll<HTMLElement>('[data-seafloor]').forEach(mountSeafloor);
+</script>

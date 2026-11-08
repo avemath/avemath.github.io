@@ -3,7 +3,7 @@ import Icon from './Icon.astro';
 import site from '@/data/site.json';
 
 interface Props {
-  /** The small muted label at the right: the live depth on /research/. */
+  /** An optional small muted label at the right of the nav. */
   label?: string;
   /** Which item is the current place: set by /work/ and the case studies. */
   section?: 'projects' | 'websites' | 'research';

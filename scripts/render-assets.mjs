@@ -3,8 +3,10 @@
 //   public/og/*.png                           1200x630 social cards
 //   public/apple-touch-icon.png
 //   public/favicon.ico                        16 and 32 px, for browsers and tools that skip SVG icons
+//   src/assets/research/seafloor-still.jpg    the Research seafloor, for reduced motion and no WebGL
 //
-// Run after a build: `npm run build && npm run assets`. Commit the output.
+// Run after a build: `npm run build && npm run assets`. Commit the output. The seafloor still is an
+// input to the build, so build once more after it changes.
 // Needs Playwright's Chromium (`npx playwright install chromium`), or set CHROMIUM_PATH to a Chromium binary.
 import { readFile, writeFile, readdir, mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -50,6 +52,29 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
   const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) ?? []).length;
   console.log(`résumé PDF: ${(pdf.length / 1024).toFixed(0)} KB, ${pages} page(s)`);
   await page.close();
+}
+
+// ---- The seafloor still ----
+// The live scene renders one fixed frame (`/research/?still`) in a WebGL-capable Chromium, and that
+// frame becomes the image the page shows before the scene loads, and instead of it.
+{
+  const gl = await chromium.launch({
+    executablePath: process.env.CHROMIUM_PATH || undefined,
+    args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+  });
+  const page = await gl.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
+  await page.route(...localOnly(base));
+  await page.goto(`${base}/research/?still`, { waitUntil: 'networkidle' });
+  const view = page.locator('[data-seafloor]');
+  await view.evaluate((el) => (el.style.height = '900px'));
+  await page.waitForSelector('[data-seafloor][data-ready="still"]', { timeout: 60000 });
+  await page.waitForTimeout(1000);
+  await mkdir('src/assets/research', { recursive: true });
+  // Read the frame from the canvas itself: an element screenshot can miss a WebGL layer.
+  const jpeg = await page.evaluate(() => document.querySelector('[data-seafloor] canvas').toDataURL('image/jpeg', 0.86));
+  await writeFile('src/assets/research/seafloor-still.jpg', Buffer.from(jpeg.split(',')[1], 'base64'));
+  console.log('seafloor still: src/assets/research/seafloor-still.jpg');
+  await gl.close();
 }
 
 // ---- Social cards ----
