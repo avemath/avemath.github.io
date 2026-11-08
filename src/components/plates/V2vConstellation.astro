@@ -1,0 +1,70 @@
+---
+// Plate III: the V2V receiver's BPSK constellation after MMSE equalization, both cars. The receiver
+// in V2V_TXRXf.m is BPSK (pskmod order 2), so the points sit at +1 and -1 on the I axis. No received
+// symbols are saved in the repo, only run 4's figure (figures/run4-fig9_bpsk_constellation.png), so
+// the points are simulated with the spread that figure shows: about 0.08 in I and 0.07 in Q, a
+// symbol SNR near 19 dB, zero bit errors. (The 7.5 dB in run 4's table is the preamble correlation
+// SNR, a different measure.) Seeded, so the drawing is the same on every build. See docs/SOURCES.md.
+const W = 500, H = 400, CX = 250, CY = 200, S = 150;
+let seed = 4;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+const gauss = () => {
+  let u = 0, v = 0;
+  while (!u) u = rnd();
+  while (!v) v = rnd();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+};
+const cars = [0, 1].map((car) =>
+  Array.from({ length: 140 }, (_, i) => {
+    const sym = i % 2 ? 1 : -1;
+    return [CX + (sym + gauss() * 0.08) * S, CY - gauss() * 0.07 * S];
+  }),
+);
+---
+
+<svg class="v2vc" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
+  <circle class="v2vc__unit" cx={CX} cy={CY} r={S} />
+  <path class="v2vc__axis" d={`M40 ${CY} H${W - 40} M${CX} 30 V${H - 30}`} />
+  <path class="v2vc__guide" d={`M${CX - S} 60 V${H - 60} M${CX + S} 60 V${H - 60}`} />
+  {cars[0].map(([x, y]) => <circle class="v2vc__pt v2vc__pt--a" cx={x.toFixed(1)} cy={y.toFixed(1)} r="2.8" />)}
+  {cars[1].map(([x, y]) => <circle class="v2vc__pt v2vc__pt--b" cx={x.toFixed(1)} cy={y.toFixed(1)} r="2.8" />)}
+  <text class="v2vc__lab" x={W - 52} y={CY - 12}>I</text>
+  <text class="v2vc__lab" x={CX + 10} y="46">Q</text>
+  <text class="v2vc__lab" x={CX - S} y={CY + 46} text-anchor="middle">-1</text>
+  <text class="v2vc__lab" x={CX + S} y={CY + 46} text-anchor="middle">+1</text>
+</svg>
+
+<style>
+  .v2vc__unit {
+    fill: none;
+    stroke: var(--rule);
+    stroke-dasharray: 3 5;
+  }
+
+  .v2vc__axis {
+    stroke: var(--rule);
+  }
+
+  .v2vc__guide {
+    stroke: var(--rule);
+    stroke-dasharray: 2 6;
+  }
+
+  .v2vc__pt {
+    opacity: 0.6;
+  }
+
+  .v2vc__pt--a {
+    fill: var(--teal);
+  }
+
+  .v2vc__pt--b {
+    fill: var(--lilac);
+  }
+
+  .v2vc__lab {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    fill: var(--muted);
+  }
+</style>

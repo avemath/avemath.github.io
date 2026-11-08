@@ -666,12 +666,13 @@ const jsonLd = [
     align-self: start;
   }
 
-  /* The same label format as every other figure on the site: "Fig. 01 / caption". */
+  /* Specimen captions: "Fig. N." in Bodoni italic, then the caption. */
   .shot figcaption::before {
-    content: 'Fig. ' counter(shot, decimal-leading-zero) ' / ';
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    color: var(--accent-ink);
+    content: 'Fig. ' counter(shot) '. ';
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.9375rem;
+    color: var(--text);
   }
 
   :global([data-theme='dark']) .shot figcaption::before {

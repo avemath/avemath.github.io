@@ -1,0 +1,80 @@
+---
+// A project as a plate: its line-art figure in a plate frame, "Plate N" in Bodoni italic, the title
+// in Bodoni, one sentence, and a mono tag line. The whole card is one link to the case study.
+interface Props {
+  n: string;
+  title: string;
+  href: string;
+  desc: string;
+  tags: string;
+}
+const { n, title, href, desc, tags } = Astro.props;
+---
+
+<a class="pplate" href={href}>
+  <span class="plate pplate__frame"><slot /></span>
+  <span class="pplate__n">Plate {n}</span>
+  <span class="pplate__title">{title}</span>
+  <span class="pplate__desc">{desc}</span>
+  <span class="pplate__tags">{tags}</span>
+</a>
+
+<style>
+  .pplate {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pplate__frame {
+    display: block;
+    transition: border-color 0.2s;
+  }
+
+  .pplate__frame :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 4;
+  }
+
+  .pplate:hover .pplate__frame,
+  .pplate:focus-visible .pplate__frame {
+    border-color: var(--accent);
+  }
+
+  .pplate__n {
+    margin-top: 0.3rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .pplate__title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.625rem;
+    line-height: 1.1;
+  }
+
+  .pplate:hover .pplate__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--accent);
+  }
+
+  .pplate__desc {
+    font-size: 0.97rem;
+    color: var(--muted);
+  }
+
+  .pplate__tags {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--teal);
+  }
+</style>

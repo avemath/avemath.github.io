@@ -415,23 +415,23 @@
 .card,
 .paper {
   position: relative;
-  border: 1px solid var(--line);
+  border: 1px solid var(--rule);
   border-radius: 0;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  background: var(--sheet);
+  /* The plate's second hairline sits just outside the card (a ring of paper, then a ring of rule),
+     so it never crosses a figure that runs to the card's edge. */
+  box-shadow:
+    0 0 0 6px var(--paper),
+    0 0 0 7px var(--rule);
+  transition: box-shadow 0.2s;
 }
 
-/* Paper lifts 2px on hover or focus within, with its shadow deepening. */
-.paper {
-  transition:
-    transform 0.16s ease-out,
-    box-shadow 0.16s ease-out;
-}
-
+/* A plate under the pointer: the outer hairline turns lilac. */
 .paper:hover,
 .paper:focus-within {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lift);
+  box-shadow:
+    0 0 0 6px var(--paper),
+    0 0 0 7px var(--accent);
 }
 
 /* A project card under the pointer: its accent strokes brighten, and the "Try:" word pulses once. */
@@ -497,8 +497,10 @@
 }
 
 .fig__label {
-  font-size: 0.875rem;
-  color: var(--text-soft);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: var(--muted);
 }
 
 /* "What to try": one imperative line in a figure's footer row. Hover wording for a mouse, tap

@@ -1,4 +1,5 @@
 ---
+import { roman } from '@/lib/format';
 // A project on /work/: a paper card with the figure label row, the project's picture (its cover
 // or its drawn signature), the title, one line, what the card offers (Live, Drawing, Code) and
 // the links. The whole card opens the case study.
@@ -22,7 +23,7 @@ const kind = isWebsite(project) && d.links.live ? displayUrl(d.links.live) : typ
 
 <article class="wc paper" aria-labelledby={`wc-${project.id}`}>
   <div class="fig__bar wc__bar">
-    <p class="fig__label">Fig. {String(fig).padStart(2, '0')} / {kind}</p>
+    <p class="fig__label">Plate {roman(fig)} / {kind}</p>
     {d.confidentiality === 'limited' && <p class="fig__label">public wording only</p>}
   </div>
   <div class="wc__media">

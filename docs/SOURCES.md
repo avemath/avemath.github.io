@@ -32,6 +32,12 @@ Documents in `docs/sources/` are kept locally and are never committed or publish
 - **The source is at 1000 m** for the plate, as the approved mockup draws it; bellhopSim's own Munk figure puts it on the axis at 1300 m.
 - **The tracer** is a simple Snell's-law step (100 m) with mirror reflections at the surface and bottom, 21 launch angles from -13 to +13 degrees. It is an illustration of the channel, not a BELLHOP run.
 
+## Plate III: the V2V constellation
+
+- **The modulation is BPSK:** `V2V_TXRXf.m` modulates every payload with `pskmod(..., 2)`, so the plate draws two clusters at +1 and -1 on the I axis (not 16-QAM).
+- **No received symbols are in the repo.** Run 4's post-MMSE constellation exists only as a figure (`figures/run4-fig9_bpsk_constellation.png` in v2v-bsm-ofdm), so the points are simulated (`src/components/plates/V2vConstellation.astro`, seeded): 140 per car, spread about 0.08 in I and 0.07 in Q, matching that figure (a symbol SNR near 19 dB, zero bit errors).
+- **The 7.5 dB SNR** in run 4's table (the case study and ChainFig) is the preamble correlation SNR, not the symbol SNR; simulating at 7.5 dB would draw clusters far wider than the radios produced.
+
 ## Other projects
 
 - **Repo READMEs and code**: bellhopSim (its main case is the Munk deep-water profile; the arrivals and spreads in Fig. R2 come from `docs/figures/figures.json`), led-audio-spectrum (firmware constants; the boot scroll is "LEA"), the client site repos (gracemaealterations, plvinc, BcofADAM, nmdomke.github.io), and this repo for the Signals playground.

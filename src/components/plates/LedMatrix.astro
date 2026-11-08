@@ -1,0 +1,42 @@
+---
+// Plate IV: the 16 by 16 LED matrix mid song, with a small pixel heart in the top right corner. Lit
+// LEDs shade from teal at the bottom through lilac to rose at the top; unlit ones are hairline dots.
+const N = 16, CELL = 19, W = 500, H = 400;
+const OX = (W - N * CELL) / 2, OY = (H - N * CELL) / 2;
+const bars = [5, 8, 11, 13, 12, 10, 9, 7, 8, 9, 7, 6, 5, 4, 3, 2];
+const heart = ['0110110', '1111111', '1111111', '0111110', '0011100', '0001000'];
+const leds: { x: number; y: number; c: string }[] = [];
+for (let c = 0; c < N; c++)
+  for (let r = 0; r < N; r++) {
+    let cls = 'off';
+    if (N - r <= bars[c]) {
+      const t = (N - r) / N;
+      cls = t < 0.35 ? 'teal' : t < 0.6 ? 'lilac' : 'rose';
+    }
+    const hr = r - 1, hc = c - 9;
+    if (hr >= 0 && hr < 6 && hc >= 0 && hc < 7 && heart[hr][hc] === '1') cls = 'rose';
+    leds.push({ x: OX + c * CELL + CELL / 2, y: OY + r * CELL + CELL / 2, c: cls });
+  }
+---
+
+<svg class="ledm" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
+  {leds.map((l) => <circle class:list={['ledm__led', `ledm__led--${l.c}`]} cx={l.x} cy={l.y} r={(CELL * 0.36).toFixed(2)} />)}
+</svg>
+
+<style>
+  .ledm__led--off {
+    fill: var(--rule);
+  }
+
+  .ledm__led--teal {
+    fill: var(--teal);
+  }
+
+  .ledm__led--lilac {
+    fill: var(--lilac);
+  }
+
+  .ledm__led--rose {
+    fill: var(--rose);
+  }
+</style>
