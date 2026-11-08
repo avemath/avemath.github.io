@@ -30,12 +30,3 @@ export function displayUrl(url: string): string {
   return u.host.replace(/^www\./, '') + u.pathname.replace(/\/+$/, '');
 }
 
-/**
- * Keeps the last two words of a long heading together (a no-break space between them), so a
- * single word never sits alone on the heading's last line. Short headings are left alone.
- */
-export function keepLastPair(text: string, minWords = 4): string {
-  const words = text.trim().split(/\s+/);
-  if (words.length < minWords) return text;
-  return words.slice(0, -1).join(' ') + ' ' + words[words.length - 1];
-}

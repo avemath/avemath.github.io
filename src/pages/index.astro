@@ -239,6 +239,16 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 </BaseLayout>
 
 <style>
+  /* Below the fold, the browser skips laying these out until they near the screen, so the body font's
+     swap after first paint relayouts only what is visible. (Not Projects: its sticky RAMpage
+     toolbar and tooltips must not be clipped.) */
+  :global(.below),
+  :global(#websites),
+  :global(#toolbox) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1200px;
+  }
+
   .projects__head {
     display: flex;
     flex-wrap: wrap;

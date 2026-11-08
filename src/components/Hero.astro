@@ -1,122 +1,191 @@
 ---
-import { keepLastPair } from '@/lib/format';
-import SignalPanel from './SignalPanel.astro';
-import Marquee from './Marquee.astro';
+// The home hero: the name in Bodoni with the surname in lilac italic, the thesis, the lede, and
+// Plate I beside it, the eigenray specimen (src/scripts/eigenrays.ts). Hear it plays the underwater
+// modem preamble (src/scripts/hear-it.ts). The h1 is the largest thing on first paint, so it is the
+// LCP element; the canvas draws after the browser is idle.
 import site from '@/data/site.json';
 ---
 
 <section id="top" class="hero" aria-labelledby="hero-title">
   <div class="wrap hero__grid">
     <div class="hero__text">
-      <h1 id="hero-title" class="hero__title">{keepLastPair(site.headline)}</h1>
+      <h1 id="hero-title" class="hero__title">Avery <em>Matherne</em></h1>
+      <p class="hero__thesis">I study how sound travels through water.</p>
       <p class="hero__sub">
         M.S. student in Electrical and Computer Engineering. Research assistant on an ONR project about distributed naval platforms.
         Co-founder of Because of ADAM, a drowning awareness nonprofit.
       </p>
       <div class="hero__ctas">
         <a class="btn btn--primary" href="/work/">See my work</a>
-        <a class="btn hero__resume" href={site.resumePdf}>Résumé (PDF)</a>
+        <a class="btn" href={site.resumePdf}>Résumé (PDF)</a>
       </div>
+      <p class="hero__hear">
+        <button type="button" class="btn btn--small hear" data-hear aria-pressed="false">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1.5v9l8-4.5z" fill="currentColor"></path></svg>
+          <span data-hear-label>Hear it, 2 s</span>
+          <span class="hear__prog" aria-hidden="true"></span>
+        </button>
+        <span class="hero__hear-note">the preamble an underwater modem sends before it talks, played ten times slower</span>
+      </p>
+      <p class="sr-only" aria-live="polite" data-hear-live></p>
     </div>
 
-    <div class="hero__panel">
-      <SignalPanel />
-    </div>
+    <figure class="plate hero__plate">
+      <div class="plate__head"><span>Plate I</span><span>bellhopSim</span></div>
+      <div class="hero__cwrap">
+        <canvas
+          class="hero__rays"
+          data-eigenrays
+          tabindex="0"
+          role="img"
+          aria-label="Interactive 3D drawing of sound rays fanning out from a source at 1000 meters depth, bending around the sound channel axis near 1300 meters. Drag or use the arrow keys to rotate."
+        ></canvas>
+        <span class="hand hero__note hero__note--tr" aria-hidden="true">sound bends toward the slow water</span>
+        <span class="hand hero__note hero__note--bl" aria-hidden="true">drag me around ♡</span>
+      </div>
+      <figcaption class="plate__cap">
+        <b>Fig. 1.</b> Eigenrays from a source at 1000 m, Munk sound speed profile, 100 km of range. The gold curve is sound speed; its slowest
+        point, near 1300 m, traps the rays in a channel.
+      </figcaption>
+    </figure>
   </div>
-  <div class="hero__marquee"><Marquee /></div>
 </section>
 
 <style>
-  /* The nav and the hero share one screen: the sentence, the subline, both buttons, the panel (on
-     wide screens) and the top of the marquee fit in 100svh at 1366 by 768 and at 390 by 844. */
-  .hero {
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100svh - 4rem);
-  }
-
   .hero__grid {
-    flex: 1;
     display: grid;
-    gap: 2rem;
-    align-content: center;
+    gap: 2.5rem;
     align-items: center;
-    padding-block: clamp(1.5rem, 4vh, 3rem);
+    padding-block: clamp(1.75rem, 4vw, 2rem) clamp(3rem, 7vw, 4.5rem);
   }
 
-  @media (min-width: 1024px) {
-    /* The title column is wide enough for the headline to fit in six lines at 1440. */
+  @media (min-width: 900px) {
     .hero__grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 3fr);
-      gap: clamp(2rem, 4vw, 4rem);
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 3rem;
     }
   }
 
+  /* The name is the largest thing on the first screen at every width, so it is the LCP element. */
   .hero__title {
-    font-size: clamp(34px, 4.2vw, 62px);
-    line-height: 1.02;
-    text-wrap: balance;
-    hyphens: none;
+    margin-bottom: 1.75rem;
+    font-size: clamp(64px, 7.4vw, 104px);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
   }
 
-  /* Past six lines balance gives up; pretty keeps the last word company on a phone. */
-  @media (max-width: 479px) {
-    .hero__title {
-      text-wrap: pretty;
-    }
+  .hero__thesis {
+    max-width: 22ch;
+    margin-bottom: 1.1rem;
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.2vw, 28px);
+    line-height: 1.3;
+    text-wrap: balance;
   }
 
   .hero__sub {
-    margin-top: 1.25rem;
-    max-width: 36rem;
-    font-size: 18px;
+    max-width: 42ch;
     color: var(--muted);
+  }
+
+  @media (max-width: 599px) {
+    .hero__sub {
+      font-size: 1rem;
+    }
   }
 
   .hero__ctas {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-top: 1.5rem;
+    margin-top: 1.75rem;
   }
 
-  /* Same weight and size as the accent button beside it, so the pair lines up. */
-  .hero__resume {
-    --btn-line: var(--text);
+  .hero__hear {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    margin-top: 1.25rem;
   }
 
-  /* The panel gives up height first when the screen is short. */
-  .hero__panel :global(.sig__screen) {
-    max-height: calc(100svh - 4rem - 13rem);
+  .hero__hear-note {
+    max-width: 30ch;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--muted);
   }
 
-  /* Phones and tablets: the sentence and buttons, then the marquee, then the panel, so the first
-     screen ends on the marquee and the panel waits just below it. */
-  @media (max-width: 1023px) {
-    .hero {
-      min-height: 0;
-    }
+  .hear {
+    position: relative;
+    overflow: hidden;
+    min-height: 44px;
+  }
 
-    .hero__grid {
-      display: contents;
-    }
+  .hear svg {
+    width: 0.75em;
+    height: 0.75em;
+  }
 
-    .hero__text {
-      order: 1;
-      padding: 1.75rem var(--gutter);
-    }
+  /* While it plays, a thin bar along the bottom edge shows how far through the 2 s it is. */
+  .hear__prog {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: calc(var(--p, 0) * 100%);
+    background: var(--accent);
+  }
 
-    .hero__marquee {
-      order: 2;
-    }
+  .hero__cwrap {
+    position: relative;
+  }
 
-    .hero__panel {
-      order: 3;
-      padding: 1.75rem var(--gutter) 2.5rem;
-    }
+  .hero__rays {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    cursor: grab;
+    touch-action: pan-y;
+  }
 
-    .hero__panel :global(.sig__screen) {
-      max-height: none;
+  .hero__rays:active {
+    cursor: grabbing;
+  }
+
+  .hero__rays:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .hero__note {
+    position: absolute;
+    font-size: 17px;
+    pointer-events: none;
+  }
+
+  .hero__note--tr {
+    right: 14px;
+    top: 8px;
+    max-width: 14ch;
+    text-align: right;
+  }
+
+  .hero__note--bl {
+    left: 14px;
+    bottom: 8px;
+    max-width: 18ch;
+  }
+
+  @media (max-width: 860px) {
+    .hero__note {
+      font-size: 14px;
     }
   }
 </style>
+
+<script>
+  import { mountEigenrays } from '../scripts/eigenrays';
+  import { mountHearIt } from '../scripts/hear-it';
+  document.querySelectorAll<HTMLCanvasElement>('[data-eigenrays]').forEach(mountEigenrays);
+  document.querySelectorAll<HTMLButtonElement>('[data-hear]').forEach(mountHearIt);
+</script>

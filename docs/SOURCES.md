@@ -25,6 +25,13 @@ Documents in `docs/sources/` are kept locally and are never committed or publish
 - **The final report**, EE 4003, "V2V Collision Warning System" (original: `Downloads/4003 Final Report V2V Collision Warning System.pdf`).
 - **The repo**, github.com/avemath/v2v-bsm-ofdm: README and `V2V_TXRXf.m` (vendored at `vendor/v2v/`, byte-identical to commit c5328e5). The five over-the-air runs, distances, obstructions and SNRs come from the README and report.
 
+## Plate I: the eigenray hero
+
+- **The rays are traced in the browser** (`src/scripts/eigenrays.ts`), not read from BELLHOP output: bellhopSim has no committed `.ray` file for its Munk case (its `docs/figures/` holds rendered PNGs and `figures.json`, which records settings, not ray paths).
+- **The model is bellhopSim's Munk profile:** c0 1500 m/s, channel axis 1300 m, B 1300 m, epsilon 0.00737, 5000 m of water, 100 km of range (`docs/figures/figures.json`, `deep_water.parameters`).
+- **The source is at 1000 m** for the plate, as the approved mockup draws it; bellhopSim's own Munk figure puts it on the axis at 1300 m.
+- **The tracer** is a simple Snell's-law step (100 m) with mirror reflections at the surface and bottom, 21 launch angles from -13 to +13 degrees. It is an illustration of the channel, not a BELLHOP run.
+
 ## Other projects
 
 - **Repo READMEs and code**: bellhopSim (its main case is the Munk deep-water profile; the arrivals and spreads in Fig. R2 come from `docs/figures/figures.json`), led-audio-spectrum (firmware constants; the boot scroll is "LEA"), the client site repos (gracemaealterations, plvinc, BcofADAM, nmdomke.github.io), and this repo for the Signals playground.

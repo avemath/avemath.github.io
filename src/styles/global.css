@@ -1168,3 +1168,60 @@ html[data-motion='reduce'] *::after {
     text-decoration: none;
   }
 }
+
+/* ------------------------------------------------------------------
+   Plates: a figure on the sheet in a double hairline frame, with
+   "Plate N" and its subject in Bodoni italic above, and "Fig. N."
+   in Bodoni italic leading the caption below.
+   ------------------------------------------------------------------ */
+.plate {
+  position: relative;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+}
+
+.plate::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid var(--rule);
+  pointer-events: none;
+}
+
+.plate__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  padding: 6px 10px 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+.plate__cap {
+  max-width: 66ch;
+  padding: 4px 10px 6px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.plate__cap b,
+.fig-n {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+/* A handwritten note: Kalam in the text-safe rose. */
+.hand {
+  font-family: var(--font-hand);
+  font-weight: 400;
+  color: var(--rose-ink);
+  line-height: 1.2;
+}
