@@ -1,9 +1,9 @@
 ---
-// The way down: a navy band that darkens toward the bottom, three faint eigenray lines, and a
-// small depth gauge. The research page is the only page that goes underwater.
+// The way down: a sheet band with three faint eigenray lines and a small depth gauge. The
+// research page is the only page that goes underwater.
 ---
 
-<section class="below on-navy" aria-labelledby="below-title">
+<section class="below" aria-labelledby="below-title">
   <svg class="below__rays" viewBox="0 0 1440 420" preserveAspectRatio="none" aria-hidden="true">
     <path d="M0 150 L1440 300" />
     <path d="M0 330 L1440 120" />
@@ -33,7 +33,8 @@
     position: relative;
     overflow: hidden;
     padding-block: clamp(3.5rem, 8vw, 6rem);
-    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 55%, var(--navy-deeper) 100%);
+    background: var(--sheet);
+    border-block: 1px solid var(--line);
   }
 
   .below__rays {
@@ -46,13 +47,14 @@
 
   .below__rays path {
     fill: none;
-    stroke: rgb(244 246 250 / 0.16);
+    stroke: var(--rule);
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
   }
 
   .below__rays .below__ray--hot {
-    stroke: rgb(222 106 65 / 0.55);
+    stroke: var(--teal);
+    opacity: 0.55;
   }
 
   .below__grid {
@@ -81,7 +83,7 @@
 
   .below__btn {
     margin-top: 1.75rem;
-    --btn-line: var(--on-navy);
+    --btn-line: var(--text);
   }
 
   .below__gauge {

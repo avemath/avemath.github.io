@@ -209,22 +209,22 @@ import DemoShell from './DemoShell.astro';
     width: 1.1rem;
     height: 1.1rem;
     border-radius: 50%;
-    background: #2a3346;
+    background: color-mix(in srgb, var(--screen) 85%, var(--screen-ink));
     border: 1px solid var(--line-strong);
     flex: none;
   }
 
   .wl__led[data-on] {
-    background: #5fe3a6;
+    background: var(--screen-sage);
     box-shadow:
-      0 0 12px #5fe3a6,
-      0 0 2px #fff inset;
+      0 0 12px var(--screen-sage),
+      0 0 2px var(--screen-ink) inset;
   }
 
   .wl__state-name {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .wl__state-name[data-tone='bad'] {
@@ -328,27 +328,27 @@ import DemoShell from './DemoShell.astro';
     margin-top: 0.75rem;
     padding: 0.75rem;
     border-radius: 0.6rem;
-    background: #05070c;
-    color: #9fb3d1;
+    background: var(--screen);
+    color: var(--screen-ink);
     font-size: 0.875rem;
     line-height: 1.6;
     overflow-y: auto;
   }
 
   .log :global(li[data-kind='warn']) {
-    color: #ffc670;
+    color: var(--screen-gold);
   }
 
   .log :global(li[data-kind='bad']) {
-    color: #ff8a7a;
+    color: var(--screen-hot);
   }
 
   .log :global(li[data-kind='ok']) {
-    color: #5fe3a6;
+    color: var(--screen-sage);
   }
 
   .log :global(time) {
-    color: #7f8ca6;
+    color: var(--screen-muted);
     margin-right: 0.5rem;
   }
 

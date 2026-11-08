@@ -5,7 +5,7 @@ import Marquee from './Marquee.astro';
 import site from '@/data/site.json';
 ---
 
-<section id="top" class="hero on-navy dot-grid" aria-labelledby="hero-title">
+<section id="top" class="hero" aria-labelledby="hero-title">
   <div class="wrap hero__grid">
     <div class="hero__text">
       <h1 id="hero-title" class="hero__title">{keepLastPair(site.headline)}</h1>
@@ -82,8 +82,7 @@ import site from '@/data/site.json';
 
   /* Same weight and size as the accent button beside it, so the pair lines up. */
   .hero__resume {
-    font-size: 1.1875rem;
-    --btn-line: var(--on-navy);
+    --btn-line: var(--text);
   }
 
   /* The panel gives up height first when the screen is short. */

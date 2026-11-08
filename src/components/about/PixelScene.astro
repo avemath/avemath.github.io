@@ -1,6 +1,7 @@
 ---
 // The About hero's backdrop: the levee at dusk on a 48 by 16 grid of square "LEDs". Built here,
-// once, as one inline SVG of rects, so it costs no request and no script. Sky, a rose sun at
+// once, as one inline SVG of rects, so it costs no request and no script. In the Specimen dusk
+// colors (the same in both themes, like a print): sky, a gold sun at
 // column 37 with a few stars, the treeline, the river with the sun's reflection, the levee, the
 // path and the grass, top to bottom. Each cell gets a thin darker edge in CSS so it reads as an LED.
 const W = 48;
@@ -24,19 +25,19 @@ for (let y = 0; y < H; y++) {
     const tree = 8 + Math.round(Math.sin(x * 0.7) * 0.6 + Math.sin(x * 0.23) * 0.8);
     const sun = Math.hypot(x - 37, (y - 6.5) * 1.1);
     if (y < 9) {
-      c = y < 5 ? mix('#11241F', '#2C463C', y / 5) : mix('#4A5A4C', '#B08A80', (y - 5) / 4);
-      if (sun < 2.6) c = sun < 1.6 ? '#F1DCD2' : '#D8B3A8';
-      if (y < 4 && rnd(x, y) > 0.94) c = '#7E978A';
-      if (y >= tree) c = '#0E211B';
+      c = y < 5 ? mix('#2A1D2F', '#5B4878', y / 5) : mix('#6E5A91', '#B0607F', (y - 5) / 4);
+      if (sun < 2.6) c = sun < 1.6 ? '#F4E3BC' : '#E2C17E';
+      if (y < 4 && rnd(x, y) > 0.94) c = '#C6B0EA';
+      if (y >= tree) c = '#1A1220';
     } else if (y < 11) {
-      c = (x + y) % 5 === 0 ? '#3F6D66' : '#2F5A54';
-      if (Math.abs(x - 37) < 2 && rnd(x, y) > 0.35) c = '#C9A39A';
+      c = (x + y) % 5 === 0 ? '#2F7A7A' : '#246A6C';
+      if (Math.abs(x - 37) < 2 && rnd(x, y) > 0.35) c = '#EBA8C4';
     } else if (y < 13) {
-      c = rnd(x, y) > 0.8 ? '#4E7C57' : '#3E6A49';
+      c = rnd(x, y) > 0.8 ? '#5E8A72' : '#4E7A63';
     } else if (y === 13) {
-      c = rnd(x, y) > 0.85 ? '#A3AC97' : '#8E9884';
+      c = rnd(x, y) > 0.85 ? '#C9AE78' : '#9A7637';
     } else {
-      c = rnd(x, y) > 0.75 ? '#3A6444' : '#2F5638';
+      c = rnd(x, y) > 0.75 ? '#456B57' : '#3A5C4A';
     }
     cells.push({ x, y, c });
   }

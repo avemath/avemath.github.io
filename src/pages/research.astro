@@ -47,7 +47,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   navLabel="depth 0 m"
   footer="research"
 >
-  <div class="under on-navy" data-under>
+  <div class="under" data-under>
     <div class="under__dark" aria-hidden="true"></div>
     <DepthGauge />
 
@@ -208,30 +208,21 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 </BaseLayout>
 
 <style>
-  /* The page is the water: the site's navy at the surface, near black at the bottom. A second
-     layer darkens the whole screen a little more as the depth grows. */
+  /* The research page on paper. (Phase 4 opens it with the seafloor scene.) */
   .under {
     position: relative;
     isolation: isolate;
-    background: linear-gradient(180deg, var(--navy) 0%, var(--navy) 14%, var(--navy-deep) 58%, var(--navy-deeper) 100%);
+    background: var(--bg);
   }
 
   .under__dark {
     position: fixed;
     inset: 0;
     z-index: -1;
-    background: color-mix(in srgb, var(--navy) 15%, #000);
-    opacity: calc(var(--depth, 0) * 0.35);
+    display: none;
     pointer-events: none;
   }
 
-  :global(body:has([data-under])) {
-    background: var(--navy-deeper);
-  }
-
-  :global(body:has([data-under]) .site-header) {
-    background: var(--navy);
-  }
 
   .zone-r {
     padding-block: clamp(3rem, 7vw, 5.5rem);
@@ -291,7 +282,6 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   .research__wt {
     font-size: 0.45em;
     font-weight: 400;
-    font-variation-settings: 'wdth' 100;
     letter-spacing: 0;
     color: var(--muted);
   }
@@ -336,7 +326,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .rfig--boxed {
     border: 1px solid var(--line);
-    background: color-mix(in srgb, var(--navy-deeper) 30%, transparent);
+    background: var(--sheet);
   }
 
   .rfig__plot {
@@ -351,7 +341,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   .rfig__cap {
     padding: 0.55rem 0.75rem;
     border: 1px solid var(--line);
-    background: rgb(244 246 250 / 0.06);
+    background: var(--sheet);
     font-size: 0.875rem;
     color: var(--text-soft);
   }
@@ -389,7 +379,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .rays__rx {
     fill: none;
-    stroke: var(--on-navy);
+    stroke: var(--text);
     stroke-width: 1.5;
   }
 
@@ -408,7 +398,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   }
 
   .net__link {
-    stroke: rgb(244 246 250 / 0.45);
+    stroke: var(--line-strong);
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
   }
@@ -429,10 +419,10 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     min-width: 4.5rem;
     min-height: 2.5rem;
     padding: 0.3rem 0.6rem;
-    border: 1px solid var(--on-navy);
-    background: var(--navy);
+    border: 1px solid var(--text);
+    background: var(--sheet);
     font-size: 0.875rem;
-    color: var(--on-navy);
+    color: var(--text);
     cursor: pointer;
   }
 
@@ -448,29 +438,29 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     bottom: 0;
     max-width: 16rem;
     padding: 0.45rem 0.6rem;
-    border: 1px solid var(--on-navy-line-strong);
-    background: var(--navy-deep);
-    color: var(--on-navy);
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    color: var(--text);
     font-size: 0.875rem;
     line-height: 1.45;
   }
 
   /* R2 */
   .arr__win {
-    fill: rgb(244 246 250 / 0.06);
+    fill: var(--accent-wash);
   }
 
   /* The plot draws at about 0.78 of its viewBox on desktop, so 17 units read as 13px. */
   .arr__lab {
     font-family: var(--font-mono);
     font-size: 17px;
-    fill: var(--on-navy-soft);
+    fill: var(--text-soft);
   }
 
   .arr__tick {
     font-family: var(--font-mono);
     font-size: 17px;
-    fill: var(--on-navy-muted);
+    fill: var(--muted);
   }
 
   .arr__axis {
@@ -478,12 +468,12 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   }
 
   .arr__bar {
-    stroke: rgb(244 246 250 / 0.35);
+    stroke: var(--line-strong);
     stroke-width: 2;
   }
 
   .arr__bar--in {
-    stroke: var(--on-navy);
+    stroke: var(--text);
     stroke-width: 3;
   }
 

@@ -56,11 +56,18 @@ const { empty = false } = Astro.props;
     min-width: 0;
   }
 
+  /* A scope screen: dark in both modes, with its own inks. */
   .sig__screen {
+    --text: var(--screen-ink);
+    --text-soft: var(--screen-muted);
+    --muted: var(--screen-muted);
+    --line: var(--screen-line);
+    --focus: var(--screen-accent);
     position: relative;
     aspect-ratio: 5 / 4;
-    border: 1px solid var(--line);
-    background: rgb(4 12 24 / 0.35);
+    border: 1px solid var(--rule);
+    background: var(--screen);
+    color: var(--screen-ink);
     overflow: hidden;
     touch-action: pan-y;
   }
@@ -86,7 +93,7 @@ const { empty = false } = Astro.props;
     position: absolute;
     display: none;
     pointer-events: none;
-    background: rgb(244 246 250 / 0.7);
+    background: color-mix(in srgb, var(--screen-ink) 70%, transparent);
   }
 
   .sig__cur--v {
@@ -113,12 +120,12 @@ const { empty = false } = Astro.props;
     left: 0;
     display: none;
     padding: 0.35rem 0.5rem;
-    border: 1px solid var(--on-navy-line-strong);
-    background: var(--navy);
+    border: 1px solid var(--screen-line);
+    background: var(--screen);
     font-size: 0.875rem;
     line-height: 1.45;
     white-space: pre;
-    color: var(--on-navy);
+    color: var(--screen-ink);
     pointer-events: none;
     font-variant-numeric: tabular-nums;
   }
@@ -161,11 +168,12 @@ const { empty = false } = Astro.props;
     gap: 0.5rem;
     min-height: 2.5rem;
     padding: 0.35rem 0.8rem;
-    border: 2px solid var(--on-navy);
-    background: var(--navy);
+    border: 1px solid var(--screen-ink);
+    border-radius: 999px;
+    background: var(--screen);
     font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--on-navy);
+    font-weight: 600;
+    color: var(--screen-ink);
     cursor: pointer;
   }
 

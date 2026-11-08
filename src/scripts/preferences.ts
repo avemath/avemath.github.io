@@ -19,6 +19,9 @@ export const currentTheme = (): Theme => (root.dataset.theme === 'dark' ? 'dark'
 export function setTheme(theme: Theme) {
   root.dataset.theme = theme;
   store('theme', theme);
+  // The browser chrome follows the chosen theme's paper, whatever the system setting is.
+  const paper = getComputedStyle(root).getPropertyValue('--paper').trim();
+  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', paper));
   window.dispatchEvent(new CustomEvent('themechange', { detail: theme }));
 }
 

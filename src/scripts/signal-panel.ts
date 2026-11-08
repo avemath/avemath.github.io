@@ -3,14 +3,13 @@
 // follow the pointer, snapping to chip and tone boundaries, and the tones near them brighten; by
 // keyboard the arrow keys step the same cursors. Touch screens get one slow drift in, then rest.
 // "Hear it" plays the same chips through Web Audio, only when pressed.
-import { navyAlpha } from '../lib/navy-client';
+import { token, withAlpha } from '../lib/tokens-client';
 import { CHIPS, CHIP_MS, DURATION_MS, LISTEN_STRETCH, preamble, synthesize, tones } from '../lib/preamble';
 import { prefersReducedMotion } from './preferences';
 
 const F_MIN = 8000;
 const F_MAX = 14000;
 const GRID_HZ = [8000, 10000, 12000, 14000];
-const ACCENT = '#de6a41';
 
 const fmtHz = (hz: number) => `${Math.round(hz).toLocaleString('en-US').replace(/,/g, ' ')} Hz`;
 const fmtMs = (ms: number) => `${ms.toFixed(2)} ms`;
@@ -52,8 +51,8 @@ export function mountSignalPanel(fig: HTMLElement) {
   let cur: { chip: number; tone: number } | null = null;
   let playing = -1;
   let drift = 0;
-  // The label plates are the site's navy, read once rather than on every frame.
-  const plate = navyAlpha(0.92);
+  // The screen's inks, from the tokens (the scope is dark in both themes), read once.
+  const ink = { tone: token('--screen-accent'), hot: token('--screen-hot'), grid: withAlpha(token('--screen-ink'), 0.14), label: token('--screen-muted'), plate: withAlpha(token('--screen'), 0.92) };
 
   function draw() {
     const dpr = Math.min(2, devicePixelRatio || 1);
@@ -63,7 +62,7 @@ export function mountSignalPanel(fig: HTMLElement) {
 
     // Grid: 2 kHz per division up the side, 50 ms (8 chips) across.
     ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(244,246,250,0.14)';
+    ctx.strokeStyle = ink.grid;
     ctx.beginPath();
     for (const f of GRID_HZ) {
       const y = Math.round(yOf(f)) + 0.5;
@@ -86,22 +85,22 @@ export function mountSignalPanel(fig: HTMLElement) {
       const near = cur ? Math.abs(cur.chip - c.index) <= 2 : false;
       const hot = playing === c.index || (cur?.chip === c.index && Math.abs(tones[cur.tone] - c.hz) < 1);
       ctx.globalAlpha = hot ? 1 : near ? 0.95 : 0.72;
-      ctx.fillStyle = hot ? '#ff9a72' : ACCENT;
+      ctx.fillStyle = hot ? ink.hot : ink.tone;
       ctx.fillRect(x, yOf(c.hz) - (near || hot ? 2 : 1.5), Math.min(w, b.x1 - x), near || hot ? 4 : 3);
     }
     ctx.globalAlpha = 1;
 
-    // Axis labels go on top of the tones, each on a small navy plate so a tone never runs through one.
-    ctx.font = '11px "IBM Plex Mono", monospace';
+    // Axis labels go on top of the tones, each on a small screen-colored plate so a tone never runs through one.
+    ctx.font = '11px "JetBrains Mono Variable", "JetBrains Fallback", monospace';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'right';
     for (const f of GRID_HZ.slice(1, -1)) {
       const label = `${f / 1000} kHz`;
       const y = yOf(f) - 8;
       const tw = ctx.measureText(label).width;
-      ctx.fillStyle = plate;
+      ctx.fillStyle = ink.plate;
       ctx.fillRect(b.x1 - 6 - tw, y - 7, tw + 4, 14);
-      ctx.fillStyle = 'rgba(169,182,204,0.9)';
+      ctx.fillStyle = ink.label;
       ctx.fillText(label, b.x1 - 4, y);
     }
     ctx.textAlign = 'left';

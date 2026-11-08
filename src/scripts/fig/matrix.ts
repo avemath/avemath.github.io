@@ -2,7 +2,7 @@
 // only on that click, and the audio never leaves the device), the clip, or the idle glow. Typing
 // a name scrolls it across the matrix the way setup() scrolls the owner's name on boot. Every
 // frame comes from src/lib/led-firmware.ts.
-import { navy, mixHex } from '../../lib/navy-client';
+import { token, mixHex } from '../../lib/tokens-client';
 import { createDemoTrack, createSpectrum, openMic, scrollFrame, scrollSteps, DEMO_FONT, FRAME_MS, FS, H, N, SCROLL_STEP_MS, W } from '../../lib/led-firmware';
 import { prefersReducedMotion } from '../preferences';
 
@@ -12,15 +12,20 @@ import { prefersReducedMotion } from '../preferences';
 const CLIP_SECONDS = 13;
 const CLIP_GAIN = 0.5;
 
-const ON = '#de6a41';
-const PEAK = '#ffc2a8';
 
 type Source = 'none' | 'mic' | 'clip' | 'idle' | 'name';
 
 export function mountMatrix(root: HTMLElement) {
-  // The panel is the site's navy; an unlit LED is a step lighter.
-  const NAVY = navy();
-  const OFF = mixHex(NAVY, 0.94, '#ffffff');
+  // The panel is a screen (dark in both themes); an unlit LED is a step lighter. Lit LEDs shade
+  // from teal at the bottom through lilac to rose at the top, as on the project plate.
+  const PANEL = token('--screen');
+  const OFF = mixHex(PANEL, 0.9, '#ffffff');
+  const [TEAL, LILAC, ROSE, PEAK] = ['--screen-teal', '--screen-accent', '--screen-hot', '--screen-ink'].map((n) => token(n));
+  const ON = LILAC;
+  const lit = (y: number) => {
+    const t = (H - y) / H;
+    return t < 0.35 ? TEAL : t < 0.6 ? LILAC : ROSE;
+  };
   const canvas = root.querySelector<HTMLCanvasElement>('[data-mf-canvas]')!;
   const ctx = canvas.getContext('2d')!;
   const read = root.querySelector<HTMLElement>('[data-mf-read]')!;
@@ -47,7 +52,7 @@ export function mountMatrix(root: HTMLElement) {
     ctx.fillRect(x * cell + 1, y * cell + 1, cell - 2, cell - 2);
   };
   const clear = () => {
-    ctx.fillStyle = NAVY;
+    ctx.fillStyle = PANEL;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
@@ -55,12 +60,12 @@ export function mountMatrix(root: HTMLElement) {
     clear();
     const s = sp.s;
     for (let x = 0; x < W; x++) {
-      for (let y = 0; y < H; y++) led(x, y, H - 1 - y < s.bandValues[x] ? ON : OFF);
+      for (let y = 0; y < H; y++) led(x, y, H - 1 - y < s.bandValues[x] ? lit(y) : OFF);
       if (s.peakValues[x] > 0) led(x, H - 1 - Math.min(H - 1, s.peakValues[x]), PEAK);
     }
   }
 
-  // displayIdleGlow(): the firmware's breathing glow, brightest in the middle, drawn in the accent.
+  // displayIdleGlow(): the firmware's breathing glow, brightest in the middle, drawn in lilac.
   function drawIdle(now: number) {
     clear();
     const breath = (Math.sin(((now % 2600) / 2600) * Math.PI * 2 - Math.PI / 2) + 1) / 2;

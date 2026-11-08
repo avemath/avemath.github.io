@@ -13,13 +13,23 @@ import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const DIST = 'dist';
 const site = JSON.parse(await readFile('src/data/site.json', 'utf8'));
-// The navy comes from the one token in src/styles/tokens.css, so the cards and icons follow it.
-const NAVY = /--navy:\s*(#[0-9a-fA-F]{6})/.exec(await readFile('src/styles/tokens.css', 'utf8'))[1];
-// The favicon's ground is that navy too: rewrite it in public/ and in the built copy.
-for (const f of ['public/favicon.svg', join(DIST, 'favicon.svg')]) {
-  const svg = await readFile(f, 'utf8');
-  await writeFile(f, svg.replace(/(<rect width="32" height="32" fill=")#[0-9a-fA-F]{6}/, `$1${NAVY}`));
-}
+// The Specimen palette comes from src/styles/tokens.css (the light theme), so the cards and the
+// icons follow it.
+const tokensCss = await readFile('src/styles/tokens.css', 'utf8');
+const lightBlock = tokensCss.slice(0, tokensCss.search(/^\[data-theme='dark'\] \{/m));
+const T = Object.fromEntries(['paper', 'sheet', 'ink', 'muted', 'rule', 'lilac', 'teal', 'rose', 'gold', 'lilac-ink'].map((k) => [k, new RegExp(`--${k}:\\s*(#[0-9a-fA-F]{6})`).exec(lightBlock)[1]]));
+
+// The favicon: three sound rays bending through the channel and a gold source, on ink. Paths only,
+// so it never depends on a font.
+const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="${T.ink}"/>
+  <path d="M6 13 C 12 4, 18 22, 27 9" fill="none" stroke="${T.rose}" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M6 13 C 12 8, 18 18, 27 13" fill="none" stroke="#c6b0ea" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M6 13 C 12 12, 18 14, 27 17" fill="none" stroke="#7ccac3" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="6" cy="13" r="3" fill="#e2c17e"/>
+</svg>
+`;
+for (const f of ['public/favicon.svg', join(DIST, 'favicon.svg')]) await writeFile(f, favicon);
 const { server, base } = serveDist(DIST);
 
 const fonts = await readdir(join(DIST, '_astro'));
@@ -63,28 +73,57 @@ const cards = [
   ...projects.map((p) => ({ file: p.id, eyebrow: p.type, title: p.title, sub: p.summary })),
 ];
 
-// The card is the site's hero in miniature: navy with the faint dot grid, the wide Archivo
-// headline, and a short FH-BFSK hop pattern in the accent. No spectrogram.
-const hops = [3, 9, 5, 11, 1, 7, 12, 4, 8, 2, 10, 6];
-const tones = hops.map((h, i) => `<rect x="${760 + i * 30}" y="${470 - h * 22}" width="22" height="5" fill="${i % 4 === 3 ? '#f4f6fa' : '#de6a41'}"/>`).join('');
+// The card is the home hero in miniature, as a Specimen plate: paper, the title in Bodoni Moda, and
+// Plate I's eigenrays (Munk profile, source at 1000 m, 100 km) in a double-hairline frame.
+const munk = (z) => { const e = (2 * (z - 1300)) / 1300; return 1500 * (1 + 0.00737 * (e - 1 + Math.exp(-e))); };
+const dmunk = (z) => { const e = (2 * (z - 1300)) / 1300; return ((1500 * 0.00737 * (1 - Math.exp(-e))) * 2) / 1300; };
+function trace(theta) {
+  let r = 0, z = 1000, th = theta;
+  const pts = [];
+  for (let i = 0; r < 100000; i++) {
+    th += (-dmunk(z) / munk(z)) * Math.cos(th) * 100;
+    r += Math.cos(th) * 100;
+    z += Math.sin(th) * 100;
+    if (z < 0) { z = -z; th = -th; }
+    if (z > 5000) { z = 10000 - z; th = -th; }
+    if (i % 8 === 0) pts.push([r / 100000, z / 5000]);
+  }
+  return pts;
+}
+const PX = 724, PY = 112, PW = 400, PH = 360;
+const rays = [];
+for (let a = -13; a <= 13.01; a += 1.3) {
+  const t = Math.abs(a) / 13;
+  const col = t < 0.34 ? T.teal : t < 0.67 ? T.lilac : T.rose;
+  const d = trace((a * Math.PI) / 180).map(([u, v], i) => `${i ? 'L' : 'M'}${(PX + 24 + u * (PW - 48)).toFixed(1)} ${(PY + 24 + v * (PH - 48)).toFixed(1)}`).join(' ');
+  rays.push(`<path d="${d}" fill="none" stroke="${col}" stroke-width="1.4" stroke-opacity=".6"/>`);
+}
+const ssp = [];
+for (let z = 0; z <= 5000; z += 100) ssp.push(`${ssp.length ? 'L' : 'M'}${(PX + 24 + ((munk(z) - 1480) / 90) * 60).toFixed(1)} ${(PY + 24 + (z / 5000) * (PH - 48)).toFixed(1)}`);
+const plate = `<rect x="${PX}" y="${PY}" width="${PW}" height="${PH}" fill="${T.sheet}" stroke="${T.rule}"/>
+<rect x="${PX + 8}" y="${PY + 8}" width="${PW - 16}" height="${PH - 16}" fill="none" stroke="${T.rule}"/>
+${rays.join('')}<path d="${ssp.join(' ')}" fill="none" stroke="${T.gold}" stroke-width="2.6"/>
+<circle cx="${PX + 24}" cy="${(PY + 24 + (1000 / 5000) * (PH - 48)).toFixed(1)}" r="6" fill="${T.gold}"/>
+<text x="${PX}" y="${PY + PH + 34}" font-family="BO" font-style="italic" font-size="22" fill="${T.muted}">Plate I, eigenrays</text>`;
 
 const html = (c) => `<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face{font-family:AR;src:url(${font('archivo-latin-wdth')}) format('woff2');font-weight:100 900;font-stretch:62% 125%}
-@font-face{font-family:PM;src:url(${font('ibm-plex-mono-latin-400')}) format('woff2')}
+@font-face{font-family:BO;src:url(${font('bodoni-moda-latin-wght-normal')}) format('woff2');font-weight:400 900}
+@font-face{font-family:BO;font-style:italic;src:url(${font('bodoni-moda-latin-wght-italic')}) format('woff2');font-weight:400 900}
+@font-face{font-family:HK;src:url(${font('hanken-grotesk-latin-wght-normal')}) format('woff2');font-weight:100 900}
+@font-face{font-family:JM;src:url(${font('jetbrains-mono-latin-wght-normal')}) format('woff2');font-weight:100 800}
 *{margin:0;box-sizing:border-box}
-body{width:1200px;height:630px;background:${NAVY} radial-gradient(rgb(244 246 250/.09) 1.2px,transparent 1.6px) 0 0/24px 24px;color:#f4f6fa;font-family:AR;position:relative;overflow:hidden}
+body{width:1200px;height:630px;background:${T.paper};color:${T.ink};font-family:HK;position:relative;overflow:hidden}
 .g{position:absolute;inset:0}
-.c{position:absolute;left:80px;top:72px;bottom:64px;width:640px;display:flex;flex-direction:column}
-.e{font-size:24px;font-weight:600;color:#f08a64}
-h1{font-weight:800;font-variation-settings:'wdth' 112;font-size:${c.title.length > 40 ? 58 : c.title.length > 24 ? 68 : 88}px;line-height:.96;letter-spacing:-.03em;margin-top:22px}
-p{margin-top:24px;font-size:26px;line-height:1.4;color:#a9b6cc;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
-.f{margin-top:auto;display:flex;align-items:center;gap:14px;font-family:PM;font-size:20px;color:#a9b6cc}
-.f:before{content:'';width:40px;height:6px;background:#de6a41}
-.bar{position:absolute;left:0;right:0;bottom:0;height:14px;background:#de6a41}
+.c{position:absolute;left:76px;top:76px;bottom:64px;width:600px;display:flex;flex-direction:column}
+.e{font-family:BO;font-style:italic;font-size:28px;color:${T['lilac-ink']}}
+h1{font-family:BO;font-weight:400;font-size:${c.title.length > 40 ? 58 : c.title.length > 24 ? 70 : 92}px;line-height:.98;letter-spacing:-.015em;margin-top:18px}
+p{margin-top:24px;font-size:26px;line-height:1.4;color:${T.muted};display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.f{margin-top:auto;display:flex;align-items:center;gap:14px;font-family:JM;font-size:20px;color:${T.muted}}
+.f:before{content:'';width:40px;height:2px;background:${T.gold}}
 </style></head><body>
-<svg class="g" viewBox="0 0 1200 630"><rect x="740" y="180" width="380" height="320" fill="none" stroke="rgb(244 246 250/.22)"/>${tones}<text x="752" y="204" font-family="PM" font-size="15" fill="#a9b6cc">FH-BFSK, JANUS band</text></svg>
+<svg class="g" viewBox="0 0 1200 630">${plate}</svg>
 <div class="c"><div class="e">${c.eyebrow}</div><h1>${c.title}</h1><p>${c.sub}</p>
-<div class="f">avemath.github.io</div></div><div class="bar"></div></body></html>`;
+<div class="f">avemath.github.io</div></div></body></html>`;
 
 await mkdir('public/og', { recursive: true });
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
@@ -112,7 +151,7 @@ console.log(`social cards: ${cards.length}`);
 
 // ---- Apple touch icon ----
 await page.setViewportSize({ width: 180, height: 180 });
-await page.setContent(`<body style="margin:0;background:${NAVY}"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
+await page.setContent(`<body style="margin:0;background:${T.ink}"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
 await page.waitForTimeout(200);
 await page.screenshot({ path: 'public/apple-touch-icon.png' });
 

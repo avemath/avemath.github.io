@@ -29,7 +29,7 @@ const isCurrent = (key: string) =>
   (key === 'websites' && path === '/services');
 ---
 
-<header class="site-header on-navy no-print" data-header>
+<header class="site-header no-print" data-header>
   <div class="wrap site-header__row">
     <a href="/" class="brand" aria-label={`${site.name}, home`}>{site.name}</a>
 
@@ -90,11 +90,12 @@ const isCurrent = (key: string) =>
 </header>
 
 <style>
-  /* The nav sits on navy on every page, so the hero and the header read as one ground. */
+  /* The nav sits on paper on every page, with a hairline once the page scrolls. */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 40;
+    background: var(--bg);
     border-bottom: 1px solid transparent;
     transition: border-color 0.3s;
   }
@@ -241,7 +242,7 @@ const isCurrent = (key: string) =>
     top: 100%;
     padding: 0.25rem var(--gutter) 1rem;
     border-bottom: 1px solid var(--line);
-    background: var(--navy);
+    background: var(--bg);
   }
 
   .mnav__link {

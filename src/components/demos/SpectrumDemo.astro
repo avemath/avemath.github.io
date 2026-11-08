@@ -78,8 +78,8 @@ import Icon from '../Icon.astro';
     position: relative;
     padding: 2.25rem 0.9rem 0.9rem;
     border-radius: 1rem;
-    background: #05070c;
-    border: 1px solid #1d2638;
+    background: var(--screen);
+    border: 1px solid var(--screen-line);
     box-shadow: inset 0 0 40px rgb(0 0 0 / 0.6);
   }
 
@@ -97,13 +97,13 @@ import Icon from '../Icon.astro';
     border-radius: 0.3rem;
     font-size: 0.875rem;
     letter-spacing: 0.12em;
-    color: #8a9bb8;
+    color: var(--screen-muted);
     background: rgb(255 255 255 / 0.06);
   }
 
   .spec__mode[data-on] {
-    color: #05070c;
-    background: #3ddcff;
+    color: var(--screen);
+    background: var(--screen-teal);
   }
 
   .spec__controls {

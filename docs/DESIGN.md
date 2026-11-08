@@ -1,31 +1,38 @@
-# Design system: the bench
+# Design system: Specimen
 
-A communications engineer's test report. The home page is the surface: navy hero and footer, white paper for the body, one muted buoy orange, wide Archivo headings, and figures that read like instrument readouts and timing diagrams. Only /research/ goes underwater. The concept, what changed and what was removed are in [REDESIGN.md](REDESIGN.md#redesign-3-bench-on-the-surface-water-below).
+A field notebook of engraved plates: paper by day, a glowing night bench after dark. Figures sit in plate frames (a double hairline) with "Fig. N." captions in Bodoni italic, and every plate is drawn from Ave's own data. The approved mockups are `docs/mockups/specimen-study.html` and `docs/mockups/specimen-choices.html`; what changed is in [REDESIGN.md](REDESIGN.md#specimen).
 
 The live reference is `/styleguide/` (not linked or indexed). Toggle the theme to check both palettes.
 
 ## Color
 
-Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme='dark']`. Tailwind reads them through `@theme` in `global.css`, so utilities like `text-muted` and `bg-surface` follow the theme.
+Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme='dark']`. The palette is the whole system; the older role names (`--bg`, `--text`, `--line`, `--accent` and so on) point at it, so every component follows. Tailwind reads them through `@theme` in `global.css`.
 
-| Token | Light | Dark | Use |
+| Token | Light (paper) | Dark (night bench) | Use |
 |---|---|---|---|
-| `--navy` | `#16325a` | same | hero, nav, footer, research ground. The one value to change: everything navy below is mixed from it |
-| `--navy-deep`, `--navy-deeper` | navy at 65% and 38% toward black | same | gradients that darken downward |
-| `--bg`, `--surface` | `#ffffff` | navy at 80% toward black, navy at 2% toward white | page and paper cards |
-| `--ground-alt` | `#eef1f5` with a dot grid | navy at 86% toward black | alternate sections (`.ground-alt`) |
-| `--text` | `var(--navy)` | `#f4f6fa` | ink |
-| `--muted` | `#5b6778` | `#a9b6cc` | labels, meta |
-| `--line` | `#cbd3df` | navy at 14% toward white | 1px borders |
-| `--accent` | `#de6a41` | same | fills and strokes only: primary buttons, the marquee, active traces, callouts |
-| `--accent-ink` | `#b4502a` | `--accent-on-navy` | text in the accent color (passes 4.5:1) |
-| `--accent-on-navy` | `#f08a64` | same | small orange text on navy (5.2:1 on `#16325a`) |
+| `--paper` | `#efede9` | `#110d15` | page ground (`--bg`) |
+| `--sheet` | `#f7f5f1` | `#18131d` | plates, bands, cards (`--surface`) |
+| `--ink` | `#2a1d2f` | `#ede7ef` | text (`--text`), 13.7:1 and 15.8:1 |
+| `--muted` | `#665b6b` | `#a99eae` | labels, meta, 5.5:1 and 7.5:1 |
+| `--rule` | `#d3cbd3` | `#332a38` | hairlines (`--line`), decoration only |
+| `--line-strong` | `#897f8c` | `#6c6271` | borders that mark a control, 3.3:1 |
+| `--lilac` | `#7e62a6` | `#c6b0ea` | the accent (`--accent`): fills, strokes, large display type |
+| `--sage`, `--teal`, `--gold`, `--rose` | `#4e7a63`, `#246a6c`, `#9a7637`, `#b0607f` | `#9dcaae`, `#7ccac3`, `#e2c17e`, `#eba8c4` | plate inks |
+| `--lilac-ink`, `--sage-ink`, `--gold-ink`, `--rose-ink` | `#765c9c`, `#48705b`, `#81632e`, `#97536d` | the bright inks | small text in those colors (4.75:1 or better on paper) |
+| `--photo` | `#fbfaf7` | `#f2efea` | print borders |
+| `--screen` and `--screen-*` | `#1c1720` | `#0a080c` | the oscilloscope, the LED matrix, the serial console: dark in both themes |
+| `--bit` | `#1e8a5a` | `#5cf2a6` (with glow) | the bit girl |
 
-On navy (`.on-navy`) the inks are `#f4f6fa` (11.9:1), `#a9b6cc` (6.3:1) and lines at 22% white, in both themes. The accent on navy is 3.8:1: fine for fills, icons and text 24px and up, never small text. Outside CSS, `src/lib/navy.ts` (theme-color), `src/lib/navy-client.ts` (canvases) and `scripts/render-assets.mjs` (favicon, social cards) read `--navy` from `tokens.css`, so retinting is a one-line change followed by `npm run assets`. White on the accent is 3.4:1, so white text on it is always 19px bold (large text): the primary button and the marquee. A small primary button turns into a solid ink button instead.
+In light mode lilac (4.3:1), sage (4.2:1), gold (3.6:1) and rose (3.7:1) are too light for small text, so text uses the `*-ink` variants; the bright values stay for lines, fills and type 24px and up. Prints and handwritten notes stay light in both themes (`--photo-ink`, `--note-*`). Outside CSS, `src/lib/theme.ts` (the two theme-color tags), `src/lib/tokens-client.ts` (canvases) and `scripts/render-assets.mjs` (favicon, social cards) read the tokens, so `npm run assets` follows any change.
 
 ## Type
 
-One family, Archivo (variable weight and width), self-hosted from Fontsource, Latin only. Headings: weight 800, `'wdth' 112`, letter-spacing -0.03em, line-height 0.94. Body 17px/1.5. IBM Plex Mono for code (14px), readouts and depth labels. Both are preloaded, and each has a fallback face sized to its metrics (`src/styles/fonts.css`, measured with `scripts/measure-fallback.mjs`), so the swap does not move the layout. No pixel or dot-matrix fonts.
+- **Bodoni Moda** (display): headings at weight 400 (h3 and h4 at 500), italic for accents (`h1 em` is lilac), plate numbers and "Fig. N." captions.
+- **Hanken Grotesk** (body): 17px/1.5.
+- **JetBrains Mono** (data, pin names, labels, code).
+- **Kalam** (handwritten notes and captions only).
+
+All are self-hosted from Fontsource, Latin only, `font-display: swap`. Only Bodoni Moda roman (the hero face) is preloaded. Each family has a fallback face sized to its metrics (`src/styles/fonts.css`, measured with `scripts/measure-fallback.mjs` against Georgia, Arial and Courier New), so the swap does not move the layout.
 
 ## Shape
 

@@ -1,10 +1,7 @@
 ---
 // About holds the person; Projects and Websites hold the work. Hero over the levee in pixels,
 // the AVE-26 datasheet (pins and photos in src/data/about.json), the longer version, the
-// recommendations as pull quotes, why underwater, and a closing band. Its "Garden" palette is in
-// src/styles/about.css, scoped by data-page="about".
-import '@/styles/about.css';
-import '@/styles/hand.css';
+// recommendations as pull quotes, why underwater, and a closing band, all on the Specimen tokens.
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
 import PixelScene from '@/components/about/PixelScene.astro';
@@ -30,7 +27,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   footer="links"
   description="About Avery Matherne: graduate researcher at LSU, web designer, nonprofit co-founder, and someone who would rather be outside."
 >
-  <section class="ab-hero g-dark">
+  <section class="ab-hero ab-band">
     <PixelScene />
     <div class="ab-hero__shade" aria-hidden="true"></div>
     <div class="wrap ab-hero__grid">
@@ -128,7 +125,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
 
   <PullQuotes />
 
-  <section class="ab-why g-dark" aria-labelledby="why-title">
+  <section class="ab-why ab-band" aria-labelledby="why-title">
     <div class="wrap ab-why__grid">
       <div class="ab-why__text">
         <p class="ab-why__kicker">Why underwater</p>
@@ -185,7 +182,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   </section>
 
 
-  <section class="ab-end g-dark" aria-labelledby="end-title">
+  <section class="ab-end ab-band" aria-labelledby="end-title">
     <div class="wrap ab-end__row">
       <div>
         <h2 id="end-title" class="ab-h2 ab-h2--lg">Say hi.</h2>
@@ -200,8 +197,9 @@ import ida from '@/assets/about/polaroid-ida.jpg';
 </BaseLayout>
 
 <style>
-  .g-dark {
-    background: var(--g-hero);
+  /* The hero, Why underwater and the closing band sit on the sheet. */
+  .ab-band {
+    background: var(--sheet);
   }
 
   .ab-btns {
@@ -232,7 +230,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   .ab-hero__shade {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgb(20 42 36 / 0.94) 0%, rgb(20 42 36 / 0.8) 40%, rgb(20 42 36 / 0) 70%);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--sheet) 94%, transparent) 0%, color-mix(in srgb, var(--sheet) 82%, transparent) 40%, transparent 70%);
   }
 
   .ab-hero__grid {
@@ -254,7 +252,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   /* Stacked, the text sits over the whole scene, so the shade runs top to bottom instead. */
   @media (max-width: 959px) {
     .ab-hero__shade {
-      background: linear-gradient(180deg, rgb(20 42 36 / 0.94) 0%, rgb(20 42 36 / 0.86) 55%, rgb(20 42 36 / 0.35) 100%);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--sheet) 94%, transparent) 0%, color-mix(in srgb, var(--sheet) 86%, transparent) 55%, color-mix(in srgb, var(--sheet) 35%, transparent) 100%);
     }
   }
 
@@ -267,7 +265,6 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   .ab-hero__title {
     font-size: clamp(2.75rem, 2rem + 3.4vw, 4.25rem);
     font-weight: 800;
-    font-variation-settings: 'wdth' 112;
     letter-spacing: -0.03em;
     line-height: 0.98;
   }
@@ -393,7 +390,8 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   /* Why underwater: the deep band. */
   .ab-why {
     margin-top: 4.5rem;
-    background: var(--g-band);
+    background: var(--sheet);
+    border-block: 1px solid var(--line);
   }
 
   /* Straight on from the recommendations band, with no strip of page between the two. */
@@ -431,7 +429,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   .ab-why__kicker {
     font-size: 0.9375rem;
     font-weight: 700;
-    color: var(--g-accent);
+    color: var(--accent-ink);
   }
 
   /* The prints, each the photo's own shape, two by two; an odd last one sits centered under them. */

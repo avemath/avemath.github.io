@@ -306,7 +306,7 @@ export type Spectrum = ReturnType<typeof createSpectrum>;
 // ---- Drawing. FastLED's rainbow hue 0..255 maps to roughly 0..360 degrees. ----
 export const hsv = (hue: number, sat: number, val: number) =>
   `hsl(${(hue / 256) * 360} ${(sat / 255) * 100}% ${Math.max(4, (val / 255) * 58)}%)`;
-export const OFF = '#121826';
+export const OFF = '#1c1720';
 
 export function createMatrix(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext('2d')!;

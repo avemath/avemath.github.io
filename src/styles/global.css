@@ -5,9 +5,10 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @theme {
-  --font-display: 'Archivo Variable', 'Archivo Wide Fallback', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Archivo Variable', 'Archivo Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'IBM Plex Mono Fallback', ui-monospace, Menlo, monospace;
+  --font-display: 'Bodoni Moda Variable', 'Bodoni Fallback', 'Didot', 'Bodoni 72', Georgia, serif;
+  --font-sans: 'Hanken Grotesk Variable', 'Hanken Fallback', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Fallback', ui-monospace, Menlo, monospace;
+  --font-hand: 'Kalam', 'Bradley Hand', 'Segoe Print', cursive;
 
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -56,10 +57,9 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 800;
-    font-variation-settings: 'wdth' 112;
-    line-height: 0.94;
-    letter-spacing: -0.03em;
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: -0.015em;
     text-wrap: balance;
     color: var(--text);
   }
@@ -75,8 +75,15 @@
 
   h3,
   h4 {
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.005em;
+  }
+
+  /* An accent word in a heading: Bodoni italic, in lilac. */
+  :is(h1, h2, h3) em {
+    font-style: italic;
+    color: var(--accent);
   }
 
   p,
@@ -90,7 +97,7 @@
 
   ::selection {
     background: var(--accent);
-    color: #fff;
+    color: var(--paper);
   }
 
   :focus-visible {
@@ -156,35 +163,6 @@
 /* The alternate ground: a pale grey with a faint dot grid, like the paper under a scope. */
 .ground-alt {
   background: var(--ground-alt) radial-gradient(var(--dot) 1px, transparent 1.4px) 0 0 / 20px 20px;
-}
-
-/* Navy ground: the hero, the footer and the research page. The same navy in both themes, so its
-   inks are fixed too. */
-.on-navy {
-  --bg: var(--navy);
-  --surface: var(--navy-2);
-  --surface-2: var(--navy-3);
-  --text: var(--on-navy);
-  --bg-contrast: var(--navy);
-  --text-soft: var(--on-navy-soft);
-  --muted: var(--on-navy-muted);
-  --line: var(--on-navy-line);
-  --line-strong: var(--on-navy-line-strong);
-  --accent-ink: var(--accent-on-navy);
-  --focus: var(--accent-on-navy);
-  --dot: rgb(244 246 250 / 0.09);
-  --shadow: none;
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-line: var(--line);
-  --color-text: var(--text);
-  --color-soft: var(--text-soft);
-  --color-muted: var(--muted);
-  --color-accent: var(--accent-ink);
-  --color-amber-ink: var(--accent-ink);
-  background-color: var(--navy);
-  color: var(--text);
 }
 
 .dot-grid {
@@ -292,7 +270,7 @@
   font-family: var(--font-mono);
 }
 
-/* Depth ranges, axis labels and readouts: IBM Plex Mono, the instrument face. */
+/* Depth ranges, axis labels and readouts: JetBrains Mono, the instrument face. */
 .label {
   font-family: var(--font-mono);
   font-size: 0.875rem;
@@ -315,7 +293,8 @@
 }
 
 /* ------------------------------------------------------------------
-   Buttons: square, 2px border, 50px tall, bold.
+   Buttons: pills with a 1px ink border, 46px tall. The primary action
+   is an ink fill that turns lilac on hover.
    ------------------------------------------------------------------ */
 .btn {
   --btn-bg: transparent;
@@ -325,14 +304,14 @@
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  min-height: 50px;
-  padding: 0.6rem 1.15rem;
-  border: 2px solid var(--btn-line);
-  border-radius: 0;
+  min-height: 46px;
+  padding: 0.55rem 1.35rem;
+  border: 1px solid var(--btn-line);
+  border-radius: 999px;
   background: var(--btn-bg);
   color: var(--btn-fg);
   font-family: var(--font-sans);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.9375rem;
   line-height: 1.1;
   text-decoration: none;
@@ -344,25 +323,23 @@
 }
 
 .btn:hover {
-  --btn-bg: color-mix(in oklab, var(--text) 7%, transparent);
+  --btn-line: var(--accent);
 }
 
 .btn:active {
   transform: translateY(1px);
 }
 
-/* Accent fill with white text. White on the accent passes only as large text (3.4:1), so the
-   label is set at 19px bold, which counts as large. */
+/* The main action: ink fill, paper text (13.7:1); lilac fill on hover (paper on lilac-ink, 4.6:1). */
 .btn--primary {
-  --btn-bg: var(--accent);
-  --btn-fg: #fff;
-  --btn-line: var(--accent);
-  font-size: 1.1875rem;
+  --btn-bg: var(--text);
+  --btn-fg: var(--bg-contrast);
+  --btn-line: var(--text);
 }
 
 .btn--primary:hover {
-  --btn-bg: var(--accent-hover);
-  --btn-line: var(--accent-hover);
+  --btn-bg: var(--accent-ink);
+  --btn-line: var(--accent-ink);
 }
 
 /* Solid ink: the main action inside a paper card. */
@@ -388,8 +365,7 @@
   font-size: 0.875rem;
 }
 
-/* A small primary button cannot carry white on the accent (its label is too small), so it
-   becomes a solid ink button instead. */
+/* A small primary button: the same ink fill. */
 .btn--small.btn--primary {
   --btn-bg: var(--text);
   --btn-fg: var(--bg-contrast);
@@ -594,8 +570,8 @@
   width: 1.375rem;
   height: 1.375rem;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-ink);
+  color: var(--bg);
   font-size: 0.875rem;
   font-weight: 700;
   line-height: 1;
@@ -710,13 +686,14 @@
 }
 
 .dw__svg .co circle {
-  fill: var(--accent);
+  fill: var(--accent-ink);
 }
 
 .dw__svg .co text {
-  font-size: 13px;
+  /* 12px keeps Hanken's taller line box inside the 9 to 10.5 unit circles. */
+  font-size: 12px;
   font-weight: 700;
-  fill: #fff;
+  fill: var(--bg);
   text-anchor: middle;
 }
 
@@ -755,7 +732,7 @@
 }
 
 /* ------------------------------------------------------------------
-   Code panels (How it works and Code tabs): IBM Plex Mono at 14px with
+   Code panels (How it works and Code tabs): JetBrains Mono at 14px with
    line numbers. Never narrower than 60 characters; narrower screens
    scroll the panel sideways instead of wrapping the code.
    ------------------------------------------------------------------ */
@@ -1022,7 +999,7 @@
   fill: var(--text);
   font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .wiring__s,
@@ -1163,8 +1140,7 @@ html[data-motion='reduce'] *::after {
    ------------------------------------------------------------------ */
 @media print {
   :root,
-  [data-theme='dark'],
-  .on-navy {
+  [data-theme='dark'] {
     --bg: #fff;
     --surface: #fff;
     --surface-2: #fff;

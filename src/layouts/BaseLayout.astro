@@ -1,5 +1,5 @@
 ---
-import { NAVY } from '@/lib/navy';
+import { PAPER } from '@/lib/theme';
 import '@/styles/global.css';
 import SEO from '@/components/SEO.astro';
 import Header from '@/components/Header.astro';
@@ -7,10 +7,9 @@ import Footer from '@/components/Footer.astro';
 import CommandPalette from '@/components/CommandPalette.astro';
 import site from '@/data/site.json';
 // The Latin font files, preloaded so text can render in the right face on first paint.
-import archivoUrl from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
-import monoUrl from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url';
+import bodoniUrl from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-wght-normal.woff2?url';
 
-const fontPreloads = [archivoUrl, monoUrl];
+const fontPreloads = [bodoniUrl];
 
 interface Props {
   title?: string;
@@ -39,7 +38,8 @@ const { bare = false, navLabel, section, footer = 'default', page, ...seo } = As
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content={NAVY} />
+    <meta name="theme-color" content={PAPER.light} media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content={PAPER.dark} media="(prefers-color-scheme: dark)" />
     <script is:inline>
       // Apply saved or system theme and motion settings before first paint.
       (function () {
@@ -53,6 +53,9 @@ const { bare = false, navLabel, section, footer = 'default', page, ...seo } = As
           theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
         d.dataset.theme = theme;
+        // The browser chrome follows the chosen theme, even when it differs from the system's.
+        var pick = document.querySelector('meta[name="theme-color"][media*="' + theme + '"]');
+        if (pick) document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.setAttribute('content', pick.getAttribute('content')); });
         // Lets CSS show controls that only work with JavaScript, before first paint, so they never shift the page.
         d.classList.add('js');
         if (motion === 'reduce') d.dataset.motion = 'reduce';

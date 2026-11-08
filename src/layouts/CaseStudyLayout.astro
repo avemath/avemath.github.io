@@ -303,7 +303,7 @@ const jsonLd = [
     <section class="wrap pb-16 md:pb-24 no-print">
       <div class="case__cta card">
         <div>
-          <p class="font-display text-2xl font-semibold tracking-tight">Want to talk about this project?</p>
+          <p class="font-display text-2xl font-medium tracking-tight">Want to talk about this project?</p>
           <p class="mt-1 text-soft">I'm happy to go deeper on any of it. {site.replyTime}</p>
         </div>
         <a class="btn btn--primary" href={`/contact/?topic=${d.type === 'client-site' || d.type === 'nonprofit' ? 'website' : d.type === 'research' ? 'research' : 'job'}`}>
@@ -509,7 +509,7 @@ const jsonLd = [
   .case__metric {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 3vw, 2.2rem);
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: -0.03em;
   }
 
@@ -694,7 +694,7 @@ const jsonLd = [
   }
 
   .shot__img :global(video) {
-    background: #05070c;
+    background: var(--screen);
   }
 
   /* The clips are about 860 to 960 px wide; shown any wider they turn soft, so they stop there. */
@@ -777,7 +777,7 @@ const jsonLd = [
   .pager__title {
     font-family: var(--font-display);
     font-size: 1.15rem;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .case__cta {

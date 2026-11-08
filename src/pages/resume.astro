@@ -146,7 +146,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     </article>
 
     <div class="resume-cta card no-print">
-      <p class="font-display text-2xl font-semibold tracking-tight">Want to talk about any of this?</p>
+      <p class="font-display text-2xl font-medium tracking-tight">Want to talk about any of this?</p>
       <div class="flex flex-wrap gap-3">
         <a class="btn btn--primary" href="/contact/?topic=job">Send a note <Icon name="arrow-right" /></a>
         <a class="btn" href="/work/">All work</a>
@@ -343,7 +343,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
   @media print {
     @page {
       size: letter;
-      margin: 0.36in 0.5in;
+      margin: 0.3in 0.5in;
     }
 
     .wrap {
@@ -357,12 +357,6 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       border: 0;
       box-shadow: none;
       font-family: var(--font-sans);
-      /* Archivo a touch narrower than on screen, so the page holds to one sheet. */
-      font-variation-settings: 'wdth' 90;
-    }
-
-    .resume :is(h1, h2, h3) {
-      font-variation-settings: 'wdth' 96;
     }
 
     .r-head {
@@ -406,10 +400,11 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
       color: #333;
     }
 
+    /* Hanken Grotesk has no narrow width to fall back on, so the print size is 8.5pt to hold one page. */
     .r-sub,
     .r-list,
     .r-skills {
-      font-size: 8.8pt;
+      font-size: 8.5pt;
       color: #111;
     }
 
@@ -424,7 +419,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
     }
 
     .resume {
-      line-height: 1.32;
+      line-height: 1.3;
     }
 
     /* One page: the PDF keeps the top three bullets per entry, two for the brief section, and 24 skills per group. */

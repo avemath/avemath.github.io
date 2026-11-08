@@ -56,10 +56,10 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
     width: 100%;
     margin: 0;
     padding: 5.1% 5.1% 0;
-    background: #fbfaf6;
+    background: var(--photo);
     box-shadow:
-      0 1px 2px rgb(28 42 37 / 0.18),
-      0 12px 24px -12px rgb(28 42 37 / 0.45);
+      0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent),
+      0 12px 24px -12px color-mix(in srgb, var(--ink) 45%, transparent);
     rotate: var(--tilt);
     container-type: inline-size;
   }
@@ -79,7 +79,7 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
   .pol__img {
     aspect-ratio: 1;
     overflow: hidden;
-    background: #e6ede6;
+    background: var(--sheet);
   }
 
   .pol__img :global(picture) {
@@ -94,7 +94,7 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
 
   /* The pin panel: a square window, the whole photo inside it on the panel tint. */
   .pol--contain .pol__img {
-    background: var(--ds-desc, #fafcf9);
+    background: var(--sheet);
   }
 
   .pol--contain .pol__img :global(img) {
@@ -112,7 +112,7 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
     font-family: 'Kalam', 'Segoe Print', 'Bradley Hand', cursive;
     font-size: 1.25rem;
     line-height: 1.1;
-    color: #1c2a25;
+    color: var(--photo-ink);
     overflow-wrap: anywhere;
   }
 
@@ -141,7 +141,7 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
     max-width: 100%;
     max-height: 100%;
     box-shadow:
-      0 1px 2px rgb(28 42 37 / 0.18),
-      0 12px 24px -12px rgb(28 42 37 / 0.45);
+      0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent),
+      0 12px 24px -12px color-mix(in srgb, var(--ink) 45%, transparent);
   }
 </style>
