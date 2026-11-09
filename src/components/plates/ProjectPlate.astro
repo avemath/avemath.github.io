@@ -1,14 +1,17 @@
 ---
 // A project as a plate: its line-art figure in a plate frame, "Plate N" in Bodoni italic, the title
-// in Bodoni, one sentence, and a mono tag line. The whole card is one link to the case study.
+// in Bodoni, one sentence, a mono tag line, and an optional note on where the figure comes from.
+// The whole card is one link to the case study.
 interface Props {
   n: string;
   title: string;
   href: string;
   desc: string;
   tags: string;
+  /** A small caption on the figure's source (simulated, not measured, say). */
+  note?: string;
 }
-const { n, title, href, desc, tags } = Astro.props;
+const { n, title, href, desc, tags, note } = Astro.props;
 ---
 
 <a class="pplate" href={href}>
@@ -17,6 +20,7 @@ const { n, title, href, desc, tags } = Astro.props;
   <span class="pplate__title">{title}</span>
   <span class="pplate__desc">{desc}</span>
   <span class="pplate__tags">{tags}</span>
+  {note && <span class="pplate__note">{note}</span>}
 </a>
 
 <style>
@@ -69,6 +73,12 @@ const { n, title, href, desc, tags } = Astro.props;
 
   .pplate__desc {
     font-size: 0.97rem;
+    color: var(--muted);
+  }
+
+  .pplate__note {
+    font-size: 0.8125rem;
+    font-style: italic;
     color: var(--muted);
   }
 

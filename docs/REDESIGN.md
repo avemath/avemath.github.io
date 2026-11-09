@@ -547,10 +547,13 @@ Branch `specimen`, from `docs/mockups/specimen-study.html` and `docs/mockups/spe
 - `src/data/about.json`: check the wording of each of the ten pin notes (VCC, OUTSIDE, SNOW, FIELD, THRIFT, TYGA, SIDEQ, FILM, FAIRE, GND).
 - `src/data/about.json`, `Datasheet.astro`: a latte photo for VCC and a photo of the bellows camera for THRIFT.
 - `src/lib/skills.ts`: Landspace's repo is private; make it public to link its files.
-- `src/scripts/fig/matrix.ts`: "Play the clip" plays the firmware's generated demo track; add a recorded clip if you want one.
+- `src/scripts/fig/matrix.ts`: "Play a demo" plays the firmware's generated demo track (captioned "A generated demo track, not a recording."); add a recorded clip if you want one.
+- `src/components/plates/V2vConstellation.astro`: replace with run 4 received symbols if I can export them from MATLAB.
 
-### Flagged, not changed
+### Fixes before push
 
-- The Characteristics row "Known issues" says "than she builds them" (third person).
-- The style guide page (`/styleguide/`, not indexed) still calls itself "Signal design system" and lists the old role names.
-- The home teaser for Research still has a small decorative 0 to 100 m gauge.
+- The LED figure's button is "Play a demo", captioned "A generated demo track, not a recording."
+- Plate III's caption says the constellation is simulated BPSK at the SNR of the hardware runs, not measured data.
+- The home teaser for Research lost its 0 to 100 m gauge.
+- `/styleguide/` is the "Specimen design system" (title and heading), still `noindex`.
+- Kept as is, by choice: the Characteristics row "Known issues" says "than she builds them".

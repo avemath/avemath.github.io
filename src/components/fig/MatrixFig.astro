@@ -2,7 +2,7 @@
 // Fig. 03: the 16 by 16 matrix, on navy with the bars in the accent. Every frame is the firmware
 // port in src/lib/led-firmware.ts: the 128-point FFT, the 16 log-spaced bands, the adaptive noise
 // floor and the switch between spectrum and idle glow. The picture at rest is a real frame of the
-// firmware running on the clip, computed when the figure loads.
+// firmware running on the demo track, computed when the figure loads.
 ---
 
 <div class="mf" data-mf>
@@ -10,18 +10,19 @@
     <canvas class="mf__canvas" width="320" height="320" role="img" aria-label="16 by 16 LED matrix showing a spectrum" data-mf-canvas></canvas>
     <div class="mf__side">
       <p class="mf__text">
-        Uses your microphone if you allow it, otherwise a built-in clip. The same 128 point FFT and 16 log spaced bands as the firmware,
+        Uses your microphone if you allow it, otherwise a demo track. The same 128 point FFT and 16 log spaced bands as the firmware,
         ported line for line.
       </p>
       <div class="mf__ctl" role="group" aria-label="Signal source">
         <button type="button" class="mf__btn" data-mf-src="mic" aria-pressed="false">Use my mic</button>
-        <button type="button" class="mf__btn" data-mf-src="clip" aria-pressed="false">Play the clip</button>
+        <button type="button" class="mf__btn" data-mf-src="clip" aria-pressed="false">Play a demo</button>
         <button type="button" class="mf__btn" data-mf-src="idle" aria-pressed="false">Idle glow</button>
       </div>
       <p class="mf__read mono" data-mf-read aria-live="polite"></p>
     </div>
   </div>
   <p class="fig__try">Allow the mic and hum.</p>
+  <p class="fig__note">A generated demo track, not a recording.</p>
   <div class="fig__note mf__note">
     <label for="mf-name">on boot the real unit spells its owner's name; the demo spells yours if you type it</label>
     <input id="mf-name" class="mf__name" type="text" maxlength="10" autocomplete="off" spellcheck="false" placeholder="your name" data-mf-name />
