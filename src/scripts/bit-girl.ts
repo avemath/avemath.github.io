@@ -29,7 +29,8 @@ type State = 'idle' | 'wave' | 'peek' | 'run' | 'warp' | 'fade';
 
 /** Her body in figure units around her feet (multiply by the scale): the box every perch must keep clear of text. */
 export const BODY = { left: -40, right: 40, top: -126, bottom: 6 };
-export const scaleFor = (vw: number) => (vw < 600 ? 0.6 : 0.78);
+// 0.6 on phones, 0.78 on laptops, then a little bigger on big screens: about 1.2 times at 2560.
+export const scaleFor = (vw: number) => (vw < 600 ? 0.6 : 0.78 * (1 + 0.2 * Math.min(1, Math.max(0, (vw - 1440) / 1120))));
 
 const REST: Pose = { armL: 0.25, armR: -0.25, foreL: 0.1, foreR: -0.1, legL: 0.06, legR: -0.06, kneeL: 0, kneeR: 0, bob: 0, lean: 0 };
 

@@ -193,6 +193,39 @@ const right = pins.slice(5).reverse();
     align-items: center;
   }
 
+  /* On big screens the chip, its pins, the tray, the print that slides out, the note and the pirate
+     print all grow together, in proportion: the print is 270px wide up to 1440, about 380px at
+     1920 and 460px at 2560. (Sizes inside are px, so this zoom is the only thing scaling them.) */
+  @media (min-width: 1600px) {
+    .ds__main {
+      zoom: 1.13;
+    }
+  }
+
+  @media (min-width: 1760px) {
+    .ds__main {
+      zoom: 1.27;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .ds__main {
+      zoom: 1.41;
+    }
+  }
+
+  @media (min-width: 2240px) {
+    .ds__main {
+      zoom: 1.56;
+    }
+  }
+
+  @media (min-width: 2560px) {
+    .ds__main {
+      zoom: 1.7;
+    }
+  }
+
   /* The extra room above leaves the bit girl space to stand on the chip. */
   @media (min-width: 860px) {
     .ds__main {

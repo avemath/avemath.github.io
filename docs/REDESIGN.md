@@ -595,3 +595,13 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 - **Research**: muted translucent panels; Back to the surface scrolls to the top so the camera rises, with a Home link beside it.
 - **Tests**: the figure viewer, Step through starting at stage 1 and the crate (mouse, keyboard, touch, reduced motion) are in `scripts/check-interactions.mjs`, with Back to the surface.
 - **Lighthouse (mobile)**: / 95 (median of 5), /research/ 98, /work/v2v-bsm-ofdm/ 98, /work/rampage/ 95, /about/ 97; desktop 100.
+
+## Large screens (November 8, 2026)
+
+- One root size: 16px up to 1440 wide, then growing to about 19.8px at 2560 and stopping there (`html` in `global.css`). Body text is 17px at 1440, about 19px at 1920 and 21px at 2560; headings, the hero name, the marquee, labels and spacing are in rem and follow. Laptop and phone sizes are unchanged. SVG labels stay in px, in each drawing's own units.
+- The container grows from 1216px at 1440 to about 1466px at 1920 and 1800px at 2560 (capped); the case study rail and figure widths are in rem. Paragraphs keep about 80 characters; the extra width goes to figures, columns and gutters.
+- About: the chip, its pins, the tray, the print that slides out, the note and the pirate print grow together (zoom steps from 1600px): the print is about 380px at 1920 and 460px at 2560. Every print on About is at least about 240px wide at 1920.
+- The crate's sleeves are in rem; the bit girl grows to about 1.2 times at 2560.
+- Arriving at a #section re-lands on it after fonts and the page load, so a late shift above it can't leave you mid-page.
+- Screenshots at 1440, 1920, 2560 and 3440 by 1440, light and dark, of home, About, Research, Signals and RAMpage: `docs/specimen/large/` (WebP, the first four screens of each page).
+- Tests: the layout checks and the label checks now also run at 1920 and 2560.

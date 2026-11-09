@@ -98,6 +98,21 @@ const { bare = false, navLabel, section, footer = 'default', page, bitGirl = fal
       initTabs();
       initSketches();
       initTexture();
+
+      // Arriving at a #section: once the fonts and the page have loaded (which can move things above
+      // it), land on the section again, unless the visitor has already scrolled.
+      if (location.hash.length > 1) {
+        let moved = false;
+        for (const ev of ['wheel', 'touchmove', 'keydown', 'pointerdown']) addEventListener(ev, () => (moved = true), { once: true, passive: true });
+        const land = () => {
+          const id = decodeURIComponent(location.hash.slice(1));
+          const target = document.getElementById(id);
+          if (target && !moved) target.scrollIntoView({ block: 'start', behavior: 'instant' });
+        };
+        document.fonts?.ready.then(land);
+        if (document.readyState === 'complete') land();
+        else addEventListener('load', land, { once: true });
+      }
       initHScroll();
     </script>
 

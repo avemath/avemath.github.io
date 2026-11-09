@@ -367,10 +367,11 @@ const drawn = ['v2v-bsm-ofdm', 'led-audio-spectrum', 'bellhop-sim', 'signals-pla
     fill: var(--art-bg);
   }
 
+  /* In the drawing's own units (px), so the labels scale with the SVG, not with the root size. */
   .art-label,
   .art-chip {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: 14px;
     stroke: none;
   }
 

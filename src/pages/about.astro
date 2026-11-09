@@ -206,7 +206,7 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   .ab-girl-count {
     min-height: 1.6em;
     margin-top: 0.5rem;
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   /* The hero, Why underwater and the closing band sit on the sheet. */
@@ -346,6 +346,13 @@ import ida from '@/assets/about/polaroid-ida.jpg';
     .ab-long__rp :global(.ab-long__print) {
       width: 100%;
       margin: 0.25rem 0 0;
+    }
+  }
+
+  /* On big screens the build-night print stays at least about 230px wide. */
+  @media (min-width: 1600px) {
+    .ab-long__rp {
+      grid-template-columns: minmax(0, 1fr) 13rem;
     }
   }
 

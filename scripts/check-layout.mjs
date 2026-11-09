@@ -4,7 +4,7 @@
 // viewport, that the toolbar's buttons are at least 44px tall, and that pressing Fire leaves the
 // plow on screen and moves it out. Space on the focused drawing must fire too. The drawing must fit
 // without scrolling sideways, with its labels at 13px or more on screen.
-// Then, at 320, 390, 768 and 1440 in both themes: the About chip and tray (every pin a 44px
+// Then, at 320, 390, 768, 1440, 1920 and 2560 in both themes: the About chip and tray (every pin a 44px
 // button inside the page, each press bringing out its own print, no sideways scroll); the Research
 // seafloor water covering the whole page edge to edge (the live scene fixed to the viewport) with no sideways scroll; and the bit girl on home, About
 // and Research: her canvas never takes a click, every perch she may use keeps her clear of text,
@@ -18,6 +18,7 @@ const SIZES = [
   [1366, 768],
   [1440, 900],
   [1920, 1080],
+  [2560, 1440],
   [390, 844],
   [375, 667],
   [320, 568],
@@ -125,7 +126,7 @@ for (const scheme of ['light', 'dark']) {
 }
 
 // ---- Specimen: the About chip, the Research seafloor and the bit girl ----
-const WIDTHS = [320, 390, 768, 1440];
+const WIDTHS = [320, 390, 768, 1440, 1920, 2560];
 // Every line of text on the page, in page coordinates (the bit girl's own canvas has none).
 const textBoxes = () => {
   const out = [];
@@ -241,4 +242,4 @@ if (problems) {
   process.exit(1);
 }
 console.log('\nRAMpage layout: Fire and the plow are on screen together at every size.');
-console.log('Specimen layout: the chip, the seafloor and the bit girl hold at 320, 390, 768 and 1440.');
+console.log('Specimen layout: the chip, the seafloor and the bit girl hold at 320, 390, 768, 1440, 1920 and 2560.');

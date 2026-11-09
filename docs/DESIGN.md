@@ -33,6 +33,8 @@ Sections alternate paper, sheet and the deep band (`.band-paper`, `.band-sheet`,
 
 ## Type
 
+The root size is 16px up to 1440 wide and grows to about 19.8px at 2560 (capped), so everything in rem scales together on big screens; laptops and phones are unchanged. Body text: 17px at 1440, about 19px at 1920, 21px at 2560.
+
 - **Bodoni Moda** (display): headings at weight 400 (h3 and h4 at 500), italic for accents (`h1 em` is green), plate numbers and "Fig. N." captions.
 - **Hanken Grotesk** (body): 17px/1.5.
 - **JetBrains Mono** (data, pin names, labels, code).
