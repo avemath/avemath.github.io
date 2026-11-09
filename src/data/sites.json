@@ -2,49 +2,53 @@
   {
     "slug": "because-of-adam",
     "url": "https://becauseofadam.org",
-    "performance": 90,
+    "performance": 100,
     "accessibility": 100,
-    "loadsInS": 1.78,
+    "loadsInS": null,
     "liveSince": "Sep 2026",
     "ownerEdits": "family adds events and news",
-    "measuredOn": "2026-11-08",
+    "measuredOn": "2026-11-01",
     "quote": "",
-    "quoteBy": ""
+    "quoteBy": "",
+    "source": "PageSpeed Insights, mobile"
   },
   {
     "slug": "grace-mae-alterations",
     "url": "https://gracemaealterations.com",
-    "performance": 83,
+    "performance": 98,
     "accessibility": 100,
-    "loadsInS": 2.91,
+    "loadsInS": null,
     "liveSince": "Apr 2026",
     "ownerEdits": "owner edits about 435 fields",
-    "measuredOn": "2026-11-08",
+    "measuredOn": "2026-11-01",
     "quote": "Brides come in already knowing what a bustle is, and the inquiry forms arrive with everything I need to give a quote.",
-    "quoteBy": "Grace, Grace Mae Alterations"
+    "quoteBy": "Grace, Grace Mae Alterations",
+    "source": "PageSpeed Insights, mobile"
   },
   {
     "slug": "petro-land-ventures",
     "url": "https://plvinc.com",
-    "performance": 86,
+    "performance": 98,
     "accessibility": 100,
-    "loadsInS": 3.2,
+    "loadsInS": null,
     "liveSince": "Jun 2026",
     "ownerEdits": "owner edits every page",
-    "measuredOn": "2026-11-08",
+    "measuredOn": "2026-11-01",
     "quote": "Avery built us a site that speaks to oil companies and landowners at the same time, and I can update it myself without calling her.",
-    "quoteBy": "Rickey, Petro Land Ventures"
+    "quoteBy": "Rickey, Petro Land Ventures",
+    "source": "PageSpeed Insights, mobile"
   },
   {
     "slug": "nicholas-domke",
     "url": "https://nmdomke.github.io",
-    "performance": 83,
+    "performance": 100,
     "accessibility": 100,
-    "loadsInS": 2.3,
+    "loadsInS": null,
     "liveSince": "Oct 2026",
     "ownerEdits": "owner edits one content file",
-    "measuredOn": "2026-11-08",
+    "measuredOn": "2026-11-02",
     "quote": "",
-    "quoteBy": ""
+    "quoteBy": "",
+    "source": "PageSpeed Insights, mobile"
   }
 ]

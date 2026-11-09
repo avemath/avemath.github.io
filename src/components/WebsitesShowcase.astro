@@ -17,9 +17,9 @@ const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': Adam
 // accessibility, how fast it loads, how long it has been live, what the owner edits), not commit
 // counts. On the home page the site figures follow the hop pattern (Fig. 05) and come before the
 // Toolbox.
-// performance, accessibility and loadsInS (mobile Largest Contentful Paint, in seconds) are the
-// median of three Lighthouse 12 mobile runs on the live home page, dated by measuredOn (see
-// docs/SOURCES.md).
+// performance, accessibility and loadsInS (mobile Largest Contentful Paint, in seconds) come only
+// from Google's PageSpeed Insights (mobile), written by scripts/measure-sites.mjs and dated by
+// measuredOn (see docs/SOURCES.md). Loads in shows only once PageSpeed has measured it.
 interface Props {
   /** Only the site rows, for /work/, which has its own heading. */
   rowsOnly?: boolean;
@@ -88,17 +88,19 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                             <dt class="label">Accessibility</dt>
                             <dd class="site__metric">{data.accessibility}</dd>
                           </div>
-                          <div>
-                            <dt class="label">Loads in</dt>
-                            <dd class="site__metric">
-                              {data.loadsInS.toFixed(1)}
-                              <span class="site__unit">s</span>
-                            </dd>
-                          </div>
+                          {data.loadsInS != null && (
+                            <div>
+                              <dt class="label">Loads in</dt>
+                              <dd class="site__metric">
+                                {Number(data.loadsInS).toFixed(1)}
+                                <span class="site__unit">s</span>
+                              </dd>
+                            </div>
+                          )}
                         </dl>
                         <p class="site__measured">
-                          Lighthouse mobile, median of 3 runs, measured {new Date(`${data.measuredOn}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. Loads in is
-                          Largest Contentful Paint.
+                          {data.source}, measured {new Date(`${data.measuredOn}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.
+                          {data.loadsInS != null && ' Loads in is Largest Contentful Paint.'}
                         </p>
                         <dl class="site__more">
                           <div>

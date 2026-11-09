@@ -8,7 +8,7 @@ order: 8
 period: { start: "2026-04", end: "2026-09" }
 status: live
 summary: A bridal alterations studio site with interactive guides that explain bustles and hems better than words can, and inquiry forms that arrive ready to quote.
-outcome: Lighthouse 100 for accessibility and SEO, inquiries that arrive ready to quote, and about 435 fields the owner edits herself.
+outcome: PageSpeed Insights 100 for accessibility and SEO, inquiries that arrive ready to quote, and about 435 fields the owner edits herself.
 role: Design, build, CMS, email, testing and launch.
 keywords: ["bridal", "sewing", "alterations", "Pittsburgh", "Sanity", "Next.js", "bustle"]
 stack: [Next.js, React, TypeScript, Sanity, Tailwind CSS, Framer Motion, Resend, Playwright, Vercel]
@@ -23,7 +23,7 @@ gallery:
     alt: Bustle explorer showing a white gown from the back and side, with gold arrows tracing where the train is lifted, and controls for bustle style and train length.
     caption: The bustle explorer. Pick a style and a train, then press "Bustle it" to watch the pickup points travel.
 metrics:
-  - { label: Lighthouse accessibility, value: "100" }
+  - { label: PageSpeed accessibility, value: "100" }
   - { label: Fields the owner edits, value: "~435" }
 client:
   name: Grace Mae Alterations
@@ -49,7 +49,7 @@ The site had three jobs: explain bustles, timelines and fittings to brides befor
 
 ## Outcome
 
-Lighthouse scores 100 for accessibility and SEO on every page I audited. Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
+PageSpeed Insights scores the home page 100 for accessibility and SEO. Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
 
 ## What I'd do next
 
