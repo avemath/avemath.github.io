@@ -7,9 +7,12 @@ const GLYPHS = '01<>/#*+=·';
 // One animation per element: starting a new decode cancels the one in flight.
 const active = new WeakMap<HTMLElement, number>();
 
-export const mask = (text: string) => text.replace(/[^\s]/g, () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]);
+export const mask = (text: string, glyphs = GLYPHS) => text.replace(/[^\s]/g, () => glyphs[Math.floor(Math.random() * glyphs.length)]);
 
-export function decode(el: HTMLElement, text: string, duration = 650) {
+/** Only 0s and 1s: text decoding out of bits (the field notes). */
+export const BITS = '01';
+
+export function decode(el: HTMLElement, text: string, duration = 650, glyphs = GLYPHS) {
   const running = active.get(el);
   if (running !== undefined) cancelAnimationFrame(running);
   if (prefersReducedMotion()) {
@@ -21,7 +24,7 @@ export function decode(el: HTMLElement, text: string, duration = 650) {
   const tick = (now: number) => {
     const t = Math.min(1, (now - start) / duration);
     const shown = Math.floor(t * text.length);
-    el.textContent = text.slice(0, shown) + mask(text.slice(shown));
+    el.textContent = text.slice(0, shown) + mask(text.slice(shown), glyphs);
     if (t < 1) active.set(el, requestAnimationFrame(tick));
     else {
       el.textContent = text;

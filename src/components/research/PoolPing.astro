@@ -1,0 +1,156 @@
+---
+// The pool alarm idea as a moving cross-section: a swimmer crosses the pool at the surface, and
+// every kick sends sound spreading through the water toward a listener on the wall. A concept
+// drawing, not results: nothing here is measured. Animates only while on screen; with reduced
+// motion it is one still frame.
+---
+
+<div class="pp" data-pp>
+  <svg viewBox="0 0 640 260" class="pp__svg" role="img" aria-label="Concept drawing, not results: a pool seen from the side. A swimmer moves along the surface and sound spreads out through the water in rings toward a listener mounted on the pool wall.">
+    <defs>
+      <clipPath id="pp-water"><path d="M40 70 H600 V210 Q600 226 584 226 H56 Q40 226 40 210 Z" /></clipPath>
+    </defs>
+    <path class="pp__pool" d="M40 40 V210 Q40 226 56 226 H584 Q600 226 600 210 V40" />
+    <path class="pp__water" d="M40 70 H600 V210 Q600 226 584 226 H56 Q40 226 40 210 Z" />
+    <path class="pp__line" d="M40 70 H600" />
+    <g clip-path="url(#pp-water)" data-pp-rings></g>
+    <g class="pp__swimmer" data-pp-swimmer>
+      <circle cx="0" cy="-6" r="7" />
+      <path d="M-4 0 L-30 4 M-12 1 L-24 -8 M2 -2 L18 -10" />
+    </g>
+    <g class="pp__mic">
+      <rect x="586" y="150" width="10" height="22" rx="2" />
+      <path d="M586 161 H570" />
+    </g>
+    <text class="pp__t" x="586" y="196" text-anchor="end">listener on the wall</text>
+    <text class="pp__t" x="48" y="60">water line</text>
+    <text class="pp__badge" x="592" y="30" text-anchor="end">concept drawing, not results</text>
+  </svg>
+</div>
+
+<style>
+  .pp__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .pp__pool {
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 2;
+  }
+
+  .pp__water {
+    fill: color-mix(in srgb, var(--teal) 12%, transparent);
+  }
+
+  .pp__line {
+    stroke: var(--teal);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 5;
+  }
+
+  .pp__svg :global(.pp__ring) {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+  }
+
+  .pp__swimmer circle {
+    fill: var(--surface);
+    stroke: var(--text);
+    stroke-width: 2;
+  }
+
+  .pp__swimmer path,
+  .pp__mic path {
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .pp__mic rect {
+    fill: var(--rose);
+  }
+
+  .pp__t {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    fill: var(--muted);
+  }
+
+  .pp__badge {
+    font-family: var(--font-hand);
+    font-size: 18px;
+    fill: var(--rose-ink);
+  }
+</style>
+
+<script>
+  import { prefersReducedMotion } from '../../scripts/preferences';
+
+  document.querySelectorAll<HTMLElement>('[data-pp]').forEach((root) => {
+    const svg = root.querySelector('svg')!;
+    const rings = root.querySelector<SVGGElement>('[data-pp-rings]')!;
+    const swimmer = root.querySelector<SVGGElement>('[data-pp-swimmer]')!;
+    const NS = 'http://www.w3.org/2000/svg';
+    // A ring is born at the swimmer every 0.7 s and spreads at a steady speed while fading.
+    let born: { x: number; t: number; el: SVGCircleElement }[] = [];
+    const swimAt = (t: number) => 120 + (Math.sin(t * 0.35) * 0.5 + 0.5) * 360;
+    const draw = (t: number) => {
+      const x = swimAt(t);
+      swimmer.setAttribute('transform', `translate(${x.toFixed(1)} 72)${Math.cos(t * 0.35) < 0 ? ' scale(-1 1)' : ''}`);
+      if (!born.length || t - born[born.length - 1].t > 0.7) {
+        const el = document.createElementNS(NS, 'circle');
+        el.setAttribute('class', 'pp__ring');
+        rings.append(el);
+        born.push({ x, t, el });
+      }
+      born = born.filter((r) => {
+        const age = t - r.t;
+        if (age > 3.2) {
+          r.el.remove();
+          return false;
+        }
+        r.el.setAttribute('cx', r.x.toFixed(1));
+        r.el.setAttribute('cy', '74');
+        r.el.setAttribute('r', (age * 90).toFixed(1));
+        r.el.style.opacity = String(Math.max(0, 0.9 - age / 3.4));
+        return true;
+      });
+    };
+    // Reduced motion: one still frame with a few rings already spread.
+    if (prefersReducedMotion()) {
+      for (const [x, r] of [[300, 60], [300, 140], [300, 220]]) {
+        const el = document.createElementNS(NS, 'circle');
+        el.setAttribute('class', 'pp__ring');
+        el.setAttribute('cx', String(x));
+        el.setAttribute('cy', '74');
+        el.setAttribute('r', String(r));
+        el.style.opacity = String(0.9 - r / 300);
+        rings.append(el);
+      }
+      swimmer.setAttribute('transform', 'translate(300 72)');
+      return;
+    }
+    let raf = 0;
+    let onScreen = false;
+    const t0 = performance.now();
+    const loop = (now: number) => {
+      raf = 0;
+      if (!onScreen || document.hidden) return;
+      draw((now - t0) / 1000);
+      raf = requestAnimationFrame(loop);
+    };
+    new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      if (onScreen && !raf) raf = requestAnimationFrame(loop);
+    }).observe(svg);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && onScreen && !raf) raf = requestAnimationFrame(loop);
+    });
+    draw(0);
+  });
+</script>

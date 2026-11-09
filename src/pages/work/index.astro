@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import WorkCard from '@/components/WorkCard.astro';
+import ToolPanel from '@/components/ToolPanel.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import { getWorkOrder, workSection, workSections } from '@/lib/projects';
 
@@ -53,11 +54,21 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
           </div>
           {s.id === 'websites' && <WebsitesShowcase rowsOnly firstFig={webStart} />}
           {(s.id === 'websites' ? s.projects.filter((p) => !showcased(p)) : s.projects).length > 0 && (
-            <div class:list={['work-grid', s.id === 'websites' && 'work-grid--after-sites']}>
-              {(s.id === 'websites' ? s.projects.filter((p) => !showcased(p)) : s.projects).map((p) => (
-                <WorkCard project={p} fig={figOf.get(p.id)!} />
-              ))}
-            </div>
+            s.id === 'websites' ? (
+              <div class="tools">
+                {s.projects
+                  .filter((p) => !showcased(p))
+                  .map((p, k) => (
+                    <ToolPanel project={p} fig={figOf.get(p.id)!} flip={k % 2 === 1} />
+                  ))}
+              </div>
+            ) : (
+              <div class="work-grid">
+                {s.projects.map((p) => (
+                  <WorkCard project={p} fig={figOf.get(p.id)!} />
+                ))}
+              </div>
+            )
           )}
         </div>
       </section>
@@ -182,6 +193,13 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
   }
 
   /* After the website rows, a card gets the same space the rows keep between themselves. */
+  /* The client tools: large panels at the scale of the website displays above them. */
+  .tools {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    margin-top: clamp(4rem, 8vw, 6.5rem);
+  }
+
   .work-grid--after-sites {
     margin-top: clamp(4rem, 8vw, 6.5rem);
   }

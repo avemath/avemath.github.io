@@ -8,14 +8,44 @@
 //
 // With reduced motion there are no ripples: the decoded result and the whole spectrogram show at once.
 import { F_HIGH, F_LOW } from '@/lib/fhbfsk';
+import MeshStill from '@/components/plates/MeshStill.astro';
 
 interface Props {
   /** Plate number shown in the head. */
   n?: string;
+  /** The home page's version: the mesh, Send a packet and a link to the full playground. */
+  compact?: boolean;
 }
-const { n = 'VIII' } = Astro.props;
+const { n = 'VIII', compact = false } = Astro.props;
 ---
 
+{
+  compact && (
+    <div class="pg pg--compact" data-pg data-compact data-state="idle">
+      <div class="pg__mesh-wrap">
+        <div class="pg__still" aria-hidden="true">
+          <MeshStill />
+        </div>
+        <canvas
+          class="pg__mesh"
+          data-pg-mesh
+          tabindex="0"
+          role="img"
+          aria-label="A pane of water drawn as a wavy crosshatch. Send a packet and it crosses from left to right as ripples: close ripples for a 1, wide ones for a 0. Click or tap the water, or press Enter, to drop a ping."
+        />
+        <span class="hand pg__note pg__note--tx" aria-hidden="true">sender</span>
+        <span class="hand pg__note pg__note--rx" aria-hidden="true">tap the water ♡</span>
+      </div>
+      <div class="pg__bar">
+        <button type="button" class="btn btn--primary" data-pg-send>Send a packet</button>
+        <p class="pg__sum mono" data-pg-sum aria-live="polite">“hi from Ave”, 88 bits, one 6.25 ms chip each</p>
+        <a class="link pg__full" href="/work/signals-playground/#playground">Open the full playground</a>
+      </div>
+    </div>
+  )
+}
+
+{!compact && (
 <section class="pg plate" data-pg data-state="idle" aria-labelledby="pg-title">
   <div class="plate__head"><span>Plate {n}</span><span>FH-BFSK packet</span></div>
   <h2 id="pg-title" class="pg__title">Send a message through the water</h2>
@@ -82,6 +112,7 @@ const { n = 'VIII' } = Astro.props;
     noise, echo and Doppler act on the real waveform, so the errors are real too.
   </p>
 </section>
+)}
 
 <style>
   .pg {
@@ -171,6 +202,45 @@ const { n = 'VIII' } = Astro.props;
     .pg__mesh {
       aspect-ratio: 4 / 3;
     }
+  }
+
+  /* The compact version: no plate frame of its own (the card is the frame). */
+  .pg--compact {
+    gap: 0.9rem;
+    padding: 1rem;
+    background: transparent;
+  }
+
+  .pg--compact .pg__mesh {
+    aspect-ratio: 16 / 8;
+  }
+
+  /* The still drawing shows until the live mesh has drawn (and without scripts). */
+  .pg__still {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 6%;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+  }
+
+  .pg[data-ready] .pg__still {
+    display: none;
+  }
+
+  .pg__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1.25rem;
+  }
+
+  .pg__sum {
+    flex: 1 1 14rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
   }
 
   .pg__note {

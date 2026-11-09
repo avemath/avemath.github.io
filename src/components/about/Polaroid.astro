@@ -6,7 +6,8 @@
 // Photos are never cropped. By default the frame takes the photo's own shape: fixed width, height
 // follows. With fit="contain" (the datasheet's pin panel) the window stays square so the panel
 // keeps its height, and the whole photo sits inside it on the panel tint, with side margins for a
-// tall photo. With bare, a photo that is already a print (with its own border) shows as it is.
+// tall photo. With bare, a photo that is already a print (with its own border) shows as it is, at
+// the same outer width as a framed print.
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import PrintArt from './PrintArt.astro';
@@ -116,18 +117,11 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
     overflow-wrap: anywhere;
   }
 
-  /* A print that already has its own white border: no frame added, the whole print in a square
-     window so the panel keeps its height, with the print's own shadow. */
+  /* A print that already has its own white border: no frame added, the whole print at the same
+     outer width as the framed prints, with the print's own shadow. */
   .pol-bare {
     margin: 0;
     rotate: var(--tilt);
-  }
-
-  .pol-bare__box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 1;
   }
 
   .pol-bare__box :global(picture) {
@@ -136,10 +130,8 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
 
   .pol-bare__box :global(img) {
     display: block;
-    width: auto;
+    width: 100%;
     height: auto;
-    max-width: 100%;
-    max-height: 100%;
     box-shadow:
       0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent),
       0 12px 24px -12px color-mix(in srgb, var(--ink) 45%, transparent);

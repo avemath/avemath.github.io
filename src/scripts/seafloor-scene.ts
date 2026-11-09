@@ -37,6 +37,8 @@ export interface SeafloorOptions {
   noShafts?: boolean;
   /** Pitch for a still frame, radians. */
   pitch?: number;
+  /** Leave the jellyfish out (the home page's still of the deep shows only the terraces). */
+  noJellies?: boolean;
 }
 
 export function mountSeafloorScene(host: HTMLElement, opts: SeafloorOptions = {}) {
@@ -233,6 +235,7 @@ export function mountSeafloorScene(host: HTMLElement, opts: SeafloorOptions = {}
       return { g, phi: (k / 10) * Math.PI * 2, len: 2.4 + (((k * 37) % 10) / 10) * 1.6, inner: k % 3 === 0 };
     });
     grp.scale.setScalar(j.s);
+    grp.visible = !opts.noJellies;
     scene.add(grp);
     return { j, grp, bell, tents };
   });

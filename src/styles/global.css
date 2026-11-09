@@ -32,7 +32,7 @@
   /* One root size for the whole site. It is 16px up to 1440px wide (laptops and phones are as
      before), then grows with the screen to about 19.8px at 2560 and stops there: body text is 17px
      at 1440, about 19px at 1920 and 21px at 2560, and everything sized in rem (headings, the hero
-     name, the marquee, labels, spacing, the chip, the prints, the crate) grows on the same curve. */
+     name, the marquee, labels, spacing, the chip, the prints, the radio dial) grows on the same curve. */
   html {
     font-size: clamp(100%, calc(11.166px + 0.3357vw), 123.5%);
     -webkit-text-size-adjust: 100%;

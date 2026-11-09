@@ -491,10 +491,8 @@ const right = pins.slice(5).reverse();
     width: min(270px, 100%);
   }
 
-  /* A photo that is already a print shows whole, with no frame of its own. */
-  .slip :global(.slip__print--bare) {
-    width: min(260px, 100%);
-  }
+  /* A photo that is already a print shows whole, with no frame of its own, at the same outer width
+     as the framed prints (the .slip__print widths above apply to it too). */
 
   /* FAIRE: a second, larger print up top, overlapping the corner. */
   .slip :global(.slip__mini) {

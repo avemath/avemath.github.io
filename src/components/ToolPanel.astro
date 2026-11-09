@@ -1,0 +1,395 @@
+---
+// A client tool as a large feature panel, at the scale of the website displays above it on /work/.
+// An animated flow shows what the tool does, drawn from its case study: for the PLV Abstract
+// Builder, recorded documents stack into the run sheet and the abstract PDF assembles; for Little
+// Explorer Swim, the intake form fills, a row lands in the sheet and the lesson report prints. The
+// flow plays when the panel scrolls into view and again on hover or focus; with reduced motion it
+// shows its finished state. A real screenshot of the tool shows beside it when the repo has one.
+import { Image } from 'astro:assets';
+import type { Project } from '@/lib/projects';
+import { projectHref, typeLabels } from '@/lib/projects';
+import runSheet from '@/assets/projects/plv-abstract-builder/run-sheet.png';
+
+interface Props {
+  project: Project;
+  fig: number;
+  flip?: boolean;
+}
+const { project, fig, flip = false } = Astro.props;
+const d = project.data;
+const kind = project.id === 'plv-abstract-builder' ? 'plv' : 'swim';
+const shot = kind === 'plv' ? { src: runSheet, alt: d.gallery?.[0]?.alt ?? 'The run sheet step of the PLV Abstract Builder.' } : null;
+const flowLabel =
+  kind === 'plv'
+    ? 'An animation: five recorded documents slide one by one into the run sheet, each becoming a row with a check mark, and then the pages of the finished abstract PDF stack together, every reference boxed as a link.'
+    : "An animation: the day's intake form fills in field by field, a row lands in the sheet for that child, and a one-page lesson report prints out as a PDF.";
+---
+
+<article class:list={['tool paper', { 'tool--flip': flip }]} aria-labelledby={`tool-${project.id}`} data-tool-panel>
+  <div class="tool__fig">
+    <p class="fig__label tool__label">Fig. {String(fig).padStart(2, '0')} / {typeLabels[d.type]}</p>
+    <svg class:list={['flow', `flow--${kind}`]} viewBox="0 0 640 300" role="img" aria-label={flowLabel}>
+      {
+        kind === 'plv' ? (
+          <>
+            {/* The recorded documents, a stack on the left. */}
+            {[0, 1, 2, 3, 4].map((i) => (
+              <g class="f-doc" style={`--i:${i}`}>
+                <rect x={30 + i * 4} y={60 + i * 8} width="96" height="124" rx="3" />
+                <path d={`M${44 + i * 4} ${84 + i * 8}h60M${44 + i * 4} ${98 + i * 8}h68M${44 + i * 4} ${112 + i * 8}h52M${44 + i * 4} ${126 + i * 8}h64`} />
+              </g>
+            ))}
+            <text class="f-cap" x="78" y="236" text-anchor="middle">recorded documents</text>
+            <path class="f-arrow" d="M150 128h40m-8-6 8 6-8 6" />
+            {/* The run sheet: rows land one by one, each with a check. */}
+            <rect class="f-sheet" x="206" y="44" width="200" height="176" rx="4" />
+            <path class="f-sheet-head" d="M206 70h200M250 44v176M320 44v176" />
+            {[0, 1, 2, 3, 4].map((i) => (
+              <g class="f-row" style={`--i:${i}`}>
+                <rect x="210" y={76 + i * 28} width="192" height="22" rx="2" />
+                <path class="f-tick" d={`M380 ${87 + i * 28}l5 5 9-10`} />
+              </g>
+            ))}
+            <text class="f-cap" x="306" y="236" text-anchor="middle">run sheet</text>
+            <path class="f-arrow f-arrow--2" d="M422 128h40m-8-6 8 6-8 6" />
+            {/* The abstract PDF: pages stack, references boxed as links. */}
+            {[0, 1, 2].map((i) => (
+              <g class="f-page" style={`--i:${i}`}>
+                <rect x={484 + i * 10} y={52 + i * 10} width="112" height="150" rx="3" />
+                <path d={`M${498 + i * 10} ${80 + i * 10}h70M${498 + i * 10} ${94 + i * 10}h82M${498 + i * 10} ${108 + i * 10}h60`} />
+                <rect class="f-link" x={498 + i * 10} y={124 + i * 10} width="44" height="12" rx="2" />
+              </g>
+            ))}
+            <text class="f-pdf" x="560" y="186" text-anchor="middle">PDF</text>
+            <text class="f-cap" x="550" y="236" text-anchor="middle">finished abstract</text>
+          </>
+        ) : (
+          <>
+            {/* The intake form: fields fill in. */}
+            <rect class="f-sheet" x="30" y="40" width="150" height="190" rx="6" />
+            <text class="f-title" x="44" y="64">Today</text>
+            {['ate', 'slept', 'felt', 'notes'].map((k, i) => (
+              <g class="f-field" style={`--i:${i}`}>
+                <text class="f-k" x="44" y={92 + i * 34}>{k}</text>
+                <rect x="88" y={80 + i * 34} width="78" height="18" rx="3" />
+                <path class="f-fill" d={`M94 ${89 + i * 34}h${36 + (i % 2) * 22}`} />
+              </g>
+            ))}
+            <text class="f-cap" x="105" y="256" text-anchor="middle">intake form</text>
+            <path class="f-arrow" d="M196 135h40m-8-6 8 6-8 6" />
+            {/* The sheet: a new row lands. */}
+            <rect class="f-sheet" x="252" y="56" width="170" height="150" rx="4" />
+            <path class="f-sheet-head" d="M252 80h170M300 56v150M346 56v150M392 56v150" />
+            {[0, 1, 2].map((i) => (
+              <rect class="f-old" x="256" y={86 + i * 24} width="162" height="18" rx="2" />
+            ))}
+            <rect class="f-new" x="256" y="158" width="162" height="18" rx="2" />
+            <text class="f-cap" x="337" y="256" text-anchor="middle">the sheet</text>
+            <path class="f-arrow f-arrow--2" d="M438 135h40m-8-6 8 6-8 6" />
+            {/* The report prints. */}
+            <rect class="f-printer" x="490" y="96" width="120" height="40" rx="6" />
+            <g class="f-report">
+              <rect x="504" y="132" width="92" height="104" rx="2" />
+              <path d="M514 152h60M514 166h72M514 180h48M514 194h66" />
+            </g>
+            <text class="f-pdf" x="550" y="226" text-anchor="middle">PDF</text>
+            <text class="f-cap" x="550" y="256" text-anchor="middle">lesson report</text>
+          </>
+        )
+      }
+    </svg>
+    {
+      shot && (
+        <figure class="tool__shot">
+          <Image src={shot.src} alt={shot.alt} widths={[480, 720, 960]} sizes="(min-width: 960px) 34rem, 92vw" quality={78} loading="lazy" />
+          <figcaption>The run sheet, in the tool.</figcaption>
+        </figure>
+      )
+    }
+  </div>
+  <div class="tool__text">
+    <p class="eyebrow tool__eyebrow">{typeLabels[d.type]} · {d.status === 'live' ? 'Live' : d.status}</p>
+    <h3 id={`tool-${project.id}`} class="tool__title">{d.title}</h3>
+    <p class="tool__summary">{d.summary}</p>
+    {d.outcome && <p class="tool__outcome">{d.outcome}</p>}
+    {d.stack && <p class="tool__stack mono">{d.stack.join(' · ')}</p>}
+    <a class="btn tool__btn" href={projectHref(project)}>Case study</a>
+  </div>
+</article>
+
+<style>
+  .tool {
+    display: grid;
+    gap: 0;
+  }
+
+  @media (min-width: 960px) {
+    .tool {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+
+    .tool--flip {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+
+    .tool--flip .tool__fig {
+      order: 2;
+    }
+  }
+
+  .tool__fig {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    padding: clamp(1rem, 2.5vw, 1.75rem);
+    background: var(--fig-tint);
+  }
+
+  .flow {
+    width: 100%;
+    height: auto;
+  }
+
+  .flow :is(rect, path) {
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .flow .f-doc rect,
+  .flow .f-page rect,
+  .flow .f-sheet,
+  .flow .f-printer,
+  .flow .f-report rect {
+    fill: var(--surface);
+  }
+
+  .flow .f-row rect,
+  .flow .f-new {
+    fill: var(--accent-wash-strong);
+    stroke: var(--accent);
+  }
+
+  .flow .f-old {
+    fill: color-mix(in srgb, var(--text) 6%, transparent);
+    stroke: var(--line);
+  }
+
+  .flow .f-tick,
+  .flow .f-fill {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+  }
+
+  .flow .f-link {
+    stroke: var(--teal);
+  }
+
+  .flow .f-arrow {
+    stroke: var(--muted);
+  }
+
+  .flow .f-doc path,
+  .flow .f-page path,
+  .flow .f-report path,
+  .flow .f-sheet-head {
+    stroke: var(--line-strong);
+    stroke-width: 1;
+  }
+
+  .flow text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    fill: var(--muted);
+  }
+
+  .flow .f-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    fill: var(--text);
+  }
+
+  .flow .f-pdf {
+    font-weight: 600;
+    fill: var(--accent-ink);
+  }
+
+  /* ---- The flow plays when [data-play] is set (in view, hover or focus). ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:not([data-motion='reduce'])) .tool:not([data-played]) :is(.f-doc, .f-row, .f-page, .f-field .f-fill, .f-new, .f-report, .f-pdf) {
+      opacity: 0;
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] .f-doc {
+      animation: f-in 0.4s ease both, f-out 0.5s ease both;
+      animation-delay: calc(var(--i) * 0.12s), calc(0.9s + var(--i) * 0.35s);
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] .f-row {
+      animation: f-drop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-delay: calc(1.1s + var(--i) * 0.35s);
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] .f-page {
+      animation: f-stack 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-delay: calc(3.1s + var(--i) * 0.3s);
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] .f-field .f-fill {
+      stroke-dasharray: 80;
+      animation: f-write 0.5s ease both;
+      animation-delay: calc(0.3s + var(--i) * 0.45s);
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] .f-new {
+      animation: f-drop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-delay: 2.4s;
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] .f-report {
+      animation: f-print 1.1s ease-out both;
+      animation-delay: 3.1s;
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] .f-pdf {
+      animation: f-in 0.4s ease both;
+      animation-delay: 4.1s;
+    }
+
+    :global(html:not([data-motion='reduce'])) .tool[data-play] :is(.f-doc, .f-row, .f-page, .f-field .f-fill, .f-new, .f-report, .f-pdf) {
+      opacity: 1;
+    }
+  }
+
+  @keyframes f-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes f-out {
+    to {
+      opacity: 0.35;
+      transform: translateX(10px);
+    }
+  }
+
+  @keyframes f-drop {
+    from {
+      opacity: 0;
+      transform: translate(-60px, -10px);
+    }
+  }
+
+  @keyframes f-stack {
+    from {
+      opacity: 0;
+      transform: translate(-30px, 20px);
+    }
+  }
+
+  @keyframes f-write {
+    from {
+      stroke-dashoffset: 80;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes f-print {
+    from {
+      opacity: 1;
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  .tool__shot {
+    margin: 0;
+  }
+
+  .tool__shot :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .tool__shot figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .tool__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+  }
+
+  .tool__eyebrow {
+    color: var(--muted);
+  }
+
+  .tool__title {
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    line-height: 1;
+  }
+
+  .tool__summary {
+    font-size: clamp(1.125rem, 1.4vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--text-soft);
+  }
+
+  .tool__outcome {
+    font-size: 1rem;
+    color: var(--text-soft);
+  }
+
+  .tool__stack {
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .tool__btn {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+</style>
+
+<script>
+  // Play the flow once when the panel comes into view, and again on hover or focus. After the first
+  // play it keeps its finished state ([data-played]).
+  document.querySelectorAll<HTMLElement>('[data-tool-panel]').forEach((panel) => {
+    const play = () => {
+      panel.removeAttribute('data-play');
+      void panel.offsetWidth;
+      panel.setAttribute('data-play', '');
+      setTimeout(() => panel.setAttribute('data-played', ''), 4600);
+    };
+    new IntersectionObserver(
+      ([e], io) => {
+        if (!e.isIntersecting) return;
+        play();
+        io.disconnect();
+      },
+      { threshold: 0.35 },
+    ).observe(panel);
+    panel.querySelector('.tool__fig')!.addEventListener('pointerenter', play);
+    panel.addEventListener('focusin', (e) => {
+      if (!panel.contains(e.relatedTarget as Node)) play();
+    });
+  });
+</script>

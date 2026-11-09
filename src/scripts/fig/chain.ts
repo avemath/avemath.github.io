@@ -51,7 +51,7 @@ export function mountChain(root: HTMLElement) {
     if (view === 'bsm') {
       shown = null;
       const c = collision(30);
-      svg.style.display = 'none';
+      (svg.parentElement as HTMLElement).style.display = 'none';
       bsm.hidden = false;
       // The fields each car sends (V2V_TXRXf.m, TX-1). On the radios, the decoded fields matched
       // these exactly in all five runs.
@@ -72,7 +72,7 @@ export function mountChain(root: HTMLElement) {
       cap.textContent = `${stages[i].look} Decoded on the radios, the same in all five runs.`;
       return;
     }
-    svg.style.display = '';
+    (svg.parentElement as HTMLElement).style.display = '';
     bsm.hidden = true;
     const pts = view === 'sync' ? r.rx : r.pts;
     // Scale so the clean points sit at plus and minus one.

@@ -19,21 +19,27 @@ const SPAN = 7;
 const DOPPLER_DRAW = 40;
 
 export function mountPlayground(root: HTMLElement) {
-  const $ = <T extends Element>(s: string) => root.querySelector<T>(s)!;
-  const form = $<HTMLFormElement>('[data-pg-form]');
-  const msgIn = $<HTMLInputElement>('[data-pg-msg]');
-  const snrIn = $<HTMLInputElement>('[data-pg-snr]');
-  const echoIn = $<HTMLInputElement>('[data-pg-echo]');
-  const dopIn = $<HTMLInputElement>('[data-pg-doppler]');
-  const txBits = $<HTMLElement>('[data-pg-tx-bits]');
-  const rxText = $<HTMLElement>('[data-pg-rx-text]');
-  const rxBits = $<HTMLElement>('[data-pg-rx-bits]');
-  const sum = $<HTMLElement>('[data-pg-sum]');
-  const live = $<HTMLElement>('[data-pg-live]');
+  // The compact version on the home page has only the mesh, a Send a packet button and a line for
+  // the result. Anything it leaves out is a detached stand-in here (the default message, a clean
+  // channel), so the same link runs either way.
+  const $ = <T extends Element>(s: string, make?: () => T) => (root.querySelector<T>(s) ?? make?.())!;
+  const input = (value: string) => () => Object.assign(document.createElement('input'), { value }) as HTMLInputElement;
+  const el = <K extends keyof HTMLElementTagNameMap>(tag: K) => () => document.createElement(tag);
+  const compact = root.hasAttribute('data-compact');
+  const form = $<HTMLFormElement>('[data-pg-form]', el('form'));
+  const msgIn = $<HTMLInputElement>('[data-pg-msg]', input('hi from Ave'));
+  const snrIn = $<HTMLInputElement>('[data-pg-snr]', input('30'));
+  const echoIn = $<HTMLInputElement>('[data-pg-echo]', input('0'));
+  const dopIn = $<HTMLInputElement>('[data-pg-doppler]', input('0'));
+  const txBits = $<HTMLElement>('[data-pg-tx-bits]', el('p'));
+  const rxText = $<HTMLElement>('[data-pg-rx-text]', el('p'));
+  const rxBits = $<HTMLElement>('[data-pg-rx-bits]', el('p'));
+  const sum = $<HTMLElement>('[data-pg-sum]', el('p'));
+  const live = $<HTMLElement>('[data-pg-live]', el('p'));
   const mesh = $<HTMLCanvasElement>('[data-pg-mesh]');
-  const spec = $<HTMLCanvasElement>('[data-pg-spec]');
-  const hear = $<HTMLButtonElement>('[data-pg-hear]');
-  const hearLabel = $<HTMLElement>('[data-pg-hear-label]');
+  const spec = $<HTMLCanvasElement>('[data-pg-spec]', el('canvas'));
+  const hear = $<HTMLButtonElement>('[data-pg-hear]', el('button'));
+  const hearLabel = $<HTMLElement>('[data-pg-hear-label]', el('span'));
   const mctx = mesh.getContext('2d')!;
   const sctx = spec.getContext('2d')!;
 
@@ -45,10 +51,11 @@ export function mountPlayground(root: HTMLElement) {
   };
   const showOutputs = () => {
     const s = settings();
-    root.querySelector('[data-pg-out="snr"]')!.textContent = `${s.snrDb} dB SNR`;
-    root.querySelector('[data-pg-out="echo"]')!.textContent = s.echoGain ? `${s.echoMs.toFixed(1)} ms, ${Math.round(s.echoGain * 100)}%` : 'off';
+    const out = (k: string) => root.querySelector(`[data-pg-out="${k}"]`) ?? { textContent: '' };
+    out('snr').textContent = `${s.snrDb} dB SNR`;
+    out('echo').textContent = s.echoGain ? `${s.echoMs.toFixed(1)} ms, ${Math.round(s.echoGain * 100)}%` : 'off';
     const shift = ((s.speed / C_WATER) * 11520).toFixed(0);
-    root.querySelector('[data-pg-out="doppler"]')!.textContent = `${s.speed > 0 ? '+' : ''}${s.speed} m/s (${Number(shift) > 0 ? '+' : ''}${shift} Hz)`;
+    out('doppler').textContent = `${s.speed > 0 ? '+' : ''}${s.speed} m/s (${Number(shift) > 0 ? '+' : ''}${shift} Hz)`;
   };
 
   // ---- One run of the link ----
@@ -321,6 +328,8 @@ export function mountPlayground(root: HTMLElement) {
     e.preventDefault();
     send();
   });
+  // The compact version's Send a packet is a plain button.
+  if (compact) root.querySelector('[data-pg-send]')?.addEventListener('click', send);
   for (const el of [snrIn, echoIn, dopIn]) el.addEventListener('input', showOutputs);
   const ping = (clientX: number, clientY: number) => {
     const r = mesh.getBoundingClientRect();
@@ -421,5 +430,6 @@ export function mountPlayground(root: HTMLElement) {
   requestAnimationFrame(() => {
     size();
     drawMesh(0);
+    root.dataset.ready = '';
   });
 }

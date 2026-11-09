@@ -19,18 +19,20 @@ interface Props {
   proj?: string;
   /** The title's heading level: 3 under a section heading (home), 2 straight under a page's h1. */
   level?: 2 | 3;
+  /** The name of the extra view (the plate slot), "Plate" unless set. */
+  plateLabel?: string;
 }
 
-const { id, fig, kind, flip = false, wide = false, eyebrow, title, offers = ['Live', 'Drawing', 'Code'], proj, level = 3 } = Astro.props;
+const { id, fig, kind, flip = false, wide = false, eyebrow, title, offers = ['Live', 'Drawing', 'Code'], proj, level = 3, plateLabel = 'Plate' } = Astro.props;
 const Title = level === 2 ? 'h2' : 'h3';
 // A card with a plate slot gets a fifth view, Plate: the line-art figure from the Specimen plates.
 const hasPlate = Astro.slots.has('plate');
 const views = [
   { key: 'live', label: 'Live' },
-  ...(hasPlate ? [{ key: 'plate', label: 'Plate' }] : []),
+  ...(hasPlate ? [{ key: 'plate', label: plateLabel }] : []),
   { key: 'drawing', label: 'Drawing' },
-  { key: 'how', label: 'How it works' },
-  { key: 'code', label: 'Code' },
+  ...(Astro.slots.has('how') ? [{ key: 'how', label: 'How it works' }] : []),
+  ...(Astro.slots.has('code') ? [{ key: 'code', label: 'Code' }] : []),
 ];
 ---
 
@@ -69,12 +71,20 @@ const views = [
     <div class="fc__view" id={`${id}-drawing`} role="tabpanel" aria-labelledby={`${id}-tab-drawing`} hidden>
       <slot name="drawing" />
     </div>
-    <div class="fc__view" id={`${id}-how`} role="tabpanel" aria-labelledby={`${id}-tab-how`} hidden>
+    {
+      Astro.slots.has('how') && (
+  <div class="fc__view" id={`${id}-how`} role="tabpanel" aria-labelledby={`${id}-tab-how`} hidden>
       <slot name="how" />
     </div>
-    <div class="fc__view" id={`${id}-code`} role="tabpanel" aria-labelledby={`${id}-tab-code`} hidden>
+      )
+    }
+    {
+      Astro.slots.has('code') && (
+  <div class="fc__view" id={`${id}-code`} role="tabpanel" aria-labelledby={`${id}-tab-code`} hidden>
       <slot name="code" />
     </div>
+      )
+    }
   </div>
 
   <div class="fc__text">

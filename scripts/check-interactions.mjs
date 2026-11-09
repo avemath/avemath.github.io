@@ -5,19 +5,24 @@
 //   marquee        hovering the strip pauses it
 //   tabs           every figure card's tabs show their own view (home and the RAMpage case study)
 //   chain          hovering a V2V receiver stage selects it; Step through always starts at stage 1,
-//                  then moves on, and only shows on the Live view
+//                  then moves on, and only shows on the Live view; at 390, 1440 and 2560 every
+//                  stage's caption sits below the drawing, never over it
 //   figure-viewer  the V2V figures: Next and Previous, arrow keys, thumbnails, swipe, full screen,
 //                  captions, and the buttons in the text that jump to a figure
-//   crate          the Toolbox crate: the pointer, the arrow keys and a swipe flip through it; a press
-//                  or Enter pins a sleeve; reduced motion lays it out as a plain list
 //   surface        Back to the surface scrolls to the top of /research/; Home goes home
 //   matrix         the LED card's sources are toggle buttons; the name field takes a name
-//   hop-tabs       the hop pattern card's Live and Drawing tabs
+//   signals-card   the Signals card: the hop pattern is its own view, and Send a packet runs the mesh
 //   decode         headings below the first screen decode to their full text when scrolled to
 //   draw-in        figures below the first screen draw in when scrolled to
 //   live-tiles     website showcase Try it opens the live panel and Close closes it
 //   rampage-hover  the RAMpage photo plate plays its match clip on hover, never with reduced motion
-//   toolbox        a chip is a toggle filter: lights matching plates, fades the rest, says where it is used
+//   tune           the Toolbox radio: dragging searches then snaps to a station, the keys and buttons
+//                  step, locking filters the plates and Escape clears, phones swipe with no sideways
+//                  scroll, and reduced motion jumps the needle
+//   race           Why sound: Send runs the race and the clock stops at 2.00 s
+//   arrivals       Fig. R2: hovering or arrowing through the arrivals names each one's path
+//   field-notes    notes start as bits, decode into text when scrolled to, and a tap replays them
+//   tool-panel     the client tool panels play their flow when scrolled to and keep the end state
 //   seafloor-drag  dragging open water on /research/ turns the camera; panels never start a drag
 //   seafloor-still with reduced motion, /research/ never loads three.js and shows the still gradient
 //   playground     the mesh playground decodes a typed message exactly at high SNR and makes errors at low
@@ -178,6 +183,24 @@ await test('chain', async () => {
     if (cap.length < 30) fail('chain', `stage ${i + 1} has no caption ("${cap}")`);
   }
   if (await home.locator('#v2v [role="tab"][data-view="plate"]').count()) fail('chain', 'the V2V card still has a Plate tab');
+  // Every stage's caption sits below the drawing, at a phone, a laptop and a big screen.
+  for (const w of [390, 1440, 2560]) {
+    const p = await page('/', { w, h: w < 600 ? 844 : 1100 });
+    await settleOn(p, '#v2v [data-step]');
+    const st = p.locator('#v2v [data-stage]');
+    for (let i = 0; i < n; i++) {
+      await st.nth(i).click();
+      const r = await p.evaluate(() => {
+        const box = document.querySelector('#v2v .cf__box');
+        const cap = document.querySelector('#v2v [data-cf-cap]').getBoundingClientRect();
+        const b = box && !box.hidden && box.getBoundingClientRect().height ? box.getBoundingClientRect() : null;
+        return { capTop: cap.top, boxBottom: b ? b.bottom : null, capH: cap.height };
+      });
+      if (!r.capH) fail('chain', `at ${w}px stage ${i + 1}'s caption is empty`);
+      if (r.boxBottom !== null && r.capTop < r.boxBottom - 1) fail('chain', `at ${w}px stage ${i + 1}'s caption overlaps the drawing (${r.capTop} < ${r.boxBottom})`);
+    }
+    await p.close();
+  }
 });
 
 await test('matrix', async () => {
@@ -191,16 +214,19 @@ await test('matrix', async () => {
   if ((await home.locator('#led [data-mf-name]').inputValue()) !== 'LEA') fail('matrix', 'the name field does not take a name');
 });
 
-await test('hop-tabs', async () => {
-  const tabs = home.locator('[data-live-host] [data-tabs] [role="tab"]');
-  const n = await tabs.count();
-  if (n < 2) fail('hop-tabs', `${n} tabs on the hop pattern card`);
-  for (let i = 0; i < n; i++) {
-    await tabs.nth(i).click();
-    const id = await tabs.nth(i).getAttribute('aria-controls');
-    if (await home.locator(`#${id}`).isHidden()) fail('hop-tabs', `tab ${i + 1} does not show its view`);
-  }
-  await tabs.first().click();
+await test('signals-card', async () => {
+  const card = home.locator('#signals');
+  await settleOn(home, '#signals');
+  // The hop pattern lives on as the card's own view.
+  await card.locator('[role="tab"][data-view="plate"]').click();
+  if (!(await card.locator('[data-live-host]').isVisible())) fail('signals-card', 'the Hop pattern view does not show the hop tile');
+  await card.locator('[role="tab"][data-view="live"]').click();
+  const pg = card.locator('[data-pg]');
+  if (!(await pg.isVisible())) return fail('signals-card', 'the Live view does not show the mesh');
+  await home.waitForFunction(() => document.querySelector('#signals [data-pg]')?.hasAttribute('data-ready'), null, { timeout: 10000 }).catch(() => fail('signals-card', 'the live mesh never drew (the still stays up)'));
+  await pg.locator('[data-pg-send]').click();
+  await home.waitForFunction(() => document.querySelector('#signals [data-pg]')?.dataset.state === 'done', null, { timeout: 20000 }).catch(() => fail('signals-card', 'Send a packet does not finish a send'));
+  if (!(await card.locator('a[href="/work/signals-playground/"]').count())) fail('signals-card', 'no link to the full playground');
 });
 
 await test('decode', async () => {
@@ -209,7 +235,7 @@ await test('decode', async () => {
   if (!heads) fail('decode', 'no headings below the first screen decode');
   const h = p.locator('.dh').first();
   const want = (await h.locator('.dh__real').textContent()).trim();
-  await h.scrollIntoViewIfNeeded();
+  await h.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await p.waitForTimeout(2500);
   // Decoded: the real text shows and the scrambling layer is gone or says the same.
   const done = await h.evaluate((el) => ({ decoding: el.hasAttribute('data-decoding'), real: el.querySelector('.dh__real').textContent.trim(), fx: el.querySelector('.dh__fx').textContent.trim(), realVis: getComputedStyle(el.querySelector('.dh__real')).visibility }));
@@ -265,96 +291,165 @@ await test('rampage-hover', async () => {
   await still.close();
 });
 
-await test('toolbox', async () => {
-  const url = home.url();
-  // Python: used on plates on the home page. Sleeves overlap, so press its uncovered left edge.
-  const chip = home.locator('[data-tool]').first();
-  await settleOn(home, '[data-crate]');
-  // (The crate test covers pressing with the pointer; this one presses with the keyboard.)
-  await chip.focus();
-  await home.keyboard.press('Space');
-  if (home.url() !== url) fail('toolbox', 'pressing a chip navigated');
-  if ((await chip.getAttribute('aria-pressed')) !== 'true') fail('toolbox', 'the chip is not pressed');
-  const name = (await chip.locator('.sleeve__name').textContent()).trim();
-  const line = (await home.locator('[data-tb-line]').textContent()).trim();
-  if (!line.startsWith(`${name}: used in `) || !line.endsWith('.')) fail('toolbox', `the line says "${line}"`);
-  if ((await home.locator('[data-tb-line]').getAttribute('aria-live')) !== 'polite') fail('toolbox', 'the line is not a polite live region');
-  const dim = await home.locator('[data-proj][data-dim]').count();
-  const lit = await home.locator('[data-proj]:not([data-dim])').count();
-  if (!dim || !lit) fail('toolbox', `${lit} plates lit and ${dim} faded; both should be some`);
-  const op = await home.locator('[data-proj][data-dim]').first().evaluate((e) => getComputedStyle(e).opacity);
-  await home.waitForTimeout(400);
-  const op2 = await home.locator('[data-proj][data-dim]').first().evaluate((e) => getComputedStyle(e).opacity);
-  if (Math.abs(Number(op2) - 0.35) > 0.01) fail('toolbox', `faded plates are at ${op2} (${op}), not 0.35`);
-  await home.keyboard.press('Space');
-  if ((await chip.getAttribute('aria-pressed')) !== 'false' || (await home.locator('[data-proj][data-dim]').count())) fail('toolbox', 'pressing the chip again does not clear the filter');
-  await home.keyboard.press('Enter');
-  if ((await chip.getAttribute('aria-pressed')) !== 'true') fail('toolbox', 'Enter does not press a chip');
-  await home.keyboard.press('Escape');
-  if ((await chip.getAttribute('aria-pressed')) !== 'false' || (await home.locator('[data-tb-line]').textContent()).trim()) fail('toolbox', 'Escape does not clear the filter');
-});
-await test('crate', async () => {
-  const sleeves = home.locator('[data-tool]');
-  const n = await sleeves.count();
-  const openAt = () => sleeves.evaluateAll((b) => b.findIndex((x) => x.hasAttribute('data-open')));
-  const shownUse = () => home.locator('[data-use]:not([hidden])').getAttribute('data-use');
-  await settleOn(home, '[data-crate]');
-  // The pointer flips: over each sleeve's visible edge, that sleeve opens and its card shows.
-  const first = await home.locator('.crate__slot').first().boundingBox();
-  const last = await home.locator('.crate__slot').last().boundingBox();
-  const span = last.x + last.width - first.x;
-  for (const i of [1, 4, n - 2]) {
-    await home.mouse.move(first.x + ((i + 0.5) / n) * span, first.y + first.height * 0.6, { steps: 4 });
-    await home.waitForTimeout(80);
-    if ((await openAt()) !== i) fail('crate', `the pointer over sleeve ${i + 1} opened sleeve ${(await openAt()) + 1}`);
-    if ((await shownUse()) !== (await sleeves.nth(i).getAttribute('data-tool'))) fail('crate', `sleeve ${i + 1}'s card does not show`);
+await test('tune', async () => {
+  const p = await page('/', { w: 1440, h: 1000 });
+  await settleOn(p, '[data-radio]');
+  const dial = p.locator('[data-dial]');
+  const sig = () => p.locator('[data-tune-sig]').textContent();
+  const now = async () => Number(await dial.getAttribute('aria-valuenow'));
+  const N = Number(await dial.getAttribute('aria-valuemax'));
+  if ((await dial.getAttribute('role')) !== 'slider') fail('tune', 'the dial is not a slider');
+  const cardName = () => p.locator('[data-use]:not([hidden]) .tb__name').textContent();
+  // Drag: held down and moved slowly across, the needle passes between stations (searching);
+  // let go anywhere and it snaps onto one (locked).
+  const b = await dial.boundingBox();
+  const y = b.y + b.height * 0.5;
+  await p.mouse.move(b.x + b.width * 0.08, y);
+  await p.mouse.down();
+  let searched = false;
+  for (let k = 0; k <= 30; k++) {
+    await p.mouse.move(b.x + b.width * (0.08 + k * 0.012), y);
+    await p.waitForTimeout(40);
+    if ((await sig()).startsWith('searching')) searched = true;
   }
-  // The card names the skill, its level and its projects with thumbnails.
-  const card = home.locator('[data-use]:not([hidden])');
-  if (!(await card.locator('.tb__lvl').textContent()).match(/Know well|Have built with/)) fail('crate', 'the card does not say Know well or Have built with');
-  if (!(await card.locator('a.tb__proj').count())) fail('crate', 'the card has no project links');
-  // Keyboard: arrows flip and move focus, Enter pins, Escape clears.
-  await sleeves.first().focus();
-  for (let k = 0; k < 3; k++) await home.keyboard.press('ArrowRight');
-  if ((await openAt()) !== 3) fail('crate', `three ArrowRight presses open sleeve ${(await openAt()) + 1}, not 4`);
-  if (!(await sleeves.nth(3).evaluate((e) => e === document.activeElement))) fail('crate', 'the arrow keys do not move focus with the open sleeve');
-  await home.keyboard.press('Enter');
-  if ((await sleeves.nth(3).getAttribute('aria-pressed')) !== 'true') fail('crate', 'Enter does not pin the sleeve');
-  if (!(await home.locator('[data-proj][data-dim]').count())) fail('crate', 'pinning does not apply the project filter');
-  await home.keyboard.press('Escape');
-  if ((await sleeves.nth(3).getAttribute('aria-pressed')) !== 'false') fail('crate', 'Escape does not clear the pin');
-  // Touch: a sideways swipe flips, a tap pins.
+  if (!searched) fail('tune', 'dragging between stations never reads "searching"');
+  await p.mouse.move(b.x + b.width * 0.445, y);
+  await p.mouse.up();
+  await p.waitForTimeout(800);
+  const s1 = await sig();
+  if (!/^locked: .+, \d+ projects?$/.test(s1)) fail('tune', `after letting go the dial says "${s1}", not locked`);
+  const vt = await dial.getAttribute('aria-valuetext');
+  if (!vt.startsWith((await cardName()).trim())) fail('tune', `the slider says "${vt}" but the card shows ${await cardName()}`);
+  if (!s1.includes((await cardName()).trim())) fail('tune', 'the scope line and the card disagree');
+  if (!(await p.locator('[data-proj][data-dim]').count())) fail('tune', 'letting go on a station does not apply the project filter');
+  // Keys: Home, three steps right, End.
+  await dial.focus();
+  await p.keyboard.press('Home');
+  if ((await now()) !== 1) fail('tune', `Home lands on station ${await now()}`);
+  for (let k = 0; k < 3; k++) await p.keyboard.press('ArrowRight');
+  if ((await now()) !== 4) fail('tune', `three ArrowRight presses land on station ${await now()}, not 4`);
+  await p.keyboard.press('ArrowLeft');
+  if ((await now()) !== 3) fail('tune', 'ArrowLeft does not step back');
+  await p.keyboard.press('End');
+  if ((await now()) !== N) fail('tune', 'End does not reach the last station');
+  // Buttons.
+  await p.locator('[data-dial-prev]').click();
+  if ((await now()) !== N - 1) fail('tune', 'Previous station does not step back');
+  await p.locator('[data-dial-next]').click();
+  if ((await now()) !== N) fail('tune', 'Next station does not step on');
+  // The filter: Python lights some plates and fades the rest, says where it is used, and Escape clears.
+  await dial.focus();
+  await p.keyboard.press('Home');
+  const name = (await cardName()).trim();
+  const line = (await p.locator('[data-tb-line]').textContent()).trim();
+  if (!line.startsWith(`${name}: used in `)) fail('tune', `the live line says "${line}"`);
+  if ((await p.locator('[data-tb-line]').getAttribute('aria-live')) !== 'polite') fail('tune', 'the line is not a polite live region');
+  const dim = await p.locator('[data-proj][data-dim]').count();
+  const lit = await p.locator('[data-proj]:not([data-dim])').count();
+  if (!dim || !lit) fail('tune', `${lit} plates lit and ${dim} faded; both should be some`);
+  await p.keyboard.press('Escape');
+  if ((await p.locator('[data-proj][data-dim]').count()) || (await p.locator('[data-tb-line]').textContent()).trim()) fail('tune', 'Escape does not clear the filter');
+  await p.waitForTimeout(600);
+  if (!(await sig()).startsWith('locked')) fail('tune', 'the keys leave the needle between stations');
+  await p.close();
+
+  // Phone: no sideways page scroll, the dial fits, and a sideways swipe tunes and snaps.
   const t = await page('/', { w: 390, h: 844, touch: true });
-  await settleOn(t, '[data-crate]');
-  const row = await t.locator('[data-crate-row]').boundingBox();
+  await settleOn(t, '[data-radio]');
+  const over = await t.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  if (over > 0) fail('tune', `the phone page scrolls sideways by ${over}px`);
+  const tb = await t.locator('[data-dial]').boundingBox();
+  if (tb.x < 0 || tb.x + tb.width > 390) fail('tune', 'the dial does not fit the phone screen');
+  const tnow = async () => Number(await t.locator('[data-dial]').getAttribute('aria-valuenow'));
+  const before = await tnow();
   const cdp = await t.context().newCDPSession(t);
   const touch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] });
-  const y = row.y + row.height * 0.5;
-  await touch('touchStart', row.x + row.width - 30, y);
-  for (let k = 1; k <= 10; k++) await touch('touchMove', row.x + row.width - 30 - k * 22, y + 1);
+  const ty = tb.y + tb.height * 0.5;
+  await touch('touchStart', tb.x + 30, ty);
+  for (let k = 1; k <= 12; k++) await touch('touchMove', tb.x + 30 + k * 20, ty + 1);
   await touch('touchEnd');
-  // The swipe began on the last sleeve and moved 220px left, so the open sleeve moved left with it.
-  const swiped = await t.locator('[data-tool]').evaluateAll((b) => b.findIndex((x) => x.hasAttribute('data-open')));
-  const nT = await t.locator('[data-tool]').count();
-  if (!(swiped >= 0 && swiped <= nT - 4)) fail('crate', `a swipe left from the last sleeve opened sleeve ${swiped + 1}`);
-  // A second touch right after the swipe, on the same spot, reads as a double tap; wait as a person would.
-  await t.waitForTimeout(700);
-  const lastBox = await t.locator('[data-tool]').last().boundingBox();
-  await t.touchscreen.tap(lastBox.x + lastBox.width - 10, lastBox.y + 24);
-  await t.waitForTimeout(200);
-  if ((await t.locator('[data-tool]').last().getAttribute('aria-pressed')) !== 'true') {
-    const st = await t.locator('[data-tool]').evaluateAll((b) => b.map((x) => (x.hasAttribute('data-open') ? 'O' : '') + (x.getAttribute('aria-pressed') === 'true' ? 'P' : '-')).join(','));
-    fail('crate', `a tap does not pin a sleeve (${st})`);
-  }
+  await t.waitForTimeout(800);
+  if ((await tnow()) === before) fail('tune', 'a sideways swipe on the phone dial does not tune');
+  if (!(await t.locator('[data-tune-sig]').textContent()).startsWith('locked')) fail('tune', 'a swipe does not snap onto a station');
+  await t.locator('[data-dial-next]').click();
+  if ((await tnow()) !== Math.min(N, (await tnow()))) fail('tune', 'Next station is missing on the phone');
   await t.close();
-  // Reduced motion: a plain list, no sleeve covering another.
+
+  // Reduced motion: Next jumps the needle straight onto the station.
   const rm = await page('/', { reduce: true });
-  const boxes = await rm.locator('[data-tool]').evaluateAll((b) => b.map((x) => x.getBoundingClientRect().toJSON()));
-  const overlap = boxes.some((a, i) => boxes.some((b, j) => i < j && a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1));
-  if (overlap) fail('crate', 'with reduced motion the sleeves still overlap');
+  await settleOn(rm, '[data-radio]');
+  await rm.locator('[data-dial-next]').click();
+  await rm.waitForTimeout(50);
+  if (!(await rm.locator('[data-tune-sig]').textContent()).startsWith('locked')) fail('tune', 'with reduced motion the needle slides instead of jumping');
   await rm.close();
 });
 await home.close();
+
+await test('race', async () => {
+  const p = await page('/research/');
+  await settleOn(p, '[data-race]');
+  await p.locator('[data-race-send]').click();
+  await p.waitForFunction(() => { const v = Number(document.querySelector('[data-race-clock]').textContent); return v > 0.05 && v < 2; }, null, { timeout: 4000 }).catch(() => fail('race', 'the clock never runs'));
+  await p.waitForFunction(() => document.querySelector('[data-race-clock]').textContent === '2.00', null, { timeout: 8000 }).catch(async () => fail('race', `the clock stops at ${await p.locator('[data-race-clock]').textContent()}, not 2.00`));
+  await p.waitForTimeout(200);
+  if (!(await p.locator('[data-race-live]').textContent()).includes('2.00')) fail('race', 'the live line does not give the round trip');
+  await p.close();
+});
+
+await test('arrivals', async () => {
+  const p = await page('/research/');
+  await settleOn(p, '[data-arr-plot]');
+  const read = () => p.locator('[data-arr-read]').textContent();
+  const bars = p.locator('[data-arr]');
+  const n = await bars.count();
+  if (n < 3) return fail('arrivals', `only ${n} arrivals to hover`);
+  await bars.nth(1).dispatchEvent('pointerenter');
+  if (!/^Arrival 2 of \d+: .*(direct|surface|bottom|both)/.test(await read())) fail('arrivals', `hovering arrival 2 reads "${await read()}"`);
+  if (!(await p.locator('[data-arr-path]').getAttribute('d'))?.startsWith('M')) fail('arrivals', 'no path drawn on the sketch');
+  await p.locator('[data-arr-plot]').focus();
+  await p.keyboard.press('End');
+  if (!(await read()).startsWith(`Arrival ${n} of ${n}`)) fail('arrivals', `End reads "${await read()}"`);
+  await p.keyboard.press('ArrowLeft');
+  if (!(await read()).startsWith(`Arrival ${n - 1} of`)) fail('arrivals', 'ArrowLeft does not step back');
+  await p.close();
+});
+
+await test('field-notes', async () => {
+  const p = await page('/research/');
+  const note = p.locator('[data-note]').last();
+  const val = note.locator('[data-note-value]');
+  const want = await val.getAttribute('data-text');
+  const shown0 = (await val.textContent()).trim();
+  if (!/^[01\s]+$/.test(shown0)) fail('field-notes', `before it is on screen the note shows "${shown0}", not bits`);
+  await settleOn(p, '[data-note] >> nth=-1');
+  await p.waitForTimeout(2200);
+  if ((await val.textContent()).trim() !== want) fail('field-notes', `scrolled to, the note reads "${await val.textContent()}", not "${want}"`);
+  await note.click();
+  await p.waitForTimeout(80);
+  if ((await val.textContent()) === want) fail('field-notes', 'a tap does not replay the decode');
+  await p.waitForTimeout(1800);
+  if ((await val.textContent()).trim() !== want) fail('field-notes', 'the replay does not end on the text');
+  const rm = await page('/research/', { reduce: true });
+  const v2 = rm.locator('[data-note] [data-note-value]').last();
+  if ((await v2.textContent()).trim() !== (await v2.getAttribute('data-text'))) fail('field-notes', 'with reduced motion the note is not simply shown');
+  await rm.close();
+  await p.close();
+});
+
+await test('tool-panel', async () => {
+  const p = await page('/work/');
+  const panels = p.locator('[data-tool-panel]');
+  const n = await panels.count();
+  if (n < 2) fail('tool-panel', `${n} client tool panels on /work/`);
+  for (let i = 0; i < n; i++) {
+    await settleOn(p, `[data-tool-panel] >> nth=${i}`);
+    await p.waitForTimeout(300);
+    if (!(await panels.nth(i).evaluate((e) => e.hasAttribute('data-play')))) fail('tool-panel', `panel ${i + 1} does not play when scrolled to`);
+  }
+  await p.waitForTimeout(4800);
+  if (!(await panels.first().evaluate((e) => e.hasAttribute('data-played')))) fail('tool-panel', 'the flow does not keep its end state');
+  await p.close();
+});
 
 await test('figure-viewer', async () => {
   const p = await page('/work/v2v-bsm-ofdm/');
@@ -509,16 +604,20 @@ await test('playground', async () => {
   await pg.locator('[data-pg-snr]').fill('30');
   await pg.locator('[data-pg-echo]').fill('0');
   await pg.locator('[data-pg-doppler]').fill('0');
-  await pg.locator('[data-pg-msg]').press('Enter');
-  await p.waitForFunction(() => document.querySelector('[data-pg]')?.dataset.state === 'done', null, { timeout: 20000 });
+  // The mesh only animates on screen (and a send finishes as its chips arrive), so center it first.
+  const sendFromView = async (how) => {
+    await pg.locator('[data-pg-mesh]').evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await how();
+    await p.waitForFunction(() => document.querySelector('[data-pg]')?.dataset.state === 'done', null, { timeout: 30000 });
+  };
+  await sendFromView(() => pg.locator('[data-pg-form]').evaluate((f) => f.requestSubmit()));
   const got = await pg.locator('[data-pg-rx-text]').getAttribute('data-text');
   if (got !== msg) fail('playground', `at 30 dB SNR "${msg}" decoded as "${got}"`);
   const errsHigh = Number(await pg.getAttribute('data-errors'));
   if (errsHigh !== 0) fail('playground', `${errsHigh} bit errors at 30 dB SNR`);
   const min = await pg.locator('[data-pg-snr]').getAttribute('min');
   await pg.locator('[data-pg-snr]').fill(min);
-  await pg.locator('[data-pg-send]').click();
-  await p.waitForFunction(() => document.querySelector('[data-pg]')?.dataset.state === 'done', null, { timeout: 20000 });
+  await sendFromView(() => pg.locator('[data-pg-send]').evaluate((b) => b.click()));
   const errsLow = Number(await pg.getAttribute('data-errors'));
   if (!(errsLow >= 1)) fail('playground', `no bit errors at the lowest SNR (${min} dB)`);
   const roseBits = await pg.locator('[data-pg-rx-bits] .is-wrong').count();

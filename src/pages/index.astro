@@ -21,7 +21,7 @@ import SignalsHop from '@/components/drawings/SignalsHop.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import Toolbox from '@/components/Toolbox.astro';
 import LedMatrix from '@/components/plates/LedMatrix.astro';
-import MeshStill from '@/components/plates/MeshStill.astro';
+import MeshPlayground from '@/components/playground/MeshPlayground.astro';
 import site from '@/data/site.json';
 import { cut, lineOf, region } from '@/lib/excerpt';
 import { hopSequence, toneHz, F_HIGH, F_LOW } from '@/lib/fhbfsk';
@@ -126,9 +126,55 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             <a class="link projects__cs" href="/work/led-audio-spectrum/">Case study</a>
           </Fragment>
         </FigureCard>
+
+        <FigureCard
+          id="signals"
+          fig="VI"
+          kind="Signal mesh"
+          flip
+          proj="/work/signals-playground/"
+          plateLabel="Hop pattern"
+          offers={['Live', 'Drawing', 'Code']}
+          eyebrow="Personal project, built to study, then cleaned up to share"
+          title="Signals playground"
+        >
+          <MeshPlayground compact />
+          <div slot="plate" class="sig-hop" data-live-host>
+            <div class="mini__fig mini__fig--live" data-live-media data-draw>
+              <svg viewBox="0 0 400 120" preserveAspectRatio="xMinYMid meet" class="mini__hops" aria-hidden="true">
+                {
+                  hops.map((p, i) => (
+                    <rect x={20 + i * 36} y={hopY(toneHz(p, bits[i])) - 2} width="26" height="4" fill={i % 2 ? 'var(--text)' : 'var(--accent)'} />
+                  ))
+                }
+              </svg>
+              <SignalsLive />
+            </div>
+            <p class="fig__try">Press Try it, then Play, and listen to each hop.</p>
+          </div>
+          <SignalsHop slot="drawing" />
+          <CodeFile
+            slot="code"
+            code="fhbfsk"
+            file="src/lib/fhbfsk.ts"
+            url={`${SELF}/src/lib/fhbfsk.ts`}
+            note="The whole link the playground runs: text to bits, the 48 kHz waveform, the channel and the detector."
+          />
+          <Fragment slot="text">
+            <p>
+              Type a message and watch it cross a pane of water as a JANUS style FH-BFSK packet: each bit is one 6.25 ms chip that hops between
+              13 tone pairs. Noise, a surface echo and Doppler act on the real waveform, and a real detector decodes it on the far side.
+            </p>
+            <div class="sig-note"><MarginNote where="signals" /></div>
+          </Fragment>
+          <Fragment slot="actions">
+            <a class="btn btn--solid" href="/work/signals-playground/#playground">Open the playground</a>
+            <a class="btn" href="/work/signals-playground/">Case study</a>
+          </Fragment>
+        </FigureCard>
       </div>
 
-      <p class="projects__more">Three more below, then the research.</p>
+      <p class="projects__more">Two more below, then the research.</p>
 
       <ul class="minis">
         <li class="mini paper" data-proj="/work/bellhop-sim/">
@@ -151,49 +197,6 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <p class="fig__try">Open the figures and the fixes.</p>
         </li>
 
-        <li class="mini paper" data-live-host data-proj="/work/signals-playground/">
-          <div class="fig__bar mini__bar">
-            <p class="fig__label plate-n">Plate VI / Hop pattern</p>
-            <div class="tabset" role="tablist" aria-label="Signals playground: views" data-tabs>
-              <button type="button" role="tab" id="sig-tab-mesh" aria-controls="sig-mesh" aria-selected="true" tabindex="0">Mesh</button>
-              <button type="button" role="tab" id="sig-tab-live" aria-controls="sig-live" aria-selected="false" tabindex="-1">Live</button>
-              <button type="button" role="tab" id="sig-tab-drawing" aria-controls="sig-drawing" aria-selected="false" tabindex="-1">Drawing</button>
-            </div>
-          </div>
-          <div id="sig-mesh" role="tabpanel" aria-labelledby="sig-tab-mesh">
-            <a class="mini__fig mini__mesh" href="/work/signals-playground/#playground" aria-label="Open the Signals playground: send a message through the water">
-              <MeshStill />
-            </a>
-            <p class="fig__try">Open it, type a message, and send it through the water.</p>
-          </div>
-          <div id="sig-live" role="tabpanel" aria-labelledby="sig-tab-live" hidden>
-          <div class="mini__fig mini__fig--live" data-live-media data-draw>
-            <svg viewBox="0 0 400 120" preserveAspectRatio="xMinYMid meet" class="mini__hops" aria-hidden="true">
-              {
-                hops.map((p, i) => (
-                  <rect x={20 + i * 36} y={hopY(toneHz(p, bits[i])) - 2} width="26" height="4" fill={i % 2 ? 'var(--text)' : 'var(--accent)'} />
-                ))
-              }
-            </svg>
-            <SignalsLive />
-          </div>
-          <p class="fig__try">Press Try it, then Play, and listen.</p>
-          </div>
-          <div id="sig-drawing" role="tabpanel" aria-labelledby="sig-tab-drawing" hidden>
-            <SignalsHop />
-          </div>
-          <div class="mini__note"><MarginNote where="signals" /></div>
-          <div class="mini__body">
-            <h3 class="mini__title"><a href="/work/signals-playground/">Signals playground</a></h3>
-            <p class="mini__offers">
-              <a href="/work/signals-playground/#playground">Playground</a>
-              <a href="#sig-live" data-tab-target="sig-tab-live">Live</a>
-              <a href="#sig-drawing" data-tab-target="sig-tab-drawing">Drawing</a>
-              <a href="https://github.com/avemath/avemath.github.io/blob/main/src/components/demos/SignalsDemo.astro">Code</a>
-            </p>
-            <p class="mini__text">Type a message and watch it cross a pane of water as a JANUS style FH-BFSK packet, then decode on the far side. You can hear each hop.</p>
-          </div>
-        </li>
 
         <li class="mini paper mini--accent" data-proj="/work/acoustic-pool-alarm/ /research/">
           <div class="fig__bar mini__bar">
@@ -265,15 +268,14 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   }
 
   /* A card's Plate view: the line-art figure in its frame, with a note on where it comes from. */
-  .mini__mesh {
-    display: block;
-    padding: 0.5rem 0.75rem;
+  .sig-hop {
+    padding: 1rem;
   }
 
-  .mini__mesh:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: -2px;
+  .sig-note {
+    margin-top: 1rem;
   }
+
 
   .fc-plate__frame {
     display: block;
@@ -308,10 +310,10 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     margin-top: 1.75rem;
   }
 
-  /* Three across only once each column can be about 280px wide. */
-  @media (min-width: 1024px) {
+  /* Two across from 760px. */
+  @media (min-width: 760px) {
     .minis {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .minis:has([data-live-on]) {

@@ -1,16 +1,21 @@
 ---
-// The About hero's backdrop: the levee at dusk on a 48 by 16 grid of square "LEDs". Built here,
-// once, as one inline SVG of rects, so it costs no request and no script. In the Specimen dusk
-// colors (the same in both themes, like a print): sky, a gold sun at
-// column 37 with a few stars, the treeline, the river with the sun's reflection, the levee, the
-// path and the grass, top to bottom. Each cell gets a thin darker edge in CSS so it reads as an LED.
-const W = 48;
-const H = 16;
+// The About hero's backdrop: the levee at dusk on a 96 by 32 grid of square "LEDs" (twice the
+// detail of the first 48 by 16 version, same scene and colors). Built here, once: the cells become
+// a tiny PNG (a few KB, inline, drawn crisp with no smoothing) and one path draws the thin darker
+// edge between cells so each reads as an LED. No request and no script. In the Specimen dusk
+// colors (the same in both themes, like a print): sky, a gold sun with a few stars, the treeline,
+// the river with the sun's reflection, the levee, the path and the grass, top to bottom.
+import { deflateSync } from 'node:zlib';
 
+const W = 96;
+const H = 32;
+// The scene is described on the original 48 by 16 grid; each new cell samples its center.
+const S = 2;
+
+const hex = (x: string) => [1, 3, 5].map((k) => parseInt(x.slice(k, k + 2), 16));
 const mix = (a: string, b: string, t: number) => {
-  const p = (x: string) => [1, 3, 5].map((k) => parseInt(x.slice(k, k + 2), 16));
-  const A = p(a);
-  const B = p(b);
+  const A = hex(a);
+  const B = hex(b);
   return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
 };
 const rnd = (x: number, y: number) => {
@@ -18,34 +23,75 @@ const rnd = (x: number, y: number) => {
   return s - Math.floor(s);
 };
 
-const cells: { x: number; y: number; c: string }[] = [];
+const color = (x: number, y: number) => {
+  const X = (x + 0.5) / S - 0.5;
+  const Y = (y + 0.5) / S - 0.5;
+  const tree = 8 + Math.sin(X * 0.7) * 0.6 + Math.sin(X * 0.23) * 0.8;
+  const sun = Math.hypot(X - 37, (Y - 6.5) * 1.1);
+  if (Y < 8.75) {
+    let c = Y < 5 ? mix('#2A1D2F', '#5B4878', Math.max(0, Y) / 5) : mix('#6E5A91', '#B0607F', (Y - 5) / 4);
+    if (sun < 2.6) c = sun < 1.6 ? '#F4E3BC' : '#E2C17E';
+    if (Y < 4 && rnd(x, y) > 0.975) c = '#C6B0EA';
+    if (Y >= tree - 0.25) c = '#1A1220';
+    return c;
+  }
+  if (Y < 10.75) {
+    let c = (x + y) % 7 === 0 ? '#2F7A7A' : '#246A6C';
+    if (Math.abs(X - 37) < 2 && rnd(x, y) > 0.4) c = '#EBA8C4';
+    return c;
+  }
+  if (Y < 12.75) return rnd(x, y) > 0.8 ? '#5E8A72' : '#4E7A63';
+  if (Y < 13.75) return rnd(x, y) > 0.85 ? '#C9AE78' : '#9A7637';
+  return rnd(x, y) > 0.75 ? '#456B57' : '#3A5C4A';
+};
+
+// A PNG, by hand: one filter byte per row, then RGB.
+const raw = Buffer.alloc(H * (1 + W * 3));
 for (let y = 0; y < H; y++) {
+  raw[y * (1 + W * 3)] = 0;
   for (let x = 0; x < W; x++) {
-    let c: string;
-    const tree = 8 + Math.round(Math.sin(x * 0.7) * 0.6 + Math.sin(x * 0.23) * 0.8);
-    const sun = Math.hypot(x - 37, (y - 6.5) * 1.1);
-    if (y < 9) {
-      c = y < 5 ? mix('#2A1D2F', '#5B4878', y / 5) : mix('#6E5A91', '#B0607F', (y - 5) / 4);
-      if (sun < 2.6) c = sun < 1.6 ? '#F4E3BC' : '#E2C17E';
-      if (y < 4 && rnd(x, y) > 0.94) c = '#C6B0EA';
-      if (y >= tree) c = '#1A1220';
-    } else if (y < 11) {
-      c = (x + y) % 5 === 0 ? '#2F7A7A' : '#246A6C';
-      if (Math.abs(x - 37) < 2 && rnd(x, y) > 0.35) c = '#EBA8C4';
-    } else if (y < 13) {
-      c = rnd(x, y) > 0.8 ? '#5E8A72' : '#4E7A63';
-    } else if (y === 13) {
-      c = rnd(x, y) > 0.85 ? '#C9AE78' : '#9A7637';
-    } else {
-      c = rnd(x, y) > 0.75 ? '#456B57' : '#3A5C4A';
-    }
-    cells.push({ x, y, c });
+    const [r, g, b] = hex(color(x, y));
+    const o = y * (1 + W * 3) + 1 + x * 3;
+    raw[o] = r;
+    raw[o + 1] = g;
+    raw[o + 2] = b;
   }
 }
+const crcTable = Array.from({ length: 256 }, (_, n) => {
+  let c = n;
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+  return c >>> 0;
+});
+const crc = (buf: Buffer) => {
+  let c = 0xffffffff;
+  for (const v of buf) c = crcTable[(c ^ v) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+};
+const chunk = (type: string, data: Buffer) => {
+  const len = Buffer.alloc(4);
+  len.writeUInt32BE(data.length);
+  const td = Buffer.concat([Buffer.from(type), data]);
+  const c = Buffer.alloc(4);
+  c.writeUInt32BE(crc(td));
+  return Buffer.concat([len, td, c]);
+};
+const ihdr = Buffer.alloc(13);
+ihdr.writeUInt32BE(W, 0);
+ihdr.writeUInt32BE(H, 4);
+ihdr.writeUInt8(8, 8); // bit depth
+ihdr.writeUInt8(2, 9); // RGB
+const png = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0))]);
+const src = `data:image/png;base64,${png.toString('base64')}`;
+
+// The LED edges: every column and row line in one path.
+let grid = '';
+for (let x = 0; x <= W; x++) grid += `M${x} 0V${H}`;
+for (let y = 0; y <= H; y++) grid += `M0 ${y}H${W}`;
 ---
 
-<svg class="px" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMaxYMax slice" shape-rendering="crispEdges" aria-hidden="true" focusable="false">
-  {cells.map((p) => <rect x={p.x} y={p.y} width="1" height="1" fill={p.c} />)}
+<svg class="px" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMaxYMax slice" aria-hidden="true" focusable="false">
+  <image href={src} x="0" y="0" width={W} height={H} preserveAspectRatio="none" class="px__img" />
+  <path d={grid} class="px__grid" />
 </svg>
 
 <style>
@@ -55,15 +101,21 @@ for (let y = 0; y < H; y++) {
     display: block;
     width: 100%;
     /* Full width at its own 3:1 shape on wide screens; on narrow ones it keeps a usable height and
-       crops from the left, so the sun at column 37 stays in view. */
+       crops from the left, so the sun near column 74 of 96 stays in view. */
     height: max(100vw / 3, 16rem);
     pointer-events: none;
   }
 
-  /* A 1px stroke on the shared edge puts 0.5px of darker edge inside each cell, so each reads as an LED. */
-  .px rect {
+  .px__img {
+    image-rendering: pixelated;
+  }
+
+  /* A 1px line on every shared edge, so each cell reads as an LED. */
+  .px__grid {
+    fill: none;
     stroke: rgb(0 0 0 / 0.18);
     stroke-width: 1px;
     vector-effect: non-scaling-stroke;
+    shape-rendering: crispEdges;
   }
 </style>

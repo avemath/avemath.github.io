@@ -605,3 +605,16 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 - Arriving at a #section re-lands on it after fonts and the page load, so a late shift above it can't leave you mid-page.
 - Screenshots at 1440, 1920, 2560 and 3440 by 1440, light and dark, of home, About, Research, Signals and RAMpage: `docs/specimen/large/` (WebP, the first four screens of each page; kept locally, not in the repo).
 - Tests: the layout checks and the label checks now also run at 1920 and 2560.
+
+## Polish, round 2 (November 8, 2026)
+
+- **Home About** is a feature band: a portrait of about 360px at 1440, a section-size heading, the large body size and more room around it.
+- **V2V Step through**: the constellation sits in a fixed square box and the caption follows it in normal flow, so no step's caption covers the drawing (tested at 390, 1440 and 2560).
+- **Signals** on home is a big figure card like RAMpage and V2V: the live mesh (compact, runs only on screen) with Send a packet and a link to the full playground, the hop pattern as its own view, the drawing and the code. The still and the reduced-motion fallback stay.
+- **Client tools** (PLV Abstract Builder, Little Explorer Swim) are large panels on /work/ whose flows play when scrolled to and on hover or focus (`src/components/ToolPanel.astro`). PLV shows the real run sheet screenshot; there is no Little Explorer Swim screenshot in the repo, so that panel shows the flow only.
+- **Research**: Why sound is a race (Send, a real-time clock, the 1500 m/s field note large); R1's messages move quickly on radio links and slowly on acoustic ones; R2's arrivals show each one's path on a sketch from the BELLHOP surface and bottom bounce counts (hover, tap or arrow keys); the pool alarm is a moving concept drawing labeled "not results"; field notes are bigger and decode out of bits, tap to replay.
+- **About**: the pixel levee is 96 by 32; the graduation print is the same outer size as the other prints; new captions.
+- **Below the surface** still re-rendered without jellyfish (`nojellies`).
+- **Marquee and status strip** were too big on laptops (the 1.5 times size stacked on the large-screen scaling). The marquee is now 18px (1.2 times the original 15px) up to 1920 wide, in px so the root scaling does not stack, rising gently to 21px at 2560; the band follows the text. The status values are body large (19px at 1440), the labels as they were, with less padding. Checked at 1366, 1440, 1536, 1920 and 2560 against the screenshots from before this round.
+- **Toolbox**: the record crate is replaced by "Tune in", an old radio on the deep band (`src/components/Toolbox.astro`, `src/scripts/toolbox.ts`, data in `src/lib/skills.ts`): stations on a dial, drag and snap, arrow keys, Previous and Next, a scope from static to a clean signal, the locked skill's projects and files, and the same project filter. Concepts: `docs/mockups/skills-concepts.html`.
+- **Tests**: the radio (drag, snap, keys, buttons, filter, phone swipe and no sideways scroll, reduced motion), the Signals card, the V2V caption at three widths, the race, the R2 arrivals, the field notes and the tool panels, in `scripts/check-interactions.mjs`. The crate tests are gone.

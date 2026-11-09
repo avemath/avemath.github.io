@@ -1,32 +1,42 @@
-// Field notes: each value starts masked and decodes as it scrolls into view; a tap replays it.
-// With reduced motion every value is simply shown. The real value is always in the DOM for
-// screen readers (an sr-only copy), and the masked glyphs are hidden from them.
-import { decode, mask } from './decode';
+// Field notes: each note starts as bits and decodes into text as it scrolls into view, the value
+// first and then the line under it; a tap replays it. With reduced motion every note is simply
+// shown. The real text is always in the DOM for screen readers (sr-only copies), and the bits are
+// hidden from them.
+import { BITS, decode, mask } from './decode';
 import { prefersReducedMotion } from './preferences';
 
 const cards = [...document.querySelectorAll<HTMLButtonElement>('[data-note]')];
 const valueOf = (card: HTMLButtonElement) => card.querySelector<HTMLElement>('[data-note-value]')!;
 const textOf = (card: HTMLButtonElement) => valueOf(card).dataset.text ?? '';
+const detailOf = (card: HTMLButtonElement) => card.querySelector<HTMLElement>('[data-note-detail]');
 
 function reveal(card: HTMLButtonElement) {
   delete card.dataset.masked;
-  decode(valueOf(card), textOf(card), 800);
+  decode(valueOf(card), textOf(card), 900, BITS);
+  const d = detailOf(card);
+  if (d) decode(d, d.dataset.text ?? '', 1400, BITS);
 }
 
 function showAll() {
   cards.forEach((card) => {
     delete card.dataset.masked;
     valueOf(card).textContent = textOf(card);
+    const d = detailOf(card);
+    if (d) d.textContent = d.dataset.text ?? '';
   });
+}
+
+function maskCard(card: HTMLButtonElement) {
+  card.dataset.masked = '';
+  valueOf(card).textContent = mask(textOf(card), BITS);
+  const d = detailOf(card);
+  if (d) d.textContent = mask(d.dataset.text ?? '', BITS);
 }
 
 // Cards start masked and decode as they scroll into view, staggered left to right across a
 // row. With reduced motion every fact is simply shown.
 if (!prefersReducedMotion() && 'IntersectionObserver' in window) {
-  cards.forEach((card) => {
-    card.dataset.masked = '';
-    valueOf(card).textContent = mask(textOf(card));
-  });
+  cards.forEach(maskCard);
   const io = new IntersectionObserver(
     (entries) => {
       // The entries carry their rectangles, so grouping into rows reads no layout of its own.
@@ -54,7 +64,7 @@ if (!prefersReducedMotion() && 'IntersectionObserver' in window) {
 // A tap decodes a card early, or replays the effect.
 cards.forEach((card) =>
   card.addEventListener('click', () => {
-    if (card.dataset.masked === undefined && !prefersReducedMotion()) valueOf(card).textContent = mask(textOf(card));
+    if (card.dataset.masked === undefined && !prefersReducedMotion()) maskCard(card);
     reveal(card);
   }),
 );

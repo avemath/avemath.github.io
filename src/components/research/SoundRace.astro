@@ -1,0 +1,203 @@
+---
+// Why sound, as a race. Press Send: a radio pulse and a sound pulse leave a transmitter at the
+// left of a 1.5 km stretch of water. The radio pulse fades out within a few meters (seawater
+// soaks up radio), while the sound front crawls across at about 1500 m/s, reaches the far side in
+// 1 s and the answer comes back by 2 s; the clock counts in real time. With reduced motion it
+// shows the finished race at once.
+---
+
+<figure class="race" data-race>
+  <div class="race__bar">
+    <button type="button" class="btn btn--primary btn--small" data-race-send>Send</button>
+    <p class="race__clock mono" aria-hidden="true"><span data-race-clock>0.00</span> s</p>
+    <p class="sr-only" aria-live="polite" data-race-live></p>
+  </div>
+  <svg viewBox="0 -8 640 238" class="race__svg" role="img" aria-label="A 1.5 kilometer stretch of water between a transmitter on the left and a receiver on the right. Press Send: the radio pulse fades within a few meters, while the sound pulse takes one second to cross and the answer is back after two seconds.">
+    <defs>
+      <linearGradient id="race-water" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="var(--teal)" stop-opacity="0.18" />
+        <stop offset="1" stop-color="var(--teal)" stop-opacity="0.05" />
+      </linearGradient>
+      <clipPath id="race-clip"><rect x="0" y="40" width="640" height="150" /></clipPath>
+    </defs>
+    <rect class="race__water" x="0" y="40" width="640" height="150" />
+    <path class="race__surface" d="M0 40h640" />
+    <g clip-path="url(#race-clip)">
+      <circle class="race__radio" cx="48" cy="115" r="0" data-race-radio />
+      <path class="race__sound" d="" data-race-sound />
+      <path class="race__sound race__sound--back" d="" data-race-back />
+    </g>
+    <rect class="race__tx" x="36" y="103" width="24" height="24" />
+    <rect class="race__rx" x="580" y="103" width="24" height="24" />
+    <text class="race__t race__t--tx" x="48" y="214" text-anchor="middle">transmitter</text>
+    <text class="race__t race__t--rx" x="592" y="214" text-anchor="middle">receiver</text>
+    <path class="race__dim" d="M48 26h544M48 20v12M592 20v12" />
+    <text class="race__t" x="320" y="18" text-anchor="middle">1.5 km of seawater</text>
+    <text class="race__note race__note--radio" x="70" y="80" data-race-radio-note>radio: gone within a few meters</text>
+    <text class="race__note race__note--sound" x="320" y="176" text-anchor="middle" data-race-sound-note>sound: about 1500 m/s</text>
+  </svg>
+  <figcaption class="rfig__cap mono">Press Send. 1.5 km takes sound a second each way, so a question and its answer take 2 s.</figcaption>
+</figure>
+
+<style>
+  .race {
+    margin: 0;
+  }
+
+  .race__bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0.75rem 0;
+  }
+
+  .race__clock {
+    margin-left: auto;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .race__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .race__water {
+    fill: url(#race-water);
+  }
+
+  .race__surface {
+    stroke: var(--line-strong);
+    stroke-width: 1.5;
+  }
+
+  .race__tx,
+  .race__rx {
+    fill: var(--surface);
+    stroke: var(--text);
+    stroke-width: 1.5;
+  }
+
+  .race__radio {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3;
+  }
+
+  .race__sound {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .race__sound--back {
+    stroke: var(--teal);
+  }
+
+  .race__dim {
+    stroke: var(--muted);
+    stroke-width: 1;
+  }
+
+  .race__t {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    fill: var(--muted);
+  }
+
+  .race__note {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .race__note--radio {
+    fill: var(--gold-ink);
+  }
+
+  .race__note--sound {
+    fill: var(--accent-ink);
+  }
+
+  .race[data-ran] .race__note {
+    opacity: 1;
+  }
+
+  /* On a phone the drawing is narrow, so its words are drawn larger. */
+  @media (max-width: 599px) {
+    .race__t,
+    .race__note {
+      font-size: 24px;
+    }
+
+    /* At this size the end labels would run off the drawing, so they line up with its edges. */
+    .race__t--tx {
+      text-anchor: start;
+      translate: -40px 0;
+    }
+
+    .race__t--rx {
+      text-anchor: end;
+      translate: 40px 0;
+    }
+  }
+</style>
+
+<script>
+  import { prefersReducedMotion } from '../../scripts/preferences';
+
+  // The race in real time: 1 s across, 1 s back. The radio ring grows a few pixels and fades in the
+  // first quarter second, which on this scale is a few meters of water.
+  document.querySelectorAll<HTMLElement>('[data-race]').forEach((fig) => {
+    const $ = <T extends Element>(s: string) => fig.querySelector<T>(s)!;
+    const clock = $<HTMLElement>('[data-race-clock]');
+    const live = $<HTMLElement>('[data-race-live]');
+    const radio = $<SVGCircleElement>('[data-race-radio]');
+    const sound = $<SVGPathElement>('[data-race-sound]');
+    const back = $<SVGPathElement>('[data-race-back]');
+    const X0 = 48;
+    const X1 = 592;
+    const Y = 115;
+    // A wavefront: an arc of radius r around a point, inside the water.
+    const arc = (cx: number, r: number, dir: 1 | -1) => (r <= 0 ? '' : `M${cx + dir * Math.cos(1.2) * r} ${Y - Math.sin(1.2) * r}A${r} ${r} 0 0 ${dir > 0 ? 1 : 0} ${cx + dir * Math.cos(1.2) * r} ${Y + Math.sin(1.2) * r}`);
+    let raf = 0;
+    const draw = (t: number) => {
+      // Radio: a ring of up to 14 px (a few meters at this scale) that is gone by 0.25 s.
+      const rt = Math.min(1, t / 0.25);
+      radio.setAttribute('r', String(4 + rt * 10));
+      radio.style.opacity = String(1 - rt);
+      // Sound: out to the receiver by 1 s, the answer back by 2 s.
+      const out = Math.min(1, t);
+      const ret = Math.max(0, Math.min(1, t - 1));
+      sound.setAttribute('d', t < 1.02 ? arc(X0, out * (X1 - X0), 1) : '');
+      // The answer's front stays where it arrived, at the transmitter, once the round trip is done.
+      back.setAttribute('d', t >= 1 ? arc(X1, ret * (X1 - X0), -1) : '');
+      clock.textContent = Math.min(2, t).toFixed(2);
+    };
+    const send = () => {
+      cancelAnimationFrame(raf);
+      fig.setAttribute('data-ran', '');
+      live.textContent = '';
+      if (prefersReducedMotion()) {
+        draw(0.25);
+        back.setAttribute('d', arc(X1, X1 - X0, -1));
+        clock.textContent = '2.00';
+        live.textContent = 'The radio pulse is gone within a few meters. The sound pulse takes 1 second across and the answer is back after 2.00 seconds.';
+        return;
+      }
+      const t0 = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(2, (now - t0) / 1000);
+        draw(t);
+        if (t < 2) raf = requestAnimationFrame(tick);
+        else live.textContent = 'Round trip: 2.00 seconds. The radio pulse never got past the first few meters.';
+      };
+      raf = requestAnimationFrame(tick);
+    };
+    $<HTMLButtonElement>('[data-race-send]').addEventListener('click', send);
+  });
+</script>

@@ -64,11 +64,11 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
     args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
   });
   await mkdir('src/assets/research', { recursive: true });
-  // The deep still leaves the light shafts out and looks from among the jellyfish, not under them,
-  // so no long lines cross the home page's band.
+  // The deep still leaves the light shafts and the jellyfish out, so no outlines cross the home
+  // page's band: only the terraces, their glowing contours and the formations.
   for (const [query, file] of [
     ['depth=0', 'seafloor-shallow.jpg'],
-    ['depth=0.6&pitch=-0.12&noshafts', 'seafloor-still.jpg'],
+    ['depth=0.6&pitch=-0.12&noshafts&nojellies', 'seafloor-still.jpg'],
   ]) {
     const page = await gl.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
     await page.route(...localOnly(base));

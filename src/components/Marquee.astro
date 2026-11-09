@@ -45,10 +45,12 @@ const items = [
   }
 
   /* Light ink on the deep band, in mono like the plate labels. */
+  /* About 1.2 times the original 15px: 18px up to 1920 wide, in px so the large-screen root
+     scaling does not stack on top, then a gentle rise to 21px at 2560. The band follows the text. */
   .mq__list li {
-    padding: 1.05rem 2.1rem;
+    padding: 0.7em 1.4em;
     font-family: var(--font-mono);
-    font-size: 1.40625rem;
+    font-size: clamp(18px, calc(18px + (100vw - 1920px) * 0.0047), 21px);
     font-weight: 500;
     letter-spacing: 0.02em;
     white-space: nowrap;
@@ -56,7 +58,7 @@ const items = [
 
   .mq__list li::after {
     content: '·';
-    margin-left: 4.2rem;
+    margin-left: 2.8em;
     color: var(--deep-accent);
   }
 

@@ -5,6 +5,7 @@ import pico from '../../vendor/rampage/pico_direct.py?raw';
 import ofdmRx from './ofdm-rx.ts?raw';
 import v2vTxrx from '../../vendor/v2v/V2V_TXRXf.m?raw';
 import ledFw from './led-firmware.ts?raw';
+import fhbfsk from './fhbfsk.ts?raw';
 import type { Lang } from './excerpt';
 
 export const codeFiles: Record<string, { source: string; lang: Lang }> = {
@@ -12,4 +13,5 @@ export const codeFiles: Record<string, { source: string; lang: Lang }> = {
   'ofdm-rx': { source: ofdmRx, lang: 'ts' },
   'v2v-txrx': { source: v2vTxrx, lang: 'matlab' },
   'led-firmware': { source: ledFw, lang: 'ts' },
+  fhbfsk: { source: fhbfsk, lang: 'ts' },
 };
