@@ -216,6 +216,14 @@ const flowLabel =
     fill: var(--accent-ink);
   }
 
+  /* Below 480px the drawing is too small for its words to stay readable (they would be under
+     12px), so the flow shows as shapes only; the figure's alt text says what each part is. */
+  @media (max-width: 479px) {
+    .flow text {
+      display: none;
+    }
+  }
+
   /* ---- The flow plays when [data-play] is set (in view, hover or focus). ---- */
   @media (prefers-reduced-motion: no-preference) {
     :global(html:not([data-motion='reduce'])) .tool:not([data-played]) :is(.f-doc, .f-row, .f-page, .f-field .f-fill, .f-new, .f-report, .f-pdf) {
