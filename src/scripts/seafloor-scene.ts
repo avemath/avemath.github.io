@@ -33,6 +33,10 @@ export interface SeafloorOptions {
   depth?: number;
   /** Fraction of the device pixel ratio to render at (phones use less). */
   scale?: number;
+  /** Leave the light shafts out (the home page's still of the deep). */
+  noShafts?: boolean;
+  /** Pitch for a still frame, radians. */
+  pitch?: number;
 }
 
 export function mountSeafloorScene(host: HTMLElement, opts: SeafloorOptions = {}) {
@@ -295,7 +299,7 @@ export function mountSeafloorScene(host: HTMLElement, opts: SeafloorOptions = {}
   };
 
   // ---- Camera: on the way down. Depth comes from the page; yaw and pitch from dragging.
-  const cam = { yaw: 0, pitch: -0.22, depth: opts.depth ?? 0 };
+  const cam = { yaw: 0, pitch: opts.pitch ?? -0.22, depth: opts.depth ?? 0 };
   const clampPitch = (p: number) => Math.max(-1.3, Math.min(1.25, p));
   const look = new THREE.Vector3();
   const aim = () => {
@@ -318,7 +322,7 @@ export function mountSeafloorScene(host: HTMLElement, opts: SeafloorOptions = {}
     uni.uCausticAmt.value = SHALLOW.causticAmt + (DEEP.causticAmt - SHALLOW.causticAmt) * t;
     uni.uFogD.value = SHALLOW.fog + (DEEP.fog - SHALLOW.fog) * t;
     shaftMat.opacity = 0.05 * (1 - t) ** 1.6;
-    shafts.visible = shaftMat.opacity > 0.003;
+    shafts.visible = !opts.noShafts && shaftMat.opacity > 0.003;
     (plankton.material as THREE.PointsMaterial).opacity = 0.35 + 0.55 * t;
   };
 

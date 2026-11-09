@@ -57,20 +57,22 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 // ---- The seafloor stills ----
 // The live scene renders one fixed frame (`/research/?still&depth=...`) in a WebGL-capable Chromium.
 // The shallows (depth 0) sit at the top of /research/ before the scene loads, and instead of it with
-// reduced motion or no WebGL; the deep (depth 0.85) is the home page's Research teaser.
+// reduced motion or no WebGL; the deep (depth 0.6, no light shafts) is the home page's Research teaser.
 {
   const gl = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
     args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
   });
   await mkdir('src/assets/research', { recursive: true });
-  for (const [depth, file] of [
-    [0, 'seafloor-shallow.jpg'],
-    [0.85, 'seafloor-still.jpg'],
+  // The deep still leaves the light shafts out and looks from among the jellyfish, not under them,
+  // so no long lines cross the home page's band.
+  for (const [query, file] of [
+    ['depth=0', 'seafloor-shallow.jpg'],
+    ['depth=0.6&pitch=-0.12&noshafts', 'seafloor-still.jpg'],
   ]) {
     const page = await gl.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
     await page.route(...localOnly(base));
-    await page.goto(`${base}/research/?still&depth=${depth}`, { waitUntil: 'networkidle' });
+    await page.goto(`${base}/research/?still&${query}`, { waitUntil: 'networkidle' });
     await page.waitForSelector('[data-seafloor][data-ready="still"]', { timeout: 60000 });
     await page.waitForTimeout(1000);
     // Read the frame from the canvas itself: an element screenshot can miss a WebGL layer.

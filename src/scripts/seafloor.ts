@@ -37,7 +37,9 @@ export function mountSeafloor(host: HTMLElement) {
   if (params.has('still')) {
     host.dataset.mode = 'still';
     const depth = Number(params.get('depth') ?? 0);
-    import('./seafloor-scene').then(({ mountSeafloorScene }) => mountSeafloorScene(host, { still: true, depth }));
+    const pitch = params.has('pitch') ? Number(params.get('pitch')) : undefined;
+    const noShafts = params.has('noshafts');
+    import('./seafloor-scene').then(({ mountSeafloorScene }) => mountSeafloorScene(host, { still: true, depth, pitch, noShafts }));
     return;
   }
   if (!hasWebGL()) return;

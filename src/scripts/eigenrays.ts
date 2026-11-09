@@ -81,7 +81,7 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
 
   let ink: Record<string, string> = {};
   const readInks = () => {
-    ink = Object.fromEntries(['--sheet', '--muted', '--rule', '--gold', '--teal', '--lilac', '--rose'].map((n) => [n, token(n)]));
+    ink = Object.fromEntries(['--surface', '--muted', '--rule', '--gold', '--teal', '--lilac', '--rose'].map((n) => [n, token(n)]));
     ink.dark = token('--bit-glow') === '1' ? '1' : '';
   };
 
@@ -104,7 +104,7 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
-    ctx.fillStyle = ink['--sheet'];
+    ctx.fillStyle = ink['--surface'];
     ctx.fillRect(0, 0, W, H);
     const mu = ink['--muted'];
     const ru = ink['--rule'];

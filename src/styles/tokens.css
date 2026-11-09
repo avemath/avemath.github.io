@@ -20,7 +20,7 @@
    - Deep band: deep-ink 13.0:1, deep-accent 8.8:1, deep-muted 6.7:1.
    - The figure inks (*-ink) are 4.9:1 or better on light paper.
    - rule is a hairline (decoration only); --line-strong (3.1:1 light,
-     3.3:1 dark) is for borders that mark a control.
+     3.2:1 dark, also on cards) is for borders that mark a control.
    ------------------------------------------------------------------ */
 :root {
   --paper: #eef2ec;
@@ -138,7 +138,7 @@
   --sheet: #13201b;
   --ink: #e6efea;
   --muted: #9db0a6;
-  --rule: #2a3b34;
+  --rule: #2c4038;
   --green: #7fd6a8;
   --green-strong: #7fd6a8;
   --lilac: #c6b0ea;
@@ -157,8 +157,12 @@
   --bit: #5cf2a6;
   --bit-glow: 1;
 
-  --line-strong: #5f7369;
+  --line-strong: #687c72;
   --focus: var(--green);
+  /* Cards, plates and figure panes: a lighter dark than the page (#0c1512) and the sheet sections
+     (#13201b), with a #2c4038 border. */
+  --surface: #1a2a24;
+  --fig-tint: #1a2a24;
   /* On dark grounds a shadow does not read, so paper gets a faint light ring instead. */
   --shadow: 0 0 0 1px rgb(230 239 234 / 0.05);
   --shadow-lift: 0 0 0 1px rgb(230 239 234 / 0.14);

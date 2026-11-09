@@ -11,11 +11,12 @@ Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme=
 | Token | Light | Dark | Use |
 |---|---|---|---|
 | `--paper` | `#eef2ec` | `#0c1512` | page ground (`--bg`) |
-| `--sheet` | `#f8faf6` | `#13201b` | plates, sheet sections (`--surface`) |
+| `--sheet` | `#f8faf6` | `#13201b` | sheet sections |
+| `--surface`, `--fig-tint` | `#f8faf6` | `#1a2a24` | cards, plates, figure panes: in dark mode a lighter dark than the page and the sheet sections |
 | `--ink` | `#1c2823` | `#e6efea` | text (`--text`): 13.5:1 and 15.8:1 on paper |
 | `--muted` | `#586660` | `#9db0a6` | labels, meta: 5.3:1 (5.7:1 on sheet) and 8.1:1 (7.4:1 on sheet) |
-| `--rule` | `#cbd6ce` | `#2a3b34` | hairlines (`--line`), decoration only |
-| `--line-strong` | `#7e8c84` | `#5f7369` | borders that mark a control, 3.1:1 and 3.3:1 |
+| `--rule` | `#cbd6ce` | `#2c4038` | hairlines and card borders (`--line`), decoration only |
+| `--line-strong` | `#7e8c84` | `#687c72` | borders that mark a control: 3.1:1 light, 3.4:1 on dark cards |
 | `--green` (`--accent`) | `#2e7d5b` | `#7fd6a8` | the accent: fills, strokes, large type; 4.4:1 light, so not for small text |
 | `--green-strong` (`--accent-ink`, `--accent-strong`, `--focus`) | `#1f5e44` | `#7fd6a8` | links, small accent text, focus rings: 6.8:1 on paper, 7.3:1 on sheet; paper text on it is 6.8:1 |
 | `--deep`, `--deep-ink`, `--deep-muted`, `--deep-accent` | `#0e2a22`, `#e6efea`, `#9db0a6`, `#7fd6a8` | same | the deep band (footer, marquee, Research teaser): 13.0:1, 6.7:1, 8.8:1 |
@@ -28,7 +29,7 @@ Green is the accent for links, buttons, headings and focus; purple is no longer 
 
 ### Surfaces
 
-Sections alternate paper, sheet and the deep band (`.band-paper`, `.band-sheet`, `.band-deep` in `global.css`) so no two neighbors share a background; the footer is always deep. `.band-deep` re-points the role tokens, so anything inside reads light on deep green. Plates on sheet sections get `--plate-shadow`. The home hero has a faint contour texture (`.topo`, `public/topo.svg` from `scripts/gen-topo.mjs`, about 6%), and the Research teaser draws the same lines glowing over a still of the seafloor.
+Sections alternate paper, sheet and the deep band (`.band-paper`, `.band-sheet`, `.band-deep` in `global.css`) so no two neighbors share a background; the footer is always deep. `.band-deep` re-points the role tokens, so anything inside reads light on deep green. Plates on sheet sections get `--plate-shadow`. Every paper and sheet section and the home hero carry the faint contour texture (`public/topo.svg` from `scripts/gen-topo.mjs`, about 5%, tiled at one scale); with a fine pointer a soft glow brightens the lines under the cursor (`src/scripts/texture.ts`), and in dark mode a few plankton drift through the hero and the deep bands. The glow and the plankton are off with reduced motion. The Research teaser draws the same lines glowing over a still of the seafloor. Research panels are a muted, translucent surface (`#e8efea` at 90%, `#16241f` at 88%) with the water blurred behind; inside them muted text is `#4a5751` in light mode so it keeps 5.2:1 over the darkest water.
 
 ## Type
 

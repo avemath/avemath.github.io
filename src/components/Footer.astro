@@ -25,11 +25,13 @@ try {
 ---
 
 <footer id="contact" class:list={['site-footer band-deep no-print', variant === 'research' && 'site-footer--deep', variant === 'links' && 'site-footer--links']} {...perchAttrs}>
+  <span class="plankton" aria-hidden="true"></span>
   <div class="wrap foot">
     {
       variant === 'research' ? (
         <p class="foot__back">
-          <a class="btn" href="/">Back to the surface</a>
+          <a class="btn" href="#research-title" data-surface>Back to the surface</a>
+          <a class="foot__link" href="/">Home</a>
           <a class="foot__link" href="/#websites">Or see the websites</a>
         </p>
       ) : variant === 'links' ? null : (
@@ -241,3 +243,27 @@ try {
     background: var(--accent);
   }
 </style>
+
+<script>
+  // On /research/, "Back to the surface" scrolls smoothly to the top of the page, so the camera
+  // rises back through the water to the shallows; then the title takes focus. Without
+  // JavaScript it is a plain link to the title.
+  import { prefersReducedMotion } from '../scripts/preferences';
+  document.querySelectorAll<HTMLAnchorElement>('[data-surface]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const smooth = !prefersReducedMotion();
+      scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+      const title = document.getElementById('research-title');
+      if (!title) return;
+      title.tabIndex = -1;
+      const focus = () => title.focus({ preventScroll: true });
+      if (!smooth) focus();
+      else {
+        let tries = 0;
+        const done = () => (scrollY < 2 || ++tries > 40 ? focus() : setTimeout(done, 120));
+        done();
+      }
+    }),
+  );
+</script>

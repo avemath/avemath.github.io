@@ -9,7 +9,7 @@ import { prefersReducedMotion } from '../preferences';
 const CFO_HZ = 5000;
 const SNR_DB = 18;
 
-type Stage = { key: string; name: string; text: string; io: string };
+type Stage = { key: string; name: string; text: string; io: string; look: string };
 
 const OFF: Stages = { cfo: false, lin: false, pll: false, mmse: false };
 // What has been switched on by the end of each stage.
@@ -69,7 +69,7 @@ export function mountChain(root: HTMLElement) {
         rows.map(([f, a, b]) => `<tr><th scope="row">${f}</th><td>${a}</td><td>${a}</td><td>${b}</td><td>${b}</td></tr>`).join('') +
         `</tbody></table><p>gap ${GAP_M.toFixed(1)} m, closing ${c.closingRate.toFixed(0)} m/s, TTC ${c.ttc.toFixed(1)} s, under ${TTC_WARN.toFixed(1)} s</p>` +
         `<p class="cf__warn">${c.brakeWarn ? 'WARNING: Brake Recommended' : 'no warning'}</p>`;
-      cap.textContent = 'rx: decoded on the radios, the same in all five runs';
+      cap.textContent = `${stages[i].look} Decoded on the radios, the same in all five runs.`;
       return;
     }
     svg.style.display = '';
@@ -104,7 +104,7 @@ export function mountChain(root: HTMLElement) {
       };
       step(t0);
     }
-    cap.textContent = decided ? `${r.errors} of ${r.bits.length} decisions wrong, in green` : view === 'sync' ? 'preamble symbols after this stage' : 'data subcarriers after this stage';
+    cap.textContent = `${stages[i].look}${decided ? ` ${r.errors} of ${r.bits.length} decisions wrong, in green.` : ''}`;
   }
 
   function select(i: number) {
@@ -129,7 +129,21 @@ export function mountChain(root: HTMLElement) {
     b.addEventListener('mouseenter', () => select(i));
     b.addEventListener('focus', () => select(i));
   });
-  stepBtn?.addEventListener('click', () => select((current + 1) % stages.length));
+  // Step through the receiver: the first press always goes to stage 1, then each press to the next,
+  // back to stage 1 after the last. Picking a stage by hand, or leaving the Live view, starts the
+  // stepping over. The button only shows on the Live view, the one view where it works.
+  let stepping = false;
+  stepBtn?.addEventListener('click', () => {
+    const next = stepping ? (current + 1) % stages.length : 0;
+    select(next);
+    stepping = true;
+  });
+  buttons.forEach((b) => b.addEventListener('click', () => (stepping = false)));
+  card?.addEventListener('viewchange', (e) => {
+    const live = (e as CustomEvent).detail === 'live';
+    if (stepBtn) stepBtn.hidden = !live;
+    stepping = false;
+  });
 
   // The first constellation runs the receiver, so it waits until the figure is near the screen.
   const near = new IntersectionObserver(

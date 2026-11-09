@@ -76,7 +76,7 @@ const jsonLd = [
   <article class="case descent">
     <div class="case__zone case__zone--top">
     <header class="case__head">
-      <div class="wrap">
+      <div class="wrap wrap--case">
         <nav aria-label="Breadcrumb" class="crumbs no-print">
           <ol>
             <li><a href="/work/" class="link">Work</a></li>
@@ -183,7 +183,7 @@ const jsonLd = [
       </div>
     </header>
 
-    <div class="wrap">
+    <div class="wrap wrap--case">
       {
         d.metrics && !limited && (
           <dl class="case__metrics">
@@ -203,7 +203,7 @@ const jsonLd = [
     <div class="case__zone">
     <slot name="demo" />
 
-    <div class="wrap case__body">
+    <div class="case__body">
       {
         toc.length > 2 && (
           <aside class="case__toc no-print" aria-label="On this page">
@@ -220,7 +220,7 @@ const jsonLd = [
           </aside>
         )
       }
-      <div class="prose case__prose">
+      <div class="prose case__prose" data-fig-viewer={project.id === 'v2v-bsm-ofdm' ? '' : undefined}>
         <slot />
       </div>
     </div>
@@ -230,7 +230,7 @@ const jsonLd = [
     <div class="case__zone case__zone--end">
     {
       d.gallery && !limited && (
-        <section id="gallery" class="wrap case__gallery-wrap" aria-labelledby="gallery-title">
+        <section id="gallery" class="case__gallery-wrap" aria-labelledby="gallery-title">
           <h2 id="gallery-title" class="section-title section-title--sm">Gallery</h2>
           <div class="case__gallery">
             {d.gallery.map((g, i) => (
@@ -258,9 +258,9 @@ const jsonLd = [
 
     {
       // The first and last case studies already offer "All work" in the pager, so the link would repeat it.
-      prev && next && <p class="wrap case__all no-print"><a class="link" href="/work/"><Icon name="arrow-left" class="inline h-4 w-4" /> Back to all work</a></p>
+      prev && next && <p class="wrap wrap--case case__all no-print"><a class="link" href="/work/"><Icon name="arrow-left" class="inline h-4 w-4" /> Back to all work</a></p>
     }
-    <nav class="wrap case__pager no-print" aria-label="More projects">
+    <nav class="wrap wrap--case case__pager no-print" aria-label="More projects">
       {
         prev ? (
           <a class="pager card card--lift" href={projectHref(prev)}>
@@ -299,7 +299,7 @@ const jsonLd = [
       }
     </nav>
 
-    <section class="wrap pb-16 md:pb-24 no-print">
+    <section class="wrap wrap--case pb-16 md:pb-24 no-print">
       <div class="case__cta card">
         <div>
           <p class="font-display text-2xl font-medium tracking-tight">Want to talk about this project?</p>
@@ -512,19 +512,44 @@ const jsonLd = [
     letter-spacing: -0.03em;
   }
 
-  .case__body {
+  /* A fluid layout: the contents rail (about 220px) on the left, then a content column that grows
+     with the screen. Text stops at about 80 characters; figures, images and code break out wider,
+     up to about 1100px. Body type grows a little on large screens. The gallery uses the same
+     columns, so its photos line up with the figures above. */
+  .case__body,
+  .case__gallery-wrap {
+    --rail: 220px;
+    --rail-gap: clamp(2rem, 3vw, 3.5rem);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 3rem;
+    width: 100%;
+    max-width: calc(var(--rail) + var(--rail-gap) + 1100px + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .case__body {
     padding-block: clamp(3rem, 6vw, 5rem);
   }
 
-  /* The contents rail starts at the container's left edge, like the head, the gallery and the pager. */
-  @media (min-width: 1100px) {
+  .case__prose {
+    font-size: clamp(1.0625rem, 0.95rem + 0.28vw, 1.25rem);
+    line-height: 1.62;
+  }
+
+  .case__prose > :global(:is(figure, pre, table, .case__fig, video, .figure-wide)) {
+    max-width: 1100px;
+  }
+
+  @media (min-width: 1024px) {
     .case__body {
-      grid-template-columns: 14rem minmax(0, 44rem);
-      justify-content: start;
-      gap: 4rem;
+      grid-template-columns: var(--rail) minmax(0, 1fr);
+      gap: var(--rail-gap);
+    }
+
+    .case__gallery-wrap {
+      padding-left: calc(var(--gutter) + var(--rail) + var(--rail-gap));
     }
   }
 
@@ -532,7 +557,7 @@ const jsonLd = [
     display: none;
   }
 
-  @media (min-width: 1100px) {
+  @media (min-width: 1024px) {
     .case__toc {
       display: block;
       position: sticky;
@@ -586,8 +611,17 @@ const jsonLd = [
     border: 1px solid var(--line);
   }
 
+  /* An instant print shows at the text column's full width (it is portrait, so never taller than
+     most of the screen), with its own white border. */
   .case__prose :global(.case__fig--print) {
-    max-width: 17rem;
+    max-width: min(80ch, 100%);
+  }
+
+  .case__prose :global(.case__fig--print img) {
+    max-height: 92vh;
+    width: auto;
+    max-width: 100%;
+    margin-inline: auto;
   }
 
   .case__prose :global(.case__fig--print img) {
@@ -607,7 +641,7 @@ const jsonLd = [
   }
 
   .case__gallery {
-    max-width: 62rem;
+    max-width: 1100px;
   }
 
   /* Same size as the other section headings in the case study, on the gallery's own left edge. */
@@ -622,31 +656,11 @@ const jsonLd = [
     counter-reset: shot;
   }
 
-  @media (min-width: 720px) {
-    .case__gallery {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .shot:first-child {
-      grid-column: 1 / -1;
-    }
-
-    /* With a wide lead shot, an even count would leave the last shot alone: it runs wide too. */
-    .shot:nth-child(even):last-child {
-      grid-column: 1 / -1;
-    }
-
-  }
-
-  /* Four shots: the three details sit in one row under the lead, once each can be about 280px. */
-  @media (min-width: 1024px) {
-    .case__gallery:has(.shot:nth-child(4):last-child) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .case__gallery:has(.shot:nth-child(4):last-child) .shot:nth-child(4) {
-      grid-column: auto;
-    }
+  /* One shot per row, each at the gallery's full width: no small photos. A portrait photo is held
+     to most of the screen's height and centered. */
+  .shot__img :global(img) {
+    max-height: 88vh;
+    object-fit: contain;
   }
 
   /* Each shot spans two rows of the gallery grid (image, caption), so captions in a row line up
@@ -791,6 +805,8 @@ const jsonLd = [
 </style>
 
 <script>
+  import { mountFigureViewer } from '../scripts/figure-viewer';
+  document.querySelectorAll<HTMLElement>('[data-fig-viewer]').forEach(mountFigureViewer);
   // Highlight the table of contents entry for the section in view.
   const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
   if (links.length) {

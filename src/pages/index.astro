@@ -20,7 +20,6 @@ import LedChain from '@/components/drawings/LedChain.astro';
 import SignalsHop from '@/components/drawings/SignalsHop.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import Toolbox from '@/components/Toolbox.astro';
-import V2vConstellation from '@/components/plates/V2vConstellation.astro';
 import LedMatrix from '@/components/plates/LedMatrix.astro';
 import MeshStill from '@/components/plates/MeshStill.astro';
 import site from '@/data/site.json';
@@ -78,10 +77,6 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
       
         <FigureCard id="v2v" proj="/work/v2v-bsm-ofdm/" fig="III" kind="Receiver chain" flip eyebrow="EE 4003, with lab partner Jason Phan" title="V2V collision warning over OFDM">
           <ChainFig />
-          <div slot="plate" class="fc-plate">
-            <span class="plate fc-plate__frame"><V2vConstellation /></span>
-            <p class="fc-plate__note">The constellation is simulated BPSK at the SNR of the hardware runs, not measured data.</p>
-          </div>
           <V2vLink slot="drawing" />
           <V2vStagesHow slot="how" url={V2V_FILE} />
           <CodeFile

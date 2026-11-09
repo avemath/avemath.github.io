@@ -6,7 +6,7 @@
 // hardware runs sit under it as a table.
 import { v2vStages } from '@/lib/v2v-stages';
 
-const stages = v2vStages.map(({ key, name, text, io }) => ({ key, name, text, io }));
+const stages = v2vStages.map(({ key, name, text, io, look }) => ({ key, name, text, io, look }));
 const first = stages.findIndex((s) => s.key === 'pll');
 const runs = [
   { run: 1, dist: '6 in', obs: 'none', snr: '8.2 / 8.2' },

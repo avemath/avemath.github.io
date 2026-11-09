@@ -4,7 +4,13 @@
 //   signal-panel   the hero scope reads out where the mouse is; Hear it is a toggle button
 //   marquee        hovering the strip pauses it
 //   tabs           every figure card's tabs show their own view (home and the RAMpage case study)
-//   chain          hovering a V2V receiver stage selects it; Step through moves to the next stage
+//   chain          hovering a V2V receiver stage selects it; Step through always starts at stage 1,
+//                  then moves on, and only shows on the Live view
+//   figure-viewer  the V2V figures: Next and Previous, arrow keys, thumbnails, swipe, full screen,
+//                  captions, and the buttons in the text that jump to a figure
+//   crate          the Toolbox crate: the pointer, the arrow keys and a swipe flip through it; a press
+//                  or Enter pins a sleeve; reduced motion lays it out as a plain list
+//   surface        Back to the surface scrolls to the top of /research/; Home goes home
 //   matrix         the LED card's sources are toggle buttons; the name field takes a name
 //   hop-tabs       the hop pattern card's Live and Drawing tabs
 //   decode         headings below the first screen decode to their full text when scrolled to
@@ -38,6 +44,18 @@ const page = async (path, opts = {}) => {
   return p;
 };
 const only = process.env.ONLY?.split(',');
+/** Scroll an element to the middle of the screen and wait until lazily laid-out sections above it
+ *  have settled, so its box stops moving. */
+const settleOn = async (p, sel) => {
+  let y = null;
+  for (let k = 0; k < 8; k++) {
+    await p.locator(sel).evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await p.waitForTimeout(250);
+    const b = await p.locator(sel).boundingBox();
+    if (y !== null && Math.abs(b.y - y) < 1) return;
+    y = b.y;
+  }
+};
 const test = async (name, fn) => {
   if (only && !only.includes(name)) return;
   const before = problems;
@@ -139,8 +157,27 @@ await test('chain', async () => {
   if (n < 9) fail('chain', `only ${n} receiver stages`);
   await stages.nth(3).hover();
   if ((await stages.nth(3).getAttribute('aria-pressed')) !== 'true') fail('chain', 'hovering stage 4 does not select it');
-  await home.locator('#v2v [data-step]').click();
-  if ((await stages.nth(4).getAttribute('aria-pressed')) !== 'true') fail('chain', 'Step through does not move to the next stage');
+  const step = home.locator('#v2v [data-step]');
+  const pressedAt = () => stages.evaluateAll((b) => b.findIndex((x) => x.getAttribute('aria-pressed') === 'true'));
+  await step.click();
+  if ((await pressedAt()) !== 0) fail('chain', `the first Step through goes to stage ${(await pressedAt()) + 1}, not stage 1`);
+  await step.click();
+  if ((await pressedAt()) !== 1) fail('chain', 'the second Step through does not go to stage 2');
+  // On a view where it cannot work, the button is hidden; back on Live it starts at stage 1 again.
+  await home.locator('#v2v [role="tab"][data-view="drawing"]').click();
+  if (await step.isVisible()) fail('chain', 'Step through shows on the Drawing view');
+  await home.locator('#v2v [role="tab"][data-view="live"]').click();
+  if (!(await step.isVisible())) fail('chain', 'Step through is hidden on the Live view');
+  await stages.nth(6).click();
+  await step.click();
+  if ((await pressedAt()) !== 0) fail('chain', 'after picking a stage by hand, Step through does not start at stage 1');
+  // Every stage has a caption saying what it did.
+  for (let i = 0; i < n; i++) {
+    await stages.nth(i).click();
+    const cap = (await home.locator('#v2v [data-cf-cap]').textContent()).trim();
+    if (cap.length < 30) fail('chain', `stage ${i + 1} has no caption ("${cap}")`);
+  }
+  if (await home.locator('#v2v [role="tab"][data-view="plate"]').count()) fail('chain', 'the V2V card still has a Plate tab');
 });
 
 await test('matrix', async () => {
@@ -230,12 +267,15 @@ await test('rampage-hover', async () => {
 
 await test('toolbox', async () => {
   const url = home.url();
+  // Python: used on plates on the home page. Sleeves overlap, so press its uncovered left edge.
   const chip = home.locator('[data-tool]').first();
-  await chip.scrollIntoViewIfNeeded();
-  await chip.click();
+  await settleOn(home, '[data-crate]');
+  // (The crate test covers pressing with the pointer; this one presses with the keyboard.)
+  await chip.focus();
+  await home.keyboard.press('Space');
   if (home.url() !== url) fail('toolbox', 'pressing a chip navigated');
   if ((await chip.getAttribute('aria-pressed')) !== 'true') fail('toolbox', 'the chip is not pressed');
-  const name = (await chip.textContent()).trim();
+  const name = (await chip.locator('.sleeve__name').textContent()).trim();
   const line = (await home.locator('[data-tb-line]').textContent()).trim();
   if (!line.startsWith(`${name}: used in `) || !line.endsWith('.')) fail('toolbox', `the line says "${line}"`);
   if ((await home.locator('[data-tb-line]').getAttribute('aria-live')) !== 'polite') fail('toolbox', 'the line is not a polite live region');
@@ -246,15 +286,127 @@ await test('toolbox', async () => {
   await home.waitForTimeout(400);
   const op2 = await home.locator('[data-proj][data-dim]').first().evaluate((e) => getComputedStyle(e).opacity);
   if (Math.abs(Number(op2) - 0.35) > 0.01) fail('toolbox', `faded plates are at ${op2} (${op}), not 0.35`);
-  await chip.click();
+  await home.keyboard.press('Space');
   if ((await chip.getAttribute('aria-pressed')) !== 'false' || (await home.locator('[data-proj][data-dim]').count())) fail('toolbox', 'pressing the chip again does not clear the filter');
-  await chip.focus();
   await home.keyboard.press('Enter');
   if ((await chip.getAttribute('aria-pressed')) !== 'true') fail('toolbox', 'Enter does not press a chip');
   await home.keyboard.press('Escape');
   if ((await chip.getAttribute('aria-pressed')) !== 'false' || (await home.locator('[data-tb-line]').textContent()).trim()) fail('toolbox', 'Escape does not clear the filter');
 });
+await test('crate', async () => {
+  const sleeves = home.locator('[data-tool]');
+  const n = await sleeves.count();
+  const openAt = () => sleeves.evaluateAll((b) => b.findIndex((x) => x.hasAttribute('data-open')));
+  const shownUse = () => home.locator('[data-use]:not([hidden])').getAttribute('data-use');
+  await settleOn(home, '[data-crate]');
+  // The pointer flips: over each sleeve's visible edge, that sleeve opens and its card shows.
+  const first = await home.locator('.crate__slot').first().boundingBox();
+  const last = await home.locator('.crate__slot').last().boundingBox();
+  const span = last.x + last.width - first.x;
+  for (const i of [1, 4, n - 2]) {
+    await home.mouse.move(first.x + ((i + 0.5) / n) * span, first.y + first.height * 0.6, { steps: 4 });
+    await home.waitForTimeout(80);
+    if ((await openAt()) !== i) fail('crate', `the pointer over sleeve ${i + 1} opened sleeve ${(await openAt()) + 1}`);
+    if ((await shownUse()) !== (await sleeves.nth(i).getAttribute('data-tool'))) fail('crate', `sleeve ${i + 1}'s card does not show`);
+  }
+  // The card names the skill, its level and its projects with thumbnails.
+  const card = home.locator('[data-use]:not([hidden])');
+  if (!(await card.locator('.tb__lvl').textContent()).match(/Know well|Have built with/)) fail('crate', 'the card does not say Know well or Have built with');
+  if (!(await card.locator('a.tb__proj').count())) fail('crate', 'the card has no project links');
+  // Keyboard: arrows flip and move focus, Enter pins, Escape clears.
+  await sleeves.first().focus();
+  for (let k = 0; k < 3; k++) await home.keyboard.press('ArrowRight');
+  if ((await openAt()) !== 3) fail('crate', `three ArrowRight presses open sleeve ${(await openAt()) + 1}, not 4`);
+  if (!(await sleeves.nth(3).evaluate((e) => e === document.activeElement))) fail('crate', 'the arrow keys do not move focus with the open sleeve');
+  await home.keyboard.press('Enter');
+  if ((await sleeves.nth(3).getAttribute('aria-pressed')) !== 'true') fail('crate', 'Enter does not pin the sleeve');
+  if (!(await home.locator('[data-proj][data-dim]').count())) fail('crate', 'pinning does not apply the project filter');
+  await home.keyboard.press('Escape');
+  if ((await sleeves.nth(3).getAttribute('aria-pressed')) !== 'false') fail('crate', 'Escape does not clear the pin');
+  // Touch: a sideways swipe flips, a tap pins.
+  const t = await page('/', { w: 390, h: 844, touch: true });
+  await settleOn(t, '[data-crate]');
+  const row = await t.locator('[data-crate-row]').boundingBox();
+  const cdp = await t.context().newCDPSession(t);
+  const touch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] });
+  const y = row.y + row.height * 0.5;
+  await touch('touchStart', row.x + row.width - 30, y);
+  for (let k = 1; k <= 10; k++) await touch('touchMove', row.x + row.width - 30 - k * 22, y + 1);
+  await touch('touchEnd');
+  // The swipe began on the last sleeve and moved 220px left, so the open sleeve moved left with it.
+  const swiped = await t.locator('[data-tool]').evaluateAll((b) => b.findIndex((x) => x.hasAttribute('data-open')));
+  const nT = await t.locator('[data-tool]').count();
+  if (!(swiped >= 0 && swiped <= nT - 4)) fail('crate', `a swipe left from the last sleeve opened sleeve ${swiped + 1}`);
+  // A second touch right after the swipe, on the same spot, reads as a double tap; wait as a person would.
+  await t.waitForTimeout(700);
+  const lastBox = await t.locator('[data-tool]').last().boundingBox();
+  await t.touchscreen.tap(lastBox.x + lastBox.width - 10, lastBox.y + 24);
+  await t.waitForTimeout(200);
+  if ((await t.locator('[data-tool]').last().getAttribute('aria-pressed')) !== 'true') {
+    const st = await t.locator('[data-tool]').evaluateAll((b) => b.map((x) => (x.hasAttribute('data-open') ? 'O' : '') + (x.getAttribute('aria-pressed') === 'true' ? 'P' : '-')).join(','));
+    fail('crate', `a tap does not pin a sleeve (${st})`);
+  }
+  await t.close();
+  // Reduced motion: a plain list, no sleeve covering another.
+  const rm = await page('/', { reduce: true });
+  const boxes = await rm.locator('[data-tool]').evaluateAll((b) => b.map((x) => x.getBoundingClientRect().toJSON()));
+  const overlap = boxes.some((a, i) => boxes.some((b, j) => i < j && a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1));
+  if (overlap) fail('crate', 'with reduced motion the sleeves still overlap');
+  await rm.close();
+});
 await home.close();
+
+await test('figure-viewer', async () => {
+  const p = await page('/work/v2v-bsm-ofdm/');
+  const fv = p.locator('[data-fv]');
+  if (!(await fv.count())) return fail('figure-viewer', 'no figure viewer on the V2V case study');
+  const thumbs = fv.locator('.fv__thumb');
+  const n = await thumbs.count();
+  if (n < 10) fail('figure-viewer', `only ${n} figures in the viewer`);
+  if (await p.locator('.case__prose > p > img').count()) fail('figure-viewer', 'figures are still inline in the text');
+  const at = async () => Number(await fv.getAttribute('data-index'));
+  const cap = () => fv.locator('[data-fv-cap]').innerText();
+  await fv.scrollIntoViewIfNeeded();
+  const cap0 = await cap();
+  await fv.locator('[data-fv-next]').click();
+  if ((await at()) !== 1 || (await cap()) === cap0) fail('figure-viewer', 'Next does not show the second figure and its caption');
+  await fv.locator('[data-fv-prev]').click();
+  await fv.locator('[data-fv-prev]').click();
+  if ((await at()) !== n - 1) fail('figure-viewer', 'Previous from the first figure does not wrap to the last');
+  await fv.locator('[data-fv-next]').focus();
+  await p.keyboard.press('ArrowRight');
+  await p.keyboard.press('ArrowRight');
+  if ((await at()) !== 1) fail('figure-viewer', `the arrow keys land on figure ${(await at()) + 1}, not 2`);
+  await thumbs.nth(5).click();
+  if ((await at()) !== 5 || !(await thumbs.nth(5).getAttribute('aria-current') !== null)) fail('figure-viewer', 'a thumbnail does not select its figure');
+  // Full screen: the same figure, its caption, Next works there too, and Escape closes it.
+  const src = await fv.locator('[data-fv-img]').getAttribute('src');
+  await fv.locator('[data-fv-open]').click();
+  const dlg = fv.locator('[data-fv-dialog]');
+  if (!(await dlg.evaluate((d) => d.open))) fail('figure-viewer', 'clicking the figure does not open it full screen');
+  if ((await dlg.locator('[data-fv-full-img]').getAttribute('src')) !== src) fail('figure-viewer', 'full screen shows a different figure');
+  if (!(await dlg.locator('[data-fv-full-cap]').innerText()).trim()) fail('figure-viewer', 'full screen drops the caption');
+  await p.keyboard.press('Escape');
+  if (await dlg.evaluate((d) => d.open)) fail('figure-viewer', 'Escape does not close full screen');
+  // A button in the text jumps to its figure.
+  const jump = p.locator('.fv-jump button').nth(2);
+  await jump.click();
+  if ((await at()) !== 3) fail('figure-viewer', `the third jump button shows figure ${(await at()) + 1}, not 4`);
+  await p.close();
+  // Touch: a swipe moves to the next figure.
+  const t = await page('/work/v2v-bsm-ofdm/', { w: 390, h: 844, touch: true });
+  const stage = await t.locator('[data-fv] .fv__stage').boundingBox();
+  await t.locator('[data-fv]').scrollIntoViewIfNeeded();
+  const s2 = await t.locator('[data-fv] .fv__stage').boundingBox();
+  const cdp = await t.context().newCDPSession(t);
+  const touch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y }] });
+  const y = s2.y + s2.height / 2;
+  await touch('touchStart', s2.x + s2.width * 0.8, y);
+  for (let k = 1; k <= 6; k++) await touch('touchMove', s2.x + s2.width * 0.8 - k * 30, y + 2);
+  await touch('touchEnd');
+  if (Number(await t.locator('[data-fv]').getAttribute('data-index')) !== 1) fail('figure-viewer', `a swipe left lands on figure ${Number(await t.locator('[data-fv]').getAttribute('data-index')) + 1}, not 2 (${Math.round(stage?.width ?? 0)})`);
+  await t.close();
+});
 
 // ---- the Research scene ----
 await test('seafloor-drag', async () => {
@@ -312,11 +464,25 @@ await test('seafloor-drag', async () => {
     // Scrolling moves the camera down.
     const d0 = await p.evaluate(() => window.__seafloor.cam.depth);
     await p.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
-    await p.waitForTimeout(150);
+    // The scroll reaches the scene on its next frame; under load that can take a while.
+    await p.waitForFunction(() => window.__seafloor.cam.depth > 0.95, null, { timeout: 5000 }).catch(() => {});
     const d1 = await p.evaluate(() => window.__seafloor.cam.depth);
     if (!(d1 > d0 && d1 > 0.95)) fail('seafloor-drag', `${w}: scrolling to the bottom leaves the camera at depth ${d1}`);
     await p.close();
   }
+});
+
+await test('surface', async () => {
+  const p = await page('/research/', { reduce: true });
+  await p.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+  const home = p.locator('footer').getByRole('link', { name: 'Home', exact: true });
+  if ((await home.getAttribute('href')) !== '/') fail('surface', 'there is no Home link beside Back to the surface');
+  await p.locator('[data-surface]').click();
+  await p.waitForTimeout(400);
+  if ((await p.evaluate(() => scrollY)) > 2) fail('surface', 'Back to the surface does not return to the top of the page');
+  if (new URL(p.url()).pathname !== '/research/') fail('surface', 'Back to the surface left the Research page');
+  if (!(await p.evaluate(() => document.activeElement?.id === 'research-title'))) fail('surface', 'the title does not take focus at the top');
+  await p.close();
 });
 
 await test('seafloor-still', async () => {

@@ -128,6 +128,11 @@
   padding-inline: var(--gutter);
 }
 
+/* The case studies' wider container: the contents rail (220px), its gap and a 1100px content column. */
+.wrap--case {
+  max-width: calc(220px + clamp(2rem, 3vw, 3.5rem) + 1100px + 2 * var(--gutter));
+}
+
 .wrap-narrow {
   width: 100%;
   max-width: 46rem;
@@ -417,7 +422,7 @@
   position: relative;
   border: 1px solid var(--rule);
   border-radius: 0;
-  background: var(--sheet);
+  background: var(--surface);
   /* The plate's second hairline sits just outside the card (a ring of paper, then a ring of rule),
      so it never crosses a figure that runs to the card's edge. */
   box-shadow:
@@ -806,9 +811,9 @@
   margin-top: 1.15em;
 }
 
-/* Reading lines stay near 70 characters; figures and tables keep the whole column. */
-.prose > :is(p, ul, ol, blockquote, h2, h3):not(:has(> img)) {
-  max-width: 30em;
+/* Reading lines stay near 80 characters; figures, images, tables and code break out wider. */
+.prose > :is(p, ul, ol, blockquote, h2, h3, h4):not(:has(> img)) {
+  max-width: 80ch;
 }
 
 .prose h2 {
@@ -891,7 +896,7 @@
 .prose img {
   display: block;
   width: 100%;
-  max-width: 44rem;
+  max-width: 1100px;
   height: auto;
   border: 1px solid var(--line);
   background: #fff;
@@ -899,7 +904,7 @@
 
 .prose p:has(> img) + p {
   margin-top: 0.6rem;
-  max-width: 44rem;
+  max-width: 80ch;
   font-size: 0.9375rem;
 }
 
@@ -912,7 +917,7 @@
 
 .prose table {
   width: 100%;
-  max-width: 44rem;
+  max-width: 1100px;
   border-collapse: collapse;
   font-size: 0.95rem;
 }
@@ -1181,7 +1186,7 @@ html[data-motion='reduce'] *::after {
   margin: 0;
   padding: 14px;
   border: 1px solid var(--rule);
-  background: var(--sheet);
+  background: var(--surface);
 }
 
 .plate::before {
@@ -1305,20 +1310,318 @@ html[data-motion='reduce'] [data-proj] {
   color-scheme: dark;
 }
 
-/* The faint contour texture behind the home hero: stacked paper, about 6%. */
-.topo {
+/* ------------------------------------------------------------------
+   The texture, with a little life. Every plain section (paper or sheet) and the home hero carry
+   the faint contour lines (public/topo.svg, tiled at one scale so the lines match from section to
+   section). With a fine pointer and motion welcome, a soft glow follows the cursor and brightens
+   the lines under it (src/scripts/texture.ts sets --mx and --my). In dark mode a few plankton
+   drift through the hero and the deep bands. All of it is behind the content (z-index -1),
+   decorative, and transform or mask only, so it costs no layout.
+   ------------------------------------------------------------------ */
+.topo,
+.band-paper,
+.band-sheet {
   position: relative;
   isolation: isolate;
+  --mx: -999px;
+  --my: -999px;
 }
 
-.topo::before {
+.topo::before,
+.band-paper::before,
+.band-sheet::before,
+.topo::after,
+.band-paper::after,
+.band-sheet::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--ink);
-  -webkit-mask: url('/topo.svg') center / cover no-repeat;
-  mask: url('/topo.svg') center / cover no-repeat;
-  opacity: 0.06;
   pointer-events: none;
+}
+
+.topo::before,
+.band-paper::before,
+.band-sheet::before {
+  background: var(--ink);
+  -webkit-mask: url('/topo.svg') 0 0 / 1600px 900px repeat;
+  mask: url('/topo.svg') 0 0 / 1600px 900px repeat;
+  opacity: 0.045;
+}
+
+.topo::before {
+  opacity: 0.06;
+}
+
+/* The glow: the same lines in the accent, seen only through a soft circle at the cursor. */
+.topo::after,
+.band-paper::after,
+.band-sheet::after {
+  display: none;
+  background: var(--accent);
+  -webkit-mask:
+    url('/topo.svg') 0 0 / 1600px 900px repeat,
+    radial-gradient(circle 180px at var(--mx) var(--my), #000 0%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask:
+    url('/topo.svg') 0 0 / 1600px 900px repeat,
+    radial-gradient(circle 180px at var(--mx) var(--my), #000 0%, transparent 100%);
+  mask-composite: intersect;
+  opacity: 0.55;
+}
+
+html[data-glow] :is(.topo, .band-paper, .band-sheet)::after {
+  display: block;
+}
+
+[data-theme='dark'] :is(.topo, .band-paper, .band-sheet)::before {
+  opacity: 0.07;
+}
+
+[data-theme='dark'] :is(.topo, .band-paper, .band-sheet)::after {
+  opacity: 0.7;
+}
+
+/* Plankton, dark mode only: a few slow dots drifting up through the hero and the deep bands. */
+.plankton {
+  display: none;
+}
+
+[data-theme='dark'] .plankton {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+[data-theme='dark'] .plankton::before,
+[data-theme='dark'] .plankton::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 -60%;
+  background-image:
+    radial-gradient(circle, rgb(127 214 168 / 0.55) 0 1.2px, transparent 1.8px),
+    radial-gradient(circle, rgb(230 239 234 / 0.35) 0 1px, transparent 1.5px);
+  background-size:
+    260px 230px,
+    410px 370px;
+  background-position:
+    30px 40px,
+    180px 120px;
+  animation: plankton-drift 90s linear infinite;
+}
+
+[data-theme='dark'] .plankton::after {
+  background-size:
+    330px 300px,
+    520px 470px;
+  background-position:
+    120px 200px,
+    300px 20px;
+  opacity: 0.7;
+  animation-duration: 140s;
+}
+
+@keyframes plankton-drift {
+  to {
+    transform: translate3d(-40px, -38%, 0);
+  }
+}
+
+html[data-motion='reduce'] .plankton {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plankton {
+    display: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   The figure viewer (src/scripts/figure-viewer.ts): one plot at a
+   time, large, with Previous and Next, a thumbnail strip, and a
+   full-screen dialog.
+   ------------------------------------------------------------------ */
+.fv {
+  margin: 2.25rem 0;
+  max-width: 1100px;
+}
+
+.fv__stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  touch-action: pan-y;
+}
+
+.fv__open {
+  display: block;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: zoom-in;
+}
+
+.prose .fv img {
+  max-width: none;
+  border: 0;
+}
+
+.fv__open img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fv__open:focus-visible,
+.fv__nav:focus-visible,
+.fv__thumb:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.fv__nav {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fv__nav:hover {
+  border-color: var(--accent);
+}
+
+@media (max-width: 599px) {
+  .fv__stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fv__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%);
+  }
+
+  .fv__nav--prev {
+    left: 4px;
+  }
+
+  .fv__nav--next {
+    right: 4px;
+  }
+}
+
+.fv__cap {
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--text-soft);
+}
+
+.fv__count {
+  margin-right: 0.4rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.fv__hint {
+  margin-top: 0.4rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.fv__thumbs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  padding-bottom: 0.4rem;
+  overflow-x: auto;
+}
+
+.fv__thumb {
+  flex: none;
+  width: 104px;
+  padding: 0;
+  border: 2px solid transparent;
+  background: #fff;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.fv__thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fv__thumb[aria-current] {
+  border-color: var(--accent);
+  opacity: 1;
+}
+
+.fv-jump {
+  font-size: 0.875rem;
+}
+
+.fv-jump button {
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  color: var(--accent-ink);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.fv__full {
+  width: min(96vw, 1800px);
+  max-width: none;
+  max-height: 96vh;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.fv__full::backdrop {
+  background: rgb(0 0 0 / 0.7);
+}
+
+.fv__full-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.fv__full-bar > span {
+  margin-right: auto;
+  color: var(--muted);
+}
+
+.fv__full img {
+  display: block;
+  width: 100%;
+  max-height: calc(96vh - 9rem);
+  object-fit: contain;
+  background: #fff;
+}
+
+.fv__full-cap {
+  margin-top: 0.6rem;
+  font-size: 0.9375rem;
 }

@@ -582,3 +582,16 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 
 - `src/components/RampagePlate.astro`: replace with CAD render when I get the SolidWorks files.
 - `src/components/plates/V2vConstellation.astro`: replace with run 4 received symbols if I can export them from MATLAB.
+
+## Specimen, round 3 (November 8, 2026)
+
+- **Site metrics** come only from PageSpeed Insights (mobile). The keyless API quota was used up, so `scripts/measure-sites.mjs` (median of 3 runs, with the date) waits for an API key: `PSI_KEY=... node scripts/measure-sites.mjs`. Until then the showcase shows the PageSpeed runs of Nov 1 and 2 (performance and accessibility), and no Loads in. The Grace Mae case study cites PageSpeed throughout.
+- **Case studies** are fluid: a 220px contents rail from 1024px, text to 80 characters, figures, images, tables and code out to 1100px, body type from 17 to 20px with the screen. The gallery is one large photo per row, aligned with the content column, and the RAMpage instant print shows at the text column's width.
+- **V2V figures**: one figure viewer (`src/scripts/figure-viewer.ts`) gathers the 13 MATLAB plots: Previous and Next, thumbnails, arrow keys, swipe, full screen, captions kept, and a button in the text where each figure was. Without JavaScript the figures stay inline.
+- **V2V receiver card**: the Plate view is gone (and with it the constellation plate component and its TODO). Step through the receiver starts at stage 1, then moves on; picking a stage or leaving the Live view starts it over, and it is hidden on the views where it cannot work. The stage order was checked against `V2V_TXRXf.m` (lines 220 to 496, in order) and is right. Each stage has a one-line caption saying what it did and why it looks as it does: the tau sweep looks like detection (the timing was already right), and after the FFT the subcarriers scatter until MMSE.
+- **Home**: the Research teaser's still has no light shafts and no tentacles crossing it; the marquee is 1.5 times larger and the status words under it bigger; the Toolbox is a crate of records (`src/components/Toolbox.astro`) with the same project filter.
+- **Texture**: contours on every plain section, a cursor glow, plankton in dark mode (see DESIGN.md).
+- **Dark mode**: cards, plates and panes are `#1a2a24` with `#2c4038` borders on the `#0c1512` page.
+- **Research**: muted translucent panels; Back to the surface scrolls to the top so the camera rises, with a Home link beside it.
+- **Tests**: the figure viewer, Step through starting at stage 1 and the crate (mouse, keyboard, touch, reduced motion) are in `scripts/check-interactions.mjs`, with Back to the surface.
+- **Lighthouse (mobile)**: / 95 (median of 5), /research/ 98, /work/v2v-bsm-ofdm/ 98, /work/rampage/ 95, /about/ 97; desktop 100.
