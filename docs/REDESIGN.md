@@ -534,7 +534,7 @@ Branch `specimen`, from `docs/mockups/specimen-study.html` and `docs/mockups/spe
 
 - `npm run test:layout` adds, at 320, 390, 768 and 1440 in both themes: the chip and tray (ten 44px pins inside the page, each press showing its own print, no sideways scroll), the seafloor filling its band edge to edge, and the bit girl (her canvas never takes a click, a real click through it reaches the pin under it, every perch she may use is clear of text, at least two per page).
 - Lighthouse (local, gzip, Lighthouse 12): mobile / 95 (94 to 96 over five runs), /about/ 97, /research/ 96, /work/rampage/ 96; desktop 100 on all four. Accessibility, best practices and SEO 100 everywhere. three.js loads on none of them during the run (it waits for the visitor), and never on any page but /research/.
-- Screenshots of every page at 390 and 1440, light and dark: `docs/specimen/` (full length for home, About, Research and RAMpage; the first 1800px for the rest).
+- Screenshots of every page at 390 and 1440, light and dark: `docs/specimen/` (kept locally, not in the repo) (full length for home, About, Research and RAMpage; the first 1800px for the rest).
 
 ### Changes from the mockups
 
@@ -603,5 +603,5 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 - About: the chip, its pins, the tray, the print that slides out, the note and the pirate print grow together (zoom steps from 1600px): the print is about 380px at 1920 and 460px at 2560. Every print on About is at least about 240px wide at 1920.
 - The crate's sleeves are in rem; the bit girl grows to about 1.2 times at 2560.
 - Arriving at a #section re-lands on it after fonts and the page load, so a late shift above it can't leave you mid-page.
-- Screenshots at 1440, 1920, 2560 and 3440 by 1440, light and dark, of home, About, Research, Signals and RAMpage: `docs/specimen/large/` (WebP, the first four screens of each page).
+- Screenshots at 1440, 1920, 2560 and 3440 by 1440, light and dark, of home, About, Research, Signals and RAMpage: `docs/specimen/large/` (WebP, the first four screens of each page; kept locally, not in the repo).
 - Tests: the layout checks and the label checks now also run at 1920 and 2560.

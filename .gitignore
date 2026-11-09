@@ -28,3 +28,6 @@ audit/
 
 # Source documents (decks, reports) used to check facts. Never published.
 docs/sources/
+
+# Screenshots (large; kept locally, not in the repo)
+docs/specimen/
