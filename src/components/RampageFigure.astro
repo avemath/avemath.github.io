@@ -1,0 +1,56 @@
+---
+// RAMpage's interactive figure, on its case study: Fire the plow, the timing diagram, the signal
+// path drawing, How it works and the firmware. (It lived on the home page until the home page
+// switched to a photo plate; nothing here changed but its place.)
+import FigureCard from '@/components/fig/FigureCard.astro';
+import TimingFig from '@/components/fig/TimingFig.astro';
+import RampageSystem from '@/components/drawings/RampageSystem.astro';
+import CodeHow from '@/components/fig/CodeHow.astro';
+import CodeFile from '@/components/fig/CodeFile.astro';
+import { cut, lineOf } from '@/lib/excerpt';
+import pico from '../../vendor/rampage/pico_direct.py?raw';
+
+const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/929c280/pico_direct.py';
+
+// Plate II, How it works: the strike itself, straight from the Pico's firmware.
+const picoHow = cut(pico, '# Increment activation counter', 45, 'py');
+const picoNotes: { text: string; lines: [number, number] }[] = [
+  { text: 'Count the activation, start the 500 ms cooldown, and lock out once all 17 are used (about the first six push with at least 30 lbf).', lines: [lineOf(pico, '# Increment activation counter'), lineOf(pico, 'weapon_depleted = True') + 1] },
+  { text: 'Plow home: the exhaust (main_solenoid, GP14) stays open for 50 ms, then closes, then a 50 ms dwell.', lines: [lineOf(pico, '# 1. Open main valve'), lineOf(pico, '# 4. Dweel time') - 1] },
+  { text: 'Plow out: both inlets (piston_solenoid, GP15) open together for 400 ms, full extension.', lines: [lineOf(pico, '# 5. Open piston valves'), lineOf(pico, 'utime.sleep_ms(SOLENOID_ACTIVATION_TIME)')] },
+  { text: 'The inlets close and the exhaust reopens, so the plow vents and retracts.', lines: [lineOf(pico, '# 7. Close valves'), lineOf(pico, '# 8. Re-open main valve') + 1] },
+];
+---
+
+<div class="wrap rfig-case" id="fire">
+        <FigureCard level={2} id="rampage" fig="II" kind="Timing diagram" wide eyebrow="Senior design capstone, 1st overall in the Bengal Bot Brawl" title="RAMpage">
+          <TimingFig />
+          <RampageSystem slot="drawing" />
+          <CodeHow slot="how" excerpt={picoHow} file="pico_direct.py" url={`${RAMPAGE}#L${picoHow.from}-L${picoHow.from + 44}`} notes={picoNotes} />
+          <CodeFile
+            slot="code"
+            code="pico-direct"
+            file="pico_direct.py"
+            url={RAMPAGE}
+            note="The Pico W firmware as it ran on the robot, vendored unmodified. The figure runs src/lib/rampage-firmware.ts, a line for line port of it."
+          />
+          <Fragment slot="text">
+            <p>
+              A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the RC receiver with hardware
+              interrupts, sequences the inlet and exhaust valves, and holds a hard limit of 17 activations in firmware, of which about the
+              first six push with at least 30 lbf before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust and cuts the
+              receiver's power through a solid-state relay. A Pi 4B streams video over UDP on its own, so a video crash never touches the
+              weapon.
+            </p>
+          </Fragment>
+          <Fragment slot="actions">
+            <button type="button" class="btn btn--solid" data-fire>Fire the plow</button>
+          </Fragment>
+        </FigureCard>
+</div>
+
+<style>
+  .rfig-case {
+    padding-block: 2rem 1rem;
+  }
+</style>

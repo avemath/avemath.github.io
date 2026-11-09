@@ -1,46 +1,58 @@
 /* ------------------------------------------------------------------
-   Design tokens: "Specimen". A field notebook of engraved plates:
-   paper by day, a glowing night bench after dark. Light values first,
+   Design tokens: "Specimen", in green. A field notebook of engraved
+   plates: green-grey paper by day, deep green water after dark, and a
+   deep band (#0E2A22) that is the same in both. Light values first,
    dark under [data-theme='dark'] (set before first paint from the
    system setting or the theme toggle).
 
-   The palette (paper, sheet, ink, muted, rule and five inks) is the
-   whole system. Everything else below is a role name that points at
-   it, so components keep reading --text, --line, --accent and so on.
+   Green is the accent for links, buttons, headings and focus. Teal,
+   lilac, rose and gold are kept for the eigenray plate, the data
+   figures and the handwritten notes only.
 
-   Contrast (WCAG AA, on paper and sheet):
-   - ink 13.7:1 light, 15.8:1 dark; muted 5.5:1 light, 7.5:1 dark.
-   - In light mode lilac (4.3:1), sage (4.2:1), gold (3.6:1) and rose
-     (3.7:1) are too light for small text, so text uses the *-ink
-     variants (4.75:1 or better). The bright values stay for lines,
-     fills, glyphs and large display type. In dark mode every ink is
-     9:1 or better, so the *-ink names point at the same colors.
-   - rule is a hairline (decoration only); --line-strong (3.3:1) is for
-     borders that mark a control.
+   Contrast (WCAG AA), see docs/DESIGN.md:
+   - Light: ink 13.5:1 on paper; muted 5.3:1 on paper, 5.7:1 on sheet.
+     accent #2E7D5B is 4.4:1 on paper, so it is for fills, strokes and
+     large type; small text in the accent uses accent-strong #1F5E44
+     (6.8:1 on paper, 7.3:1 on sheet). Paper text on accent-strong is
+     6.8:1.
+   - Dark: ink 15.8:1, muted 8.1:1 on paper and 7.4:1 on sheet, accent
+     #7FD6A8 10.7:1 on paper and 9.7:1 on sheet.
+   - Deep band: deep-ink 13.0:1, deep-accent 8.8:1, deep-muted 6.7:1.
+   - The figure inks (*-ink) are 4.9:1 or better on light paper.
+   - rule is a hairline (decoration only); --line-strong (3.1:1 light,
+     3.3:1 dark) is for borders that mark a control.
    ------------------------------------------------------------------ */
 :root {
-  --paper: #efede9;
-  --sheet: #f7f5f1;
-  --ink: #2a1d2f;
-  --muted: #665b6b;
-  --rule: #d3cbd3;
+  --paper: #eef2ec;
+  --sheet: #f8faf6;
+  --ink: #1c2823;
+  --muted: #586660;
+  --rule: #cbd6ce;
+  --green: #2e7d5b;
+  --green-strong: #1f5e44;
+  /* Figure and note inks. */
   --lilac: #7e62a6;
   --sage: #4e7a63;
   --teal: #246a6c;
   --gold: #9a7637;
   --rose: #b0607f;
   --photo: #fbfaf7;
-  /* Text-safe inks for small type in light mode. */
   --lilac-ink: #765c9c;
   --sage-ink: #48705b;
   --gold-ink: #81632e;
   --rose-ink: #97536d;
+  /* The deep band: the same in both themes (the footer, the Research teaser, the marquee). */
+  --deep: #0e2a22;
+  --deep-ink: #e6efea;
+  --deep-muted: #9db0a6;
+  --deep-accent: #7fd6a8;
+  --deep-line: rgb(230 239 234 / 0.16);
   /* A screen: the oscilloscope and the LED matrix, dark in both modes. */
-  --screen: #1c1720;
-  --screen-ink: #ede7ef;
-  --screen-muted: #a99eae;
-  --screen-line: rgb(237 231 239 / 0.16);
-  --screen-accent: #c6b0ea;
+  --screen: #0f1a16;
+  --screen-ink: #e6efea;
+  --screen-muted: #9db0a6;
+  --screen-line: rgb(230 239 234 / 0.16);
+  --screen-accent: #7fd6a8;
   --screen-hot: #eba8c4;
   --screen-teal: #7ccac3;
   --screen-gold: #e2c17e;
@@ -54,9 +66,9 @@
   --note-title: #7e3e5c;
   --note-meta: #6c6272;
   /* The datasheet chip. */
-  --chip: #2b2330;
-  --chip-ink: #ede7ef;
-  --leg: #a9a1ae;
+  --chip: #1c2823;
+  --chip-ink: #e6efea;
+  --leg: #a3b0a9;
   /* The bit girl. */
   --bit: #1e8a5a;
   --bit-glow: 0;
@@ -71,36 +83,39 @@
   --text: var(--ink);
   --text-soft: color-mix(in srgb, var(--ink) 82%, var(--muted));
   --line: var(--rule);
-  --line-strong: #897f8c;
-  --focus: var(--lilac-ink);
+  --line-strong: #7e8c84;
+  --focus: var(--green-strong);
   --fig-tint: var(--sheet);
   --dot: color-mix(in srgb, var(--ink) 10%, transparent);
   --grid: color-mix(in srgb, var(--ink) 6%, transparent);
   /* Paper on paper: a soft drop, deeper when lifted. */
   --shadow: 0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent), 0 12px 28px -20px color-mix(in srgb, var(--ink) 30%, transparent);
   --shadow-lift: 0 2px 4px color-mix(in srgb, var(--ink) 8%, transparent), 0 18px 36px -20px color-mix(in srgb, var(--ink) 40%, transparent);
+  /* A plate resting on a sheet section. */
+  --plate-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent), 0 14px 30px -18px color-mix(in srgb, var(--ink) 28%, transparent);
 
-  /* The accent is lilac: --accent for fills and strokes, --accent-ink for text. */
-  --accent: var(--lilac);
-  --accent-ink: var(--lilac-ink);
-  --accent-hover: color-mix(in srgb, var(--lilac) 85%, var(--ink));
+  /* The accent is green: --accent for fills, strokes and large type, --accent-ink for small text. */
+  --accent: var(--green);
+  --accent-ink: var(--green-strong);
+  --accent-strong: var(--green-strong);
+  --accent-hover: var(--green-strong);
   --accent-bright: var(--rose);
-  --accent-wash: color-mix(in srgb, var(--lilac) 10%, transparent);
-  --accent-wash-strong: color-mix(in srgb, var(--lilac) 18%, transparent);
+  --accent-wash: color-mix(in srgb, var(--green) 9%, transparent);
+  --accent-wash-strong: color-mix(in srgb, var(--green) 16%, transparent);
 
   --danger: #9b2c3a;
-  --ok: var(--sage-ink);
+  --ok: var(--green-strong);
   --leaf: var(--sage);
   --leaf-ink: var(--sage-ink);
 
   --code-bg: var(--sheet);
   --code-ink: var(--ink);
   --code-num: var(--muted);
-  --code-hot: color-mix(in srgb, var(--lilac) 12%, transparent);
+  --code-hot: color-mix(in srgb, var(--green) 12%, transparent);
   --code-comment: var(--muted);
   --code-string: var(--rose-ink);
   --code-number: var(--teal);
-  --code-keyword: var(--lilac-ink);
+  --code-keyword: var(--green-strong);
 
   /* Old names, kept so every component reads the new palette. */
   --amber: var(--accent);
@@ -117,13 +132,15 @@
   color-scheme: light;
 }
 
-/* The night bench. */
+/* After dark: deep green water. */
 [data-theme='dark'] {
-  --paper: #110d15;
-  --sheet: #18131d;
-  --ink: #ede7ef;
-  --muted: #a99eae;
-  --rule: #332a38;
+  --paper: #0c1512;
+  --sheet: #13201b;
+  --ink: #e6efea;
+  --muted: #9db0a6;
+  --rule: #2a3b34;
+  --green: #7fd6a8;
+  --green-strong: #7fd6a8;
   --lilac: #c6b0ea;
   --sage: #9dcaae;
   --teal: #7ccac3;
@@ -134,17 +151,18 @@
   --sage-ink: var(--sage);
   --gold-ink: var(--gold);
   --rose-ink: var(--rose);
-  --screen: #0a080c;
-  --chip: #0c090f;
-  --leg: #7f7685;
+  --screen: #08100d;
+  --chip: #08100d;
+  --leg: #6f8279;
   --bit: #5cf2a6;
   --bit-glow: 1;
 
-  --line-strong: #6c6271;
-  --focus: var(--lilac);
+  --line-strong: #5f7369;
+  --focus: var(--green);
   /* On dark grounds a shadow does not read, so paper gets a faint light ring instead. */
-  --shadow: 0 0 0 1px rgb(237 231 239 / 0.05);
-  --shadow-lift: 0 0 0 1px rgb(237 231 239 / 0.14);
+  --shadow: 0 0 0 1px rgb(230 239 234 / 0.05);
+  --shadow-lift: 0 0 0 1px rgb(230 239 234 / 0.14);
+  --plate-shadow: 0 0 0 1px rgb(230 239 234 / 0.06);
   --danger: #f19aa6;
   color-scheme: dark;
 }

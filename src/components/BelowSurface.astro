@@ -1,17 +1,17 @@
 ---
-// The way down: a sheet band with three faint eigenray lines, leading to the research page, which
-// opens on the seafloor scene.
+// The way down: a deep band with a still of the Research page's seafloor (rendered from the live
+// scene by `npm run assets`), the same contour lines as the hero glowing over it, and the words in
+// light ink. It leads to the research page, which opens on the seafloor scene.
+import { Image } from 'astro:assets';
+import still from '@/assets/research/seafloor-still.jpg';
 ---
 
-<section class="below" aria-labelledby="below-title" data-perch="below" data-perch-x="0.92 0.72">
-  <svg class="below__rays" viewBox="0 0 1440 420" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 150 L1440 300" />
-    <path d="M0 330 L1440 120" />
-    <path d="M520 0 L1440 220" class="below__ray--hot" />
-  </svg>
+<section class="below band-deep" aria-labelledby="below-title" data-perch="below" data-perch-x="0.92 0.72">
+  <Image src={still} alt="" data-girl-ignore class="below__still" widths={[640, 960, 1280, 1600]} sizes="100vw" quality={70} loading="lazy" />
+  <span class="below__topo" aria-hidden="true"><span></span></span>
   <div class="wrap below__grid">
-    <div>
-      <p class="eyebrow">Below the surface</p>
+    <div class="below__copy">
+      <p class="eyebrow below__eyebrow">Below the surface</p>
       <h2 id="below-title" class="section-title below__title" data-decode>The research lives on its own page, and it goes&nbsp;underwater.</h2>
       <p class="below__text">
         Underwater acoustic channels, the ONR data management work, bellhopSim, and the pool alarm. It opens on a glowing seafloor you can
@@ -25,30 +25,64 @@
 <style>
   .below {
     position: relative;
+    isolation: isolate;
     overflow: hidden;
-    padding-block: clamp(3.5rem, 8vw, 6rem);
-    background: var(--sheet);
-    border-block: 1px solid var(--line);
+    padding-block: clamp(4rem, 10vw, 7.5rem);
   }
 
-  .below__rays {
+  /* The seafloor still fills the band; a gradient keeps the words on solid deep green. */
+  .below__still {
     position: absolute;
     inset: 0;
+    z-index: -2;
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    object-position: 70% 60%;
+  }
+
+  .below::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, var(--deep) 0%, var(--deep) 38%, rgb(14 42 34 / 0.72) 62%, rgb(14 42 34 / 0.25) 100%);
+  }
+
+  @media (max-width: 759px) {
+    .below::after {
+      background: linear-gradient(180deg, var(--deep) 0%, var(--deep) 58%, rgb(14 42 34 / 0.55) 100%);
+    }
+
+    .below__still {
+      object-position: 60% 100%;
+    }
+  }
+
+  /* The contour lines, glowing. */
+  .below__topo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.3;
+    filter: drop-shadow(0 0 3px var(--deep-accent));
     pointer-events: none;
   }
 
-  .below__rays path {
-    fill: none;
-    stroke: var(--rule);
-    stroke-width: 1;
-    vector-effect: non-scaling-stroke;
+  .below__topo span {
+    position: absolute;
+    inset: 0;
+    background: var(--deep-accent);
+    -webkit-mask: url('/topo.svg') center / cover no-repeat;
+    mask: url('/topo.svg') center / cover no-repeat;
   }
 
-  .below__rays .below__ray--hot {
-    stroke: var(--teal);
-    opacity: 0.55;
+  .below__copy {
+    max-width: 38rem;
+  }
+
+  .below__eyebrow {
+    color: var(--deep-accent);
   }
 
   .below__grid {

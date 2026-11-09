@@ -1,0 +1,280 @@
+---
+// The Signals playground: a message crosses a pane of water as an FH-BFSK packet. Type up to 24
+// characters; they become bits (shown above the mesh), the bits become a real 48 kHz waveform with
+// one 6.25 ms chip per bit in the JANUS band, the waveform goes through a real channel (noise, a
+// surface echo, Doppler) and a real detector decodes it. Every bit shown is computed by
+// src/lib/fhbfsk.ts; the mesh, the ripples and the receiver's live reveal are the drawing of it
+// (src/scripts/playground.ts). The spectrogram under the mesh is the received waveform's.
+//
+// With reduced motion there are no ripples: the decoded result and the whole spectrogram show at once.
+import { F_HIGH, F_LOW } from '@/lib/fhbfsk';
+
+interface Props {
+  /** Plate number shown in the head. */
+  n?: string;
+}
+const { n = 'VIII' } = Astro.props;
+---
+
+<section class="pg plate" data-pg data-state="idle" aria-labelledby="pg-title">
+  <div class="plate__head"><span>Plate {n}</span><span>FH-BFSK packet</span></div>
+  <h2 id="pg-title" class="pg__title">Send a message through the water</h2>
+
+  <form class="pg__form" data-pg-form>
+    <label class="pg__field">
+      <span class="pg__k">Message</span>
+      <input type="text" name="msg" maxlength="24" value="hi from Ave" autocomplete="off" spellcheck="false" data-pg-msg />
+    </label>
+    <button type="submit" class="btn btn--primary" data-pg-send>Send</button>
+    <button type="button" class="btn" data-pg-hear aria-pressed="false"><span data-pg-hear-label>Hear it</span></button>
+  </form>
+
+  <p class="pg__k">Sent bits <span class="pg__dim">(8 per character)</span></p>
+  <p class="pg__bits mono" data-pg-tx-bits></p>
+
+  <div class="pg__stage">
+    <div class="pg__mesh-wrap">
+      <canvas
+        class="pg__mesh"
+        data-pg-mesh
+        tabindex="0"
+        role="img"
+        aria-label="A pane of water drawn as a wavy crosshatch. The packet crosses it from left to right as ripples: close ripples for a 1, wide ones for a 0. Click or tap it, or press Enter, to drop a ping."
+      ></canvas>
+      <span class="hand pg__note pg__note--tx" aria-hidden="true">sender</span>
+      <span class="hand pg__note pg__note--rx" aria-hidden="true">tap the water ♡</span>
+    </div>
+    <aside class="pg__rx" aria-labelledby="pg-rx-title">
+      <h3 id="pg-rx-title" class="pg__k">Receiver</h3>
+      <p class="pg__rx-text" data-pg-rx-text data-text=""></p>
+      <p class="pg__rx-bits mono" data-pg-rx-bits></p>
+      <p class="pg__rx-sum" data-pg-sum></p>
+    </aside>
+  </div>
+
+  <div class="pg__spec-wrap">
+    <canvas class="pg__spec" data-pg-spec role="img" aria-label={`Spectrogram of the received signal from ${F_LOW} to ${F_HIGH} Hz: each chip is a short dash at its tone, hopping up and down the band.`}></canvas>
+    <p class="pg__spec-k mono"><span>{(F_HIGH / 1000).toFixed(1)} kHz</span><span>spectrogram, received</span><span>{(F_LOW / 1000).toFixed(2)} kHz</span></p>
+  </div>
+
+  <div class="pg__sliders">
+    <label class="pg__slider">
+      <span class="pg__k">Noise <output data-pg-out="snr"></output></span>
+      <input type="range" min="-20" max="30" step="1" value="10" data-pg-snr aria-describedby="pg-snr-help" />
+      <span class="pg__help" id="pg-snr-help">Signal to noise ratio. Lower is noisier: the water gets rougher and bits start to flip.</span>
+    </label>
+    <label class="pg__slider">
+      <span class="pg__k">Surface echo <output data-pg-out="echo"></output></span>
+      <input type="range" min="0" max="10" step="1" value="0" data-pg-echo aria-describedby="pg-echo-help" />
+      <span class="pg__help" id="pg-echo-help">A weaker copy off the surface, arriving later. Higher is later and stronger.</span>
+    </label>
+    <label class="pg__slider">
+      <span class="pg__k">Doppler <output data-pg-out="doppler"></output></span>
+      <input type="range" min="-12" max="12" step="0.5" value="0" data-pg-doppler aria-describedby="pg-doppler-help" />
+      <span class="pg__help" id="pg-doppler-help">How fast the sender moves toward you. Every tone shifts and the packet squeezes; the drawing stretches it 40 times so you can see it.</span>
+    </label>
+  </div>
+
+  <p class="sr-only" aria-live="polite" data-pg-live></p>
+  <p class="plate__cap">
+    <b>Fig. 2.</b> The sender (left) sends one 6.25 ms chip per bit, hopping between 13 tone pairs from {F_LOW} to {F_HIGH} Hz: the
+    high tone of the pair for a 1, the low tone for a 0. The receiver (right) compares the energy at the two tones of each chip. The
+    noise, echo and Doppler act on the real waveform, so the errors are real too.
+  </p>
+</section>
+
+<style>
+  .pg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: clamp(1rem, 2.5vw, 1.75rem);
+    background: var(--sheet);
+  }
+
+  .pg__title {
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+  }
+
+  .pg__k {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .pg__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+
+  .pg__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1 1 14rem;
+  }
+
+  .pg__field input {
+    min-height: 46px;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--text);
+    font: 500 1rem var(--font-mono);
+  }
+
+  .pg__field input:focus-visible,
+  .pg__slider input:focus-visible,
+  .pg__mesh:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .pg__bits {
+    min-height: 1.5em;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    word-break: break-all;
+    color: var(--text-soft);
+  }
+
+  .pg__stage {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 900px) {
+    .pg__stage {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+    }
+  }
+
+  .pg__mesh-wrap {
+    position: relative;
+  }
+
+  .pg__mesh {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 7;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    cursor: crosshair;
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 599px) {
+    .pg__mesh {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  .pg__note {
+    position: absolute;
+    top: 6px;
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  .pg__note--tx {
+    left: 10px;
+  }
+
+  .pg__note--rx {
+    right: 10px;
+  }
+
+  .pg__rx {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.9rem 1rem;
+    border-left: 3px solid var(--accent);
+    background: var(--paper);
+  }
+
+  .pg__rx-text {
+    min-height: 1.4em;
+    font: 500 1.25rem var(--font-mono);
+    word-break: break-all;
+  }
+
+  .pg__rx-bits {
+    min-height: 1.5em;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    word-break: break-all;
+    color: var(--text-soft);
+  }
+
+  .pg__rx :global(.is-wrong) {
+    color: var(--rose-ink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  .pg__rx-sum {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .pg__spec {
+    display: block;
+    width: 100%;
+    height: 72px;
+    border: 1px solid var(--rule);
+    background: var(--screen);
+    image-rendering: pixelated;
+  }
+
+  .pg__spec-k {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .pg__sliders {
+    display: grid;
+    gap: 1rem 1.5rem;
+  }
+
+  @media (min-width: 760px) {
+    .pg__sliders {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .pg__slider {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .pg__slider output {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .pg__slider input {
+    width: 100%;
+    min-height: 32px;
+    accent-color: var(--accent);
+  }
+
+  .pg__help {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  import { mountPlayground } from '../../scripts/playground';
+  document.querySelectorAll<HTMLElement>('[data-pg]').forEach(mountPlayground);
+</script>

@@ -74,6 +74,30 @@ for (let i = 1; i < CHIPS; i++) maxJoin = Math.max(maxJoin, Math.abs(audio[i * c
 const steady = 0.18 * 2 * Math.sin((Math.PI * 13600) / sr);
 check('No clicks at chip joins', maxJoin < 1e-3 && maxJoin < steady, `largest join step ${maxJoin.toExponential(2)}`);
 
+// The mesh playground's link (src/lib/fhbfsk.ts): text to bits and back, a clean channel decodes
+// exactly, a noisy one makes errors, and Doppler shifts the tones.
+{
+  const { textToBits, bitsToText, modulate, channel, demodulate, FS, CHIP_N } = await import('../src/lib/fhbfsk.ts');
+  const msg = 'hi from Ave';
+  const bits = textToBits(msg);
+  check('Text to bits and back', bitsToText(bits) === msg && bits.length === 88, `${bits.length} bits`);
+  const { x } = modulate(bits);
+  check('One 6.25 ms chip per bit at 48 kHz', x.length === bits.length * CHIP_N && CHIP_N === 300 && FS === 48000, `${x.length} samples`);
+  const rx = (snrDb, extra = {}) => {
+    const y = channel(x, { snrDb, echoMs: 0, echoGain: 0, speed: 0, seed: 3, ...extra });
+    const r = demodulate(y, bits.length).bits;
+    return { errs: r.filter((b, i) => b !== bits[i]).length, text: bitsToText(r) };
+  };
+  const hi = rx(30);
+  check('30 dB SNR decodes exactly', hi.errs === 0 && hi.text === msg, `${hi.errs} errors, "${hi.text}"`);
+  const lo = rx(-20);
+  check('-20 dB SNR makes bit errors', lo.errs >= 1, `${lo.errs} errors`);
+  const echo = rx(30, { echoMs: 2.4, echoGain: 0.36 });
+  check('A moderate surface echo still decodes', echo.errs === 0, `${echo.errs} errors`);
+  const fast = rx(30, { speed: 12 });
+  check('12 m/s of Doppler costs bits', fast.errs >= 1, `${fast.errs} errors`);
+}
+
 if (failures) {
   console.error(`\ntest:comms: ${failures} check(s) failed.`);
   process.exit(1);

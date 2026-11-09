@@ -1,0 +1,177 @@
+---
+// RAMpage on the home page: a real photo of the robot in a plate frame. Hovering or focusing the
+// plate plays a short, silent clip of a match in its place (the hover preview); it never plays
+// with reduced motion. Fire the plow, the signal path and the timing diagram live on the case
+// study (src/components/RampageFigure.astro).
+// TODO(ave): replace with CAD render when I get the SolidWorks files.
+import { Picture } from 'astro:assets';
+import photo from '@/assets/projects/rampage/shop-lid.jpg';
+---
+
+<article class="rp paper" id="rampage" aria-labelledby="rampage-title" data-rp data-proj="/work/rampage/">
+  <a class="rp__media plate" href="/work/rampage/" aria-label="RAMpage case study" data-rp-media>
+    <span class="plate__head rp__head"><span>Plate II</span><span>RAMpage, on the bench</span></span>
+    <span class="rp__frame">
+      <Picture
+        src={photo}
+        alt="The RAMpage combat robot on a wooden shop bench with its painted lid on."
+        formats={['avif', 'webp']}
+        widths={[480, 720, 960]}
+        sizes="(min-width: 960px) 34rem, 92vw"
+        quality={78}
+        loading="lazy"
+        class="rp__img"
+      />
+      <video class="rp__clip" muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" data-rp-clip data-src="/media/rampage-arena.mp4"></video>
+      <span class="rp__hint mono" aria-hidden="true">hover to watch a match</span>
+    </span>
+  </a>
+  <div class="rp__text">
+    <p class="eyebrow rp__eyebrow">Senior design capstone, 1st overall in the Bengal Bot Brawl</p>
+    <h3 id="rampage-title" class="rp__title" data-decode>RAMpage</h3>
+    <p class="rp__body">
+      A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the RC receiver with hardware interrupts,
+      sequences the inlet and exhaust valves, and holds a hard limit of 17 activations in firmware, of which about the first six push with
+      at least 30 lbf before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust and cuts the receiver's power
+      through a solid-state relay.
+    </p>
+    <div class="rp__actions">
+      <a class="btn btn--primary" href="/work/rampage/#fire">Fire the plow</a>
+      <a class="btn" href="/work/rampage/">Case study</a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .rp {
+    display: grid;
+    scroll-margin-top: 5rem;
+  }
+
+  @media (min-width: 960px) {
+    .rp {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+  }
+
+  .rp__media {
+    display: block;
+    margin: clamp(0.75rem, 2vw, 1.25rem);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .rp__head {
+    margin-bottom: 0.6rem;
+  }
+
+  .rp__frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 5 / 4;
+    overflow: hidden;
+    background: var(--sheet);
+  }
+
+  .rp__frame :global(picture) {
+    display: contents;
+  }
+
+  .rp__frame :global(img),
+  .rp__clip {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .rp__clip {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .rp[data-previewing] .rp__clip {
+    opacity: 1;
+  }
+
+  .rp__hint {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    padding: 2px 8px;
+    font-size: 12px;
+    background: rgb(0 0 0 / 0.55);
+    color: #fff;
+  }
+
+  .rp[data-previewing] .rp__hint,
+  :global(html[data-motion='reduce']) .rp__hint {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rp__hint {
+      display: none;
+    }
+  }
+
+  .rp__media:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .rp__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+  }
+
+  .rp__eyebrow {
+    color: var(--muted);
+  }
+
+  .rp__title {
+    margin-top: 0.6rem;
+    font-size: clamp(2rem, 3.4vw, 2.75rem);
+    line-height: 0.98;
+  }
+
+  .rp__body {
+    margin-top: 1rem;
+    color: var(--text-soft);
+  }
+
+  .rp__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+</style>
+
+<script>
+  import { prefersReducedMotion } from '../scripts/preferences';
+
+  // The hover preview: the match clip loads on the first hover or focus, plays while the plate is
+  // hovered or focused, and stops when it is not. Never with reduced motion.
+  document.querySelectorAll<HTMLElement>('[data-rp]').forEach((card) => {
+    const media = card.querySelector<HTMLElement>('[data-rp-media]')!;
+    const clip = card.querySelector<HTMLVideoElement>('[data-rp-clip]')!;
+    const on = () => {
+      if (prefersReducedMotion()) return;
+      if (!clip.src) clip.src = clip.dataset.src!;
+      card.setAttribute('data-previewing', '');
+      clip.play().catch(() => card.removeAttribute('data-previewing'));
+    };
+    const off = () => {
+      card.removeAttribute('data-previewing');
+      clip.pause();
+    };
+    media.addEventListener('pointerenter', on);
+    media.addEventListener('pointerleave', off);
+    media.addEventListener('focus', on);
+    media.addEventListener('blur', off);
+  });
+</script>

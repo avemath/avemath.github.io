@@ -1,39 +1,46 @@
-// The home page Toolbox: hovering or focusing a chip shows where that tool was used in the panel
-// under the rows. On touch, the first tap on a chip shows its panel instead of following the link;
-// a second tap on the same chip follows it, and the panel's project link works on the first.
+// The home page Toolbox. Each chip is a toggle filter: pressing it (click, Enter or Space) lights
+// the project plates on the page that use the tool ([data-proj], matched against the chip's case
+// study links), fades the rest to 35%, and writes "<Skill>: used in ..." in the polite live line.
+// Pressing the same chip again, or Escape, clears it. Hovering or focusing a chip also fills the
+// panel with where it was used and the real file; pressing never navigates.
 export function initToolbox() {
   const root = document.querySelector<HTMLElement>('[data-tb]');
   if (!root) return;
-  const chips = [...root.querySelectorAll<HTMLAnchorElement>('[data-tool]')];
+  const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-tool]')];
   const uses = [...root.querySelectorAll<HTMLElement>('[data-use]')];
-  let current = -1;
-  let touch = false;
+  const line = root.querySelector<HTMLElement>('[data-tb-line]')!;
+  const plates = [...document.querySelectorAll<HTMLElement>('[data-proj]')];
+  let pressed = -1;
 
-  const show = (i: number) => {
-    current = i;
-    uses.forEach((u) => (u.hidden = Number(u.dataset.use) !== i));
-    chips.forEach((c) => c.toggleAttribute('data-on', Number(c.dataset.tool) === i));
+  const show = (i: number) => uses.forEach((u) => (u.hidden = Number(u.dataset.use) !== i));
+
+  const press = (i: number) => {
+    pressed = i;
+    chips.forEach((c) => c.setAttribute('aria-pressed', String(Number(c.dataset.tool) === i)));
+    const chip = chips.find((c) => Number(c.dataset.tool) === i);
+    const hrefs = new Set((chip?.dataset.hrefs || '').split(' ').filter(Boolean));
+    plates.forEach((p) => {
+      const lit = i < 0 || (p.dataset.proj || '').split(' ').some((h) => hrefs.has(h));
+      p.toggleAttribute('data-dim', !lit);
+    });
+    line.textContent = chip ? chip.dataset.line! : '';
+    if (i >= 0) show(i);
   };
 
   for (const chip of chips) {
     const i = Number(chip.dataset.tool);
-    chip.addEventListener('pointerdown', (e) => (touch = e.pointerType !== 'mouse'));
-    // A short wait before a hover counts, so moving the mouse down across the second row to the
-    // panel does not swap the panel on the way.
     let wait = 0;
     chip.addEventListener('pointerenter', (e) => {
       if (e.pointerType === 'mouse') wait = window.setTimeout(() => show(i), 120);
     });
-    chip.addEventListener('pointerleave', () => clearTimeout(wait));
-    chip.addEventListener('focus', () => {
-      if (!touch) show(i);
+    chip.addEventListener('pointerleave', () => {
+      clearTimeout(wait);
+      if (pressed >= 0) show(pressed);
     });
-    chip.addEventListener('click', (e) => {
-      if (touch && current !== i) {
-        e.preventDefault();
-        show(i);
-      }
-      touch = false;
-    });
+    chip.addEventListener('focus', () => show(i));
+    chip.addEventListener('click', () => press(pressed === i ? -1 : i));
   }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pressed >= 0) press(-1);
+  });
 }

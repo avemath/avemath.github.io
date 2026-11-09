@@ -3,7 +3,7 @@
 //   public/og/*.png                           1200x630 social cards
 //   public/apple-touch-icon.png
 //   public/favicon.ico                        16 and 32 px, for browsers and tools that skip SVG icons
-//   src/assets/research/seafloor-still.jpg    the Research seafloor, for reduced motion and no WebGL
+//   src/assets/research/seafloor-*.jpg        the Research seafloor: the shallows and the deep
 //
 // Run after a build: `npm run build && npm run assets`. Commit the output. The seafloor still is an
 // input to the build, so build once more after it changes.
@@ -54,26 +54,31 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
   await page.close();
 }
 
-// ---- The seafloor still ----
-// The live scene renders one fixed frame (`/research/?still`) in a WebGL-capable Chromium, and that
-// frame becomes the image the page shows before the scene loads, and instead of it.
+// ---- The seafloor stills ----
+// The live scene renders one fixed frame (`/research/?still&depth=...`) in a WebGL-capable Chromium.
+// The shallows (depth 0) sit at the top of /research/ before the scene loads, and instead of it with
+// reduced motion or no WebGL; the deep (depth 0.85) is the home page's Research teaser.
 {
   const gl = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
     args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
   });
-  const page = await gl.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
-  await page.route(...localOnly(base));
-  await page.goto(`${base}/research/?still`, { waitUntil: 'networkidle' });
-  const view = page.locator('[data-seafloor]');
-  await view.evaluate((el) => (el.style.height = '900px'));
-  await page.waitForSelector('[data-seafloor][data-ready="still"]', { timeout: 60000 });
-  await page.waitForTimeout(1000);
   await mkdir('src/assets/research', { recursive: true });
-  // Read the frame from the canvas itself: an element screenshot can miss a WebGL layer.
-  const jpeg = await page.evaluate(() => document.querySelector('[data-seafloor] canvas').toDataURL('image/jpeg', 0.86));
-  await writeFile('src/assets/research/seafloor-still.jpg', Buffer.from(jpeg.split(',')[1], 'base64'));
-  console.log('seafloor still: src/assets/research/seafloor-still.jpg');
+  for (const [depth, file] of [
+    [0, 'seafloor-shallow.jpg'],
+    [0.85, 'seafloor-still.jpg'],
+  ]) {
+    const page = await gl.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
+    await page.route(...localOnly(base));
+    await page.goto(`${base}/research/?still&depth=${depth}`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('[data-seafloor][data-ready="still"]', { timeout: 60000 });
+    await page.waitForTimeout(1000);
+    // Read the frame from the canvas itself: an element screenshot can miss a WebGL layer.
+    const jpeg = await page.evaluate(() => document.querySelector('[data-seafloor] canvas').toDataURL('image/jpeg', 0.86));
+    await writeFile(`src/assets/research/${file}`, Buffer.from(jpeg.split(',')[1], 'base64'));
+    console.log(`seafloor still: src/assets/research/${file}`);
+    await page.close();
+  }
   await gl.close();
 }
 

@@ -42,11 +42,16 @@ Documents in `docs/sources/` are kept locally and are never committed or publish
 
 - **An illustration, not data.** The terraces, formations, jellyfish and crabs are drawn from a seeded layout (`src/lib/seafloor.ts`); no bathymetry or survey is behind it. The crabs are for Ave's grandfathers, who worked the water in Lafitte as fishermen and crabbers.
 
+## The Signals playground (Plate VIII)
+
+- **Every bit is computed, not drawn.** `src/lib/fhbfsk.ts` turns the text into 8 bits per character, makes a 48 kHz waveform with one 6.25 ms chip per bit at the JANUS tone pairs (the hop order is the playground's own, seed 87), puts it through the channel (Doppler as a time scaling by 1 + v/1500 m/s, a surface echo as a delayed, weaker copy, then white Gaussian noise at the SNR, measured per sample over the full 24 kHz), and decodes each chip by comparing the energy at its two tones (Goertzel, noncoherent BFSK). Chip timing is known: there is no preamble or synchronization. `npm run test:comms` checks that 30 dB decodes exactly, -20 dB makes errors, a moderate echo still decodes and 12 m/s of Doppler costs bits.
+- **The drawing is the picture of that run.** The ripple spacing per bit, the echo's lag and the noise roughness follow the settings; the Doppler stretch is drawn 40 times larger than it is so you can see it. The spectrogram is the received waveform's.
+
 ## Other projects
 
 - **Repo READMEs and code**: bellhopSim (its main case is the Munk deep-water profile; the arrivals and spreads in Fig. R2 come from `docs/figures/figures.json`), led-audio-spectrum (firmware constants; the boot scroll is "LEA"), the client site repos (gracemaealterations, plvinc, BcofADAM, nmdomke.github.io), and this repo for the Signals playground.
 - **Client site order**: the GitHub repo creation dates: gracemaealterations 2026-04-15, plvinc 2026-06-05, BcofADAM 2026-09-28, nmdomke.github.io 2026-10-26.
-- **Client site metrics** (Lighthouse scores, page weight): measured on the live sites, recorded in each case study.
+- **Client site metrics on the website showcase** (`src/data/sites.json`): performance, accessibility and "Loads in" (mobile Largest Contentful Paint, in seconds) are the median of three Lighthouse 12 mobile runs (default simulated throttling) on each live home page, run Nov 8, 2026 from a home connection: becauseofadam.org 90 / 100 / 1.8 s, gracemaealterations.com 83 / 100 / 2.9 s, plvinc.com 86 / 100 / 3.2 s, nmdomke.github.io 83 / 100 / 2.3 s. These replace the earlier page weights and PageSpeed Insights scores; PageSpeed Insights runs on Google's machines and scores higher, which is why a case study can quote a higher dated PageSpeed number.
 
 ## Research and Integer
 

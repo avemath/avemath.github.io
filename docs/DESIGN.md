@@ -8,31 +8,36 @@ The live reference is `/styleguide/` (not linked or indexed). Toggle the theme t
 
 Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme='dark']`. The palette is the whole system; the older role names (`--bg`, `--text`, `--line`, `--accent` and so on) point at it, so every component follows. Tailwind reads them through `@theme` in `global.css`.
 
-| Token | Light (paper) | Dark (night bench) | Use |
+| Token | Light | Dark | Use |
 |---|---|---|---|
-| `--paper` | `#efede9` | `#110d15` | page ground (`--bg`) |
-| `--sheet` | `#f7f5f1` | `#18131d` | plates, bands, cards (`--surface`) |
-| `--ink` | `#2a1d2f` | `#ede7ef` | text (`--text`), 13.7:1 and 15.8:1 |
-| `--muted` | `#665b6b` | `#a99eae` | labels, meta, 5.5:1 and 7.5:1 |
-| `--rule` | `#d3cbd3` | `#332a38` | hairlines (`--line`), decoration only |
-| `--line-strong` | `#897f8c` | `#6c6271` | borders that mark a control, 3.3:1 |
-| `--lilac` | `#7e62a6` | `#c6b0ea` | the accent (`--accent`): fills, strokes, large display type |
-| `--sage`, `--teal`, `--gold`, `--rose` | `#4e7a63`, `#246a6c`, `#9a7637`, `#b0607f` | `#9dcaae`, `#7ccac3`, `#e2c17e`, `#eba8c4` | plate inks |
-| `--lilac-ink`, `--sage-ink`, `--gold-ink`, `--rose-ink` | `#765c9c`, `#48705b`, `#81632e`, `#97536d` | the bright inks | small text in those colors (4.75:1 or better on paper) |
+| `--paper` | `#eef2ec` | `#0c1512` | page ground (`--bg`) |
+| `--sheet` | `#f8faf6` | `#13201b` | plates, sheet sections (`--surface`) |
+| `--ink` | `#1c2823` | `#e6efea` | text (`--text`): 13.5:1 and 15.8:1 on paper |
+| `--muted` | `#586660` | `#9db0a6` | labels, meta: 5.3:1 (5.7:1 on sheet) and 8.1:1 (7.4:1 on sheet) |
+| `--rule` | `#cbd6ce` | `#2a3b34` | hairlines (`--line`), decoration only |
+| `--line-strong` | `#7e8c84` | `#5f7369` | borders that mark a control, 3.1:1 and 3.3:1 |
+| `--green` (`--accent`) | `#2e7d5b` | `#7fd6a8` | the accent: fills, strokes, large type; 4.4:1 light, so not for small text |
+| `--green-strong` (`--accent-ink`, `--accent-strong`, `--focus`) | `#1f5e44` | `#7fd6a8` | links, small accent text, focus rings: 6.8:1 on paper, 7.3:1 on sheet; paper text on it is 6.8:1 |
+| `--deep`, `--deep-ink`, `--deep-muted`, `--deep-accent` | `#0e2a22`, `#e6efea`, `#9db0a6`, `#7fd6a8` | same | the deep band (footer, marquee, Research teaser): 13.0:1, 6.7:1, 8.8:1 |
+| `--teal`, `--lilac`, `--rose`, `--gold`, `--sage` and their `*-ink` | as before | as before | only the eigenray plate, data figures and the handwritten notes; `*-ink` is 4.9:1 or better on light paper |
 | `--photo` | `#fbfaf7` | `#f2efea` | print borders |
-| `--screen` and `--screen-*` | `#1c1720` | `#0a080c` | the oscilloscope, the LED matrix, the serial console: dark in both themes |
+| `--screen` and `--screen-*` | `#0f1a16` | `#08100d` | the oscilloscope, the LED matrix, the spectrogram: dark in both themes |
 | `--bit` | `#1e8a5a` | `#5cf2a6` (with glow) | the bit girl |
 
-In light mode lilac (4.3:1), sage (4.2:1), gold (3.6:1) and rose (3.7:1) are too light for small text, so text uses the `*-ink` variants; the bright values stay for lines, fills and type 24px and up. Prints and handwritten notes stay light in both themes (`--photo-ink`, `--note-*`). Outside CSS, `src/lib/theme.ts` (the two theme-color tags), `src/lib/tokens-client.ts` (canvases) and `scripts/render-assets.mjs` (favicon, social cards) read the tokens, so `npm run assets` follows any change.
+Green is the accent for links, buttons, headings and focus; purple is no longer a UI accent. Prints and handwritten notes stay light in both themes (`--photo-ink`, `--note-*`). Outside CSS, `src/lib/theme.ts` (the two theme-color tags), `src/lib/tokens-client.ts` (canvases) and `scripts/render-assets.mjs` (favicon, social cards) read the tokens, so `npm run assets` follows any change.
+
+### Surfaces
+
+Sections alternate paper, sheet and the deep band (`.band-paper`, `.band-sheet`, `.band-deep` in `global.css`) so no two neighbors share a background; the footer is always deep. `.band-deep` re-points the role tokens, so anything inside reads light on deep green. Plates on sheet sections get `--plate-shadow`. The home hero has a faint contour texture (`.topo`, `public/topo.svg` from `scripts/gen-topo.mjs`, about 6%), and the Research teaser draws the same lines glowing over a still of the seafloor.
 
 ## Type
 
-- **Bodoni Moda** (display): headings at weight 400 (h3 and h4 at 500), italic for accents (`h1 em` is lilac), plate numbers and "Fig. N." captions.
+- **Bodoni Moda** (display): headings at weight 400 (h3 and h4 at 500), italic for accents (`h1 em` is green), plate numbers and "Fig. N." captions.
 - **Hanken Grotesk** (body): 17px/1.5.
 - **JetBrains Mono** (data, pin names, labels, code).
 - **Kalam** (handwritten notes and captions only).
 
-All are self-hosted from Fontsource, Latin only, `font-display: swap`. Only Bodoni Moda roman (the hero face) is preloaded. Each family has a fallback face sized to its metrics (`src/styles/fonts.css`, measured with `scripts/measure-fallback.mjs` against Georgia, Arial and Courier New), so the swap does not move the layout.
+All are self-hosted from Fontsource, Latin only, `font-display: swap`. Bodoni Moda roman and italic (the hero name) are preloaded. Each family has a fallback face sized to its metrics (`src/styles/fonts.css`, measured with `scripts/measure-fallback.mjs` against Georgia, Arial and Courier New; Hanken Grotesk also has Roboto and DejaVu Sans faces for systems without Arial), so the swap does not move the layout.
 
 ## Shape
 

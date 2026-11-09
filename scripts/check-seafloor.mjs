@@ -5,7 +5,7 @@
 //     reach (bell, tentacle sway and drift);
 //   - a crab's body and the ends of its legs never sit below the ground under its footprint.
 // Run with `npm run test:seafloor` (part of verify; Node 22 runs the TypeScript module directly).
-import { jellies, jellyAt, JELLY, crabs, crabAt, CRAB, groundAt, viewer } from '../src/lib/seafloor.ts';
+import { jellies, jellyAt, JELLY, crabs, crabAt, CRAB, groundAt, viewer, cameraAt, shallow } from '../src/lib/seafloor.ts';
 
 let problems = 0;
 const fail = (msg) => {
@@ -52,6 +52,22 @@ for (let t = 0; t <= 120; t += 0.25) {
         fail(`crabs ${a} and ${b} overlap at t=${t}`);
         t = Infinity;
       }
+}
+
+// The camera's way down never enters a terrace or a formation, and moves smoothly.
+let prev = null;
+for (let p = 0; p <= 1.0001; p += 0.002) {
+  const c = cameraAt(p);
+  const clear = c.y - groundAt(c.x, c.z, 1.5);
+  if (clear < 3) fail(`the camera at depth ${p.toFixed(3)} is only ${clear.toFixed(2)} above the ground`);
+  if (prev && Math.abs(c.y - prev.y) > 1.2) fail(`the camera jumps ${Math.abs(c.y - prev.y).toFixed(2)} between depths near ${p.toFixed(3)}`);
+  prev = c;
+}
+// The crabs sit below the shallow camera, in front of it.
+for (const [i, c] of crabs.entries()) {
+  const y = crabAt(c, 0).y;
+  if (y > shallow.eye - 3) fail(`crab ${i} is not below the shallow camera`);
+  if (c.z > shallow.z) fail(`crab ${i} is behind the shallow camera`);
 }
 
 if (problems) {

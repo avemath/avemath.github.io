@@ -14,11 +14,12 @@ import { getProjects, isWebsite, projectHref } from '@/lib/projects';
 const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.cover && p.data.links.live && p.data.client?.permission);
 const live: Partial<Record<string, typeof AdamLive>> = { 'because-of-adam': AdamLive, 'grace-mae-alterations': GraceLive };
 // Each site's facts come from src/data/sites.json: things a visitor can judge (speed,
-// accessibility, page weight, how long it has been live, what the owner edits), not commit
+// accessibility, how fast it loads, how long it has been live, what the owner edits), not commit
 // counts. On the home page the site figures follow the hop pattern (Fig. 05) and come before the
 // Toolbox.
-// pagespeedMobile and accessibility are PageSpeed Insights mobile results, dated by measuredOn.
-// pageWeightKb is the home page's transferred size from a local Lighthouse mobile run that day.
+// performance, accessibility and loadsInS (mobile Largest Contentful Paint, in seconds) are the
+// median of three Lighthouse 12 mobile runs on the live home page, dated by measuredOn (see
+// docs/SOURCES.md).
 interface Props {
   /** Only the site rows, for /work/, which has its own heading. */
   rowsOnly?: boolean;
@@ -50,7 +51,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
           const data = siteData(p.id);
           return (
             <>
-              <li class:list={['site', i % 2 === 1 && 'site--flip']} data-reveal data-live-host={Live ? '' : undefined}>
+              <li class:list={['site', i % 2 === 1 && 'site--flip']} data-reveal data-live-host={Live ? '' : undefined} data-proj={`/#websites /work/${p.id}/`}>
                 <div class="site__media">
                   <BrowserFrame
                     src={p.data.cover!}
@@ -80,21 +81,25 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                       <>
                         <dl class="site__metrics">
                           <div>
-                            <dt class="label">Mobile performance</dt>
-                            <dd class="site__metric">{data.pagespeedMobile}</dd>
+                            <dt class="label">Performance</dt>
+                            <dd class="site__metric">{data.performance}</dd>
                           </div>
                           <div>
                             <dt class="label">Accessibility</dt>
                             <dd class="site__metric">{data.accessibility}</dd>
                           </div>
                           <div>
-                            <dt class="label">Home page weight</dt>
+                            <dt class="label">Loads in</dt>
                             <dd class="site__metric">
-                              {data.pageWeightKb}
-                              <span class="site__unit">KB</span>
+                              {data.loadsInS.toFixed(1)}
+                              <span class="site__unit">s</span>
                             </dd>
                           </div>
                         </dl>
+                        <p class="site__measured">
+                          Lighthouse mobile, median of 3 runs, measured {new Date(`${data.measuredOn}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. Loads in is
+                          Largest Contentful Paint.
+                        </p>
                         <dl class="site__more">
                           <div>
                             <dt class="label">Live since</dt>
@@ -317,6 +322,12 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
   .site__facts dd {
     margin-top: 0.25rem;
     font-size: 0.95rem;
+  }
+
+  .site__measured {
+    margin-top: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
   }
 
   .site__metrics {

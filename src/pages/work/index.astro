@@ -21,7 +21,7 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
   description="Engineering, research and client websites by Avery Matherne, each with a case study on what I did and how."
   section="projects"
 >
-  <section class="section work-head" id="all">
+  <section class="section work-head band-paper" id="all">
     <div class="wrap">
       <h1 class="section-title work-head__title">All work</h1>
       <p class="section-lede">
@@ -42,8 +42,8 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
   </section>
 
   {
-    sections.map((s) => (
-      <section id={s.id} class="section work-sec" aria-labelledby={`${s.id}-title`}>
+    sections.map((s, i) => (
+      <section id={s.id} class:list={['section work-sec', i % 2 === 0 ? 'band-sheet' : 'band-paper']} aria-labelledby={`${s.id}-title`}>
         <div class="wrap">
           <div class="work-sec__head">
             <h2 id={`${s.id}-title`} class="section-title section-title--sm" data-decode>
@@ -64,7 +64,7 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
     ))
   }
 
-  <section class="section section--tight">
+  <section class="section section--tight band-paper">
     <div class="wrap work-end">
       <p>Want the story behind the work, or to see the research underwater?</p>
       <p class="work-end__links">

@@ -18,7 +18,7 @@ const nav = [
   { href: '/work/#websites', label: 'Websites', key: 'websites' },
   { href: '/research/', label: 'Research', key: 'research' },
   { href: '/about/', label: 'About', key: 'about' },
-  { href: '/#contact', label: 'Contact', key: 'contact' },
+  { href: '/contact/', label: 'Contact', key: 'contact' },
 ];
 // The contact page lights Contact, and the services page (website work) lights Websites.
 const isCurrent = (key: string) =>
@@ -38,7 +38,7 @@ const isCurrent = (key: string) =>
         {
           nav.map((item) => (
             <li>
-              <a href={item.href} class="nav-link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' || path === '/about' ? 'page' : 'true') : undefined}
+              <a href={item.href} class="nav-link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' || path === '/about' || path === '/contact' ? 'page' : 'true') : undefined}
                 data-nav-key={item.key}>
                 {item.label}
               </a>
@@ -70,7 +70,7 @@ const isCurrent = (key: string) =>
             {
               nav.map((item) => (
                 <li>
-                  <a href={item.href} class="mnav__link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' || path === '/about' ? 'page' : 'true') : undefined}
+                  <a href={item.href} class="mnav__link" aria-current={isCurrent(item.key) ? (path === '/work' || path === '/research' || path === '/about' || path === '/contact' ? 'page' : 'true') : undefined}
                 data-nav-key={item.key}>
                     {item.label}
                   </a>

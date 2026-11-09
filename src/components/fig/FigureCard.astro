@@ -15,18 +15,26 @@ interface Props {
   title: string;
   /** What the card offers, as a quiet row under the title. */
   offers?: string[];
+  /** The case study this card stands for (the Toolbox filter lights it). */
+  proj?: string;
+  /** The title's heading level: 3 under a section heading (home), 2 straight under a page's h1. */
+  level?: 2 | 3;
 }
 
-const { id, fig, kind, flip = false, wide = false, eyebrow, title, offers = ['Live', 'Drawing', 'Code'] } = Astro.props;
+const { id, fig, kind, flip = false, wide = false, eyebrow, title, offers = ['Live', 'Drawing', 'Code'], proj, level = 3 } = Astro.props;
+const Title = level === 2 ? 'h2' : 'h3';
+// A card with a plate slot gets a fifth view, Plate: the line-art figure from the Specimen plates.
+const hasPlate = Astro.slots.has('plate');
 const views = [
   { key: 'live', label: 'Live' },
+  ...(hasPlate ? [{ key: 'plate', label: 'Plate' }] : []),
   { key: 'drawing', label: 'Drawing' },
   { key: 'how', label: 'How it works' },
   { key: 'code', label: 'Code' },
 ];
 ---
 
-<article class:list={['fc paper', flip && 'fc--flip', wide && 'fc--wide']} id={id} aria-labelledby={`${id}-title`} data-fc>
+<article class:list={['fc paper', flip && 'fc--flip', wide && 'fc--wide']} id={id} aria-labelledby={`${id}-title`} data-fc data-proj={proj}>
   <div class="fc__fig">
     <div class="fig__bar">
       <p class="fig__label">Plate {fig} / {kind}</p>
@@ -51,6 +59,13 @@ const views = [
     <div class="fc__view" id={`${id}-live`} role="tabpanel" aria-labelledby={`${id}-tab-live`}>
       <slot />
     </div>
+    {
+      hasPlate && (
+        <div class="fc__view fc__plate" id={`${id}-plate`} role="tabpanel" aria-labelledby={`${id}-tab-plate`} hidden>
+          <slot name="plate" />
+        </div>
+      )
+    }
     <div class="fc__view" id={`${id}-drawing`} role="tabpanel" aria-labelledby={`${id}-tab-drawing`} hidden>
       <slot name="drawing" />
     </div>
@@ -64,7 +79,7 @@ const views = [
 
   <div class="fc__text">
     <p class="eyebrow fc__eyebrow">{eyebrow}</p>
-    <h3 id={`${id}-title`} class="fc__title" data-decode>{title}</h3>
+    <Title id={`${id}-title`} class="fc__title" data-decode>{title}</Title>
     <p class="fc__offers">
       {
         offers.map((o) => (
@@ -172,6 +187,10 @@ const views = [
 
   .fc__view[hidden] {
     display: none;
+  }
+
+  .fc__plate {
+    padding: 1.25rem;
   }
 
   .fc__text {

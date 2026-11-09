@@ -46,14 +46,27 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   image="/og/research.png"
   footer="research"
 >
-  <header class="wrap research__head">
-    <h1 id="research-title" class="research__h1">Research, below the <em>surface</em>.</h1>
-  </header>
+  <div class="rs">
+    <Seafloor />
+    <div class="rs__content">
+      <section class="wrap rpanel rpanel--intro" aria-labelledby="research-title" data-rpanel data-perch="intro" data-perch-x="0.88 0.14">
+        <h1 id="research-title" class="research__h1">Research, below the <em>surface</em>.</h1>
+        <p class="rs__cap">
+          <b>On a ledge above the deep.</b> Scroll down and the water darkens with depth, from the murky green shallows to the glow at the
+          bottom. The little blue crabs on the ledges are for my grandfathers.
+        </p>
+        <p
+          class="hand rs__look"
+          tabindex="0"
+          role="img"
+          aria-label="The seafloor behind this page. Use the left and right arrow keys to look around, and up and down to look up and down."
+          data-sea-keys
+        >
+          drag the water to look around, or focus here and use the arrow keys ♡
+        </p>
+      </section>
 
-  <Seafloor />
-
-  <div class="research">
-    <section id="below" class="wrap zone-r">
+    <section id="below" class="wrap zone-r rpanel" data-rpanel data-perch="below" data-perch-x="0.9 0.12">
       <div class="zone-r__grid">
         <div>
           <p class="zone-r__text">
@@ -81,7 +94,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       </div>
     </section>
 
-    <section id="onr" class="wrap zone-r" aria-labelledby="onr-title">
+    <section id="onr" class="wrap zone-r rpanel" data-rpanel data-perch="onr" data-perch-x="0.9 0.12" aria-labelledby="onr-title">
       <div class="zone-r__grid zone-r__grid--flip">
         <div class="zone-r__fig">
         <figure class="rfig rfig--boxed" data-perch="net" data-perch-x="0.85">
@@ -103,7 +116,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             <p class="net__read" id="net-read" data-net-read aria-live="polite">Hover or focus a node.</p>
             <script type="application/json" data-net-nodes set:html={JSON.stringify(nodes.map(({ id, text }) => ({ id, text })))} />
           </div>
-          <p class="fig__note">A drawing of the kind of network the project is about, not project data. Solid lines are radio, lilac lines acoustic.</p>
+          <p class="fig__note">A drawing of the kind of network the project is about, not project data. Solid lines are radio, green lines acoustic.</p>
           <p class="fig__try"><span class="on-mouse">Hover</span><span class="on-touch">Tap</span> a node to see how it links to the others.</p>
         </figure>
           <MarginNote where="onr" />
@@ -124,7 +137,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       </div>
     </section>
 
-    <section id="bellhop" class="wrap zone-r" aria-labelledby="bellhop-title">
+    <section id="bellhop" class="wrap zone-r rpanel" data-rpanel data-perch="bellhop" data-perch-x="0.9 0.12" aria-labelledby="bellhop-title">
       <div class="zone-r__grid">
         <div>
           <h2 id="bellhop-title" class="research__h2" data-decode>bellhopSim</h2>
@@ -162,7 +175,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           </div>
           <p class="fig__note">
             {ch.arrivals.length} arrivals from BELLHOP: 1000 m of water, source at 50 m, receiver at 100 m, 3.5 kHz. The strongest is in
-            lilac; {ch.n_within_20db} fall within 20 dB of it.
+            green; {ch.n_within_20db} fall within 20 dB of it.
           </p>
           </div>
           <div id="r2-drawing" role="tabpanel" aria-labelledby="r2-tab-drawing" hidden>
@@ -174,7 +187,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       </div>
     </section>
 
-    <section id="pool-alarm" class="wrap zone-r" aria-labelledby="pool-title">
+    <section id="pool-alarm" class="wrap zone-r rpanel" data-rpanel data-perch="pool-alarm" data-perch-x="0.9 0.12" aria-labelledby="pool-title">
       {/* NAME: working title until Avery picks one. Update the title here and in acoustic-pool-alarm.md then, and delete this comment. */}
       <div class="zone-r__grid zone-r__grid--flip">
         <div class="zone-r__fig">
@@ -201,20 +214,86 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
         </div>
       </div>
     </section>
-
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  /* The research page: the title, the seafloor scene full width, then the work on paper. */
-  .research__head {
-    padding-block: clamp(1.75rem, 4vw, 2.75rem) clamp(1.25rem, 3vw, 2rem);
+  /* One continuous scene: the water behind everything (Seafloor.astro), and the work in solid sheet
+     panels on top, with open water between them to look into and drag. */
+  .rs {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .rs__content {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(1.25rem, 3vw, 2rem) clamp(4rem, 30vh, 16rem);
+    touch-action: pan-y;
+  }
+
+  :global(html[data-sea-drag]) .rs__content {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  .rpanel {
+    background: color-mix(in srgb, var(--sheet) 95%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--rule);
+    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.55);
+  }
+
+  .rpanel + .rpanel {
+    margin-top: clamp(14rem, 42vh, 30rem);
+  }
+
+  .rpanel--intro {
+    max-width: min(46rem, calc(100% - 2 * var(--gutter)));
+    margin-left: max(var(--gutter), calc((100% - 75rem) / 2 + var(--gutter)));
+    padding-block: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  @media (max-width: 759px) {
+    .rpanel--intro {
+      max-width: none;
+      margin-inline: 0;
+    }
+  }
+
+  .rs__cap {
+    margin-top: 1rem;
+    max-width: 40em;
+    color: var(--text-soft);
+  }
+
+  .rs__cap b {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .rs__look {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-size: 17px;
+    cursor: grab;
+  }
+
+  .rs__look:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+  }
+
+  :global(html:not([data-sea-live])) .rs__look {
+    display: none;
   }
 
 
   .zone-r {
-    padding-block: clamp(3rem, 7vw, 5.5rem);
-    border-bottom: 1px solid var(--line);
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
   }
 
   .zone-r:last-of-type {

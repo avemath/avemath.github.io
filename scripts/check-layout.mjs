@@ -1,4 +1,4 @@
-// Fails unless the RAMpage figure's Fire button and the plow are on screen together. At each size
+// Fails unless the RAMpage figure's Fire button and the plow are on screen together (on the case study). At each size
 // below it scrolls the figure into view (the way a reader gets there), then checks that the Fire,
 // Slow-mo and Reset controls, the whole pneumatics drawing and the plow all sit inside the
 // viewport, that the toolbar's buttons are at least 44px tall, and that pressing Fire leaves the
@@ -6,7 +6,7 @@
 // without scrolling sideways, with its labels at 13px or more on screen.
 // Then, at 320, 390, 768 and 1440 in both themes: the About chip and tray (every pin a 44px
 // button inside the page, each press bringing out its own print, no sideways scroll); the Research
-// seafloor filling its band edge to edge with no sideways scroll; and the bit girl on home, About
+// seafloor water covering the whole page edge to edge (the live scene fixed to the viewport) with no sideways scroll; and the bit girl on home, About
 // and Research: her canvas never takes a click, every perch she may use keeps her clear of text,
 // and each page leaves her at least two places to go.
 // Run after a build: `npm run build && npm run test:layout`.
@@ -38,7 +38,7 @@ for (const scheme of ['light', 'dark']) {
   for (const [w, h] of SIZES) {
     const page = await browser.newPage({ viewport: { width: w, height: h }, colorScheme: scheme });
     await page.route(...localOnly(base));
-    await page.goto(`${base}/`, { waitUntil: 'networkidle' });
+    await page.goto(`${base}/work/rampage/`, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
     const label = `${w}x${h} ${scheme}`;
 
@@ -172,15 +172,18 @@ for (const scheme of ['light', 'dark']) {
       if (await sideways()) fail(`${label} /about/: pin ${i + 1}'s print makes the page scroll sideways`);
     }
 
-    // The seafloor fills its band, edge to edge.
+    // The seafloor: the still layer covers the whole page behind the panels, edge to edge, and
+    // the live layer is fixed to the viewport.
     await page.goto(`${base}/research/`, { waitUntil: 'networkidle' });
     const sea = await page.evaluate(() => {
-      const v = document.querySelector('[data-seafloor]').getBoundingClientRect();
-      const pic = document.querySelector('[data-seafloor] .sea__still, [data-seafloor] canvas')?.getBoundingClientRect();
-      return { vx: v.x, vw: v.width, vh: v.height, pw: pic?.width ?? 0, ph: pic?.height ?? 0, cw: document.documentElement.clientWidth };
+      const a = document.querySelector('.abyss').getBoundingClientRect();
+      const rs = document.querySelector('.rs').getBoundingClientRect();
+      const live = getComputedStyle(document.querySelector('.abyss__live'));
+      return { ax: a.x, aw: a.width, ah: a.height, rh: rs.height, cw: document.documentElement.clientWidth, pos: live.position, inset: [live.top, live.left, live.right, live.bottom].join(' ') };
     });
-    if (Math.abs(sea.vx) > 0.5 || Math.abs(sea.vw - sea.cw) > 0.5) fail(`${label} /research/: the seafloor band is ${Math.round(sea.vw)}px wide at ${Math.round(sea.vx)}, not the full ${sea.cw}px`);
-    if (Math.abs(sea.pw - sea.vw) > 0.5 || Math.abs(sea.ph - sea.vh) > 0.5) fail(`${label} /research/: the scene does not fill its band (${Math.round(sea.pw)}x${Math.round(sea.ph)} in ${Math.round(sea.vw)}x${Math.round(sea.vh)})`);
+    if (Math.abs(sea.ax) > 0.5 || Math.abs(sea.aw - sea.cw) > 0.5) fail(`${label} /research/: the water is ${Math.round(sea.aw)}px wide at ${Math.round(sea.ax)}, not the full ${sea.cw}px`);
+    if (Math.abs(sea.ah - sea.rh) > 1) fail(`${label} /research/: the water covers ${Math.round(sea.ah)} of the page's ${Math.round(sea.rh)}px`);
+    if (sea.pos !== 'fixed' || sea.inset !== '0px 0px 0px 0px') fail(`${label} /research/: the live scene is not fixed to the whole viewport (${sea.pos}, ${sea.inset})`);
     if (await sideways()) fail(`${label} /research/: the page scrolls sideways`);
 
     // The bit girl.

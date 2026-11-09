@@ -1,0 +1,96 @@
+---
+// A still of the signal mesh for the home page's Signals plate: the same pane, view and ripple
+// spacing as the live playground (src/lib/mesh.ts), with the packet for "hi" half way across.
+// Drawn at build time as SVG, so it costs no script.
+import { NU, NV, projector, rippleFreq, swell } from '@/lib/mesh';
+import { textToBits } from '@/lib/fhbfsk';
+
+const W = 400;
+const H = 175;
+const project = projector(W, H);
+const bits = textToBits('hi');
+const SPAN = 7;
+const bw = 1 / SPAN;
+const head = 0.95;
+const at = (u: number) => {
+  const x = head - u;
+  if (x < 0) return { h: 0, bit: -1 };
+  const i = Math.floor(x / bw);
+  if (i >= bits.length) return { h: 0, bit: -1 };
+  const env = Math.sin((Math.PI * (x % bw)) / bw) ** 0.6;
+  return { h: 0.034 * env * Math.sin(2 * Math.PI * rippleFreq(bits[i]) * x), bit: bits[i] };
+};
+const r1 = (n: number) => n.toFixed(1);
+const grid: [number, number][][] = [];
+const hs: number[][] = [];
+for (let j = 0; j <= NV; j += 2) {
+  const row: [number, number][] = [];
+  const hr: number[] = [];
+  for (let i = 0; i <= NU; i++) {
+    const u = i / NU;
+    const v = j / NV;
+    const h = at(u).h * (0.75 + 0.25 * Math.cos(v * 6)) + swell(u, v, 2);
+    hr.push(h);
+    row.push(project(u, v, h));
+  }
+  grid.push(row);
+  hs.push(hr);
+}
+const across = grid.map((row) => 'M' + row.map((p) => `${r1(p[0])} ${r1(p[1])}`).join('L')).join('');
+let into = '';
+for (let i = 0; i <= NU; i += 2) into += 'M' + grid.map((row) => `${r1(row[i][0])} ${r1(row[i][1])}`).join('L');
+let hi = '';
+let lo = '';
+grid.forEach((row, j) => {
+  for (let i = 0; i < NU; i++) {
+    const hm = Math.abs(hs[j][i] + hs[j][i + 1]) / 2;
+    if (hm < 0.012) continue;
+    const seg = `M${r1(row[i][0])} ${r1(row[i][1])}L${r1(row[i + 1][0])} ${r1(row[i + 1][1])}`;
+    if (at(i / NU).bit === 1) hi += seg;
+    else lo += seg;
+  }
+});
+---
+
+<svg class="mesh-still" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+  <path d={across} class="mesh-still__a" />
+  <path d={into} class="mesh-still__b" />
+  <path d={hi} class="mesh-still__hi" />
+  <path d={lo} class="mesh-still__lo" />
+</svg>
+
+<style>
+  .mesh-still {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .mesh-still path {
+    fill: none;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .mesh-still__a {
+    stroke: var(--accent);
+    stroke-width: 0.8;
+    opacity: 0.55;
+  }
+
+  .mesh-still__b {
+    stroke: var(--accent);
+    stroke-width: 0.6;
+    opacity: 0.38;
+  }
+
+  .mesh-still__hi {
+    stroke: var(--accent-strong);
+    stroke-width: 1.8;
+  }
+
+  .mesh-still__lo {
+    stroke: var(--teal);
+    stroke-width: 1.8;
+  }
+</style>

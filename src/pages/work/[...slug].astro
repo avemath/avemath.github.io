@@ -4,8 +4,10 @@ import { render } from 'astro:content';
 import CaseStudyLayout from '@/layouts/CaseStudyLayout.astro';
 import SpectrumDemo from '@/components/demos/SpectrumDemo.astro';
 import WeaponLogicDemo from '@/components/demos/WeaponLogicDemo.astro';
+import RampageFigure from '@/components/RampageFigure.astro';
 import OfdmDemo from '@/components/demos/OfdmDemo.astro';
 import SignalsDemo from '@/components/demos/SignalsDemo.astro';
+import MeshPlayground from '@/components/playground/MeshPlayground.astro';
 import { getWorkOrder, type Project } from '@/lib/projects';
 
 export const getStaticPaths = (async () => {
@@ -27,8 +29,28 @@ const demo = project.data.demo;
 
 <CaseStudyLayout project={project} headings={headings} prev={prev} next={next}>
   {demo === 'spectrum' && <SpectrumDemo slot="demo" />}
-  {demo === 'weapon-logic' && <WeaponLogicDemo slot="demo" />}
+  {
+    demo === 'weapon-logic' && (
+      <Fragment slot="demo">
+        <RampageFigure />
+        <WeaponLogicDemo />
+      </Fragment>
+    )
+  }
   {demo === 'ofdm' && <OfdmDemo slot="demo" />}
-  {demo === 'signals' && <SignalsDemo slot="demo" />}
+  {
+    demo === 'signals' && (
+      <Fragment slot="demo">
+        <div class="wrap pg-case" id="playground"><MeshPlayground /></div>
+        <SignalsDemo />
+      </Fragment>
+    )
+  }
   <Content />
 </CaseStudyLayout>
+
+<style>
+  .pg-case {
+    padding-block: 2rem 1rem;
+  }
+</style>

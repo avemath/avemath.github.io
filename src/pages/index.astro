@@ -1,38 +1,52 @@
 ---
 import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import RampagePlate from '@/components/RampagePlate.astro';
+import Marquee from '@/components/Marquee.astro';
 import Hero from '@/components/Hero.astro';
 import StatusStrip from '@/components/StatusStrip.astro';
 import AboutTeaser from '@/components/AboutTeaser.astro';
 import FigureCard from '@/components/fig/FigureCard.astro';
-import TimingFig from '@/components/fig/TimingFig.astro';
+import ChainFig from '@/components/fig/ChainFig.astro';
+import MatrixFig from '@/components/fig/MatrixFig.astro';
 import CodeHow from '@/components/fig/CodeHow.astro';
 import CodeFile from '@/components/fig/CodeFile.astro';
+import V2vStagesHow from '@/components/fig/V2vStagesHow.astro';
 import SignalsLive from '@/components/live/SignalsLive.astro';
 import BelowSurface from '@/components/BelowSurface.astro';
 import MarginNote from '@/components/MarginNote.astro';
-import RampageSystem from '@/components/drawings/RampageSystem.astro';
+import V2vLink from '@/components/drawings/V2vLink.astro';
+import LedChain from '@/components/drawings/LedChain.astro';
 import SignalsHop from '@/components/drawings/SignalsHop.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
 import Toolbox from '@/components/Toolbox.astro';
-import ProjectPlate from '@/components/plates/ProjectPlate.astro';
 import V2vConstellation from '@/components/plates/V2vConstellation.astro';
 import LedMatrix from '@/components/plates/LedMatrix.astro';
+import MeshStill from '@/components/plates/MeshStill.astro';
 import site from '@/data/site.json';
-import { cut, lineOf } from '@/lib/excerpt';
+import { cut, lineOf, region } from '@/lib/excerpt';
 import { hopSequence, toneHz, F_HIGH, F_LOW } from '@/lib/fhbfsk';
+import { v2vStages } from '@/lib/v2v-stages';
 import eigenrays from '@/assets/projects/bellhop-sim/ssp_and_rays.png';
-import pico from '../../vendor/rampage/pico_direct.py?raw';
+import ledFw from '../lib/led-firmware.ts?raw';
 
-const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/929c280/pico_direct.py';
+const SELF = 'https://github.com/avemath/avemath.github.io/blob/main';
+// The How it works excerpt links to line numbers, so it points at a commit where the file is the same.
+const SELF_PINNED = 'https://github.com/avemath/avemath.github.io/blob/6ad0c1f';
 
-// Plate II, How it works: the strike itself, straight from the Pico's firmware.
-const picoHow = cut(pico, '# Increment activation counter', 45, 'py');
-const picoNotes: { text: string; lines: [number, number] }[] = [
-  { text: 'Count the activation, start the 500 ms cooldown, and lock out once all 17 are used (about the first six push with at least 30 lbf).', lines: [lineOf(pico, '# Increment activation counter'), lineOf(pico, 'weapon_depleted = True') + 1] },
-  { text: 'Plow home: the exhaust (main_solenoid, GP14) stays open for 50 ms, then closes, then a 50 ms dwell.', lines: [lineOf(pico, '# 1. Open main valve'), lineOf(pico, '# 4. Dweel time') - 1] },
-  { text: 'Plow out: both inlets (piston_solenoid, GP15) open together for 400 ms, full extension.', lines: [lineOf(pico, '# 5. Open piston valves'), lineOf(pico, 'utime.sleep_ms(SOLENOID_ACTIVATION_TIME)')] },
-  { text: 'The inlets close and the exhaust reopens, so the plow vents and retracts.', lines: [lineOf(pico, '# 7. Close valves'), lineOf(pico, '# 8. Re-open main valve') + 1] },
+
+// Plate III: the MATLAB file that ran on the radios, and where each receiver stage sits in it.
+// Pinned to a commit, like RAMPAGE, so the stage line ranges never drift from the vendored copy.
+const V2V_FILE = 'https://github.com/avemath/v2v-bsm-ofdm/blob/c5328e5/V2V_TXRXf.m';
+const v2vLines = v2vStages.map((st, i) => `${i + 1} ${st.name} ${st.lines[0]} to ${st.lines[1]}`).join('; ');
+
+// Plate IV, How it works: FFT bins into 16 bands, AGC and smoothing, as in loop().
+const ledHow = region(ledFw, 'bands', 'ts');
+const bandStart = lineOf(ledFw, '#region how:bands');
+const ledNotes: { text: string; lines: [number, number] }[] = [
+  { text: 'Average the FFT bins inside each of the 16 log-spaced bands, and gate out the noise.', lines: [lineOf(ledFw, 'for (let b = 0; b < 16; b++) {', bandStart), lineOf(ledFw, 'if (val > peak) peak = val;', bandStart) + 1] },
+  { text: 'AGC: the full-scale level rises fast with loud music and falls slowly back.', lines: [lineOf(ledFw, 'if (peak > s.levelMax)', bandStart), lineOf(ledFw, 'else s.levelMax = Math.max(LEVELMAX_FLOOR', bandStart)] },
+  { text: 'Scale each band to the 16 rows, smooth it, and let the peak dots hold and fall.', lines: [lineOf(ledFw, 'const h = Math.min(H', bandStart), lineOf(ledFw, 'else peakValues[b] = Math.max(0, peakValues[b] - PEAK_FALL_RATE);', bandStart)] },
 ];
 
 // Plate VI: the first eight chips of the Signals playground's hop pattern (seed 87).
@@ -42,11 +56,16 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 ---
 
 <BaseLayout bitGirl jsonLd={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: site.url }]}>
+  <!-- Arriving at a #section, skip the lazy layout so the jump lands on the real position. -->
+  <script is:inline>
+    if (location.hash) document.documentElement.classList.add('cv-off');
+  </script>
   <Hero />
+  <Marquee />
   <StatusStrip />
   <AboutTeaser />
 
-  <section id="projects" class="section projects" aria-labelledby="projects-title">
+  <section id="projects" class="section projects band-sheet" aria-labelledby="projects-title">
     <div class="wrap">
       <div class="projects__head">
         <h2 id="projects-title" class="section-title projects__title" data-decode>Projects</h2>
@@ -54,56 +73,70 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
       </div>
 
       <div class="projects__cards">
-        <FigureCard id="rampage" fig="II" kind="Timing diagram" wide eyebrow="Senior design capstone, 1st overall in the Bengal Bot Brawl" title="RAMpage">
-          <TimingFig />
-          <RampageSystem slot="drawing" />
-          <CodeHow slot="how" excerpt={picoHow} file="pico_direct.py" url={`${RAMPAGE}#L${picoHow.from}-L${picoHow.from + 44}`} notes={picoNotes} />
+        <RampagePlate />
+
+      
+        <FigureCard id="v2v" proj="/work/v2v-bsm-ofdm/" fig="III" kind="Receiver chain" flip eyebrow="EE 4003, with lab partner Jason Phan" title="V2V collision warning over OFDM">
+          <ChainFig />
+          <div slot="plate" class="fc-plate">
+            <span class="plate fc-plate__frame"><V2vConstellation /></span>
+            <p class="fc-plate__note">The constellation is simulated BPSK at the SNR of the hardware runs, not measured data.</p>
+          </div>
+          <V2vLink slot="drawing" />
+          <V2vStagesHow slot="how" url={V2V_FILE} />
           <CodeFile
             slot="code"
-            code="pico-direct"
-            file="pico_direct.py"
-            url={RAMPAGE}
-            note="The Pico W firmware as it ran on the robot, vendored unmodified. The figure runs src/lib/rampage-firmware.ts, a line for line port of it."
+            code="v2v-txrx"
+            file="V2V_TXRXf.m"
+            url={V2V_FILE}
+            note={`The transmitter and receiver that ran on the radios. The receiver stages, by line: ${v2vLines}. The live figure runs a browser port, src/lib/ofdm-rx.ts.`}
           />
           <Fragment slot="text">
             <p>
-              A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the RC receiver with hardware
-              interrupts, sequences the inlet and exhaust valves, and holds a hard limit of 17 activations in firmware, of which about the
-              first six push with at least 30 lbf before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust and cuts the
-              receiver's power through a solid-state relay. A Pi 4B streams video over UDP on its own, so a video crash never touches the
-              weapon.
+              An OFDM radio link (data split across many narrow carriers at once), modeled on IEEE 802.11p (the car version of Wi-Fi), run over the air between two ADALM-PLUTO software radios.
+              I designed and wrote the transmitter, the nine-stage receiver and the warning logic. One radio sends both cars' safety
+              messages in turn; the other decodes them and computes time to collision. All five hardware runs decoded with zero bit errors.
             </p>
           </Fragment>
           <Fragment slot="actions">
-            <button type="button" class="btn btn--solid" data-fire>Fire the plow</button>
-            <a class="btn" href="/work/rampage/">Case study</a>
+            <button type="button" class="btn btn--solid" data-step>Step through the receiver</button>
+            <a class="btn" href="/work/v2v-bsm-ofdm/">Case study</a>
           </Fragment>
         </FigureCard>
 
-      </div>
-
-      <div class="duo">
-        <ProjectPlate
-          n="III"
-          title="V2V warning radio"
-          href="/work/v2v-bsm-ofdm/"
-          desc="An OFDM link on a software-defined radio at 2.9 GHz that warns of a collision. I wrote the transmitter, receiver and warning logic."
-          tags="MATLAB, OFDM, BPSK, Pluto SDR"
-          note="The constellation is simulated BPSK at the SNR of the hardware runs, not measured data."
-        ><V2vConstellation /></ProjectPlate>
-        <ProjectPlate
-          n="IV"
-          title="LED spectrum"
-          href="/work/led-audio-spectrum/"
-          desc="A 16 by 16 LED matrix that dances to music, built as a Christmas 2025 gift for my sisters."
-          tags="C++, FFT, 256 LEDs"
-        ><LedMatrix /></ProjectPlate>
+        <FigureCard id="led" proj="/work/led-audio-spectrum/" fig="IV" kind="16 by 16 matrix" eyebrow="Personal project, one built for each sister" title="LED audio spectrum">
+          <MatrixFig />
+          <div slot="plate" class="fc-plate">
+            <span class="plate fc-plate__frame"><LedMatrix /></span>
+            <p class="fc-plate__note">The 16 by 16 matrix: a spectrum, and a heart for my sisters.</p>
+          </div>
+          <LedChain slot="drawing" />
+          <CodeHow slot="how" excerpt={ledHow} file="src/lib/led-firmware.ts" url={`${SELF_PINNED}/src/lib/led-firmware.ts#L${ledHow.from}`} notes={ledNotes} />
+          <CodeFile
+            slot="code"
+            code="led-firmware"
+            file="src/lib/led-firmware.ts"
+            url={`${SELF}/src/lib/led-firmware.ts`}
+            note="The ESP32 firmware (github.com/avemath/led-audio-spectrum), ported to the browser. The figure runs this file."
+          />
+          <Fragment slot="text">
+            <p>
+              An ESP32 drives a 16 by 16 matrix from a microphone: 128 point FFT into 16 log spaced bands, an adaptive noise floor, AGC and
+              debounced switching between the spectrum and an idle glow. Tuned so quiet, distant music still reads.
+            </p>
+          </Fragment>
+          <Fragment slot="actions">
+            <button type="button" class="btn btn--solid" data-mic>Try it with your mic</button>
+            <a class="btn" href="https://github.com/avemath/led-audio-spectrum">Firmware</a>
+            <a class="link projects__cs" href="/work/led-audio-spectrum/">Case study</a>
+          </Fragment>
+        </FigureCard>
       </div>
 
       <p class="projects__more">Three more below, then the research.</p>
 
       <ul class="minis">
-        <li class="mini paper">
+        <li class="mini paper" data-proj="/work/bellhop-sim/">
           <div class="fig__bar mini__bar">
             <p class="fig__label plate-n">Plate V / Eigenrays</p>
             <p class="fig__label">Figures</p>
@@ -123,15 +156,22 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <p class="fig__try">Open the figures and the fixes.</p>
         </li>
 
-        <li class="mini paper" data-live-host>
+        <li class="mini paper" data-live-host data-proj="/work/signals-playground/">
           <div class="fig__bar mini__bar">
             <p class="fig__label plate-n">Plate VI / Hop pattern</p>
             <div class="tabset" role="tablist" aria-label="Signals playground: views" data-tabs>
-              <button type="button" role="tab" id="sig-tab-live" aria-controls="sig-live" aria-selected="true" tabindex="0">Live</button>
+              <button type="button" role="tab" id="sig-tab-mesh" aria-controls="sig-mesh" aria-selected="true" tabindex="0">Mesh</button>
+              <button type="button" role="tab" id="sig-tab-live" aria-controls="sig-live" aria-selected="false" tabindex="-1">Live</button>
               <button type="button" role="tab" id="sig-tab-drawing" aria-controls="sig-drawing" aria-selected="false" tabindex="-1">Drawing</button>
             </div>
           </div>
-          <div id="sig-live" role="tabpanel" aria-labelledby="sig-tab-live">
+          <div id="sig-mesh" role="tabpanel" aria-labelledby="sig-tab-mesh">
+            <a class="mini__fig mini__mesh" href="/work/signals-playground/#playground" aria-label="Open the Signals playground: send a message through the water">
+              <MeshStill />
+            </a>
+            <p class="fig__try">Open it, type a message, and send it through the water.</p>
+          </div>
+          <div id="sig-live" role="tabpanel" aria-labelledby="sig-tab-live" hidden>
           <div class="mini__fig mini__fig--live" data-live-media data-draw>
             <svg viewBox="0 0 400 120" preserveAspectRatio="xMinYMid meet" class="mini__hops" aria-hidden="true">
               {
@@ -151,15 +191,16 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           <div class="mini__body">
             <h3 class="mini__title"><a href="/work/signals-playground/">Signals playground</a></h3>
             <p class="mini__offers">
+              <a href="/work/signals-playground/#playground">Playground</a>
               <a href="#sig-live" data-tab-target="sig-tab-live">Live</a>
               <a href="#sig-drawing" data-tab-target="sig-tab-drawing">Drawing</a>
               <a href="https://github.com/avemath/avemath.github.io/blob/main/src/components/demos/SignalsDemo.astro">Code</a>
             </p>
-            <p class="mini__text">A JANUS style FH-BFSK preamble, one chip at a time. You can hear each hop.</p>
+            <p class="mini__text">Type a message and watch it cross a pane of water as a JANUS style FH-BFSK packet, then decode on the far side. You can hear each hop.</p>
           </div>
         </li>
 
-        <li class="mini paper mini--accent">
+        <li class="mini paper mini--accent" data-proj="/work/acoustic-pool-alarm/ /research/">
           <div class="fig__bar mini__bar">
             <p class="fig__label plate-n">Plate VII / In progress</p>
             <p class="fig__label">Research page</p>
@@ -184,7 +225,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   </section>
 
   <BelowSurface />
-  <div class="ground-alt"><WebsitesShowcase /></div>
+  <div class="band-paper"><WebsitesShowcase /></div>
   <Toolbox />
 </BaseLayout>
 
@@ -192,9 +233,9 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   /* Below the fold, the browser skips laying these out until they near the screen, so the body font's
      swap after first paint relayouts only what is visible. (Not Projects: its sticky RAMpage
      toolbar and tooltips must not be clipped.) */
-  :global(.below),
-  :global(#websites),
-  :global(#toolbox) {
+  :global(html:not(.cv-off) .below),
+  :global(html:not(.cv-off) #websites),
+  :global(html:not(.cv-off) #toolbox) {
     content-visibility: auto;
     contain-intrinsic-size: auto 1200px;
   }
@@ -228,17 +269,32 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     margin-top: 1.75rem;
   }
 
-  /* Plates III and IV side by side, as in the Specimen study. */
-  .duo {
-    display: grid;
-    gap: 2.5rem 1.75rem;
-    margin-top: 2.75rem;
+  /* A card's Plate view: the line-art figure in its frame, with a note on where it comes from. */
+  .mini__mesh {
+    display: block;
+    padding: 0.5rem 0.75rem;
   }
 
-  @media (min-width: 760px) {
-    .duo {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .mini__mesh:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+
+  .fc-plate__frame {
+    display: block;
+  }
+
+  .fc-plate__frame :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .fc-plate__note {
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--muted);
   }
 
   .projects__more {

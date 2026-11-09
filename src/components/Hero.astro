@@ -1,12 +1,13 @@
 ---
-// The home hero: the name in Bodoni with the surname in lilac italic, the thesis, the lede, and
-// Plate I beside it, the eigenray specimen (src/scripts/eigenrays.ts). Hear it plays the underwater
-// modem preamble (src/scripts/hear-it.ts). The h1 is the largest thing on first paint, so it is the
-// LCP element; the canvas draws after the browser is idle.
+// The home hero: the name in Bodoni with the surname in green italic, the thesis, the lede, and
+// Plate I beside it, the eigenray specimen (src/scripts/eigenrays.ts). The h1 is the largest thing on first paint, so it is the
+// LCP element; the canvas draws after the browser is idle. Under the buttons, the signal panel: the
+// preamble an underwater modem sends, read with scope cursors and heard with Hear it.
 import site from '@/data/site.json';
+import SignalPanel from './SignalPanel.astro';
 ---
 
-<section id="top" class="hero" aria-labelledby="hero-title">
+<section id="top" class="hero band-paper topo" aria-labelledby="hero-title">
   <div class="wrap hero__grid">
     <div class="hero__text">
       <h1 id="hero-title" class="hero__title">Avery <em>Matherne</em></h1>
@@ -19,15 +20,7 @@ import site from '@/data/site.json';
         <a class="btn btn--primary" href="/work/">See my work</a>
         <a class="btn" href={site.resumePdf}>Résumé (PDF)</a>
       </div>
-      <p class="hero__hear">
-        <button type="button" class="btn btn--small hear" data-hear aria-pressed="false">
-          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1.5v9l8-4.5z" fill="currentColor"></path></svg>
-          <span data-hear-label>Hear it, 2 s</span>
-          <span class="hear__prog" aria-hidden="true"></span>
-        </button>
-        <span class="hero__hear-note">the preamble an underwater modem sends before it talks, played ten times slower</span>
-      </p>
-      <p class="sr-only" aria-live="polite" data-hear-live></p>
+      <div class="hero__sig"><SignalPanel /></div>
     </div>
 
     <figure class="plate hero__plate">
@@ -101,40 +94,9 @@ import site from '@/data/site.json';
     margin-top: 1.75rem;
   }
 
-  .hero__hear {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 0.9rem;
-    margin-top: 1.25rem;
-  }
-
-  .hero__hear-note {
-    max-width: 30ch;
-    font-size: 0.875rem;
-    line-height: 1.4;
-    color: var(--muted);
-  }
-
-  .hear {
-    position: relative;
-    overflow: hidden;
-    min-height: 44px;
-  }
-
-  .hear svg {
-    width: 0.75em;
-    height: 0.75em;
-  }
-
-  /* While it plays, a thin bar along the bottom edge shows how far through the 2 s it is. */
-  .hear__prog {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 2px;
-    width: calc(var(--p, 0) * 100%);
-    background: var(--accent);
+  .hero__sig {
+    margin-top: 1.75rem;
+    max-width: 34rem;
   }
 
   .hero__cwrap {
@@ -185,7 +147,5 @@ import site from '@/data/site.json';
 
 <script>
   import { mountEigenrays } from '../scripts/eigenrays';
-  import { mountHearIt } from '../scripts/hear-it';
   document.querySelectorAll<HTMLCanvasElement>('[data-eigenrays]').forEach(mountEigenrays);
-  document.querySelectorAll<HTMLButtonElement>('[data-hear]').forEach(mountHearIt);
 </script>

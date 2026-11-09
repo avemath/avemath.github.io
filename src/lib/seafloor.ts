@@ -184,6 +184,31 @@ export const jellies: Jelly[] = (() => {
   return out;
 })();
 
+// ---- The camera's way down ----
+// On /research/ the page scroll moves the camera from the shallow rim (the top of the page: murky
+// green water, light shafts, the crabs) down the slope to the basin floor (the bottom: dark water
+// that glows). It rides the smooth field (always at or above the terraces) plus an eye height, and
+// keeps clear of the formations: scripts/check-seafloor.mjs checks the whole path.
+export const PATH = { z0: 100, z1: 6, x: 0, eye0: 9, eye1: 6 };
+const ease = (p: number) => p * p * (3 - 2 * p);
+
+/** The camera at scroll depth p (0 = top of the page, 1 = bottom). */
+export function cameraAt(p: number) {
+  const q = Math.min(1, Math.max(0, p));
+  const z = PATH.z0 + (PATH.z1 - PATH.z0) * q;
+  const x = PATH.x + Math.sin(q * Math.PI) * 6;
+  const smooth = (levels(x, z) / LEV) * HMAX + 0.5;
+  const nearSlab = Math.max(0, ...slabs.filter((s) => Math.hypot(x - s.x, z - s.z) < s.r + 3).map((s) => s.y1));
+  const eye = PATH.eye0 + (PATH.eye1 - PATH.eye0) * ease(q);
+  return { x, z, y: Math.max(smooth, nearSlab) + eye };
+}
+
+/** Where the crabs live: on the ledges just in front of the camera's starting point. */
+export const shallow = (() => {
+  const c = cameraAt(0);
+  return { x: c.x, z: c.z, eye: c.y };
+})();
+
 // ---- Crabs ----
 // Drawn at scale 1, the legs reach 2.9 to the side and the claws 2.3 forward; times the scale, plus
 // a margin, that is the footprint every placement and the test use.
@@ -202,11 +227,11 @@ export function crabAt(c: Crab, t: number) {
   return { x, z: c.z, y: groundAt(x, c.z, CRAB.reach) + 0.05 };
 }
 
-/** Four glowing blue crabs on ledges near the viewer. Each walks a stretch that is one flat terrace
- *  top, so it never climbs a riser or walks into a formation. */
+/** Four glowing blue crabs on ledges just below the shallow start of the camera's way down. Each
+ *  walks a stretch that is one flat terrace top, so it never climbs a riser or walks into a formation. */
 export const crabs: Crab[] = (() => {
-  // [x, z offset from the viewer, phase]: in front of the ledge, close enough to see, far enough
-  // that a whole crab fits in view.
+  // [x, z offset from the shallow camera, phase]: in front of it and below, close enough to see,
+  // far enough that a whole crab fits in view.
   const starts = [
     [5, -11, 0.6],
     [-6, -14, 2.4],
@@ -220,6 +245,9 @@ export const crabs: Crab[] = (() => {
     for (let i = -8; i <= 8; i++) if (Math.abs(groundAt(x + (i / 8) * span, z, CRAB.reach) - y) > 0.02) return false;
     return true;
   };
+  const placed: Crab[] = [];
+  // Far enough from every crab already placed that the two walks never meet.
+  const apart = (x: number, z: number) => placed.every((c) => Math.abs(z - c.z) > 2 * CRAB.reach || Math.abs(x - c.x) > 2 * CRAB.reach + 2 * span + 0.5);
   return starts.map(([dx, dz, ph]) => {
     // Search outward from the wanted spot, ring by ring, for the nearest level walk.
     for (let ring = 0; ring <= 30; ring++) {
@@ -227,8 +255,12 @@ export const crabs: Crab[] = (() => {
       for (let k = 0; k < n; k++) {
         const a = (k / n) * Math.PI * 2;
         const x = dx + Math.cos(a) * ring * 0.5;
-        const z = viewer.z + dz + Math.sin(a) * ring * 0.5;
-        if (Math.hypot(x - viewer.x, z - viewer.z) > 3 && level(x, z)) return { x, z, span, ph };
+        const z = shallow.z + dz + Math.sin(a) * ring * 0.5;
+        if (Math.hypot(x - shallow.x, z - shallow.z) > 3 && apart(x, z) && level(x, z)) {
+          const c = { x, z, span, ph };
+          placed.push(c);
+          return c;
+        }
       }
     }
     throw new Error(`no level ledge for the crab near (${dx}, ${dz})`);

@@ -557,3 +557,28 @@ Branch `specimen`, from `docs/mockups/specimen-study.html` and `docs/mockups/spe
 - The home teaser for Research lost its 0 to 100 m gauge.
 - `/styleguide/` is the "Specimen design system" (title and heading), still `noindex`.
 - Kept as is, by choice: the Characteristics row "Known issues" says "than she builds them".
+
+## Specimen, round 2 (November 8, 2026)
+
+### Interactions restored (compared with main before Specimen, b8a3090)
+
+Lost on the home page and now back, restyled: the hero's signal scope (SignalPanel: cursors, readout, Hear it), the marquee (hover pauses it), the V2V receiver-chain card (hover a stage, Step through the receiver, Live, Drawing with its draw-in, How it works, Code, decode heading) and the LED matrix card (mic, Play a demo, Idle glow, the name field, the same four views). Both cards also gained a Plate view with the Specimen line art. The RAMpage card's Fire the plow, timing diagram, signal path drawing, How it works and Code moved, unchanged, to the RAMpage case study (`#fire`); home shows a photo plate with a hover preview (the arena clip) and a Fire the plow link. The case studies lost nothing. `scripts/check-interactions.mjs` (in `npm run test:layout`) tests each interaction.
+
+### Other fixes
+
+- Contact in the nav went to `/#contact`, the home footer, and lazily laid-out sections (`content-visibility`) made the jump land in the Websites list. It now goes to /contact/, and arriving at any `/#section` turns the lazy layout off for that visit.
+- Toolbox chips are toggle filters (`aria-pressed`): matching project plates stay lit, the rest fade to 35%, and a polite live line says where the tool was used. Press again or Escape to clear. Hover still fills the "Used in" panel.
+- Green is the accent (see DESIGN.md); surfaces alternate paper, sheet and deep; the hero has the contour texture; the Research teaser and the footer are deep bands.
+- The seafloor drag never worked in a real browser: the still image sat on top of the WebGL canvas (later in the DOM), so you were looking at and dragging the image, whose native drag cancelled the pointer. Rebuilt with the Research scene below; the drag test checks what is under the pointer and that the camera turns.
+- /research/ is one scene: the seafloor is a fixed canvas behind the page, scrolling moves the camera from the murky green shallows (light shafts, the crabs) down to the glowing deep, and the content sits in sheet panels with a slight blur. Drag open water to look around (on touch, a sideways swipe turns, an up-and-down swipe scrolls); arrow keys from the scene control in the first panel. Phones render at 60% resolution; it pauses when the tab is hidden. Reduced motion or no WebGL: a still gradient from shallow green to deep, with a still render of the shallows at the top.
+- The Signals playground (Plate VIII, `src/components/playground/MeshPlayground.astro`) leads the Signals case study; the five earlier demos stay under it. The home Signals plate opens on a still of the mesh and keeps its Live and Drawing views.
+- Website metrics are now performance, accessibility and Loads in (mobile LCP), measured Nov 8, 2026 (see SOURCES.md).
+
+### Lighthouse (local, Lighthouse 12)
+
+Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /about/ 97, /work/rampage/ 96, /work/signals-playground/ 97. Desktop: / 100, /research/ 100. Accessibility, best practices and SEO 100 on all. three.js loads on none of them during a run, because it waits for the visitor to move, scroll or type.
+
+### TODO(ave), new
+
+- `src/components/RampagePlate.astro`: replace with CAD render when I get the SolidWorks files.
+- `src/components/plates/V2vConstellation.astro`: replace with run 4 received symbols if I can export them from MATLAB.

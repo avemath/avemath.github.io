@@ -80,7 +80,7 @@
     letter-spacing: -0.005em;
   }
 
-  /* An accent word in a heading: Bodoni italic, in lilac. */
+  /* An accent word in a heading: Bodoni italic, in the green accent. */
   :is(h1, h2, h3) em {
     font-style: italic;
     color: var(--accent);
@@ -294,7 +294,7 @@
 
 /* ------------------------------------------------------------------
    Buttons: pills with a 1px ink border, 46px tall. The primary action
-   is an ink fill that turns lilac on hover.
+   is an ink fill that turns green on hover.
    ------------------------------------------------------------------ */
 .btn {
   --btn-bg: transparent;
@@ -330,7 +330,7 @@
   transform: translateY(1px);
 }
 
-/* The main action: ink fill, paper text (13.7:1); lilac fill on hover (paper on lilac-ink, 4.6:1). */
+/* The main action: ink fill, paper text (13.5:1); green fill on hover (paper on accent-strong, 6.8:1). */
 .btn--primary {
   --btn-bg: var(--text);
   --btn-fg: var(--bg-contrast);
@@ -426,7 +426,7 @@
   transition: box-shadow 0.2s;
 }
 
-/* A plate under the pointer: the outer hairline turns lilac. */
+/* A plate under the pointer: the outer hairline turns green. */
 .paper:hover,
 .paper:focus-within {
   box-shadow:
@@ -1226,4 +1226,99 @@ html[data-motion='reduce'] *::after {
   font-weight: 400;
   color: var(--rose-ink);
   line-height: 1.2;
+}
+
+/* The Toolbox filter: plates that do not use the pressed tool fade to 35%. */
+[data-proj] {
+  transition: opacity 0.25s ease;
+}
+
+[data-proj][data-dim] {
+  opacity: 0.35;
+}
+
+html[data-motion='reduce'] [data-proj] {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-proj] {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Section surfaces. Neighboring sections never share a background:
+   paper, sheet and the deep band alternate down every page.
+   The deep band re-points the role tokens, so anything inside it
+   (buttons, links, focus rings, plates) reads light on deep green.
+   ------------------------------------------------------------------ */
+.band-paper {
+  background: var(--paper);
+}
+
+.band-sheet {
+  background: var(--sheet);
+}
+
+/* Plates resting on a sheet section get a soft shadow. */
+.band-sheet :is(.paper, .plate, .pplate__frame) {
+  box-shadow:
+    0 0 0 6px var(--paper),
+    0 0 0 7px var(--rule),
+    var(--plate-shadow);
+}
+
+.band-sheet .plate {
+  box-shadow: var(--plate-shadow);
+}
+
+.band-sheet .paper:hover,
+.band-sheet .paper:focus-within {
+  box-shadow:
+    0 0 0 6px var(--paper),
+    0 0 0 7px var(--accent),
+    var(--plate-shadow);
+}
+
+.band-deep {
+  --bg: var(--deep);
+  --bg-contrast: var(--deep);
+  --paper: var(--deep);
+  --sheet: #133a2f;
+  --surface: #133a2f;
+  --ink: var(--deep-ink);
+  --text: var(--deep-ink);
+  --text-soft: var(--deep-ink);
+  --muted: var(--deep-muted);
+  --rule: var(--deep-line);
+  --line: var(--deep-line);
+  --line-strong: #7d978b;
+  --accent: var(--deep-accent);
+  --accent-ink: var(--deep-accent);
+  --accent-strong: var(--deep-accent);
+  --accent-hover: var(--deep-accent);
+  --focus: var(--deep-accent);
+  --teal: #7ccac3;
+  background: var(--deep);
+  color: var(--deep-ink);
+  color-scheme: dark;
+}
+
+/* The faint contour texture behind the home hero: stacked paper, about 6%. */
+.topo {
+  position: relative;
+  isolation: isolate;
+}
+
+.topo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ink);
+  -webkit-mask: url('/topo.svg') center / cover no-repeat;
+  mask: url('/topo.svg') center / cover no-repeat;
+  opacity: 0.06;
+  pointer-events: none;
 }

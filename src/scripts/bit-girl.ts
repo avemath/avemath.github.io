@@ -9,6 +9,7 @@
 //   data-perch-min="760"      only from this viewport width up (phones get perches with room)
 //   data-perch-start          where she starts
 //   data-perch-inside         she may stand over the element's own picture (the seafloor scene)
+//   data-girl-ignore          a background picture she may stand in front of
 //
 // She turns to face the cursor. Left alone for about 3 s with the cursor on the page, she waves.
 // The first time the cursor comes close on a perch she may run once to another perch on the same
@@ -123,7 +124,7 @@ function obstacles() {
   const add = (q: DOMRect, el: Element, text: boolean) => {
     if (q.width > 1 && q.height > 1) out.push({ box: [q.left + scrollX, q.top + scrollY, q.right + scrollX, q.bottom + scrollY], el, text });
   };
-  for (const el of document.querySelectorAll('img, video, iframe, [data-girl-avoid]')) if (!el.closest('[hidden]')) add(el.getBoundingClientRect(), el, false);
+  for (const el of document.querySelectorAll('img, video, iframe, [data-girl-avoid]')) if (!el.closest('[hidden], [data-girl-ignore]')) add(el.getBoundingClientRect(), el, false);
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   const range = document.createRange();
   while (walker.nextNode()) {
