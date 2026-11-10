@@ -57,13 +57,67 @@ function measure() {
   const label = (el) => el.textContent.trim().replace(/\s+/g, ' ').slice(0, 70);
   const add = (el, kind, px, fig) => out.push({ fig: fig ?? figName(el), label: label(el), kind, px: Math.round(px * 10) / 10 });
 
+  // Convex quads (four screen points, in order) for rotated labels.
+  const quadOf = (r) => [{ x: r.left, y: r.top }, { x: r.right, y: r.top }, { x: r.right, y: r.bottom }, { x: r.left, y: r.bottom }];
+  // How far two convex quads overlap along their least-overlapping axis (separating axis test);
+  // 0 or less means apart.
+  const overlapDepth = (A, B) => {
+    let depth = Infinity;
+    for (const P of [A, B]) {
+      for (let i = 0; i < P.length; i++) {
+        const p = P[i];
+        const q = P[(i + 1) % P.length];
+        const len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+        const n = { x: -(q.y - p.y) / len, y: (q.x - p.x) / len };
+        const proj = (Q) => Q.map((v) => v.x * n.x + v.y * n.y);
+        const a = proj(A);
+        const b = proj(B);
+        const o = Math.min(Math.max(...a), Math.max(...b)) - Math.max(Math.min(...a), Math.min(...b));
+        if (o <= 0) return 0;
+        depth = Math.min(depth, o);
+      }
+    }
+    return depth;
+  };
+  // Does a segment touch a convex quad (shrunk 1px)?
+  const polyHit = (a, b, Q) => {
+    const cx = Q.reduce((s, v) => s + v.x, 0) / 4;
+    const cy = Q.reduce((s, v) => s + v.y, 0) / 4;
+    const S = Q.map((v) => {
+      const d = Math.hypot(v.x - cx, v.y - cy) || 1;
+      return { x: v.x - ((v.x - cx) / d) * 1.4, y: v.y - ((v.y - cy) / d) * 1.4 };
+    });
+    const side = (p, q, r) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+    const inside = (pt) => {
+      const s0 = Math.sign(side(S[0], S[1], pt));
+      return S.every((v, i) => Math.sign(side(v, S[(i + 1) % 4], pt)) === s0);
+    };
+    if (inside(a) || inside(b)) return true;
+    const cross = (p, q, r, s2) => {
+      const d1 = side(p, q, r), d2 = side(p, q, s2), d3 = side(r, s2, p), d4 = side(r, s2, q);
+      return d1 * d2 < 0 && d3 * d4 < 0;
+    };
+    return S.some((v, i) => cross(a, b, v, S[(i + 1) % 4]));
+  };
+
   for (const svg of document.querySelectorAll('main svg')) {
     const sr = visible(svg);
     if (!sr) continue;
+    // A rotated label is tested as what it is, a rotated rectangle (its own box turned by its
+    // transform), not as the larger upright box around it.
+    const outline = (t) => {
+      const m = t.getScreenCTM();
+      if (!m || (Math.abs(m.b) < 1e-3 && Math.abs(m.c) < 1e-3)) return null;
+      const bb = t.getBBox();
+      const top = bb.y + bb.height * 0.15;
+      const bot = bb.y + bb.height * 0.85;
+      return [[bb.x, top], [bb.x + bb.width, top], [bb.x + bb.width, bot], [bb.x, bot]].map(([x, y]) => new DOMPoint(x, y).matrixTransform(m));
+    };
     const texts = [...svg.querySelectorAll('text')]
       .filter((t) => t.textContent.trim())
       .map((t) => ({ t, r: visible(t) }))
-      .filter((x) => x.r);
+      .filter((x) => x.r)
+      .map((x) => ({ ...x, q: outline(x.t) }));
     if (!texts.length) continue;
     const fig = figName(svg);
     const svgArea = sr.width * sr.height;
@@ -80,6 +134,8 @@ function measure() {
       .filter((x) => x.r && x.r.width > 6 && x.r.height > 6 && x.r.width * x.r.height < svgArea * 0.4);
     const lines = [...svg.querySelectorAll('line, path')]
       .filter((l) => !l.closest('clipPath, mask, defs, marker, pattern'))
+      // A backdrop (the workbench's cutting mat grid) is texture behind everything, not a line a label can cross.
+      .filter((l) => !l.closest('[data-label-bg]'))
       .filter((l) => visible(l, true))
       .map((l) => {
         if (l.tagName === 'line') {
@@ -132,6 +188,13 @@ function measure() {
     const ink = (r) => ({ left: r.left, right: r.right, top: r.top + r.height * 0.15, bottom: r.bottom - r.height * 0.15 });
     for (let i = 0; i < texts.length; i++) {
       for (let j = i + 1; j < texts.length; j++) {
+        if (texts[i].q || texts[j].q) {
+          const qa = texts[i].q ?? quadOf(ink(texts[i].r));
+          const qb = texts[j].q ?? quadOf(ink(texts[j].r));
+          const d = overlapDepth(qa, qb);
+          if (d > 1) add(texts[i].t, `overlaps "${label(texts[j].t)}"`, d, fig);
+          continue;
+        }
         const a = ink(texts[i].r);
         const b = ink(texts[j].r);
         const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
@@ -140,14 +203,14 @@ function measure() {
       }
     }
     // Label on a line from another group.
-    for (const { t, r } of texts) {
+    for (const { t, r, q } of texts) {
       const k = ink(r);
       const box = { left: k.left + 1, right: k.right - 1, top: k.top + 1, bottom: k.bottom - 1 };
       for (const { l, a, b } of lines) {
         // Lines in the label's own group (a callout and its leader, a chip and its border) are part of it.
         const g = l.parentElement;
         if (g.tagName === 'g' && g.contains(t)) continue;
-        if (hits(a, b, box)) {
+        if (q ? polyHit(a, b, q) : hits(a, b, box)) {
           add(t, 'crosses a line', 1, fig);
           break;
         }

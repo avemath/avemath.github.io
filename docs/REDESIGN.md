@@ -655,3 +655,23 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 - `src/lib/skills.ts`: Landspace's repo is private; make it public to link its files.
 - `src/scripts/fig/matrix.ts`: "Play a demo" plays a generated track; add a recorded clip if you want one.
 - `src/components/RampagePlate.astro`: a CAD render when you have the SolidWorks files.
+
+## The workbench (November 10, 2026)
+
+/work/ is rebuilt around Concept D (the workbench) and Concept A revised (the thread map with pictures) from `docs/mockups/work-concepts-2.html`. The carousel (Concept F) is not built.
+
+- **Data:** projects carry `threads` (hardware, signals, family, web, land; names "Hardware", "Signals and sound", "For my family", "Websites and tools", "Land" in `src/lib/bench.ts`). `src/data/bench.json` places each project's object on the bench (position, size, tag); a project with no entry still shows in the thread map and the index, and the build warns.
+- **The workbench** (`src/components/work/Workbench.astro`, objects in `src/components/work/bench/`, script `src/scripts/workbench.ts`): an inline SVG on a green cutting mat (tokens `--bench-*` in `tokens.css`, light and dark). Every object is a button with its name, kind and dates; hover or focus lifts it and turns it green; choosing it shows its detail below (cover or drawing, title, kind, dates, status, outcome, role, tools, the case study and WorkCard's Live, Drawing and Code links), sets `#slug` in the address, and `/work/#slug` opens it. Arrow keys move in reading order. RAMpage is chosen first. The four client sites are prints by a laptop whose screen shows the site you point at. Phones get a scroll shelf. One animation loop, only on screen and with the tab visible, starting after the page loads; reduced motion is a still bench. The bit girl perches on the robot, the scope and the laptop lid on wide screens.
+- **How it connects** (`src/components/work/ThreadMap.astro`, `src/scripts/threadmap.ts`): stations in start order, round pictures from the covers (2x through the image pipeline), drawn stations for the rest, interchange capsules, dashed tracks to "now" for running lines and bars for finished ones, year brackets, preview cards, legend buttons, a vertical map on phones, a one-time draw-in.
+- **Client sites** keeps the showcase rows and the client tool panels; **Every project** is a compact index grouped as Engineering, Research, and Websites and client tools, keeping `#engineering`, `#research` and `#websites`.
+- **Dates** everywhere on the page come from one helper: finished work with no end date shows only its start (bellhopSim had read "May 2026 to now").
+- **Performance:** the drawings are not repeated in the HTML (the detail panel copies the bench's drawing when chosen; the map's LED station is 16 bars), the sections below the bench lay out lazily, the bench's motion and the bit girl start after load.
+- **Tests:** every bench object opens its project; keyboard only; `/work/#because-of-adam`; every map station; no sideways scroll at 320, 390, 768 and 1440; the bit girl never blocks a click; the loop stops off screen and never runs with reduced motion. `check-interactions` now runs most tests in a plain browser and only the WebGL ones with SwiftShader, which had been costing about seven cores per page and starving clicks.
+- **Screenshots:** `docs/workbench/`.
+
+### TODO(ave), workbench
+
+- `src/content/projects/*.md`: confirm the thread for each project.
+- `src/lib/bench.ts`: check the thread names. `src/data/bench.json`: check the object tags.
+- `src/pages/work/index.astro`: check the lede and the "How it connects" intro.
+- `src/components/work/bench/PoolSketch.astro`: check "listens for a splash".

@@ -90,3 +90,12 @@ Facts with no document behind them, confirmed by Ave directly. Each line gives t
 - 2026-11-06: the acoustic pool alarm is Ave's own project; Because of ADAM is the reason it exists, not a partner.
 - 2026-11-06: Integer's thruster characterization sentence may stay (no numbers).
 - 2026-11-06: keep as written: "Because of ADAM" (short form) on the résumé, "Grace Mae Alterations", the PLV Abstract Builder "AI reading step" line, and "quoted up front" on Services.
+
+## The /work/ workbench (Nov 10)
+
+The bench's moving parts are drawn from the site's own code, not illustrations:
+- **The scope (Signals playground)** shows the first eight chips of the playground's real hop pattern: `hopSequence(8, HOP_SEED)` with seed 87 from `src/lib/fhbfsk.ts`, the same chips and bits as Plate VI on the home page, each placed at its tone between 9.44 and 13.6 kHz.
+- **The bellhopSim print** draws seven rays from 1000 m at -12 to +12 degrees through bellhopSim's Munk profile, traced at build time by the site's one ray tracer (`src/lib/raytrace.ts`), over the first 60 km; the gold curve is that profile's c(z).
+- **The LED panel** runs the firmware model in `src/lib/led-firmware.ts` (the demo track through the FFT, the 16 bands, peaks that hold and fall), the same model as the LED demo on the home page. Its still frame (no script, reduced motion) is the busiest frame of that model between 2.5 and 8 s, computed at build time.
+- **Landspace's** "159.8 ac" is from the Landspace cover (its alt text names 159.8 mapped acres).
+- **The cars (V2V)** are orange and blue, MATLAB's first two plot colors, as in the V2V figures. The Integer tank and the ONR folder are generic on purpose: no numbers or specifics.

@@ -11,7 +11,7 @@ import { prefersReducedMotion } from './preferences';
 import { createSpectrum, createDemoTrack, N, FS, FRAME_MS, W, H } from '../lib/led-firmware';
 
 export function mountWorkbench() {
-  const svg = document.querySelector<SVGSVGElement>('[data-bench]');
+  const svg = document.querySelector<SVGSVGElement>('[data-bench-svg]');
   if (!svg) return;
   const objs = [...svg.querySelectorAll<SVGGElement>('.obj[data-bench]')];
   const details = [...document.querySelectorAll<HTMLElement>('[data-detail]')];
@@ -39,6 +39,17 @@ export function mountWorkbench() {
       o.setAttribute('aria-pressed', String(on));
     });
     details.forEach((d) => (d.hidden = d.dataset.detail !== slug));
+    // A project without a cover shows its bench drawing: copied in the first time it is chosen.
+    const slot = document.querySelector<SVGGElement>(`[data-clone="${slug}"]`);
+    const art = objs.find((o) => o.dataset.bench === slug)?.querySelector('.obj__art');
+    if (slot && art && !slot.childElementCount) {
+      const copy = art.cloneNode(true) as SVGGElement;
+      copy.querySelectorAll('[data-perch]').forEach((e) => e.removeAttribute('data-perch'));
+      copy.querySelectorAll('[data-led],[data-chips],[data-arcs],[data-tank],[data-pool],[data-ticks],[data-rays],[data-pk]').forEach((e) => {
+        for (const a of ['data-led', 'data-chips', 'data-arcs', 'data-tank', 'data-pool', 'data-ticks', 'data-rays', 'data-pk']) e.removeAttribute(a);
+      });
+      slot.append(...copy.childNodes);
+    }
     showSite(slug);
     if (opts.say !== false) live.textContent = `Showing ${titleOf(slug)} below the bench.`;
     if (opts.hash) history.replaceState(null, '', `#${slug}`);
@@ -115,7 +126,8 @@ export function mountWorkbench() {
       acc -= FRAME_MS;
       fed = true;
     }
-    if (!fed) return;
+    // Until the model is past its warm-up and showing bands, the panel keeps the frame it was built with.
+    if (!fed || !sp.s.spectrumMode) return;
     const s = sp.s;
     for (let c = 0; c < W; c++) {
       for (let r = 0; r < H; r++) {
@@ -129,9 +141,7 @@ export function mountWorkbench() {
     }
   };
 
-  // Start where the still frame was drawn (the build picked its moment in the demo track).
-  const startMs = Number(svg.querySelector<SVGGElement>('[data-led]')?.dataset.startMs ?? 4000);
-  if (led.length) stepLed(startMs);
+
 
   let raf = 0;
   let last = 0;
@@ -193,8 +203,21 @@ export function mountWorkbench() {
     tank.forEach((c, i) => (c.setAttribute('r', String(20 + i * 18)), (c.style.opacity = String(0.6 - i * 0.18))));
     pool.forEach((c, i) => (c.setAttribute('r', String(10 + i * 10)), (c.style.opacity = String(0.6 - i * 0.25))));
   };
+  // The motion waits until the page has loaded and the browser is idle, so it never competes with
+  // first paint.
+  let settled = false;
+  const settle = () => {
+    const go = () => {
+      settled = true;
+      kick();
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 1500 });
+    else setTimeout(go, 300);
+  };
+  if (document.readyState === 'complete') settle();
+  else addEventListener('load', settle, { once: true });
   const kick = () => {
-    if (raf || !onScreen || document.hidden || prefersReducedMotion()) return;
+    if (!settled || raf || !onScreen || document.hidden || prefersReducedMotion()) return;
     last = 0;
     raf = requestAnimationFrame(frame);
   };
@@ -214,7 +237,7 @@ export function mountWorkbench() {
       still();
     } else kick();
   });
-  still();
+  // No still() here: the page is drawn in its still state already.
 
   // For the tests: whether the loop is running, and how many frames it has drawn.
   (window as Window & { __bench?: unknown }).__bench = { running: () => raf !== 0, frames: () => frames, current: () => current, shelf };

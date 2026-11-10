@@ -27,6 +27,10 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
   bitGirl
   section="projects"
 >
+  <!-- Arriving at a #section or a project's #slug, skip the lazy layout so the jump lands on the real position. -->
+  <script is:inline>
+    if (location.hash) document.documentElement.classList.add('cv-off');
+  </script>
   <section class="section work-head band-paper" id="all">
     <div class="wrap">
       <h1 class="section-title work-head__title">All work</h1>
@@ -204,6 +208,15 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     font-family: var(--font-mono);
     font-size: 0.875rem;
     font-weight: 400;
+  }
+
+  /* Below the bench, the browser skips laying out the map, the client sites and the index until they
+     near the screen, so the first paint does not wait on them. Off when arriving at a #hash. */
+  :global(html:not(.cv-off)) .work-map,
+  :global(html:not(.cv-off)) .work-sites,
+  :global(html:not(.cv-off)) .work-index {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1200px;
   }
 
   /* The bench sits right under the title. */

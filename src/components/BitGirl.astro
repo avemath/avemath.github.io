@@ -25,5 +25,9 @@
 
 <script>
   import { mountBitGirl } from '../scripts/bit-girl';
-  document.querySelectorAll<HTMLCanvasElement>('[data-bit-girl]').forEach(mountBitGirl);
+  // She arrives once the page has loaded and the browser is idle, so she never competes with it.
+  const go = () => document.querySelectorAll<HTMLCanvasElement>('[data-bit-girl]').forEach(mountBitGirl);
+  const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 2000 }) : setTimeout(go, 300));
+  if (document.readyState === 'complete') idle();
+  else addEventListener('load', idle, { once: true });
 </script>

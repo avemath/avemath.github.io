@@ -5,6 +5,8 @@
 // twice the circle's size, or a drawing for projects without one). A project on two threads is an
 // interchange: a capsule across both lines. Lines still running end in a dashed track to "now";
 // finished lines end in a bar. Year brackets run underneath.
+// Across the page, each line's name sits in one column at the left edge, clear of the stations'
+// leaders (the mockup put it at the line's start, which ran across other stations' leaders).
 // Built here, at build time, in two shapes: across the page, and down it for phones (CSS shows the
 // one that fits), so it reads with no script. src/scripts/threadmap.ts adds the preview card on
 // hover or focus, selecting a project on the bench, the legend's highlighting and the draw-in.
@@ -139,7 +141,7 @@ const V_ = build('v');
                 <path class="tmap__track" d={`M${l.a[0]} ${l.a[1]}L${l.b[0]} ${l.b[1]}`} pathLength="1" />
                 {l.running ? <path class="tmap__now" d={`M${l.b[0]} ${l.b[1]}L${l.end[0]} ${l.end[1]}`} /> : <path class="tmap__end" d={v ? `M${l.b[0] - 12} ${l.b[1] + 34}h24` : `M${l.b[0] + 34} ${l.b[1] - 12}v24`} />}
                 {!v && (
-                  <text class="tmap__lname" x={l.a[0] - 38} y={l.a[1] + 4} text-anchor="end">
+                  <text class="tmap__lname" x={g.pos(0, 0)[0] - 38} y={l.a[1] + 4} text-anchor="end">
                     {l.t.name}
                   </text>
                 )}
@@ -187,7 +189,7 @@ const V_ = build('v');
                     <circle class="tmap__dark" cx={s.cx} cy={s.cy} r={R} />
                     {Draw && spot && (
                       <svg x={s.cx - R} y={s.cy - R} width={2 * R} height={2 * R} viewBox={`${spot.x} ${spot.y} ${spot.w} ${spot.h}`} preserveAspectRatio="xMidYMid slice" class="bench tmap__benchart">
-                        <Draw spot={spot} perch={false} />
+                        <Draw spot={spot} perch={false} mini />
                       </svg>
                     )}
                     {p.id === 'signals-playground' &&
@@ -432,6 +434,11 @@ const V_ = build('v');
 
   .tmap__benchart {
     overflow: hidden;
+  }
+
+  /* At a station's size the drawing's words are too small to read: the shapes carry it. */
+  .tmap__benchart :global(text) {
+    display: none;
   }
 
   .ic-g {

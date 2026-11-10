@@ -5,7 +5,8 @@
 // with no script and with reduced motion; src/scripts/workbench.ts plays it live.
 import { moveTo, type BenchSpot } from '@/lib/bench';
 import { createSpectrum, createDemoTrack, N, FS, FRAME_MS, W, H } from '@/lib/led-firmware';
-const { spot } = Astro.props as { spot: BenchSpot };
+// mini: for small copies (the thread map's station), 16 bars instead of 256 dots.
+const { spot, mini = false } = Astro.props as { spot: BenchSpot; mini?: boolean; perch?: boolean };
 
 // Run the model through the demo track and keep its busiest frame between 2.5 and 8 s (the most
 // light in the bars, in spectrum mode). The live panel starts from the same moment.
@@ -37,11 +38,13 @@ const cls = (c: number, r: number) => (r < bands[c] ? litClass(r) : peaks[c] > 0
 
 <g transform={moveTo(spot, 352, 70)}>
   <rect class="ln screen" x="352" y="70" width="200" height="200" rx="6" />
-  <g data-led data-start-ms={best.ms}>
-    {
-      Array.from({ length: W }, (_, c) =>
-        Array.from({ length: H }, (_, r) => <circle class={cls(c, r)} cx={364 + c * 11.8} cy={258 - r * 11.8} r="3.6" data-c={c} data-r={r} />),
-      )
-    }
-  </g>
+  {
+    mini ? (
+      bands.map((b, c) => <rect class={litClass(Math.max(0, b - 1))} x={359 + c * 11.8} y={264 - b * 11.8} width="9" height={b * 11.8} />)
+    ) : (
+      <g data-led data-start-ms={best.ms}>
+        {Array.from({ length: W }, (_, c) => Array.from({ length: H }, (_, r) => <circle class={cls(c, r)} cx={364 + c * 11.8} cy={258 - r * 11.8} r="3.6" />))}
+      </g>
+    )
+  }
 </g>

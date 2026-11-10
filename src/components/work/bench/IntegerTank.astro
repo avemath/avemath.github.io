@@ -8,7 +8,7 @@ const { spot } = Astro.props as { spot: BenchSpot };
 <g transform={moveTo(spot, 336, 340)}>
   <rect class="ln" x="336" y="340" width="216" height="176" rx="8" />
   <rect class="water" x="348" y="352" width="192" height="152" rx="4" />
-  <g data-tank>{[0, 1, 2].map(() => <circle class="ripple" cx="410" cy="428" r="10" />)}</g>
+  <g data-tank>{[0, 1, 2].map((i) => <circle class="ripple" cx="410" cy="428" r={20 + i * 18} style={`opacity:${(0.6 - i * 0.18).toFixed(2)}`} />)}</g>
   <rect class="ln" x="396" y="418" width="28" height="20" rx="5" />
   <path class="ln" d="M396 422 l-10 -6 v24 l10 -6" />
   <path class="ink-line" d="M510 352 C 512 380 498 404 500 440" style="stroke-width:1.5;fill:none" />

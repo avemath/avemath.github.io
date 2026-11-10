@@ -9,9 +9,9 @@ const { spot } = Astro.props as { spot: BenchSpot };
   <g transform="translate(-44 0)">
     <rect class="ln graph" x="662" y="528" width="132" height="148" rx="2" transform="rotate(-4 728 600)" />
     <rect class="water pool" x="684" y="556" width="88" height="58" rx="18" />
-    <g data-pool>{[0, 1].map(() => <circle class="ripple" cx="714" cy="584" r="6" />)}</g>
+    <g data-pool>{[0, 1].map((i) => <circle class="ripple" cx="714" cy="584" r={10 + i * 10} style={`opacity:${(0.6 - i * 0.25).toFixed(2)}`} />)}</g>
     <circle class="listener" cx="758" cy="600" r="4" />
     {/* TODO(ave): check wording. */}
-    <text class="hw" x="676" y="650">listens for a splash</text>
+    <text class="hw hw--sm" x="674" y="650">listens for a splash</text>
   </g>
 </g>

@@ -9,6 +9,13 @@
 //   chain          hovering a V2V receiver stage selects it; Step through always starts at stage 1,
 //                  then moves on, and only shows on the Live view; at 390, 1440 and 2560 every
 //                  stage's caption sits below the drawing, never over it
+//   bench          /work/: every bench object opens its project (detail, pressed, address); prints
+//                  put their site on the laptop
+//   bench-keyboard every bench object is reached by Tab and chosen by Enter or Space; arrows, End
+//   bench-hash     /work/#because-of-adam opens it; /work/#websites still lands on its group
+//   thread-map     every station selects its project on the bench; preview card; legend; phone labels
+//   bench-girl     nothing (the bit girl included) takes a click meant for a bench object
+//   bench-loop     the bench's loop runs on screen, stops off screen, never runs with reduced motion
 //   figure-viewer  the V2V figures: Next and Previous, arrow keys, thumbnails, swipe, full screen,
 //                  captions, and the buttons in the text that jump to a figure
 //   surface        Back to the surface scrolls to the top of /research/; Home goes home
@@ -543,6 +550,9 @@ await test('arrivals', async () => {
   const p = await page('/research/');
   await settleOn(p, '#r3-tab-arr');
   await p.locator('#r3-tab-arr').click();
+  // Move the pointer off the figure: left resting there, a bar can slide under it as the chart
+  // scrolls into view, and pointing at a bar rightly picks that bar over the keyboard's choice.
+  await p.mouse.move(2, 2);
   await settleOn(p, '[data-arr-plot]');
   const read = () => p.locator('[data-arr-read]').textContent();
   const bars = p.locator('[data-arr]');
@@ -594,6 +604,166 @@ await test('tool-panel', async () => {
   await p.waitForTimeout(4800);
   if (!(await panels.first().evaluate((e) => e.hasAttribute('data-played')))) fail('tool-panel', 'the flow does not keep its end state');
   await p.close();
+});
+
+await test('bench', async () => {
+  const p = await page('/work/');
+  const objs = p.locator('[data-bench-svg] .obj[data-bench]');
+  const n = await objs.count();
+  if (n < 15) fail('bench', `${n} objects on the bench, expected 15`);
+  // RAMpage is chosen to begin with.
+  const shown = () => p.evaluate(() => [...document.querySelectorAll('[data-detail]')].filter((d) => !d.hidden).map((d) => d.dataset.detail).join());
+  if ((await shown()) !== 'rampage') fail('bench', `the bench starts on ${await shown()}, not RAMpage`);
+  await settleOn(p, '[data-bench-svg]');
+  // Clicking every object opens its own project and puts its slug in the address.
+  for (let i = 0; i < n; i++) {
+    const o = objs.nth(i);
+    const slug = await o.getAttribute('data-bench');
+    await o.click({ force: true });
+    if ((await shown()) !== slug) fail('bench', `clicking ${slug} shows ${await shown()}`);
+    if ((await o.getAttribute('aria-pressed')) !== 'true') fail('bench', `${slug} is not marked pressed after a click`);
+    if (new URL(p.url()).hash !== `#${slug}`) fail('bench', `clicking ${slug} sets the address to ${new URL(p.url()).hash}`);
+    const label = await o.getAttribute('aria-label');
+    if (!/\. [A-Z][a-z]+( site)?, .*\d{4}/.test(label)) fail('bench', `${slug}'s name has no kind and dates: "${label}"`);
+  }
+  // Pointing at a site's print puts it on the laptop.
+  await p.locator('[data-bench="because-of-adam"]').hover({ force: true });
+  const screen = await p.evaluate(() => document.querySelector('[data-screen].is-on')?.dataset.screen);
+  if (screen !== 'because-of-adam') fail('bench', `pointing at the ADAM print shows ${screen} on the laptop`);
+  await p.close();
+});
+
+await test('bench-keyboard', async () => {
+  // Keyboard only: Tab reaches every object, Enter and Space choose, the arrows move in reading order.
+  const p = await page('/work/');
+  const slugs = await p.locator('[data-bench-svg] .obj[data-bench]').evaluateAll((os) => os.map((o) => o.dataset.bench));
+  await p.locator('[data-bench-svg] .obj[data-bench]').first().focus();
+  const seen = new Set();
+  for (let k = 0; k < slugs.length; k++) {
+    const slug = await p.evaluate(() => document.activeElement?.dataset?.bench);
+    if (!slug) break;
+    seen.add(slug);
+    await p.keyboard.press(k % 2 ? 'Enter' : ' ');
+    const open = await p.evaluate(() => [...document.querySelectorAll('[data-detail]')].find((d) => !d.hidden)?.dataset.detail);
+    if (open !== slug) fail('bench-keyboard', `${k % 2 ? 'Enter' : 'Space'} on ${slug} opens ${open}`);
+    await p.keyboard.press('Tab');
+  }
+  if (seen.size !== slugs.length) fail('bench-keyboard', `Tab reached ${seen.size} of ${slugs.length} objects (missed ${slugs.filter((s) => !seen.has(s)).join(', ')})`);
+  await p.locator('[data-bench-svg] .obj[data-bench]').first().focus();
+  await p.keyboard.press('ArrowRight');
+  const second = await p.evaluate(() => document.activeElement?.dataset?.bench);
+  if (second !== slugs[1]) fail('bench-keyboard', `ArrowRight from the first object goes to ${second}, not ${slugs[1]}`);
+  await p.keyboard.press('End');
+  if ((await p.evaluate(() => document.activeElement?.dataset?.bench)) !== slugs.at(-1)) fail('bench-keyboard', 'End does not reach the last object');
+  await p.close();
+});
+
+await test('bench-hash', async () => {
+  const p = await page('/work/#because-of-adam');
+  await p.waitForTimeout(600);
+  const open = await p.evaluate(() => [...document.querySelectorAll('[data-detail]')].find((d) => !d.hidden)?.dataset.detail);
+  if (open !== 'because-of-adam') fail('bench-hash', `/work/#because-of-adam opens ${open}`);
+  const r = await p.locator('#bench-detail').boundingBox();
+  if (!r || r.y > 900 || r.y + r.height < 0) fail('bench-hash', 'the detail is not brought into view');
+  // Old links still land: /work/#websites is the index group.
+  const q = await page('/work/#websites');
+  await q.waitForTimeout(600);
+  const top = await q.evaluate(() => document.getElementById('websites').getBoundingClientRect().top);
+  if (top < -2 || top > 450) fail('bench-hash', `/work/#websites lands ${top}px from the top`);
+  await q.close();
+  await p.close();
+});
+
+await test('thread-map', async () => {
+  const p = await page('/work/');
+  await settleOn(p, '[data-tmap]');
+  const stns = p.locator('.tmap__svg--h [data-stn]');
+  const n = await stns.count();
+  if (n < 15) fail('thread-map', `${n} stations, expected 15`);
+  for (let i = 0; i < n; i++) {
+    const slug = await stns.nth(i).getAttribute('data-stn');
+    // Each pick scrolls the bench's detail into view, so bring the next station back first.
+    await stns.nth(i).evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await stns.nth(i).click({ force: true });
+    await p.waitForTimeout(50);
+    const cur = await p.evaluate(() => window.__bench?.current());
+    if (cur !== slug) fail('thread-map', `station ${slug} selects ${cur} on the bench`);
+  }
+  // Pointing at a station shows its preview card.
+  await stns.nth(0).evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await stns.nth(0).hover({ force: true });
+  const card = await p.evaluate(() => [...document.querySelectorAll('[data-card]')].filter((c) => !c.hidden).map((c) => c.dataset.card).join());
+  if (card !== (await stns.nth(0).getAttribute('data-stn'))) fail('thread-map', `hovering the first station shows card "${card}"`);
+  // A legend button highlights its thread (and says so).
+  const key = p.locator('[data-tmap] [data-line="family"]');
+  await key.click();
+  if ((await key.getAttribute('aria-pressed')) !== 'true' || (await p.locator('[data-tmap][data-focus="family"]').count()) !== 1) fail('thread-map', 'the legend does not highlight a thread');
+  await key.click();
+  if ((await key.getAttribute('aria-pressed')) !== 'false') fail('thread-map', 'pressing the legend again does not clear it');
+  // Phones: the vertical map, with labels that stay inside it.
+  const v = await page('/work/', { w: 390, h: 844 });
+  const clip = await v.evaluate(() => {
+    const svg = document.querySelector('.tmap__svg--v');
+    if (!svg || getComputedStyle(svg).display === 'none') return 'no vertical map';
+    const b = svg.getBoundingClientRect();
+    const bad = [...svg.querySelectorAll('.tmap__lbl text')].filter((t) => t.getBoundingClientRect().right > b.right + 1).map((t) => t.textContent);
+    return bad.join(', ');
+  });
+  if (clip) fail('thread-map', `phone map: ${clip}`);
+  await v.close();
+  await p.close();
+});
+
+await test('bench-girl', async () => {
+  // The bit girl never takes a click meant for a bench object: what is under each object's middle
+  // is the object.
+  const p = await page('/work/');
+  await settleOn(p, '[data-bench-svg]');
+  await p.waitForTimeout(800);
+  const bad = await p.evaluate(() => {
+    const out = [];
+    for (const o of document.querySelectorAll('[data-bench-svg] .obj[data-bench]')) {
+      const r = o.querySelector('.obj__hit').getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      if (y < 70 || y > innerHeight - 4) continue;
+      const hit = document.elementFromPoint(x, y);
+      if (!hit || !o.contains(hit)) out.push(`${o.dataset.bench} (${hit?.tagName}${hit?.className?.baseVal ? '.' + hit.className.baseVal : ''})`);
+    }
+    return out;
+  });
+  if (bad.length) fail('bench-girl', `something else takes the click on: ${bad.join(', ')}`);
+  const pe = await p.evaluate(() => getComputedStyle(document.querySelector('[data-bit-girl]') ?? document.body).pointerEvents);
+  if (pe !== 'none' && (await p.locator('[data-bit-girl]').count())) fail('bench-girl', 'the bit girl can take clicks');
+  await p.close();
+});
+
+await test('bench-loop', async () => {
+  // The bench's one animation loop runs on screen and stops off screen.
+  const p = await page('/work/');
+  await settleOn(p, '[data-bench-svg]');
+  await p.waitForTimeout(500);
+  if (!(await p.evaluate(() => window.__bench.running()))) fail('bench-loop', 'the loop is not running with the bench on screen');
+  const f0 = await p.evaluate(() => window.__bench.frames());
+  await p.waitForTimeout(500);
+  if ((await p.evaluate(() => window.__bench.frames())) <= f0) fail('bench-loop', 'no frames drawn on screen');
+  await p.evaluate(() => document.getElementById('index-title').scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await p.waitForTimeout(500);
+  if (await p.evaluate(() => window.__bench.running())) fail('bench-loop', 'the loop keeps running with the bench off screen');
+  const f1 = await p.evaluate(() => window.__bench.frames());
+  await p.waitForTimeout(500);
+  if ((await p.evaluate(() => window.__bench.frames())) !== f1) fail('bench-loop', 'frames are still drawn off screen');
+  await p.close();
+  // Reduced motion: a still bench, every box ticked, still choosable.
+  const rm = await page('/work/', { reduce: true });
+  await settleOn(rm, '[data-bench-svg]');
+  await rm.waitForTimeout(400);
+  if (await rm.evaluate(() => window.__bench.running())) fail('bench-loop', 'the loop runs with reduced motion');
+  const ticked = await rm.evaluate(() => [...document.querySelectorAll('[data-ticks] path')].every((t) => t.classList.contains('is-on')));
+  if (!ticked) fail('bench-loop', 'with reduced motion not every box is ticked');
+  await rm.locator('[data-bench="landspace"]').click({ force: true });
+  if ((await rm.evaluate(() => window.__bench.current())) !== 'landspace') fail('bench-loop', 'with reduced motion the bench cannot be used');
+  await rm.close();
 });
 
 await test('figure-viewer', async () => {

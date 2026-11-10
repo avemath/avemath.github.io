@@ -346,6 +346,8 @@ for (const scheme of ['light', 'dark']) {
       await page.route(...localOnly(base));
       await page.goto(`${base}/research/`, { waitUntil: 'networkidle' });
       await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+      // The tags are filled by the page's script; wait for it rather than for a fixed time.
+      await page.waitForFunction(() => [...document.querySelectorAll('[data-depth-tag]')].every((t) => !t.hidden), null, { timeout: 15000 }).catch(() => {});
       await page.waitForTimeout(400);
       const v = await page.evaluate(() => {
         const panels = [...document.querySelectorAll('[data-depth-panel]')].map((p) => {
@@ -392,6 +394,31 @@ for (const scheme of ['light', 'dark']) {
   }
   await page.close();
   console.log('Research: five two-column plates at 1440, stacked on phones, no sideways scroll, tags match the gauge.');
+}
+
+// ---- /work/: never scrolls sideways; the bench shelf scrolls on phones and keeps 44px targets ----
+{
+  for (const w of [320, 390, 768, 1440]) {
+    for (const theme of ['light', 'dark']) {
+      const page = await browser.newPage({ viewport: { width: w, height: 900 } });
+      await page.route(...localOnly(base));
+      await page.goto(`${base}/work/`, { waitUntil: 'networkidle' });
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+      await page.waitForTimeout(300);
+      const v = await page.evaluate(() => {
+        const objs = [...document.querySelectorAll('[data-bench-svg] .obj[data-bench] .obj__hit')].map((r) => r.getBoundingClientRect());
+        return {
+          sw: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          small: objs.filter((r) => r.width < 44 || r.height < 44).length,
+          n: objs.length,
+        };
+      });
+      if (v.sw > 0) fail(`${w} ${theme} /work/: the page scrolls sideways by ${v.sw}px`);
+      if (v.small) fail(`${w} /work/: ${v.small} of ${v.n} bench objects are under 44px`);
+      await page.close();
+    }
+  }
+  console.log('Work: no sideways scroll at 320, 390, 768 and 1440 in both themes; every bench object is a 44px target.');
 }
 
 await browser.close();

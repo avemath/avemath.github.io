@@ -11,8 +11,8 @@ const RMAX = 60_000;
 const px = (r: number) => X0 + (r / RMAX) * (X1 - X0);
 const py = (z: number) => Y0 + (z / MUNK.zmax) * (Y1 - Y0);
 const rays = [-12, -8, -4, 0, 4, 8, 12].map((a) => {
-  const ray = traceRay(MUNK, 1000, (a * Math.PI) / 180, { rmax: RMAX, ds: 150, every: 2 });
-  return 'M' + ray.r.map((r, i) => `${px(r).toFixed(1)} ${py(ray.z[i]).toFixed(1)}`).join('L');
+  const ray = traceRay(MUNK, 1000, (a * Math.PI) / 180, { rmax: RMAX, ds: 150, every: 5 });
+  return 'M' + ray.r.map((r, i) => `${px(r).toFixed(0)} ${py(ray.z[i]).toFixed(0)}`).join('L');
 });
 // c(z) along the left edge: faster is further right.
 const ssp = Array.from({ length: 41 }, (_, i) => {

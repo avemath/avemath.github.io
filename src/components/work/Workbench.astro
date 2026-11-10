@@ -81,9 +81,9 @@ const order = [...placed].sort((a, b) => {
 
 <div class="bench-wrap">
   <div class="bench-shelf" data-bench-shelf>
-    <svg class="bench" viewBox="0 0 1200 720" role="group" aria-label={`My workbench: ${placed.length} projects, one object each. Choose one to see it below.`} data-bench>
+    <svg class="bench" viewBox="0 0 1200 720" role="group" aria-label={`My workbench: ${placed.length} projects, one object each. Choose one to see it below.`} data-bench-svg>
       <rect class="mat" x="16" y="16" width="1168" height="688" rx="18" />
-      <g class="mat__grid" aria-hidden="true">
+      <g class="mat__grid" aria-hidden="true" data-label-bg>
         {Array.from({ length: 38 }, (_, k) => 46 + k * 30).map((x) => <line class:list={[(x - 46) % 150 === 0 ? 'g2' : 'g1']} x1={x} y1="16" x2={x} y2="704" />)}
         {Array.from({ length: 22 }, (_, k) => 46 + k * 30).map((y) => <line class:list={[(y - 46) % 150 === 0 ? 'g2' : 'g1']} x1="16" y1={y} x2="1184" y2={y} />)}
         {Array.from({ length: 38 }, (_, k) => 46 + k * 30).map((x, k) => <line class="tick" x1={x} y1="16" x2={x} y2={k % 5 === 0 ? 32 : 25} />)}
@@ -120,7 +120,9 @@ const order = [...placed].sort((a, b) => {
                 <Image src={d.cover} alt="" widths={[360, 560, 760]} sizes="(min-width: 960px) 26rem, calc(100vw - 2rem)" format="webp" quality={72} loading="lazy" class="bd__img" />
               ) : (
                 <svg class="bd__draw bench" viewBox={`${spot.x - 14} ${spot.y - 14} ${spot.w + 28} ${spot.h + 28}`} aria-hidden="true">
-                  {Draw && <Draw spot={spot} perch={false} />}
+                  {/* Filled from the bench's own drawing when the project is chosen (workbench.ts),
+                      so the page does not carry every drawing twice. */}
+                  {p.id === START && Draw ? <Draw spot={spot} perch={false} /> : <g data-clone={p.id} />}
                 </svg>
               )}
             </div>
@@ -249,6 +251,10 @@ const order = [...placed].sort((a, b) => {
     font-family: var(--font-hand);
     font-size: 15px;
     fill: var(--rose-ink);
+  }
+
+  .bench .hw--sm {
+    font-size: 13px;
   }
 
   .bench .mono-ink {
