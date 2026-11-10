@@ -21,7 +21,8 @@
 //   tune           the Toolbox radio: dragging searches then snaps to a station, the keys and buttons
 //                  step, locking filters the plates and Escape clears, phones swipe with no sideways
 //                  scroll, and reduced motion jumps the needle
-//   race           Why sound: Send runs the race and the clock stops at 2.00 s
+//   race           Why sound, by keyboard only: distance slider, radio frequency, Send; the clock and
+//                  the spoken summary give the real times and where radio is lost in water
 //   arrivals       Fig. R2: hovering or arrowing through the arrivals names each one's path
 //   field-notes    notes start as bits, decode into text when scrolled to, and a tap replays them
 //   tool-panel     the client tool panels play their flow when scrolled to and keep the end state
@@ -448,13 +449,35 @@ await test('tune', async () => {
 await home.close();
 
 await test('race', async () => {
+  // Keyboard only: the distance slider, the radio frequency, then Send.
   const p = await page('/research/');
   await settleOn(p, '[data-race]');
-  await p.locator('[data-race-send]').click();
-  await p.waitForFunction(() => { const v = Number(document.querySelector('[data-race-clock]').textContent); return v > 0.05 && v < 2; }, null, { timeout: 4000 }).catch(() => fail('race', 'the clock never runs'));
-  await p.waitForFunction(() => document.querySelector('[data-race-clock]').textContent === '2.00', null, { timeout: 8000 }).catch(async () => fail('race', `the clock stops at ${await p.locator('[data-race-clock]').textContent()}, not 2.00`));
-  await p.waitForTimeout(200);
-  if (!(await p.locator('[data-race-live]').textContent()).includes('2.00')) fail('race', 'the live line does not give the round trip');
+  const d = p.locator('[data-race-d]');
+  await d.focus();
+  await p.keyboard.press('End');
+  if ((await p.locator('[data-race-dout]').textContent()) !== '10 km') fail('race', `End on the distance slider shows ${await p.locator('[data-race-dout]').textContent()}, not 10 km`);
+  if ((await d.getAttribute('aria-valuetext')) !== '10 km') fail('race', 'the slider does not say its distance to assistive tech');
+  await p.keyboard.press('Home');
+  if ((await p.locator('[data-race-dout]').textContent()) !== '10 m') fail('race', 'Home on the distance slider is not 10 m');
+  for (let k = 0; k < 6; k++) await p.keyboard.press('PageUp');
+  for (let k = 0; k < 67; k++) await p.keyboard.press('ArrowRight');
+  if ((await p.locator('[data-race-dout]').textContent()) !== '1 km') fail('race', 'the slider does not land on 1 km');
+  await p.keyboard.press('Tab');
+  const rf = p.locator('[data-race-rf]');
+  if (!(await rf.evaluate((e) => e === document.activeElement))) fail('race', 'Tab from the slider does not reach the radio frequency');
+  await p.keyboard.press('ArrowDown');
+  const freq = await rf.inputValue();
+  await p.keyboard.press('Tab');
+  await p.keyboard.press('Tab');
+  if (!(await p.locator('[data-race-send]').evaluate((e) => e === document.activeElement))) fail('race', 'Tab does not reach Send');
+  await p.keyboard.press('Enter');
+  await p.waitForFunction(() => document.querySelector('[data-race-clock]').textContent !== '0.000', null, { timeout: 4000 }).catch(() => fail('race', 'the clock never runs'));
+  await p.waitForFunction(() => document.querySelector('[data-race-live]').textContent.length > 20, null, { timeout: 12000 }).catch(() => fail('race', 'no summary after the race'));
+  const live = await p.locator('[data-race-live]').textContent();
+  const want = freq === '100000000' ? /radio in water lost after 0\.12 m at 100 MHz/ : /radio in water lost after/;
+  if (!/^At 1 km: radio in air 3\.3 µs, sound in air 2\.9 s, sound in water 0\.67 s/.test(live) || !want.test(live)) fail('race', `the summary says "${live}" (radio at ${freq} Hz)`);
+  if ((await p.locator('[data-race-clock]').textContent()) !== '2.915') fail('race', `the clock stops at ${await p.locator('[data-race-clock]').textContent()}, not 2.915`);
+  if (!(await p.locator('[data-lane="radioWater"] [data-read]').textContent()).startsWith('lost after')) fail('race', 'the radio in water lane does not say where it is lost');
   await p.close();
 });
 

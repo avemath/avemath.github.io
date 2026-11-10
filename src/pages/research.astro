@@ -59,28 +59,10 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           <figure class="rfig plate">
             <div class="fig__bar">
               <p class="fig__label">Why sound</p>
-              <div class="tabset" role="tablist" aria-label="Why sound: views" data-tabs>
-                <button type="button" role="tab" id="r0-tab-race" aria-controls="r0-race" aria-selected="true" tabindex="0">Race</button>
-                <button type="button" role="tab" id="r0-tab-drawing" aria-controls="r0-drawing" aria-selected="false" tabindex="-1">Drawing</button>
-              </div>
+              <p class="fig__label">radio vs sound, above and below the water</p>
             </div>
-            <div id="r0-race" role="tabpanel" aria-labelledby="r0-tab-race">
-              <SoundRace />
-            </div>
-            <div id="r0-drawing" role="tabpanel" aria-labelledby="r0-tab-drawing" hidden>
-              <div class="rfig__plot" data-draw>
-                <svg viewBox="0 0 320 170" class="rays" role="img" aria-label="Three paths from a source to a receiver: one direct, one off the surface, one off the bottom.">
-                  <line class="rays__surface" x1="0" y1="22" x2="320" y2="22" />
-                  <line class="rays__bottom" x1="0" y1="160" x2="320" y2="160" />
-                  <path class="rays__ray rays__ray--soft" d="M40 40 L160 22 L280 98" />
-                  <path class="rays__ray" d="M40 40 L280 98" />
-                  <path class="rays__ray rays__ray--soft" d="M40 40 L176 160 L280 98" />
-                  <rect class="rays__src" x="34" y="34" width="12" height="12" />
-                  <rect class="rays__rx" x="274" y="92" width="12" height="12" />
-                </svg>
-              </div>
-            </div>
-            <figcaption class="plate__cap"><b>Fig. R0.</b> Radio against sound, in air and in water.</figcaption>
+            <SoundRace />
+            <figcaption class="plate__cap"><b>Fig. R0.</b> The same message four ways. In air, radio wins outright. In seawater, radio is soaked up within meters (worse the higher the frequency), and sound, slower but nearly lossless, is what gets through.</figcaption>
           </figure>
         </div>
         <div class="rp__text">

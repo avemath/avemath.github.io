@@ -1,203 +1,459 @@
 ---
-// Why sound, as a race. Press Send: a radio pulse and a sound pulse leave a transmitter at the
-// left of a 1.5 km stretch of water. The radio pulse fades out within a few meters (seawater
-// soaks up radio), while the sound front crawls across at about 1500 m/s, reaches the far side in
-// 1 s and the answer comes back by 2 s; the clock counts in real time. With reduced motion it
-// shows the finished race at once.
+// Why sound, as a race across one figure split by a waterline. Four lanes: radio and sound in air
+// above the line, radio and sound in seawater below it, transmitter on the left, receiver on the
+// right. Pick a distance (10 m to 10 km, log scale), a radio frequency and a sound frequency, and
+// Send fires all four at once.
+//   - Radio in air arrives effectively at once (3.3 µs at 1 km); sound in air takes d / 343 s.
+//   - Sound in water, about 4.4 times faster than in air, loses only a little (Thorp's absorption).
+//   - Radio in water fades within meters: its rings fade with distance and stop where it is 40 dB
+//     down, from the skin depth delta = 1 / sqrt(pi f mu0 sigma), sigma = 4 S/m, at 8.686 dB per
+//     skin depth.
+// Radio would be invisible at true scale, so the clock shows real seconds and a playback rate
+// label says how much the animation is sped up or slowed down. The math is src/lib/race.ts
+// (tested in scripts/check-physics.mjs). With reduced motion Send shows the finished race at once.
+import { metersToSlider } from '@/lib/race';
+
+const RADIO = [
+  { hz: 1_000, label: '1 kHz' },
+  { hz: 10_000, label: '10 kHz' },
+  { hz: 100_000_000, label: '100 MHz' },
+  { hz: 2_400_000_000, label: '2.4 GHz' },
+];
+const SOUND = [
+  { hz: 1_000, label: '1 kHz' },
+  { hz: 10_000, label: '10 kHz' },
+  { hz: 30_000, label: '30 kHz' },
+  { hz: 100_000, label: '100 kHz' },
+];
+const lanes = [
+  { id: 'radioAir', name: 'Radio', where: 'air' },
+  { id: 'soundAir', name: 'Sound', where: 'air' },
+  { id: 'radioWater', name: 'Radio', where: 'water' },
+  { id: 'soundWater', name: 'Sound', where: 'water' },
+];
 ---
 
-<figure class="race" data-race>
-  <div class="race__bar">
-    <button type="button" class="btn btn--primary btn--small" data-race-send>Send</button>
-    <p class="race__clock mono" aria-hidden="true"><span data-race-clock>0.00</span> s</p>
-    <p class="sr-only" aria-live="polite" data-race-live></p>
+<div class="race" data-race>
+  <div class="race__ctl">
+    <label class="race__field race__field--d">
+      <span class="race__k">Distance <output class="race__v" data-race-dout>1 km</output></span>
+      <input type="range" min="0" max="1000" step="1" value={metersToSlider(1000)} aria-valuetext="1 km" data-race-d />
+    </label>
+    <label class="race__field">
+      <span class="race__k">Radio frequency</span>
+      <select data-race-rf>
+        {RADIO.map((r) => <option value={r.hz} selected={r.hz === 10_000}>{r.label}</option>)}
+      </select>
+    </label>
+    <label class="race__field">
+      <span class="race__k">Sound frequency</span>
+      <select data-race-af>
+        {SOUND.map((r) => <option value={r.hz} selected={r.hz === 10_000}>{r.label}</option>)}
+      </select>
+    </label>
+    <button type="button" class="btn btn--primary race__send" data-race-send>Send</button>
   </div>
-  <svg viewBox="0 -8 640 238" class="race__svg" role="img" aria-label="A 1.5 kilometer stretch of water between a transmitter on the left and a receiver on the right. Press Send: the radio pulse fades within a few meters, while the sound pulse takes one second to cross and the answer is back after two seconds.">
-    <defs>
-      <linearGradient id="race-water" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0" stop-color="var(--teal)" stop-opacity="0.18" />
-        <stop offset="1" stop-color="var(--teal)" stop-opacity="0.05" />
-      </linearGradient>
-      <clipPath id="race-clip"><rect x="0" y="40" width="640" height="150" /></clipPath>
-    </defs>
-    <rect class="race__water" x="0" y="40" width="640" height="150" />
-    <path class="race__surface" d="M0 40h640" />
-    <g clip-path="url(#race-clip)">
-      <circle class="race__radio" cx="48" cy="115" r="0" data-race-radio />
-      <path class="race__sound" d="" data-race-sound />
-      <path class="race__sound race__sound--back" d="" data-race-back />
-    </g>
-    <rect class="race__tx" x="36" y="103" width="24" height="24" />
-    <rect class="race__rx" x="580" y="103" width="24" height="24" />
-    <text class="race__t race__t--tx" x="48" y="214" text-anchor="middle">transmitter</text>
-    <text class="race__t race__t--rx" x="592" y="214" text-anchor="middle">receiver</text>
-    <path class="race__dim" d="M48 26h544M48 20v12M592 20v12" />
-    <text class="race__t" x="320" y="18" text-anchor="middle">1.5 km of seawater</text>
-    <text class="race__note race__note--radio" x="70" y="80" data-race-radio-note>radio: gone within a few meters</text>
-    <text class="race__note race__note--sound" x="320" y="176" text-anchor="middle" data-race-sound-note>sound: about 1500 m/s</text>
-  </svg>
-  <figcaption class="rfig__cap mono">Press Send. 1.5 km takes sound a second each way, so a question and its answer take 2 s.</figcaption>
-</figure>
+
+  <div class="race__clockrow" aria-hidden="true">
+    <p class="race__clock"><span data-race-clock>0.000</span> s</p>
+    <p class="race__rate" data-race-rate></p>
+  </div>
+
+  <div class="race__lanes" aria-hidden="true">
+    {
+      lanes.map((l, i) => (
+        <>
+          {i === 0 && <p class="race__zone">in air</p>}
+          {i === 2 && (
+            <p class="race__waterline">
+              <span>waterline</span>
+            </p>
+          )}
+          <div class:list={['lane', `lane--${l.where}`, `lane--${l.id}`]} data-lane={l.id}>
+            <span class="lane__name">{l.name}</span>
+            <div class="lane__track">
+              <span class="lane__tx" />
+              <span class="lane__rx" />
+              <span class="lane__trail" data-trail />
+              <span class="lane__front" data-front />
+              {l.id === 'radioWater' && (
+                <>
+                  <span class="lane__ring" data-ring style="--k:0" />
+                  <span class="lane__ring" data-ring style="--k:1" />
+                  <span class="lane__ring" data-ring style="--k:2" />
+                  <span class="lane__stop" data-stop />
+                </>
+              )}
+            </div>
+            <span class="lane__read" data-read />
+          </div>
+          {i === 3 && <p class="race__zone race__zone--water">in seawater</p>}
+        </>
+      ))
+    }
+  </div>
+
+  <p class="race__loss" data-race-loss></p>
+  <p class="sr-only" aria-live="polite" data-race-live></p>
+</div>
 
 <style>
   .race {
-    margin: 0;
-  }
-
-  .race__bar {
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 0.75rem 0;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 0.75rem 0.75rem 0.25rem;
   }
 
-  .race__clock {
-    margin-left: auto;
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
-    font-variant-numeric: tabular-nums;
+  .race__ctl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem 1rem;
+    align-items: end;
+  }
+
+  @container (min-width: 560px) {
+    .race__ctl {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+    }
+  }
+
+  .race__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .race__k {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .race__v {
+    font-family: var(--font-mono);
     color: var(--text);
   }
 
-  .race__svg {
-    display: block;
+  .race__field input[type='range'] {
     width: 100%;
-    height: auto;
+    min-height: 44px;
+    accent-color: var(--accent);
   }
 
-  .race__water {
-    fill: url(#race-water);
-  }
-
-  .race__surface {
-    stroke: var(--line-strong);
-    stroke-width: 1.5;
-  }
-
-  .race__tx,
-  .race__rx {
-    fill: var(--surface);
-    stroke: var(--text);
-    stroke-width: 1.5;
-  }
-
-  .race__radio {
-    fill: none;
-    stroke: var(--gold);
-    stroke-width: 3;
-  }
-
-  .race__sound {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 3;
-    stroke-linecap: round;
-  }
-
-  .race__sound--back {
-    stroke: var(--teal);
-  }
-
-  .race__dim {
-    stroke: var(--muted);
-    stroke-width: 1;
-  }
-
-  .race__t {
+  .race__field select {
+    min-height: 44px;
+    padding: 0 0.6rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
     font-family: var(--font-mono);
-    font-size: 14px;
-    fill: var(--muted);
+    font-size: 0.875rem;
   }
 
-  .race__note {
+  .race__send {
+    min-height: 44px;
+  }
+
+  .race__clockrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+  }
+
+  .race__clock {
+    margin: 0;
     font-family: var(--font-mono);
-    font-size: 14px;
-    opacity: 0;
-    transition: opacity 0.3s;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-variant-numeric: tabular-nums;
   }
 
-  .race__note--radio {
-    fill: var(--gold-ink);
+  .race__rate {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
   }
 
-  .race__note--sound {
-    fill: var(--accent-ink);
+  .race__lanes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
   }
 
-  .race[data-ran] .race__note {
-    opacity: 1;
+  .race__zone {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.9375rem;
+    color: var(--muted);
   }
 
-  /* On a phone the drawing is narrow, so its words are drawn larger. */
-  @media (max-width: 599px) {
-    .race__t,
-    .race__note {
-      font-size: 24px;
+  .race__waterline {
+    position: relative;
+    margin: 0.35rem 0;
+    border-top: 2px solid var(--teal);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .race__waterline span {
+    position: absolute;
+    right: 0;
+    top: -1.25rem;
+  }
+
+  .lane {
+    display: grid;
+    grid-template-columns: 3.75rem minmax(0, 1fr) 7.5rem;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+  }
+
+  @container (max-width: 459px) {
+    .lane {
+      grid-template-columns: 3.25rem minmax(0, 1fr);
     }
 
-    /* At this size the end labels would run off the drawing, so they line up with its edges. */
-    .race__t--tx {
-      text-anchor: start;
-      translate: -40px 0;
+    .lane__read {
+      grid-column: 2;
     }
+  }
 
-    .race__t--rx {
-      text-anchor: end;
-      translate: 40px 0;
-    }
+  .lane--water {
+    background: color-mix(in srgb, var(--teal) 12%, transparent);
+  }
+
+  .lane__name {
+    padding-left: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .lane__track {
+    position: relative;
+    height: 2.25rem;
+    margin-inline: 8px;
+  }
+
+  .lane__track::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .lane__tx,
+  .lane__rx {
+    position: absolute;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid var(--text);
+    background: var(--surface);
+    translate: -50% -50%;
+  }
+
+  .lane__tx {
+    left: 0;
+  }
+
+  .lane__rx {
+    left: 100%;
+  }
+
+  .lane__trail {
+    position: absolute;
+    left: 0;
+    top: calc(50% - 1.5px);
+    width: calc(var(--x, 0) * 100%);
+    height: 3px;
+    background: var(--c, var(--accent));
+  }
+
+  .lane__front {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--x, 0) * 100%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--c, var(--accent));
+    translate: -50% -50%;
+    opacity: var(--on, 0);
+  }
+
+  .lane--radioAir,
+  .lane--radioWater {
+    --c: var(--gold);
+  }
+
+  .lane--soundWater {
+    --c: var(--accent);
+  }
+
+  .lane--soundAir {
+    --c: var(--lilac-ink, var(--rose));
+  }
+
+  /* Radio in water: rings that spread from the transmitter and fade, and a mark where it is lost. */
+  .lane__ring {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: calc(var(--r, 0) * 2px);
+    height: calc(var(--r, 0) * 2px);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    translate: -50% -50%;
+    opacity: var(--ro, 0);
+  }
+
+  .lane__stop {
+    position: absolute;
+    top: 15%;
+    bottom: 15%;
+    left: calc(var(--stop, 0) * 100%);
+    width: 2px;
+    background: var(--gold);
+    opacity: var(--on-stop, 0);
+  }
+
+  .lane__read {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.3;
+  }
+
+  .race__loss {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
   }
 </style>
 
 <script>
   import { prefersReducedMotion } from '../../scripts/preferences';
+  import { raceAt, summary, sliderToMeters, fmtTime, fmtDist, fmtFreq } from '../../lib/race';
 
-  // The race in real time: 1 s across, 1 s back. The radio ring grows a few pixels and fades in the
-  // first quarter second, which on this scale is a few meters of water.
-  document.querySelectorAll<HTMLElement>('[data-race]').forEach((fig) => {
-    const $ = <T extends Element>(s: string) => fig.querySelector<T>(s)!;
+  document.querySelectorAll<HTMLElement>('[data-race]').forEach((root) => {
+    const $ = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+    const dIn = $<HTMLInputElement>('[data-race-d]');
+    const dOut = $<HTMLOutputElement>('[data-race-dout]');
+    const rf = $<HTMLSelectElement>('[data-race-rf]');
+    const af = $<HTMLSelectElement>('[data-race-af]');
     const clock = $<HTMLElement>('[data-race-clock]');
+    const rateEl = $<HTMLElement>('[data-race-rate]');
+    const lossEl = $<HTMLElement>('[data-race-loss]');
     const live = $<HTMLElement>('[data-race-live]');
-    const radio = $<SVGCircleElement>('[data-race-radio]');
-    const sound = $<SVGPathElement>('[data-race-sound]');
-    const back = $<SVGPathElement>('[data-race-back]');
-    const X0 = 48;
-    const X1 = 592;
-    const Y = 115;
-    // A wavefront: an arc of radius r around a point, inside the water.
-    const arc = (cx: number, r: number, dir: 1 | -1) => (r <= 0 ? '' : `M${cx + dir * Math.cos(1.2) * r} ${Y - Math.sin(1.2) * r}A${r} ${r} 0 0 ${dir > 0 ? 1 : 0} ${cx + dir * Math.cos(1.2) * r} ${Y + Math.sin(1.2) * r}`);
-    let raf = 0;
-    const draw = (t: number) => {
-      // Radio: a ring of up to 14 px (a few meters at this scale) that is gone by 0.25 s.
-      const rt = Math.min(1, t / 0.25);
-      radio.setAttribute('r', String(4 + rt * 10));
-      radio.style.opacity = String(1 - rt);
-      // Sound: out to the receiver by 1 s, the answer back by 2 s.
-      const out = Math.min(1, t);
-      const ret = Math.max(0, Math.min(1, t - 1));
-      sound.setAttribute('d', t < 1.02 ? arc(X0, out * (X1 - X0), 1) : '');
-      // The answer's front stays where it arrived, at the transmitter, once the round trip is done.
-      back.setAttribute('d', t >= 1 ? arc(X1, ret * (X1 - X0), -1) : '');
-      clock.textContent = Math.min(2, t).toFixed(2);
+    const lane = (id: string) => root.querySelector<HTMLElement>(`[data-lane="${id}"]`)!;
+    const ids = ['radioAir', 'soundAir', 'radioWater', 'soundWater'] as const;
+
+    const meters = () => sliderToMeters(Number(dIn.value));
+    const state = () => raceAt(meters(), Number(rf.value), Number(af.value));
+    // The animation runs about 3 s whatever the distance: the slowest lane (sound in air) sets the rate.
+    const playback = () => state().soundAir / 3;
+    const rateText = (k: number) =>
+      k > 0.8 && k < 1.25 ? 'playback: real time' : k >= 1 ? `playback: sped up ${Number(k.toPrecision(2))} times` : `playback: slowed ${Number((1 / k).toPrecision(2))} times`;
+
+    const set = (el: HTMLElement, k: string, v: number | string) => el.style.setProperty(k, String(v));
+    const reset = () => {
+      for (const id of ids) {
+        const l = lane(id);
+        set(l, '--x', 0);
+        set(l, '--on', 0);
+        set(l, '--on-stop', 0);
+        l.querySelector<HTMLElement>('[data-read]')!.textContent = '';
+        l.querySelectorAll<HTMLElement>('[data-ring]').forEach((r) => (set(r, '--r', 0), set(r, '--ro', 0)));
+      }
+      clock.textContent = '0.000';
     };
+    const describe = () => {
+      const s = state();
+      dOut.textContent = fmtDist(s.meters);
+      dIn.setAttribute('aria-valuetext', fmtDist(s.meters));
+      rateEl.textContent = rateText(playback());
+      lossEl.textContent = `Radio in seawater at ${fmtFreq(Number(rf.value))}: skin depth ${fmtDist(s.skinDepth)}, ${Math.round(s.radioWaterLossDb).toLocaleString('en-US')} dB lost over ${fmtDist(s.meters)}. Sound at ${fmtFreq(Number(af.value))}: ${Number(s.soundWaterDbPerKm.toPrecision(2))} dB/km, ${Number(s.soundWaterLossDb.toPrecision(2))} dB over ${fmtDist(s.meters)}.`;
+    };
+
+    /** Draw the race at simulated time t seconds. */
+    const draw = (t: number) => {
+      const s = state();
+      const times = { radioAir: s.radioAir, soundAir: s.soundAir, soundWater: s.soundWater };
+      for (const id of ['radioAir', 'soundAir', 'soundWater'] as const) {
+        const l = lane(id);
+        const x = Math.min(1, t / times[id]);
+        set(l, '--x', x);
+        set(l, '--on', x < 1 ? 1 : 0.9);
+        if (x >= 1) l.querySelector<HTMLElement>('[data-read]')!.textContent = fmtTime(times[id]);
+      }
+      // Radio in water: rings spread from the transmitter and fade with the loss; the pulse stops
+      // where it is lost (or arrives, if the distance is short enough).
+      const l = lane('radioWater');
+      const reach = Math.min(1, s.radioWaterReach / s.meters);
+      const x = Math.min(reach, t / s.radioWaterTime);
+      set(l, '--x', x);
+      set(l, '--on', s.radioWaterArrives ? 0.9 : 0);
+      set(l, '--stop', reach);
+      const track = l.querySelector<HTMLElement>('.lane__track')!;
+      const stopPx = Math.max(10, reach * track.clientWidth);
+      const age = Math.min(1, t / Math.max(1e-9, playback() * 0.6));
+      l.querySelectorAll<HTMLElement>('[data-ring]').forEach((r, k) => {
+        const a = Math.max(0, Math.min(1, age * 1.6 - k * 0.25));
+        set(r, '--r', a * stopPx);
+        set(r, '--ro', a > 0 ? (1 - a) * 0.9 : 0);
+      });
+      if (t > 0) {
+        set(l, '--on-stop', s.radioWaterArrives ? 0 : 1);
+        l.querySelector<HTMLElement>('[data-read]')!.textContent = s.radioWaterArrives ? `${fmtTime(s.radioWaterTime)}, ${Math.round(s.radioWaterLossDb)} dB down` : `lost after ${fmtDist(s.radioWaterReach)}`;
+      }
+      clock.textContent = t.toFixed(t < 0.1 ? 4 : 3);
+    };
+
+    let raf = 0;
     const send = () => {
       cancelAnimationFrame(raf);
-      fig.setAttribute('data-ran', '');
+      reset();
       live.textContent = '';
+      const s = state();
+      const end = s.soundAir;
       if (prefersReducedMotion()) {
-        draw(0.25);
-        back.setAttribute('d', arc(X1, X1 - X0, -1));
-        clock.textContent = '2.00';
-        live.textContent = 'The radio pulse is gone within a few meters. The sound pulse takes 1 second across and the answer is back after 2.00 seconds.';
+        draw(end);
+        live.textContent = summary(s.meters, Number(rf.value), Number(af.value));
         return;
       }
+      const k = playback();
       const t0 = performance.now();
       const tick = (now: number) => {
-        const t = Math.min(2, (now - t0) / 1000);
+        const t = Math.min(end, ((now - t0) / 1000) * k);
         draw(t);
-        if (t < 2) raf = requestAnimationFrame(tick);
-        else live.textContent = 'Round trip: 2.00 seconds. The radio pulse never got past the first few meters.';
+        if (t < end) raf = requestAnimationFrame(tick);
+        else live.textContent = summary(s.meters, Number(rf.value), Number(af.value));
       };
       raf = requestAnimationFrame(tick);
     };
+
+    const changed = () => {
+      cancelAnimationFrame(raf);
+      reset();
+      describe();
+    };
+    dIn.addEventListener('input', changed);
+    rf.addEventListener('change', changed);
+    af.addEventListener('change', changed);
     $<HTMLButtonElement>('[data-race-send]').addEventListener('click', send);
+    describe();
   });
 </script>
