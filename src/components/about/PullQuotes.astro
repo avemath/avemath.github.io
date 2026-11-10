@@ -1,6 +1,9 @@
 ---
-// Recommendations on About, as a pull-quote band right after "The longer version": each approved
-// quote large, with who said it. Only quotes their writers approved render (see
+// Recommendations on About, as a full-width deep green band right after "The longer version" (it
+// breaks up the light page): each approved quote large on a lighter green card, with who said it.
+// Light mode: the band is #0e2a22 with cards at #133a2f; dark mode lifts it to #15342a (cards
+// #1c4135) so it still reads as a band against the dark page. Text pairs, lowest first: muted
+// #9db0a6 on the dark card 4.95:1, the accent #7fd6a8 6.5:1, ink #e6efea 9.6:1. Only quotes their writers approved render (see
 // docs/CONTENT-GUIDE.md); with none, the band does not render at all.
 import testimonials from '@/data/testimonials.json';
 
@@ -9,7 +12,7 @@ const quotes = testimonials.filter((t) => t.approved);
 
 {
   quotes.length > 0 && (
-    <section id="recommendations" class="pq" aria-labelledby="pq-title">
+    <section id="recommendations" class="pq band-deep" aria-labelledby="pq-title">
       <div class="wrap">
         <h2 id="pq-title" class="pq__title">Recommendations</h2>
         <ul class="pq__list">
@@ -35,23 +38,30 @@ const quotes = testimonials.filter((t) => t.approved);
 
 <style>
   .pq {
-    margin-top: 4.5rem;
-    padding-block: clamp(3rem, 6vw, 4.5rem);
-    background: var(--surface-2);
+    --pq-band: #0e2a22;
+    --pq-card: #133a2f;
+    margin: 0;
+    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+    background: var(--pq-band);
+  }
+
+  :global([data-theme='dark']) .pq {
+    --pq-band: #15342a;
+    --pq-card: #1c4135;
   }
 
   .pq__title {
-    font-family: var(--font-sans);
-    font-size: 0.9375rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.6vw, 2.75rem);
+    font-weight: 400;
     letter-spacing: 0;
-    color: var(--accent-ink);
+    color: var(--deep-ink);
   }
 
   .pq__list {
     display: grid;
-    gap: 2.5rem 3.5rem;
-    margin: 1.5rem 0 0;
+    gap: 1.5rem 2rem;
+    margin: 1.75rem 0 0;
     padding: 0;
     list-style: none;
   }
@@ -68,8 +78,11 @@ const quotes = testimonials.filter((t) => t.approved);
     gap: 1.25rem;
     height: 100%;
     margin: 0;
-    padding-left: 1.25rem;
-    border-left: 3px solid var(--rose);
+    padding: clamp(1.25rem, 2.4vw, 2rem);
+    border: 1px solid var(--deep-line);
+    border-left: 3px solid var(--deep-accent);
+    border-radius: 4px;
+    background: var(--pq-card);
   }
 
   .pq__quote {
@@ -82,23 +95,27 @@ const quotes = testimonials.filter((t) => t.approved);
     text-wrap: pretty;
   }
 
+  .pq__quote {
+    color: var(--deep-ink);
+  }
+
   .pq__who {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
     margin-top: auto;
     font-size: 0.9375rem;
-    color: var(--text-soft);
+    color: var(--deep-ink);
   }
 
   .pq__name {
     font-weight: 700;
-    color: var(--text);
+    color: var(--deep-accent);
   }
 
   .pq__ctx {
     font-family: var(--font-mono);
     font-size: 0.8125rem;
-    color: var(--muted);
+    color: var(--deep-muted);
   }
 </style>

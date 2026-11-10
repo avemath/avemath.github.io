@@ -259,6 +259,85 @@ for (const scheme of ['light', 'dark']) {
   }
 }
 
+// ---- About: the datasheet is one page, and the Recommendations band reads in both themes ----
+{
+  const lum = (rgb) => {
+    const c = rgb.map((v) => v / 255).map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  };
+  const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  // Landed on #datasheet at a laptop size, the chip, the pressed pin's print and the first table
+  // row are all on screen below the header.
+  for (const [w, h] of [[1440, 900], [1280, 800]]) {
+    for (const scheme of ['light', 'dark']) {
+      const page = await browser.newPage({ viewport: { width: w, height: h }, colorScheme: scheme });
+      await page.route(...localOnly(base));
+      await page.goto(`${base}/about/#datasheet`, { waitUntil: 'networkidle' });
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForTimeout(1500);
+      const v = await page.evaluate(() => {
+        const r = (e) => e.getBoundingClientRect();
+        const slip = [...document.querySelectorAll('[data-slip]')].find((x) => !x.hidden);
+        return {
+          head: r(document.querySelector('.site-header')).bottom,
+          chip: r(document.querySelector('.dip')),
+          print: r(slip.querySelector('.pol, .pol-bare')),
+          row: r(document.querySelector('.ch tbody tr')),
+          sheet: r(document.querySelector('.ds__sheet')),
+          table: r(document.querySelector('.ch')),
+        };
+      });
+      for (const [k, b] of [['chip', v.chip], ['print', v.print], ['first table row', v.row]]) {
+        if (b.top < v.head - 1 || b.bottom > h + 1) fail(`${w}x${h} ${scheme} /about/#datasheet: the ${k} is not on screen (${Math.round(b.top)} to ${Math.round(b.bottom)})`);
+      }
+      if (v.table.top < v.sheet.top || v.table.bottom > v.sheet.bottom) fail(`${w}x${h} /about/: the table is not on the datasheet sheet`);
+      await page.close();
+    }
+  }
+  // Phones and tablets: the sheet fits the page and the table sits on it, under the tray.
+  for (const w of [320, 390, 768]) {
+    const page = await browser.newPage({ viewport: { width: w, height: 844 } });
+    await page.route(...localOnly(base));
+    await page.goto(`${base}/about/`, { waitUntil: 'networkidle' });
+    const v = await page.evaluate(() => {
+      const r = (s) => document.querySelector(s).getBoundingClientRect();
+      return { sw: document.documentElement.scrollWidth - document.documentElement.clientWidth, sheet: r('.ds__sheet'), table: r('.ch'), tray: r('#ds-tray') };
+    });
+    if (v.sw > 0) fail(`${w} /about/: the page scrolls sideways by ${v.sw}px`);
+    if (v.sheet.left < 0 || v.sheet.right > w) fail(`${w} /about/: the datasheet runs off the page`);
+    if (v.table.top < v.tray.bottom - 1 || v.table.bottom > v.sheet.bottom) fail(`${w} /about/: the table is not under the tray on the sheet`);
+    await page.close();
+  }
+  // The Recommendations band: every text on it is AA against what is behind it, in both themes,
+  // and the band differs from the page around it.
+  for (const theme of ['light', 'dark']) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.route(...localOnly(base));
+    await page.goto(`${base}/about/`, { waitUntil: 'networkidle' });
+    await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+    const pairs = await page.evaluate(() => {
+      const rgb = (c) => c.match(/[\d.]+/g).slice(0, 3).map(Number);
+      const bgOf = (e) => {
+        for (let n = e; n; n = n.parentElement) {
+          const c = getComputedStyle(n).backgroundColor;
+          if (!/rgba\(.*, 0\)$/.test(c) && c !== 'transparent') return rgb(c);
+        }
+        return [255, 255, 255];
+      };
+      const band = document.querySelector('#recommendations');
+      const out = [...band.querySelectorAll('h2, p, span')].filter((e) => e.textContent.trim() && !e.children.length).map((e) => ({ t: e.textContent.trim().slice(0, 30), fg: rgb(getComputedStyle(e).color), bg: bgOf(e) }));
+      return { out, band: bgOf(band), next: bgOf(band.nextElementSibling) };
+    });
+    for (const p of pairs.out) {
+      const r = ratio(p.fg, p.bg);
+      if (r < 4.5) fail(`/about/ ${theme}: "${p.t}" on the Recommendations band is ${r.toFixed(2)}:1, under AA`);
+    }
+    if (ratio(pairs.band, pairs.next) < 1.15) fail(`/about/ ${theme}: the Recommendations band does not stand apart from the section after it`);
+    await page.close();
+  }
+  console.log('About: the datasheet fits a laptop screen, stacks on phones, and the Recommendations band passes AA in both themes.');
+}
+
 await browser.close();
 server.close();
 if (problems) {

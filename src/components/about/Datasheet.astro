@@ -43,14 +43,18 @@ const right = pins.slice(half).reverse();
 ---
 
 <section id="datasheet" class="ds wrap" aria-labelledby="ds-title">
-  <div class="ds__head">
-    <div>
-      <p class="ds__fig">Fig. 1.</p>
-      <h2 id="ds-title" class="ds__title">AVE-26 <em>datasheet</em></h2>
-    </div>
+  <div class="ds__sheet plate">
+  <header class="ds__tb">
+    <h2 id="ds-title" class="ds__title"><span class="ds__part">AVE-26</span> <em>Datasheet</em></h2>
     <p class="ds__note">The work lives on the Projects and Websites pages. This is everything else. Press a pin.</p>
-  </div>
+    <dl class="ds__rev">
+      <div><dt>Rev.</dt><dd>2026</dd></div>
+      <div><dt>By</dt><dd>Matherne, A.</dd></div>
+      <div><dt>Sheet</dt><dd>1 of 1</dd></div>
+    </dl>
+  </header>
 
+  <div class="ds__body">
   <div class="ds__main" data-ds>
     <div class="dip" role="group" aria-label="AVE-26 pins">
       <ul class="dip__side dip__side--l">
@@ -136,15 +140,23 @@ const right = pins.slice(half).reverse();
     <caption class="ch__cap">Characteristics</caption>
     <tbody>
       {
-        about.rows.map((r, j) => (
-          <tr data-row={j} class:list={{ 'is-on': pins[START].rowIndex === j }}>
-            <th scope="row">{r.key}</th>
-            <td>{r.value}</td>
-          </tr>
-        ))
+        about.rows.map((r, j) => {
+          const on = pins.filter((p) => p.rowIndex === j);
+          return (
+            <tr data-row={j} class:list={{ 'is-on': pins[START].rowIndex === j }}>
+              <th scope="row">
+                {r.key}
+                {on.length > 0 && <span class="ch__pins">pin{on.length > 1 ? 's' : ''} {on.map((p) => p.n).join(', ')}</span>}
+              </th>
+              <td>{r.value}</td>
+            </tr>
+          );
+        })
       }
     </tbody>
   </table>
+  </div>
+  </div>
   <script type="application/json" data-ds-rows set:html={JSON.stringify(pins.map((p) => p.rowIndex))} />
 </section>
 
@@ -154,85 +166,156 @@ const right = pins.slice(half).reverse();
 </script>
 
 <style>
+  /* One datasheet page: a single plate with a title block across the top, the chip and its print
+     tray on the left and the characteristics on the right (from 1200px; stacked below, the
+     table directly under the tray). Sized so that, landed on #datasheet at 1440 by 900 or 1280 by
+     800, the chip, the pressed pin's print and the first rows of the table all show at once. */
   .ds {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    padding-block: 4.5rem 1.5rem;
-    scroll-margin-top: 5rem;
+    padding-block: 2rem 1.5rem;
+    /* html's scroll-padding-top already clears the header. */
+    scroll-margin-top: 0;
+    --ds-bg: var(--surface);
   }
 
-  .ds__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
+  .ds__sheet {
+    padding: clamp(18px, 2.2vw, 30px);
+    background: var(--ds-bg);
+  }
+
+  /* The title block: part number, title, the note, and the revision box, like a datasheet header. */
+  .ds__tb {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: end;
     gap: 0.75rem 2rem;
-  }
-
-  .ds__fig {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 1.125rem;
-    color: var(--muted);
+    padding: 0.25rem 0.5rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
   }
 
   .ds__title {
-    margin-top: 0.4rem;
-    font-size: clamp(2.25rem, 4.2vw, 3.25rem);
+    margin: 0;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1;
+  }
+
+  .ds__part {
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    font-weight: 500;
+    letter-spacing: 0.04em;
   }
 
   .ds__note {
-    max-width: 30em;
-    font-size: 1rem;
+    max-width: 34em;
+    font-size: 0.9375rem;
     color: var(--muted);
+  }
+
+  .ds__rev {
+    display: flex;
+    margin: 0;
+    border: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .ds__rev div {
+    padding: 0.3rem 0.65rem;
+  }
+
+  .ds__rev div + div {
+    border-left: 1px solid var(--rule);
+  }
+
+  .ds__rev dt {
+    color: var(--muted);
+  }
+
+  .ds__rev dd {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 959px) {
+    .ds__tb {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .ds__rev {
+      justify-self: start;
+    }
+  }
+
+  .ds__body {
+    display: grid;
+    gap: 2rem 2.5rem;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 1200px) {
+    .ds__body {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      align-items: start;
+    }
   }
 
   /* The chip and the tray side by side from 860px (6 to 5), stacked below. */
   .ds__main {
     display: grid;
-    gap: 2.5rem;
+    gap: 2rem;
     align-items: center;
   }
 
   /* On big screens the chip, its pins, the tray, the print that slides out, the note and the pirate
-     print all grow together, in proportion: the print is 270px wide up to 1440, about 380px at
-     1920 and 460px at 2560. (Sizes inside are px, so this zoom is the only thing scaling them.) */
+     print grow together, in proportion. (Sizes inside are px, so this zoom is the only thing
+     scaling them.) The table shares the row now, so the growth is gentler than before. */
   @media (min-width: 1600px) {
     .ds__main {
-      zoom: 1.13;
-    }
-  }
-
-  @media (min-width: 1760px) {
-    .ds__main {
-      zoom: 1.27;
+      zoom: 1.08;
     }
   }
 
   @media (min-width: 1920px) {
     .ds__main {
-      zoom: 1.41;
+      zoom: 1.2;
     }
   }
 
   @media (min-width: 2240px) {
     .ds__main {
-      zoom: 1.56;
+      zoom: 1.32;
     }
   }
 
   @media (min-width: 2560px) {
     .ds__main {
-      zoom: 1.7;
+      zoom: 1.42;
     }
   }
 
-  /* The extra room above leaves the bit girl space to stand on the chip. */
+  /* The room above leaves the bit girl space to stand on the chip. */
   @media (min-width: 860px) {
     .ds__main {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-      margin-top: 3.5rem;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: start;
+      padding-top: 2.25rem;
+    }
+  }
+
+  /* Beside the table the chip's column is narrower: a slimmer body and shorter legs keep every pin
+     name clear of its number. */
+  @media (min-width: 1200px) {
+    .ds__body .dip__body {
+      width: 136px;
+    }
+
+    .ds__body .pin__leg {
+      flex-basis: 22px;
+    }
+
+    .ds__body .pin {
+      gap: 7px;
     }
   }
 
@@ -263,7 +346,7 @@ const right = pins.slice(half).reverse();
     justify-content: center;
     gap: 6px;
     width: clamp(120px, 15vw, 190px);
-    min-height: 480px;
+    min-height: 440px;
     padding: 24px 12px;
     border-radius: 6px;
     background: var(--chip);
@@ -284,7 +367,7 @@ const right = pins.slice(half).reverse();
     width: 34px;
     height: 17px;
     border-radius: 0 0 17px 17px;
-    background: var(--bg);
+    background: var(--ds-bg);
     transform: translateX(-50%);
   }
 
@@ -441,7 +524,7 @@ const right = pins.slice(half).reverse();
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 520px;
+    min-height: 470px;
     scroll-margin-top: 5rem;
   }
 
@@ -616,7 +699,7 @@ const right = pins.slice(half).reverse();
 
   .ch th,
   .ch td {
-    padding: 0.75rem 0.875rem;
+    padding: 0.7rem 0.75rem;
     text-align: left;
     vertical-align: top;
   }
@@ -626,8 +709,16 @@ const right = pins.slice(half).reverse();
     font-family: var(--font-mono);
     font-size: 0.8125rem;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--muted);
+  }
+
+  /* The pins a row is about, by number, so the chip and the table read as one document. */
+  .ch__pins {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.75rem;
+    color: var(--accent-ink);
   }
 
   .ch td {
@@ -642,6 +733,23 @@ const right = pins.slice(half).reverse();
 
   .ch tr.is-on th {
     color: var(--text);
+  }
+
+  /* Beside the chip the column is narrow: the key column narrows with it. */
+  @media (min-width: 1200px) {
+    .ch {
+      margin-top: 2.25rem;
+    }
+
+    .ch th {
+      width: 9.5rem;
+      padding-inline: 0.5rem 0.75rem;
+    }
+
+    .ch td {
+      padding-inline: 0 0.5rem;
+      font-size: 0.875rem;
+    }
   }
 
   @media (max-width: 479px) {
