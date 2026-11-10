@@ -1,0 +1,15 @@
+---
+// The ONR research as a manila folder with a network drawn on it, a message moving between nodes.
+// An illustration of the kind of network, in public wording only: no numbers.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+const { spot } = Astro.props as { spot: BenchSpot };
+const pts = [[620, 380], [660, 362], [700, 392], [740, 372], [640, 430], [690, 444], [740, 428]];
+const links = [[0, 1], [1, 2], [2, 3], [0, 4], [4, 5], [5, 6], [2, 5], [3, 6], [1, 4]];
+---
+
+<g transform={moveTo(spot, 590, 330)}>
+  <path class="ln manila" d="M590 330 h70 l12 14 h100 v126 h-182 Z" />
+  {links.map(([a, b]) => <line class="net-link" x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]} />)}
+  {pts.map(([x, y]) => <circle class="net-node" cx={x} cy={y} r="5" />)}
+  <circle class="net-pk" cx="620" cy="380" r="3.5" data-pk data-pts={JSON.stringify(pts)} />
+</g>

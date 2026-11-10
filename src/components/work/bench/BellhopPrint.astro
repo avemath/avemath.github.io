@@ -1,0 +1,34 @@
+---
+// bellhopSim as a printed figure taped to the bench: the Munk sound speed profile in gold and a fan
+// of rays from 1000 m, traced by the site's one ray tracer (src/lib/raytrace.ts) at build time, not
+// drawn as sine waves. Live, the rays draw along their paths.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+import { MUNK, traceRay } from '@/lib/raytrace';
+const { spot } = Astro.props as { spot: BenchSpot };
+// The plot area on the print.
+const X0 = 98, X1 = 284, Y0 = 362, Y1 = 496;
+const RMAX = 60_000;
+const px = (r: number) => X0 + (r / RMAX) * (X1 - X0);
+const py = (z: number) => Y0 + (z / MUNK.zmax) * (Y1 - Y0);
+const rays = [-12, -8, -4, 0, 4, 8, 12].map((a) => {
+  const ray = traceRay(MUNK, 1000, (a * Math.PI) / 180, { rmax: RMAX, ds: 150, every: 2 });
+  return 'M' + ray.r.map((r, i) => `${px(r).toFixed(1)} ${py(ray.z[i]).toFixed(1)}`).join('L');
+});
+// c(z) along the left edge: faster is further right.
+const ssp = Array.from({ length: 41 }, (_, i) => {
+  const z = (MUNK.zmax * i) / 40;
+  return `${(X0 + 2 + ((MUNK.c(z) - 1490) / 70) * 40).toFixed(1)} ${py(z).toFixed(1)}`;
+});
+---
+
+<g transform={moveTo(spot, 66, 330)}>
+  <g transform="rotate(-3 180 430)">
+    <rect class="ln" x="70" y="340" width="230" height="176" rx="2" />
+    <line class="ln2" x1="92" y1="356" x2="92" y2="500" />
+    <line class="ln2" x1="92" y1="500" x2="286" y2="500" />
+    <g data-rays>{rays.map((d) => <path class="ray" d={d} pathLength="100" />)}</g>
+    <path class="ssp" d={'M' + ssp.join('L')} />
+    <rect class="tape" x="62" y="332" width="46" height="16" transform="rotate(-30 85 340)" />
+    <rect class="tape" x="262" y="332" width="46" height="16" transform="rotate(25 285 340)" />
+  </g>
+</g>

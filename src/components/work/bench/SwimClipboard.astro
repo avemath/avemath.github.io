@@ -1,0 +1,25 @@
+---
+// The Little Explorer Swim intake as a clipboard whose boxes tick, one after another. Without
+// script, and with reduced motion, every box is ticked.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+const { spot } = Astro.props as { spot: BenchSpot };
+---
+
+<g transform={moveTo(spot, 468, 528)}>
+  <g transform="translate(-40 0)">
+    <rect class="board" x="508" y="536" width="132" height="142" rx="8" />
+    <rect class="ln" x="518" y="552" width="112" height="118" />
+    <rect class="ink" x="552" y="528" width="44" height="16" rx="4" />
+    <g data-ticks>
+      {
+        [0, 1, 2, 3, 4].map((k) => (
+          <>
+            <rect class="ln2" x="528" y={566 + k * 20} width="12" height="12" />
+            <line class="ln2" x1="548" y1={572 + k * 20} x2="620" y2={572 + k * 20} />
+            <path class="tick is-on" d={`M529 ${572 + k * 20} l4 4 l8 -9`} data-k={k} />
+          </>
+        ))
+      }
+    </g>
+  </g>
+</g>

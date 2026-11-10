@@ -38,3 +38,10 @@ export function roman(n: number): string {
   for (const [v, s] of table) while (n >= v) { out += s; n -= v; }
   return out;
 }
+
+/** A project's dates: "Aug 2024 to May 2025", "Oct 2026 to now", or only the start for finished work
+ *  with no end recorded. */
+export function projectWhen(start: string, end: string | undefined, status: string): string {
+  if (!end && status === 'complete') return formatMonth(start);
+  return formatRange(start, end, 'now');
+}

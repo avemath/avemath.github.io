@@ -1,0 +1,47 @@
+---
+// The 16 by 16 LED panel, playing. The bars come from the same firmware model as the site's LED
+// demo (src/lib/led-firmware.ts: the demo track through the FFT, the 16 bands, the peaks that hold
+// and fall). This still frame is computed at build time from that model, so the panel reads right
+// with no script and with reduced motion; src/scripts/workbench.ts plays it live.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+import { createSpectrum, createDemoTrack, N, FS, FRAME_MS, W, H } from '@/lib/led-firmware';
+const { spot } = Astro.props as { spot: BenchSpot };
+
+// Run the model through the demo track and keep its busiest frame between 2.5 and 8 s (the most
+// light in the bars, in spectrum mode). The live panel starts from the same moment.
+const sp = createSpectrum();
+const track = createDemoTrack();
+let best = { score: -1, ms: 0, bands: [] as number[], peaks: [] as number[] };
+for (let f = 0; f < Math.round(8000 / FRAME_MS); f++) {
+  const s = sp.s;
+  s.clock += FRAME_MS;
+  for (let i = 0; i < N; i++) {
+    s.re[i] = track(s.clock + (i * 1000) / FS);
+    s.im[i] = 0;
+  }
+  sp.step();
+  if (s.clock < 2500 || !s.spectrumMode) continue;
+  const bandsNow = [...s.bandValues].slice(0, W);
+  const score = bandsNow.reduce((a, b) => a + b, 0);
+  if (score > best.score) best = { score, ms: s.clock, bands: bandsNow, peaks: [...s.peakValues].slice(0, W) };
+}
+const bands = best.bands;
+const peaks = best.peaks;
+// The site's LED colors: teal at the bottom, lilac in the middle, rose at the top.
+const litClass = (row: number) => {
+  const t = (row + 1) / H;
+  return t < 0.35 ? 'led-t' : t < 0.6 ? 'led-l' : 'led-r';
+};
+const cls = (c: number, r: number) => (r < bands[c] ? litClass(r) : peaks[c] > 0 && r === Math.min(H - 1, peaks[c]) ? 'led-pk' : 'led-off');
+---
+
+<g transform={moveTo(spot, 352, 70)}>
+  <rect class="ln screen" x="352" y="70" width="200" height="200" rx="6" />
+  <g data-led data-start-ms={best.ms}>
+    {
+      Array.from({ length: W }, (_, c) =>
+        Array.from({ length: H }, (_, r) => <circle class={cls(c, r)} cx={364 + c * 11.8} cy={258 - r * 11.8} r="3.6" data-c={c} data-r={r} />),
+      )
+    }
+  </g>
+</g>

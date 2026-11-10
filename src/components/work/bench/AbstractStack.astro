@@ -1,0 +1,23 @@
+---
+// The PLV Abstract Builder as a stack of county records with the run sheet on top, under a clip.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+const { spot } = Astro.props as { spot: BenchSpot };
+---
+
+<g transform={moveTo(spot, 284, 562)}>
+  <g transform="translate(-34 0)">
+    <rect class="ln" x="330" y="582" width="150" height="96" rx="2" transform="rotate(5 405 630)" />
+    <rect class="ln" x="322" y="576" width="150" height="96" rx="2" transform="rotate(-3 397 624)" />
+    <rect class="ln" x="318" y="570" width="150" height="96" rx="2" />
+    <text class="mono-ink" x="330" y="590">RUN SHEET</text>
+    {
+      [0, 1, 2, 3, 4].map((k) => (
+        <>
+          <line class="ln2" x1="330" y1={602 + k * 11} x2="456" y2={602 + k * 11} />
+          <line class="ln2" x1="370" y1={596 + k * 11} x2="370" y2={607 + k * 11} />
+        </>
+      ))
+    }
+    <rect class="ink" x="376" y="562" width="34" height="14" rx="3" />
+  </g>
+</g>

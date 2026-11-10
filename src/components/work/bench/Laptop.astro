@@ -1,0 +1,18 @@
+---
+// The laptop beside the client-site prints. Its screen shows one site at a time: the one last
+// pointed at, focused or chosen (Grace Mae to begin with). It is not a button itself. The lid's top
+// edge is a perch for the bit girl on wide screens.
+interface Props {
+  screens: { slug: string; src: string }[];
+  first: string;
+}
+const { screens, first } = Astro.props;
+---
+
+<g class="laptop" aria-hidden="true">
+  <rect class="ink" x="830" y="300" width="300" height="188" rx="10" data-perch="bench-laptop" data-perch-x="0.25 0.75" data-perch-min="760" />
+  <rect class="screen" x="840" y="310" width="280" height="168" />
+  {screens.map((s) => <image class:list={['laptop__screen', { 'is-on': s.slug === first }]} href={s.src} x="840" y="310" width="280" height="168" preserveAspectRatio="xMidYMin slice" data-screen={s.slug} />)}
+  <path class="ln" d="M812 490 h336 l-12 26 h-312 Z" />
+  <rect class="ln2" x="950" y="498" width="96" height="10" rx="3" />
+</g>

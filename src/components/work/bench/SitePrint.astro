@@ -1,0 +1,21 @@
+---
+// A client site as a print beside the laptop: a small picture of its cover, its name in Kalam, a
+// slight tilt. Pointing at it or focusing it puts the site on the laptop's screen (workbench.ts).
+import { moveTo, type BenchSpot } from '@/lib/bench';
+interface Props {
+  spot: BenchSpot;
+  /** The print's picture (the site's cover, already sized), if any. */
+  src?: string;
+  name: string;
+  tilt: number;
+}
+const { spot, src, name, tilt } = Astro.props;
+const x = spot.x + 4;
+const y = spot.y + 6;
+---
+
+<g transform={`rotate(${tilt} ${x + 42} ${y + 55})`}>
+  <rect class="ln" x={x} y={y} width="84" height="108" rx="2" />
+  {src ? <image href={src} x={x + 6} y={y + 6} width="72" height="72" preserveAspectRatio="xMidYMin slice" /> : <rect class="screen" x={x + 6} y={y + 6} width="72" height="72" />}
+  <text class="print-name" x={x + 42} y={y + 98} text-anchor="middle">{name}</text>
+</g>

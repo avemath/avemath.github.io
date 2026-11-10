@@ -1,0 +1,29 @@
+---
+// V2V: two little cars from above, orange and blue like the two radios in the V2V figures (MATLAB's
+// first two plot colors), each with a radio and an antenna on the roof, and signal arcs between them.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+const { spot } = Astro.props as { spot: BenchSpot };
+const cars = [
+  { x: 866, cls: 'car--a' },
+  { x: 1036, cls: 'car--b' },
+];
+---
+
+<g transform={moveTo(spot, 866, 100)}>
+  {
+    cars.map(({ x, cls }) => (
+      <g>
+        {[[x + 14, 146], [x + 82, 146], [x + 14, 208], [x + 82, 208]].map(([wx, wy]) => <rect class="ink" x={wx} y={wy} width="22" height="12" rx="3" />)}
+        <rect class={`car ${cls}`} x={x} y="152" width="120" height="62" rx="20" />
+        <path class="ink" opacity="0.8" d={`M${x + 86} 160 q10 23 0 46 h-12 q6 -23 0 -46 z`} />
+        <path class="ink" opacity="0.6" d={`M${x + 22} 162 q-7 21 0 42 h9 q-4 -21 0 -42 z`} />
+        <rect class="ln" x={x + 40} y="170" width="34" height="26" rx="4" style="stroke-width:1.5" />
+        <line class="ink-line" x1={x + 66} y1="172" x2={x + 80} y2="120" style="stroke-width:3" />
+        <circle class="ink" cx={x + 80} cy="118" r="4" />
+      </g>
+    ))
+  }
+  <g data-arcs>
+    {[0, 1, 2].map((i) => <path class="arc" opacity={1 - i * 0.25} d={`M${952 + i * 22} ${112 - i * 6} q ${60 - i * 22} -${30 - i * 4} ${120 - i * 44} 0`} />)}
+  </g>
+</g>

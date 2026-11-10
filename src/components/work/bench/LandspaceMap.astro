@@ -1,0 +1,15 @@
+---
+// Landspace as a map sheet: contour lines, a parcel outlined in yellow, and its acreage, 159.8 ac,
+// as on the Landspace cover.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+const { spot } = Astro.props as { spot: BenchSpot };
+---
+
+<g transform={moveTo(spot, 60, 568)}>
+  <g transform="translate(60 600) scale(.88) translate(-60 -600)">
+    <rect class="ln" x="60" y="572" width="226" height="102" rx="2" transform="rotate(2 170 620)" />
+    {[0, 1, 2, 3, 4].map((k) => <path class="contour" d={`M68 ${586 + k * 18} C 120 ${576 + k * 18}, 180 ${600 + k * 18}, 278 ${582 + k * 18}`} />)}
+    <path class="parcel" d="M130 596 L200 590 L214 640 L140 650 Z" />
+    <text class="mono-ink" x="150" y="626">159.8 ac</text>
+  </g>
+</g>

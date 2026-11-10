@@ -1,0 +1,24 @@
+---
+// One object on the /work/ workbench, as a real button inside the bench drawing: focusable, named
+// with the project's title, kind and dates, a hit area over its whole box, its drawing (the slot),
+// its small mono tag (always shown), and a focus ring drawn in the SVG (outlines do not draw on
+// SVG groups everywhere). src/scripts/workbench.ts makes it select the project.
+import type { BenchSpot } from '@/lib/bench';
+
+interface Props {
+  slug: string;
+  label: string;
+  spot: BenchSpot;
+  /** Selected to begin with (and without script). */
+  selected?: boolean;
+}
+
+const { slug, label, spot, selected = false } = Astro.props;
+---
+
+<g class:list={['obj', { 'is-sel': selected }]} data-bench={slug} tabindex="0" role="button" aria-label={label} aria-pressed={selected ? 'true' : 'false'}>
+  <rect class="obj__hit" x={spot.x - 6} y={spot.y - 6} width={spot.w + 12} height={spot.h + 12} />
+  <g class="obj__art"><slot /></g>
+  <text class="obj__tag" x={spot.tagAt[0]} y={spot.tagAt[1]}>{spot.tag}</text>
+  <rect class="obj__ring" x={spot.x - 8} y={spot.y - 8} width={spot.w + 16} height={spot.h + 16} rx="10" />
+</g>

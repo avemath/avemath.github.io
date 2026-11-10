@@ -1,0 +1,19 @@
+---
+// RAMpage from above: four wheels, the frame, the plow at the front, rivets, and the lid's
+// hand-painted lettering (RAM in bold, page in italic, as on the cover). The lid is a perch for the
+// bit girl on wide screens.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+const { spot, perch = true } = Astro.props as { spot: BenchSpot; perch?: boolean };
+---
+
+<g transform={moveTo(spot, 80, 80)}>
+  <rect class="ink" x="84" y="96" width="24" height="62" rx="5" />
+  <rect class="ink" x="84" y="198" width="24" height="62" rx="5" />
+  <rect class="ink" x="302" y="96" width="24" height="62" rx="5" />
+  <rect class="ink" x="302" y="198" width="24" height="62" rx="5" />
+  <rect class="ln" x="100" y="80" width="210" height="196" rx="10" {...(perch ? { 'data-perch': 'bench-robot', 'data-perch-x': '0.3 0.7', 'data-perch-min': '760' } : {})} />
+  <path class="ln" d="M100 276 L80 302 H330 L310 276 Z" />
+  {[[112, 92], [298, 92], [112, 264], [298, 264], [205, 92], [205, 264]].map(([x, y]) => <circle class="ink" cx={x} cy={y} r="3" />)}
+  <text class="rp-ram" x="205" y="176" text-anchor="middle" transform="rotate(-8 205 176)">RAM</text>
+  <text class="rp-page" x="212" y="216" text-anchor="middle" transform="rotate(-8 212 216)">page</text>
+</g>

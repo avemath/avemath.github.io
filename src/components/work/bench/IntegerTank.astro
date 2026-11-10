@@ -1,0 +1,17 @@
+---
+// The Integer internship as a test tank: water, a thruster, and a hydrophone hanging in to listen.
+// Generic on purpose: no numbers, no specifics.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+const { spot } = Astro.props as { spot: BenchSpot };
+---
+
+<g transform={moveTo(spot, 336, 340)}>
+  <rect class="ln" x="336" y="340" width="216" height="176" rx="8" />
+  <rect class="water" x="348" y="352" width="192" height="152" rx="4" />
+  <g data-tank>{[0, 1, 2].map(() => <circle class="ripple" cx="410" cy="428" r="10" />)}</g>
+  <rect class="ln" x="396" y="418" width="28" height="20" rx="5" />
+  <path class="ln" d="M396 422 l-10 -6 v24 l10 -6" />
+  <path class="ink-line" d="M510 352 C 512 380 498 404 500 440" style="stroke-width:1.5;fill:none" />
+  <circle class="ink" cx="500" cy="446" r="7" />
+  <text class="hw" x="462" y="494">hydrophone</text>
+</g>

@@ -47,6 +47,14 @@
   --deep-muted: #9db0a6;
   --deep-accent: #7fd6a8;
   --deep-line: rgb(230 239 234 / 0.16);
+  /* The /work/ workbench (docs/mockups/work-concepts-2.html): a green cutting mat with its grid,
+     the objects' fill, tank water and manila paper. The bench uses --screen for its screens. */
+  --bench-mat: #d6e4da;
+  --bench-grid: #bfd2c5;
+  --bench-grid2: #a7c0af;
+  --bench-obj: #fbfcf9;
+  --bench-water: #bfe0da;
+  --bench-manila: #eadfc4;
   /* A screen: the oscilloscope and the LED matrix, dark in both modes. */
   --screen: #0f1a16;
   --screen-ink: #e6efea;
@@ -152,6 +160,12 @@
   --gold-ink: var(--gold);
   --rose-ink: var(--rose);
   --screen: #08100d;
+  --bench-mat: #12241d;
+  --bench-grid: #1b3328;
+  --bench-grid2: #24463a;
+  --bench-obj: #1a2a24;
+  --bench-water: #17403c;
+  --bench-manila: #3a3424;
   --chip: #08100d;
   --leg: #6f8279;
   --bit: #5cf2a6;

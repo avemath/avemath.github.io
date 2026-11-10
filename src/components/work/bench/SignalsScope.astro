@@ -1,0 +1,30 @@
+---
+// The Signals playground as a scope showing its hop pattern: the first eight chips of the
+// playground's real pattern (seed 87, src/lib/fhbfsk.ts), the same chips and bits as Plate VI on
+// the home page, each at its tone between 9.44 and 13.6 kHz. The screen is a perch for the bit
+// girl on wide screens. Live, the chips light one at a time, left to right.
+import { moveTo, type BenchSpot } from '@/lib/bench';
+import { hopSequence, toneHz, F_HIGH, F_LOW, HOP_SEED } from '@/lib/fhbfsk';
+const { spot, perch = true } = Astro.props as { spot: BenchSpot; perch?: boolean };
+const bits = [1, 0, 1, 1, 0, 0, 1, 1];
+const hops = hopSequence(8, HOP_SEED);
+const y = (hz: number) => 104 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 106;
+---
+
+<g transform={moveTo(spot, 592, 84)}>
+  <rect class="ln" x="592" y="84" width="240" height="160" rx="10" />
+  <rect class="screen" x="606" y="98" width="160" height="118" rx="4" {...(perch ? { 'data-perch': 'bench-scope', 'data-perch-x': '0.5', 'data-perch-min': '760' } : {})} />
+  {[0, 1, 2, 3].map((k) => <line class="scope-grid" x1="606" y1={98 + 29.5 * (k + 0.5)} x2="766" y2={98 + 29.5 * (k + 0.5)} />)}
+  <g data-chips>
+    {hops.map((p, i) => <rect class="chip is-on" x={610 + i * 19.5} y={y(toneHz(p, bits[i])) - 3} width="16" height="6" rx="1.5" data-i={i} />)}
+  </g>
+  {
+    [120, 160, 200].map((cy) => (
+      <>
+        <circle class="ln" cx="800" cy={cy} r="13" />
+        <line class="ink-line" x1="800" y1={cy} x2="806" y2={cy - 10} />
+      </>
+    ))
+  }
+  <rect class="ln2" x="606" y="224" width="60" height="10" rx="3" />
+</g>
