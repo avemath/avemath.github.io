@@ -1,0 +1,634 @@
+---
+// The /work/ workbench (Concept D in docs/mockups/work-concepts-2.html): the bench from above on a
+// green cutting mat, one object per project, each a real button. Choosing one (click, tap, Enter
+// or Space) opens its detail under the bench and puts its slug in the address; arrow keys move
+// between objects in reading order. The client sites are prints beside a laptop: pointing at or
+// focusing a print shows that site on the laptop. Everything is drawn here at build time, so with
+// no script the bench is a still drawing and RAMpage's detail shows; src/scripts/workbench.ts
+// adds the selection and the motion (one loop, only while the bench is on screen).
+// Layout: src/data/bench.json. A project with no spot there is left off the bench (the build warns)
+// but still appears in the thread map and the index.
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { benchSpot, type BenchSpot } from '@/lib/bench';
+import { type Project, typeLabels, statusLabels, projectHref, offers } from '@/lib/projects';
+import { projectWhen, displayUrl } from '@/lib/format';
+import BenchItem from './bench/BenchItem.astro';
+import Rampage from './bench/Rampage.astro';
+import LedSpectrum from './bench/LedSpectrum.astro';
+import SignalsScope from './bench/SignalsScope.astro';
+import V2v from './bench/V2v.astro';
+import BellhopPrint from './bench/BellhopPrint.astro';
+import IntegerTank from './bench/IntegerTank.astro';
+import OnrFolder from './bench/OnrFolder.astro';
+import LandspaceMap from './bench/LandspaceMap.astro';
+import AbstractStack from './bench/AbstractStack.astro';
+import SwimClipboard from './bench/SwimClipboard.astro';
+import PoolSketch from './bench/PoolSketch.astro';
+import SitePrint from './bench/SitePrint.astro';
+import Laptop from './bench/Laptop.astro';
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+
+// Each project's drawing on the bench.
+const DRAW: Record<string, any> = {
+  rampage: Rampage,
+  'led-audio-spectrum': LedSpectrum,
+  'signals-playground': SignalsScope,
+  'v2v-bsm-ofdm': V2v,
+  'bellhop-sim': BellhopPrint,
+  'integer-internship': IntegerTank,
+  'onr-intelligent-data-management': OnrFolder,
+  landspace: LandspaceMap,
+  'plv-abstract-builder': AbstractStack,
+  'little-explorer-swim': SwimClipboard,
+  'acoustic-pool-alarm': PoolSketch,
+};
+// The client sites: prints by the laptop, with a little tilt each.
+const PRINTS: Record<string, { name: string; tilt: number }> = {
+  'grace-mae-alterations': { name: 'Grace Mae', tilt: -6 },
+  'petro-land-ventures': { name: 'Petro Land', tilt: 3 },
+  'because-of-adam': { name: 'ADAM', tilt: -2 },
+  'nicholas-domke': { name: 'Nicholas', tilt: 5 },
+};
+
+const kindOf = (p: Project) => typeLabels[p.data.type];
+const when = (p: Project) => projectWhen(p.data.period.start, p.data.period.end, p.data.status);
+const label = (p: Project) => `${p.data.title}. ${kindOf(p)}, ${when(p)}`;
+
+const placed = projects.filter((p) => benchSpot(p.id) && (DRAW[p.id] || PRINTS[p.id]));
+for (const p of projects) if (!placed.includes(p)) console.warn(`[workbench] ${p.id} has no object on the bench yet (add it to src/data/bench.json and src/components/work/Workbench.astro). It still shows in the thread map and the index.`);
+
+// Pictures: each site's cover for its print and for the laptop's screen.
+const sized = async (img: ImageMetadata | undefined, width: number) => (img ? (await getImage({ src: img, width, format: 'webp', quality: 70 })).src : undefined);
+const prints = await Promise.all(
+  placed.filter((p) => PRINTS[p.id]).map(async (p) => ({ p, spot: benchSpot(p.id)!, small: await sized(p.data.cover, 160), big: await sized(p.data.cover, 560) })),
+);
+const screens = prints.filter((x) => x.big).map((x) => ({ slug: x.p.id, src: x.big! }));
+const START = placed.find((p) => p.id === 'rampage')?.id ?? placed[0]?.id;
+
+// Reading order for the arrow keys: rows of the bench, top to bottom, then left to right.
+const order = [...placed].sort((a, b) => {
+  const A = benchSpot(a.id)!;
+  const B = benchSpot(b.id)!;
+  const row = (s: BenchSpot) => Math.floor((s.y + 40) / 220);
+  return row(A) - row(B) || A.x - B.x;
+});
+---
+
+<div class="bench-wrap">
+  <div class="bench-shelf" data-bench-shelf>
+    <svg class="bench" viewBox="0 0 1200 720" role="group" aria-label={`My workbench: ${placed.length} projects, one object each. Choose one to see it below.`} data-bench>
+      <rect class="mat" x="16" y="16" width="1168" height="688" rx="18" />
+      <g class="mat__grid" aria-hidden="true">
+        {Array.from({ length: 38 }, (_, k) => 46 + k * 30).map((x) => <line class:list={[(x - 46) % 150 === 0 ? 'g2' : 'g1']} x1={x} y1="16" x2={x} y2="704" />)}
+        {Array.from({ length: 22 }, (_, k) => 46 + k * 30).map((y) => <line class:list={[(y - 46) % 150 === 0 ? 'g2' : 'g1']} x1="16" y1={y} x2="1184" y2={y} />)}
+        {Array.from({ length: 38 }, (_, k) => 46 + k * 30).map((x, k) => <line class="tick" x1={x} y1="16" x2={x} y2={k % 5 === 0 ? 32 : 25} />)}
+      </g>
+      {screens.length > 0 && <Laptop screens={screens} first={screens.find((x) => x.slug === 'grace-mae-alterations')?.slug ?? screens[0].slug} />}
+      {
+        order.map((p) => {
+          const spot = benchSpot(p.id)!;
+          const Draw = DRAW[p.id];
+          const print = prints.find((x) => x.p.id === p.id);
+          return (
+            <BenchItem slug={p.id} label={label(p)} spot={spot} selected={p.id === START}>
+              {Draw ? <Draw spot={spot} /> : print && <SitePrint spot={spot} src={print.small} name={PRINTS[p.id].name} tilt={PRINTS[p.id].tilt} />}
+            </BenchItem>
+          );
+        })
+      }
+    </svg>
+  </div>
+  <p class="hand bench-hint bench-hint--wide" aria-hidden="true">point at anything on the bench ♡</p>
+  <p class="bench-hint bench-hint--swipe" aria-hidden="true">swipe to see the whole bench</p>
+
+  <div class="bench-detail" data-bench-detail id="bench-detail" tabindex="-1">
+    {
+      placed.map((p) => {
+        const d = p.data;
+        const spot = benchSpot(p.id)!;
+        const Draw = DRAW[p.id];
+        const has = offers(p);
+        return (
+          <article class="bd" data-detail={p.id} hidden={p.id !== START} aria-labelledby={`bd-${p.id}`}>
+            <div class="bd__pic">
+              {d.cover ? (
+                <Image src={d.cover} alt="" widths={[360, 560, 760]} sizes="(min-width: 960px) 26rem, calc(100vw - 2rem)" format="webp" quality={72} loading="lazy" class="bd__img" />
+              ) : (
+                <svg class="bd__draw bench" viewBox={`${spot.x - 14} ${spot.y - 14} ${spot.w + 28} ${spot.h + 28}`} aria-hidden="true">
+                  {Draw && <Draw spot={spot} perch={false} />}
+                </svg>
+              )}
+            </div>
+            <div class="bd__body">
+              <h2 class="bd__title" id={`bd-${p.id}`}>
+                {d.title}
+              </h2>
+              <p class="bd__meta">
+                <span>{kindOf(p)}</span>
+                <span>{when(p)}</span>
+                <span>{statusLabels[d.status]}</span>
+              </p>
+              {d.outcome && <p class="bd__out">{d.outcome}</p>}
+              <p class="bd__role">{d.role}</p>
+              <ul class="bd__tools" aria-label="Tools">
+                {d.stack.slice(0, 6).map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+              <p class="bd__links">
+                <a class="btn btn--primary btn--small" href={projectHref(p)}>
+                  Case study
+                </a>
+                {has.map((o) => (
+                  <a class="link" href={o.href} aria-label={`${o.label}: ${d.title}`}>
+                    {o.label}
+                  </a>
+                ))}
+                {d.links.live && !has.some((o) => o.href === d.links.live) && (
+                  <a class="link" href={d.links.live}>
+                    {d.linkLabel ?? `Visit ${displayUrl(d.links.live)}`}
+                  </a>
+                )}
+              </p>
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+  <p class="sr-only" aria-live="polite" data-bench-live></p>
+</div>
+
+<script>
+  import { mountWorkbench } from '../../scripts/workbench';
+  mountWorkbench();
+</script>
+
+<style is:global>
+  /* The bench drawing and its objects: global so the same drawings read the same inside the
+     detail panel and the thread map, and kept under .bench so the short class names stay put. */
+  /* ---- The bench drawing ---- */
+  .bench .mat {
+    fill: var(--bench-mat);
+  }
+
+  .bench .g1 {
+    stroke: var(--bench-grid);
+    stroke-width: 1;
+  }
+
+  .bench .g2,
+  .bench .tick {
+    stroke: var(--bench-grid2);
+    stroke-width: 1.5;
+  }
+
+  .bench .ln {
+    fill: var(--bench-obj);
+    stroke: var(--ink);
+    stroke-width: 2;
+    transition: stroke 0.2s;
+  }
+
+  .bench .ln2 {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    opacity: 0.7;
+  }
+
+  .bench .ink {
+    fill: var(--ink);
+  }
+
+  .bench .ink-line {
+    stroke: var(--ink);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .bench .screen {
+    fill: var(--screen);
+  }
+
+  .bench .ln.screen {
+    fill: var(--screen);
+  }
+
+  .bench .water {
+    fill: var(--bench-water);
+  }
+
+  .bench .pool {
+    stroke: var(--teal);
+    stroke-width: 1.5;
+  }
+
+  .bench .manila,
+  .bench .ln.manila {
+    fill: var(--bench-manila);
+  }
+
+  .bench .tape {
+    fill: var(--bench-manila);
+    opacity: 0.8;
+  }
+
+  .bench .board {
+    fill: #b88a55;
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  .bench .hw {
+    font-family: var(--font-hand);
+    font-size: 15px;
+    fill: var(--rose-ink);
+  }
+
+  .bench .mono-ink {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--ink);
+  }
+
+  .bench .print-name {
+    font-family: var(--font-hand);
+    font-size: 12px;
+    fill: var(--ink);
+  }
+
+  .bench .rp-ram {
+    font-family: var(--font-display);
+    font-size: 46px;
+    font-weight: 700;
+    fill: var(--rose);
+  }
+
+  .bench .rp-page {
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-style: italic;
+    fill: var(--rose);
+  }
+
+  /* LEDs: the site's screen colors, off a step lighter than the panel. */
+  .bench .led-off {
+    fill: color-mix(in srgb, var(--screen) 88%, #ffffff);
+  }
+
+  .bench .led-t {
+    fill: var(--screen-teal, #7ccac3);
+  }
+
+  .bench .led-l {
+    fill: var(--screen-accent);
+  }
+
+  .bench .led-r {
+    fill: var(--screen-hot);
+  }
+
+  .bench .led-pk {
+    fill: var(--screen-ink);
+  }
+
+  .bench .scope-grid {
+    stroke: var(--screen-line);
+    stroke-width: 1;
+  }
+
+  .bench .chip {
+    fill: color-mix(in srgb, var(--screen) 70%, var(--screen-accent));
+  }
+
+  .bench .chip.is-on {
+    fill: color-mix(in srgb, var(--screen-accent) 70%, var(--screen));
+  }
+
+  .bench .chip.is-now {
+    fill: var(--screen-accent);
+  }
+
+  .bench .car {
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  .bench .car--a {
+    fill: #d95319;
+  }
+
+  .bench .car--b {
+    fill: #0072bd;
+  }
+
+  .bench .arc {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    stroke-dasharray: 4 6;
+  }
+
+  .bench .ray {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.3;
+    opacity: 0.85;
+  }
+
+  .bench .ssp {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2.5;
+  }
+
+  .bench .ripple {
+    fill: none;
+    stroke: var(--teal);
+    stroke-width: 1.5;
+    opacity: 0;
+  }
+
+  .bench .net-link {
+    stroke: var(--ink);
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+
+  .bench .net-node {
+    fill: var(--accent);
+  }
+
+  .bench .net-pk,
+  .bench .listener {
+    fill: var(--rose);
+  }
+
+  .bench .contour {
+    fill: none;
+    stroke: var(--bench-grid2);
+    stroke-width: 1.2;
+  }
+
+  .bench .parcel {
+    fill: rgb(232 196 60 / 0.25);
+    stroke: #d9a920;
+    stroke-width: 2.5;
+  }
+
+  .bench .tick.is-on,
+  .bench .tick {
+    fill: none;
+  }
+
+  .bench path.tick {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+    opacity: 0;
+  }
+
+  .bench path.tick.is-on {
+    opacity: 1;
+  }
+
+  .bench .laptop__screen {
+    display: none;
+  }
+
+  .bench .laptop__screen.is-on {
+    display: inline;
+  }
+
+  /* ---- The objects as buttons ---- */
+  .bench .obj {
+    cursor: pointer;
+    outline: none;
+    transition:
+      transform 0.25s cubic-bezier(0.3, 0.7, 0.2, 1),
+      filter 0.25s;
+  }
+
+  .bench .obj__hit {
+    fill: transparent;
+  }
+
+  .bench .obj__tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--muted);
+  }
+
+  .bench .obj__ring {
+    fill: none;
+    stroke: none;
+    stroke-width: 2.5;
+    stroke-dasharray: 6 5;
+  }
+
+  /* Hover or focus: it lifts, with a soft shadow, and its lines turn green. */
+  .bench .obj:hover,
+  .bench .obj:focus-visible {
+    transform: translateY(-4px);
+    filter: drop-shadow(0 8px 10px rgb(10 30 20 / 0.28));
+  }
+
+  .bench .obj:hover .ln,
+  .bench .obj:focus-visible .ln,
+  .bench .obj.is-sel .ln {
+    stroke: var(--accent);
+  }
+
+  .bench .obj:hover .obj__tag,
+  .bench .obj:focus-visible .obj__tag,
+  .bench .obj.is-sel .obj__tag {
+    fill: var(--accent-ink);
+  }
+
+  .bench .obj:focus-visible .obj__ring {
+    stroke: var(--focus);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bench .obj {
+      transition: none;
+    }
+
+    .bench .obj:hover,
+    .bench .obj:focus-visible {
+      transform: none;
+    }
+  }
+
+  html[data-motion='reduce'] .bench .obj {
+    transition: none;
+  }
+
+  html[data-motion='reduce'] .bench .obj:hover,
+  html[data-motion='reduce'] .bench .obj:focus-visible {
+    transform: none;
+  }
+
+</style>
+
+<style>
+  .bench-wrap {
+    position: relative;
+  }
+
+  /* Phones get the bench as a shelf to scroll sideways, starting at the robot. The page itself
+     never scrolls sideways: only the shelf does. */
+  .bench-shelf {
+    border-radius: 16px;
+  }
+
+  .bench {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 759px) {
+    .bench-shelf {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .bench-shelf .bench {
+      width: 860px;
+      max-width: none;
+    }
+  }
+
+  .bench-hint {
+    margin: 0.5rem 0 0;
+  }
+
+  .bench-hint--wide {
+    font-size: 1.0625rem;
+  }
+
+  .bench-hint--swipe {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 759px) {
+    .bench-hint--wide {
+      display: none;
+    }
+
+    .bench-hint--swipe {
+      display: block;
+    }
+  }
+
+  /* ---- The detail under the bench ---- */
+  .bench-detail {
+    margin-top: 1.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .bench-detail:focus {
+    outline: none;
+  }
+
+  .bd {
+    display: grid;
+    gap: 1.25rem 2rem;
+    align-items: start;
+  }
+
+  .bd[hidden] {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .bd {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  .bd__pic {
+    padding: 6px;
+    border: 1px solid var(--ink);
+    background: var(--surface);
+  }
+
+  .bd__pic :global(.bd__img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--rule);
+  }
+
+  .bd__draw {
+    aspect-ratio: 16 / 10;
+    background: var(--bench-mat);
+    border: 1px solid var(--rule);
+  }
+
+  .bd__title {
+    margin: 0;
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+    font-weight: 500;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  .bd__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .bd__out {
+    margin-top: 0.85rem;
+  }
+
+  .bd__role {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .bd__tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bd__tools li {
+    padding: 0.15rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface);
+    font-size: 0.875rem;
+  }
+
+  .bd__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1.25rem;
+    margin-top: 1.1rem;
+  }
+</style>
