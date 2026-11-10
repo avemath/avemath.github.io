@@ -34,6 +34,18 @@ export function mountThreadMap() {
     const card = cards.find((c) => c.dataset.card === stn.dataset.stn);
     cards.forEach((c) => (c.hidden = c !== card));
     if (!card) return;
+    // A project with no cover shows its bench drawing: copied from the bench the first time.
+    const slot = card.querySelector<SVGGElement>('[data-card-clone]');
+    if (slot && !slot.childElementCount) {
+      const art = document.querySelector(`[data-bench-svg] .obj[data-bench="${slot.dataset.cardClone}"] .obj__art`);
+      if (art) {
+        const copy = art.cloneNode(true) as SVGGElement;
+        copy.querySelectorAll('*').forEach((e) => {
+          for (const a of [...e.attributes]) if (a.name.startsWith('data-')) e.removeAttribute(a.name);
+        });
+        slot.append(...copy.childNodes);
+      }
+    }
     const box = root.getBoundingClientRect();
     const r = stn.getBoundingClientRect();
     const w = 240;

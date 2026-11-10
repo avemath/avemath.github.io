@@ -14,7 +14,8 @@
 //                  put their site on the laptop
 //   bench-keyboard every bench object is reached by Tab and chosen by Enter or Space; arrows, End
 //   bench-hash     /work/#because-of-adam opens it; /work/#websites still lands on its group
-//   thread-map     every station selects its project on the bench; preview card; legend; phone labels
+//   thread-map     every station selects its project on the bench; every preview has a picture or a
+//                  drawing; stations keep a gap; labels stay inside the map at 640 to 1920; legend; phone labels
 //   bench-girl     nothing (the bit girl included) takes a click meant for a bench object
 //   bench-loop     the bench's loop runs on screen, stops off screen, never runs with reduced motion
 //   figure-viewer  the V2V figures: Next and Previous, arrow keys, thumbnails, swipe, full screen,
@@ -711,6 +712,42 @@ await test('thread-map', async () => {
   await stns.nth(0).hover({ force: true });
   const card = await p.evaluate(() => [...document.querySelectorAll('[data-card]')].filter((c) => !c.hidden).map((c) => c.dataset.card).join());
   if (card !== (await stns.nth(0).getAttribute('data-stn'))) fail('thread-map', `hovering the first station shows card "${card}"`);
+  // Every station's preview shows a picture: its cover, or its bench drawing. (The real pointer
+  // goes off the map first, so stations scrolling under it don't open and close cards of their own.)
+  await p.mouse.move(2, 2);
+  for (let i = 0; i < n; i++) {
+    const st = stns.nth(i);
+    await st.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await st.dispatchEvent('pointerenter');
+    const what = await p.evaluate(() => {
+      const c = [...document.querySelectorAll('[data-card]')].find((x) => !x.hidden);
+      if (!c) return 'no card';
+      if (c.querySelector('img')) return 'img';
+      const g = c.querySelector('svg [data-card-clone]');
+      return g && g.childElementCount > 0 ? 'drawing' : 'empty';
+    });
+    if (what !== 'img' && what !== 'drawing') fail('thread-map', `station ${await st.getAttribute('data-stn')}'s preview is ${what}`);
+    await st.dispatchEvent('pointerleave');
+  }
+  // Neighboring stations keep a clear gap (6 map units), and no label runs past the map.
+  const gaps = await p.evaluate(() => {
+    const halos = [...document.querySelectorAll('.tmap__svg--h [data-stn] .tmap__halo')].map((h) => h.getBBox());
+    halos.sort((a, b) => a.x - b.x);
+    let min = Infinity;
+    for (let i = 1; i < halos.length; i++) min = Math.min(min, halos[i].x - (halos[i - 1].x + halos[i - 1].width));
+    return min;
+  });
+  if (gaps < 6) fail('thread-map', `two stations are only ${gaps.toFixed(1)} units apart`);
+  for (const w of [640, 768, 1024, 1440, 1920]) {
+    const q = await page('/work/', { w });
+    await q.locator('[data-tmap]').evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    const over = await q.evaluate(() => {
+      const box = document.querySelector('[data-tmap]').getBoundingClientRect();
+      return [...document.querySelectorAll('.tmap__svg--h .tmap__lbl text')].map((t) => ({ t: t.textContent, r: t.getBoundingClientRect() })).filter(({ r }) => r.right > box.right - 2 || r.top < box.top).map(({ t }) => t);
+    });
+    if (over.length) fail('thread-map', `${w}px: labels run past the map: ${over.join(', ')}`);
+    await q.close();
+  }
   // A legend button highlights its thread (and says so).
   const key = p.locator('[data-tmap] [data-line="family"]');
   await key.click();

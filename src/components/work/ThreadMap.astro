@@ -36,7 +36,7 @@ const nameOf = (p: Project) => {
 
 // Pictures: covers at twice the station's drawn size.
 const pics = Object.fromEntries(
-  await Promise.all(P.filter((p) => p.data.cover).map(async (p) => [p.id, (await getImage({ src: p.data.cover!, width: 184, format: 'webp', quality: 70 })).src])),
+  await Promise.all(P.filter((p) => p.data.cover).map(async (p) => [p.id, (await getImage({ src: p.data.cover!, width: 160, format: 'webp', quality: 70 })).src])),
 ) as Record<string, string>;
 const cards = Object.fromEntries(
   await Promise.all(P.filter((p) => p.data.cover).map(async (p) => [p.id, (await getImage({ src: p.data.cover!, width: 480, format: 'webp', quality: 70 })).src])),
@@ -48,7 +48,9 @@ type Shape = 'h' | 'v';
 const geo = (shape: Shape) => {
   const n = P.length;
   if (shape === 'h') {
-    const W = 1200, H = 600, x0 = 210, x1 = 1100, y0 = 200, LG = 74, R = 27;
+    // Stations end well short of the right edge so the last label, turned up and to the right, stays
+    // inside the map; a smaller radius keeps a clear gap between neighboring capsules.
+    const W = 1200, H = 600, x0 = 190, x1 = 1060, y0 = 200, LG = 74, R = 23;
     return { W, H, R, LG, pos: (i: number, ln: number) => [x0 + (i * (x1 - x0)) / (n - 1), y0 + ln * LG] as [number, number] };
   }
   const W = 420, H = n * 78 + 90, x0 = 36, y0 = 50, LG = 42, R = 17;
@@ -255,7 +257,17 @@ const V_ = build('v');
     {
       P.map((p) => (
         <div class="tmap__card" data-card={p.id} hidden>
-          {cards[p.id] ? <img src={cards[p.id]} alt="" width="240" height="150" loading="lazy" decoding="async" /> : <div class="tmap__noimg" />}
+          {cards[p.id] ? (
+            <img src={cards[p.id]} alt="" width="240" height="150" loading="lazy" decoding="async" />
+          ) : (
+            // No cover: the project's bench drawing on the mat, copied in from the bench the first
+            // time the card opens (threadmap.ts), fitted to the box.
+            benchSpot(p.id) && (
+              <svg class="tmap__draw bench" viewBox={`${benchSpot(p.id)!.x - 14} ${benchSpot(p.id)!.y - 14} ${benchSpot(p.id)!.w + 28} ${benchSpot(p.id)!.h + 28}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <g data-card-clone={p.id} />
+              </svg>
+            )
+          )}
           <b>{nameOf(p)}</b>
           <span>
             {typeLabels[p.data.type]}, {when(p)}
@@ -529,6 +541,15 @@ const V_ = build('v');
   }
 
   .tmap__noimg {
+    background: var(--bench-mat);
+  }
+
+  .tmap__draw {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    border: 1px solid var(--rule);
     background: var(--bench-mat);
   }
 
