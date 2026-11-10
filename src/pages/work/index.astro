@@ -1,33 +1,37 @@
 ---
+// /work/: the workbench (every project as an object on my bench, chosen to see its detail), the
+// thread map ("How it connects"), the client sites' showcase rows and tools, and "Every project",
+// a compact index grouped as Engineering, Research, and Websites and client tools. The groups keep
+// the ids #engineering, #research and #websites, so existing links and the nav highlighting work.
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import WorkCard from '@/components/WorkCard.astro';
 import ToolPanel from '@/components/ToolPanel.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
-import { getWorkOrder, workSection, workSections } from '@/lib/projects';
+import Workbench from '@/components/work/Workbench.astro';
+import ThreadMap from '@/components/work/ThreadMap.astro';
+import { getWorkOrder, workSection, workSections, typeLabels, statusLabels, projectHref } from '@/lib/projects';
+import { projectWhen } from '@/lib/format';
 
 const order = await getWorkOrder();
 const sections = workSections.map((s) => ({ ...s, projects: order.filter((p) => workSection(p) === s.id) }));
-// Figure numbers run through the page, in order. The client sites with a screenshot and a live
-// address show as the same large rows as the home page; any other website work follows as cards.
+// The client sites with a screenshot and a live address show as the home page's large rows; the
+// tools built for client businesses follow as panels.
 const showcased = (p: (typeof order)[number]) => !!(p.data.cover && p.data.links.live && p.data.client?.permission);
-const webStart = order.findIndex((p) => workSection(p) === 'websites') + 1;
 const webRows = order.filter((p) => workSection(p) === 'websites' && showcased(p));
-const figOf = new Map(order.map((p, i) => [p.id, i + 1]));
-let n = webStart + webRows.length;
-for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf.set(p.id, n++);
+const tools = order.filter((p) => workSection(p) === 'websites' && !showcased(p));
+const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.data.period.end, p.data.status);
 ---
 
 <BaseLayout
   title="Work"
-  description="Engineering, research and client websites by Avery Matherne, each with a case study on what I did and how."
+  description="The work of Avery Matherne, laid out on a workbench: hardware, signals research, client websites and tools, how they connect, and a case study for each."
+  bitGirl
   section="projects"
 >
   <section class="section work-head band-paper" id="all">
     <div class="wrap">
       <h1 class="section-title work-head__title">All work</h1>
       <p class="section-lede">
-        {order.length} projects: the engineering and research first, then the websites. Every card opens a case study with what I did and
-        how.
+        {order.length} projects, laid out on my bench. Choose anything to see what it is; every project has a case study. {/* TODO(ave): check wording. */}
       </p>
       <nav class="filters" aria-label="Jump to a kind of work">
         <a class="filter" href="#all">All <span class="filter__n">{order.length}</span></a>
@@ -42,38 +46,78 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
     </div>
   </section>
 
-  {
-    sections.map((s, i) => (
-      <section id={s.id} class:list={['section work-sec', i % 2 === 0 ? 'band-sheet' : 'band-paper']} aria-labelledby={`${s.id}-title`}>
-        <div class="wrap">
-          <div class="work-sec__head">
-            <h2 id={`${s.id}-title`} class="section-title section-title--sm" data-decode>
-              {s.label}
-            </h2>
-            <p class="work-sec__intro">{s.intro}</p>
-          </div>
-          {s.id === 'websites' && <WebsitesShowcase rowsOnly firstFig={webStart} />}
-          {(s.id === 'websites' ? s.projects.filter((p) => !showcased(p)) : s.projects).length > 0 && (
-            s.id === 'websites' ? (
-              <div class="tools">
-                {s.projects
-                  .filter((p) => !showcased(p))
-                  .map((p, k) => (
-                    <ToolPanel project={p} fig={figOf.get(p.id)!} flip={k % 2 === 1} />
-                  ))}
-              </div>
-            ) : (
-              <div class="work-grid">
-                {s.projects.map((p) => (
-                  <WorkCard project={p} fig={figOf.get(p.id)!} />
-                ))}
-              </div>
-            )
-          )}
-        </div>
-      </section>
-    ))
-  }
+  <section class="section work-bench band-sheet" aria-labelledby="bench-title">
+    <div class="wrap">
+      <h2 id="bench-title" class="sr-only">The workbench</h2>
+      <Workbench projects={order} />
+    </div>
+  </section>
+
+  <section class="section work-map band-paper" aria-labelledby="map-title">
+    <div class="wrap">
+      <div class="work-sec__head">
+        <h2 id="map-title" class="section-title section-title--sm" data-decode>How it connects</h2>
+        {/* TODO(ave): check wording. */}
+        <p class="work-sec__intro">Each line is a thread through my work. Where two lines meet, a project belongs to both.</p>
+      </div>
+      <div class="work-map__box"><ThreadMap projects={order} /></div>
+    </div>
+  </section>
+
+  <section class="section work-sites band-sheet" aria-labelledby="sites-title">
+    <div class="wrap">
+      <div class="work-sec__head">
+        <h2 id="sites-title" class="section-title section-title--sm" data-decode>Client sites</h2>
+        <p class="work-sec__intro">{sections[2].intro}</p>
+      </div>
+      <WebsitesShowcase rowsOnly firstFig={1} />
+      {
+        tools.length > 0 && (
+          <>
+            <h3 class="work-sites__tools">Client tools</h3>
+            <div class="tools">
+              {tools.map((p, k) => (
+                <ToolPanel project={p} fig={webRows.length + 1 + k} flip={k % 2 === 1} />
+              ))}
+            </div>
+          </>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section work-index band-paper" aria-labelledby="index-title">
+    <div class="wrap">
+      <div class="work-sec__head">
+        <h2 id="index-title" class="section-title section-title--sm" data-decode>Every project</h2>
+        <p class="work-sec__intro">{order.length} projects, each with a case study.</p>
+      </div>
+      {
+        sections.map((s) => (
+          <section class="ix" id={s.id} aria-labelledby={`${s.id}-title`}>
+            <h3 class="ix__title" id={`${s.id}-title`}>
+              {s.label} <span class="ix__n">{s.projects.length}</span>
+            </h3>
+            <ul class="ix__list">
+              {s.projects.map((p) => (
+                <li class="ix__row">
+                  <a class="ix__name" href={projectHref(p)}>
+                    {p.data.title}
+                  </a>
+                  <span class="ix__kind">{typeLabels[p.data.type]}</span>
+                  <span class="ix__when">{when(p)}</span>
+                  <span class="ix__status">{statusLabels[p.data.status]}</span>
+                  <a class="ix__cs link" href={projectHref(p)} aria-label={`Case study: ${p.data.title}`}>
+                    Case study
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </section>
 
   <section class="section section--tight band-paper">
     <div class="wrap work-end">
@@ -162,8 +206,9 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
     font-weight: 400;
   }
 
-  .work-sec {
-    scroll-margin-top: 4rem;
+  /* The bench sits right under the title. */
+  .work-bench {
+    padding-top: 1.25rem;
   }
 
   .work-sec__head {
@@ -185,23 +230,115 @@ for (const p of order) if (workSection(p) === 'websites' && !showcased(p)) figOf
     color: var(--muted);
   }
 
-  .work-grid {
-    display: grid;
-    gap: 1.25rem;
+  .work-map__box {
     margin-top: 1.5rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
   }
 
-  /* After the website rows, a card gets the same space the rows keep between themselves. */
+  .work-sites__tools {
+    margin-top: clamp(3.5rem, 7vw, 5.5rem);
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule);
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+  }
+
   /* The client tools: large panels at the scale of the website displays above them. */
   .tools {
     display: grid;
     gap: clamp(2.5rem, 5vw, 4rem);
-    margin-top: clamp(4rem, 8vw, 6.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
   }
 
-  .work-grid--after-sites {
-    margin-top: clamp(4rem, 8vw, 6.5rem);
+  /* ---- Every project: one row each, grouped ---- */
+  .ix {
+    margin-top: 2rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .ix__title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-size: 1.375rem;
+  }
+
+  .ix__n {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .ix__list {
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .ix__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.15rem 1rem;
+    align-items: baseline;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .ix__name {
+    min-width: 0;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .ix__name:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-underline-offset: 0.2em;
+  }
+
+  .ix__kind,
+  .ix__when,
+  .ix__status {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .ix__cs {
+    justify-self: end;
+    font-size: 0.9375rem;
+  }
+
+  /* Phones: the name on its own line, then kind, dates, status and the link, wrapping as words. */
+  @media (max-width: 759px) {
+    .ix__row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.2rem 0.9rem;
+    }
+
+    .ix__name {
+      flex: 1 0 100%;
+    }
+
+    .ix__kind,
+    .ix__when,
+    .ix__status,
+    .ix__cs {
+      white-space: nowrap;
+    }
+
+    .ix__cs {
+      margin-left: auto;
+    }
+  }
+
+  @media (min-width: 760px) {
+    .ix__row {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 1.1fr) minmax(0, 1.6fr) minmax(0, 0.9fr) auto;
+    }
   }
 
   .work-end {
