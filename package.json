@@ -11,7 +11,8 @@
     "lint:copy": "node scripts/lint-copy.mjs",
     "test:comms": "node scripts/check-comms.mjs",
     "test:seafloor": "node scripts/check-seafloor.mjs",
-    "verify": "npm run lint:copy && npm run test:comms && npm run test:seafloor && npm run check && npm run build",
+    "test:physics": "node scripts/check-physics.mjs",
+    "verify": "npm run lint:copy && npm run test:comms && npm run test:physics && npm run test:seafloor && npm run check && npm run build",
     "test:a11y": "node scripts/check-a11y.mjs && node scripts/check-labels.mjs",
     "assets": "node scripts/render-assets.mjs",
     "test:layout": "node scripts/check-layout.mjs && node scripts/check-interactions.mjs"

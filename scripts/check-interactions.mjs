@@ -1,6 +1,8 @@
 // One test per interaction, so none can quietly disappear again. Each test drives the real built
 // page the way a visitor would and checks the result:
 //   nav            every nav item (desktop and the phone menu) lands on the right page or section
+//   hero-labels    the eigenray plate: at 24 yaws by 5 pitches (1440 and 390), no two visible labels
+//                  overlap, none leaves the canvas or sits under a note; a drag turns it and keeps that true
 //   signal-panel   the hero scope reads out where the mouse is; Hear it is a toggle button
 //   marquee        hovering the strip pauses it
 //   tabs           every figure card's tabs show their own view (home and the RAMpage case study)
@@ -44,7 +46,9 @@ const fail = (test, msg) => {
 const page = async (path, opts = {}) => {
   const p = await browser.newPage({ viewport: { width: opts.w ?? 1440, height: opts.h ?? 900 }, reducedMotion: opts.reduce ? 'reduce' : 'no-preference', hasTouch: !!opts.touch, isMobile: !!opts.touch });
   await p.route(...localOnly(base));
-  await p.goto(`${base}${path}`, { waitUntil: 'networkidle' });
+  // Loaded, then quiet on the network if it gets there soon (a busy machine can hold it off).
+  await p.goto(`${base}${path}`, { waitUntil: 'load', timeout: 60000 });
+  await p.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
   await p.evaluate(() => document.fonts.ready);
   return p;
 };
@@ -107,6 +111,61 @@ await test('nav', async () => {
     await p.locator('.mnav__panel').getByRole('link', { name: label, exact: true }).click();
     await p.waitForLoadState('networkidle');
     if (new URL(p.url()).pathname !== path) fail('nav', `phone menu ${label} went to ${new URL(p.url()).pathname}`);
+    await p.close();
+  }
+});
+
+await test('hero-labels', async () => {
+  for (const w of [1440, 390]) {
+    const p = await page('/', { w, h: w < 600 ? 844 : 900 });
+    const cv = p.locator('[data-eigenrays]');
+    await cv.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await p.waitForFunction(() => document.querySelector('[data-eigenrays]').__er?.ready(), null, { timeout: 15000 });
+    const bad = await cv.evaluate((el) => {
+      const er = el.__er;
+      const [W, H] = er.size();
+      const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+      const out = [];
+      let views = 0;
+      for (let i = 0; i < 24; i++) {
+        for (let j = 0; j < 5; j++) {
+          const yaw = -Math.PI + (2 * Math.PI * i) / 24;
+          const pitch = -0.1 + (1.2 * j) / 4;
+          er.setView(yaw, pitch);
+          views++;
+          const on = er.labels().filter((l) => l.on);
+          const avoid = er.avoid();
+          for (const l of on) {
+            if (l.box[0] < 0 || l.box[1] < 0 || l.box[2] > W || l.box[3] > H) out.push(`${l.key} leaves the canvas at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
+            for (const n of avoid) if (hit(l.box, n)) out.push(`${l.key} sits under a note at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
+          }
+          for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) if (hit(on[a].box, on[b].box)) out.push(`${on[a].key} overlaps ${on[b].key} at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
+          if (!on.length) out.push(`no label shows at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
+        }
+      }
+      return { out, views };
+    });
+    if (bad.views < 120) fail('hero-labels', `only ${bad.views} views sampled`);
+    for (const m of bad.out.slice(0, 6)) fail('hero-labels', `${w}px: ${m}`);
+    // A real drag: the view turns, the leader still points at a turning point, and the rule holds.
+    const before = await cv.evaluate((el) => el.__er.labels().map((l) => l.box.join()).join('|'));
+    const b = await cv.boundingBox();
+    await p.mouse.move(b.x + b.width * 0.5, b.y + b.height * 0.5);
+    await p.mouse.down();
+    for (let k = 1; k <= 12; k++) await p.mouse.move(b.x + b.width * (0.5 - k * 0.03), b.y + b.height * (0.5 + k * 0.01));
+    await p.mouse.up();
+    await p.waitForTimeout(300);
+    const after = await cv.evaluate((el) => {
+      const er = el.__er;
+      const on = er.labels().filter((l) => l.on);
+      const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+      let overlaps = 0;
+      for (let a = 0; a < on.length; a++) for (let c = a + 1; c < on.length; c++) if (hit(on[a].box, on[c].box)) overlaps++;
+      return { sig: er.labels().map((l) => l.box.join()).join('|'), overlaps, leader: er.leader() };
+    });
+    if (after.sig === before) fail('hero-labels', `${w}px: dragging the plate does not turn it`);
+    if (after.overlaps) fail('hero-labels', `${w}px: after a drag ${after.overlaps} labels overlap`);
+    if (!after.leader) fail('hero-labels', `${w}px: no leader line from the pinned note`);
     await p.close();
   }
 });

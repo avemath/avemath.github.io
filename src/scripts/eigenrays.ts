@@ -1,57 +1,45 @@
 // Plate I: eigenrays in 3D. A ray tracer on the Munk sound speed profile (c0 1500 m/s, channel axis
 // at 1300 m, B 1300 m, epsilon 0.00737, as in bellhopSim) fans 21 rays out from a source at 1000 m
-// over 100 km and 5000 m of water, and the fan is drawn as seven slices around the source, like a
+// over 100 km and 5000 m of water (traced by src/lib/raytrace.ts), and the fan is drawn as seven slices around the source, like a
 // wedge of ocean. The gold curve is sound speed against depth. There is no committed BELLHOP .ray
 // output for this case, so the rays are traced here (see docs/SOURCES.md).
+//
+// The long note ("sound bends toward the slow water") is HTML pinned to the plate's top right
+// corner, out of the 3D scene, with a thin leader line to the ray turning point nearest it, redrawn
+// as the view turns. The projected labels (depth and range ticks, the source, c(z), the axis) go
+// through a layout pass every frame: by priority, a label that would overlap a higher one, either
+// note, or the canvas edge fades out over about 120 ms, and back in once it is clear.
 //
 // Drag or use the arrow keys to rotate. It turns slowly on its own while it is on screen; with
 // reduced motion it draws one still frame and only moves when you move it. In dark mode the rays
 // add up like light. Nothing is traced or drawn until the browser is idle after first paint.
 import { token } from '../lib/tokens-client';
+import { MUNK, traceRay } from '../lib/raytrace';
 import { prefersReducedMotion } from './preferences';
 
 const MAXR = 100_000;
-const MAXZ = 5000;
+const MAXZ = MUNK.zmax;
 const ZS = 1000;
-const AXIS = 1300;
-const c = (z: number) => {
-  const e = (2 * (z - AXIS)) / 1300;
-  return 1500 * (1 + 0.00737 * (e - 1 + Math.exp(-e)));
-};
-const dc = (z: number) => {
-  const e = (2 * (z - AXIS)) / 1300;
-  return (1500 * 0.00737 * (1 - Math.exp(-e)) * 2) / 1300;
-};
+const AXIS = MUNK.axis!;
+const c = MUNK.c;
 
-/** One ray from the source at a launch angle (radians), as [range / MAXR, depth / MAXZ] points. */
+/** One ray from the source at a launch angle (radians), as [range / MAXR, depth / MAXZ] points, with
+ *  its turning points inside the water. Traced by the site's one ray tracer (src/lib/raytrace.ts). */
 function trace(theta: number) {
-  let r = 0;
-  let z = ZS;
-  let th = theta;
-  const ds = 100;
-  const pts: [number, number][] = [];
-  for (let i = 0; r < MAXR; i++) {
-    th += (-dc(z) / c(z)) * Math.cos(th) * ds;
-    r += Math.cos(th) * ds;
-    z += Math.sin(th) * ds;
-    if (z < 0) {
-      z = -z;
-      th = -th;
-    }
-    if (z > MAXZ) {
-      z = 2 * MAXZ - z;
-      th = -th;
-    }
-    if (i % 6 === 0) pts.push([r / MAXR, z / MAXZ]);
-  }
-  return pts;
+  const ray = traceRay(MUNK, ZS, theta, { rmax: MAXR, ds: 100, every: 6 });
+  const pts = ray.r.map((r, i) => [r / MAXR, ray.z[i] / MAXZ] as [number, number]);
+  const turns = ray.turns.map((t) => [t.r / MAXR, t.z / MAXZ] as [number, number]);
+  return { pts, turns };
 }
 
 type Pt = [number, number];
 
 export function mountEigenrays(cv: HTMLCanvasElement) {
   const ctx = cv.getContext('2d')!;
-  const rays: { a: number; pts: Pt[] }[] = [];
+  const wrap = cv.parentElement!;
+  const pinned = wrap.querySelector<HTMLElement>('[data-er-pinned]');
+  const notes = [...wrap.querySelectorAll<HTMLElement>('[data-er-note]')];
+  const rays: { a: number; pts: Pt[]; turns: Pt[] }[] = [];
   const ssp: Pt[] = [];
   let ready = false;
 
@@ -164,22 +152,126 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     ctx.arc(s[0], s[1], 7 * k, 0, Math.PI * 2);
     ctx.fill();
 
-    // Labels scale with the plate but never below 11 CSS pixels.
-    ctx.font = `500 ${Math.round(Math.max(26 * k, 11 * dpr))}px "JetBrains Mono Variable", "JetBrains Fallback", monospace`;
-    ctx.fillStyle = mu;
-    ctx.textAlign = 'right';
-    const t0 = world(0, 0, 0);
-    const tb = world(0, 1, 0);
-    const ta = world(0, AXIS / MAXZ, 0);
-    const tr = world(1, 0, -SPREAD / 2);
-    ctx.fillText('0 m', t0[0] - 12 * k, t0[1] + 6 * k);
-    ctx.fillText('5000 m', tb[0] - 12 * k, tb[1] + 6 * k);
-    ctx.fillStyle = ink['--gold'];
-    ctx.fillText('axis 1300 m', ta[0] - 48 * k, ta[1] - 14 * k);
-    ctx.fillStyle = mu;
-    ctx.textAlign = 'left';
-    ctx.fillText('100 km', tr[0] + 10 * k, tr[1]);
+    // The leader from the pinned note to the turning point nearest it, then the labels.
+    const anchor = noteAnchor();
+    if (anchor) {
+      let best: Pt | null = null;
+      let bd = Infinity;
+      for (let i = 0; i < SLICES; i++) {
+        const phi = -SPREAD / 2 + (SPREAD * i) / (SLICES - 1);
+        for (const r of rays)
+          for (const t of r.turns) {
+            const q = world(t[0], t[1], phi);
+            if (q[0] < 0 || q[1] < 0 || q[0] > W || q[1] > H) continue;
+            const d = Math.hypot(q[0] - anchor[0], q[1] - anchor[1]);
+            if (d < bd) {
+              bd = d;
+              best = q;
+            }
+          }
+      }
+      if (best) {
+        leader = best;
+        ctx.globalAlpha = 0.85;
+        ctx.strokeStyle = ink['--rose'];
+        ctx.lineWidth = Math.max(1, 1.4 * k);
+        ctx.beginPath();
+        ctx.moveTo(anchor[0], anchor[1]);
+        ctx.lineTo(best[0], best[1]);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = ink['--rose'];
+        ctx.beginPath();
+        ctx.arc(best[0], best[1], Math.max(3, 5 * k), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    drawLabels();
   }
+
+  // ---- Labels: a layout pass every frame ----
+  type Label = { key: string; text: string; at: Pt; dx: number; dy: number; align: CanvasTextAlign; color: string; pri: number };
+  const alpha = new Map<string, number>();
+  const target = new Map<string, number>();
+  let boxes: { key: string; box: number[]; on: boolean }[] = [];
+  let leader: Pt | null = null;
+  let lastLabelT = 0;
+  let fading = 0;
+  const avoidBoxes = () => {
+    const cr = cv.getBoundingClientRect();
+    return notes.map((n) => {
+      const r = n.getBoundingClientRect();
+      return [(r.left - cr.left) * dpr, (r.top - cr.top) * dpr, (r.right - cr.left) * dpr, (r.bottom - cr.top) * dpr];
+    });
+  };
+  // The leader starts under the pinned note's text, at its left end.
+  function noteAnchor(): Pt | null {
+    if (!pinned || !pinned.offsetParent) return null;
+    const cr = cv.getBoundingClientRect();
+    const r = pinned.getBoundingClientRect();
+    return [(r.left + r.width * 0.25 - cr.left) * dpr, (r.bottom + 2 - cr.top) * dpr];
+  }
+  function drawLabels() {
+    const px = Math.round(Math.max(26 * k, 11 * dpr));
+    ctx.font = `500 ${px}px "JetBrains Mono Variable", "JetBrains Fallback", monospace`;
+    const mu = ink['--muted'];
+    const sp = world(0, ZS / MAXZ, 0);
+    const cz = ssp.length ? world(0, ssp[0][1], 0) : sp;
+    const czx = ssp.length ? cz[0] - ssp[0][0] * W * 0.12 : cz[0];
+    const labels: Label[] = [
+      { key: 'source', text: 'source 1000 m', at: sp, dx: 14 * k, dy: 9 * k, align: 'left', color: ink['--gold'], pri: 6 },
+      { key: 'cz', text: 'c(z)', at: [czx, cz[1]], dx: -8 * k, dy: -12 * k, align: 'right', color: ink['--gold'], pri: 5 },
+      { key: 'axis', text: 'axis 1300 m', at: world(0, AXIS / MAXZ, 0), dx: -48 * k, dy: -14 * k, align: 'right', color: ink['--gold'], pri: 4 },
+      { key: '0m', text: '0 m', at: world(0, 0, 0), dx: -12 * k, dy: 6 * k, align: 'right', color: mu, pri: 3 },
+      { key: '5000m', text: '5000 m', at: world(0, 1, 0), dx: -12 * k, dy: 6 * k, align: 'right', color: mu, pri: 3 },
+      { key: '100km', text: '100 km', at: world(1, 0, -SPREAD / 2), dx: 10 * k, dy: 0, align: 'left', color: mu, pri: 2 },
+      { key: '50km', text: '50 km', at: world(0.5, 0, -SPREAD / 2), dx: 0, dy: -10 * k, align: 'center', color: mu, pri: 1 },
+    ];
+    const placed = avoidBoxes();
+    const gap = 4 * dpr;
+    const edge = 2 * dpr;
+    boxes = [];
+    for (const l of labels.sort((a, b) => b.pri - a.pri)) {
+      const w = ctx.measureText(l.text).width;
+      const x = l.at[0] + l.dx;
+      const y = l.at[1] + l.dy;
+      const x0 = l.align === 'right' ? x - w : l.align === 'center' ? x - w / 2 : x;
+      const box = [x0, y - px * 0.78, x0 + w, y + px * 0.22];
+      const inside = box[0] >= edge && box[1] >= edge && box[2] <= W - edge && box[3] <= H - edge;
+      const clear = placed.every((p) => box[2] + gap <= p[0] || box[0] >= p[2] + gap || box[3] + gap <= p[1] || box[1] >= p[3] + gap);
+      const on = inside && clear;
+      if (on) placed.push(box);
+      target.set(l.key, on ? 1 : 0);
+      boxes.push({ key: l.key, box, on });
+    }
+    // Fade toward the targets: about 120 ms, or at once with reduced motion.
+    const now = performance.now();
+    const dt = lastLabelT ? Math.min(100, now - lastLabelT) : 1000;
+    lastLabelT = now;
+    const snap = prefersReducedMotion() || snapNext;
+    snapNext = false;
+    let moving = false;
+    for (const l of labels) {
+      const want = target.get(l.key)!;
+      let a = alpha.get(l.key) ?? want;
+      a = snap ? want : a + Math.sign(want - a) * Math.min(Math.abs(want - a), dt / 120);
+      alpha.set(l.key, a);
+      if (a !== want) moving = true;
+      if (a <= 0) continue;
+      ctx.globalAlpha = a;
+      ctx.textAlign = l.align;
+      // A halo in the plate's color keeps a label legible where it crosses the rays.
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 4 * dpr;
+      ctx.strokeStyle = ink['--surface'];
+      ctx.strokeText(l.text, l.at[0] + l.dx, l.at[1] + l.dy);
+      ctx.fillStyle = l.color;
+      ctx.fillText(l.text, l.at[0] + l.dx, l.at[1] + l.dy);
+    }
+    ctx.globalAlpha = 1;
+    if (moving && !fading) fading = requestAnimationFrame(() => ((fading = 0), draw()));
+  }
+  let snapNext = false;
 
   function resize() {
     const r = cv.getBoundingClientRect();
@@ -267,9 +359,24 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     draw();
   });
 
+  // For the layout tests: set a view and read back every label's box and whether it shows.
+  (cv as HTMLCanvasElement & { __er?: unknown }).__er = {
+    setView(yaw: number, pitch: number) {
+      cam.yaw = yaw;
+      cam.pitch = clampPitch(pitch);
+      snapNext = true;
+      draw();
+    },
+    labels: () => boxes.map((b) => ({ ...b })),
+    avoid: () => avoidBoxes(),
+    leader: () => leader,
+    size: () => [W, H],
+    ready: () => ready,
+  };
+
   // Trace and draw once the page has painted and the browser is idle.
   const start = () => {
-    for (let a = -13; a <= 13.01; a += 1.3) rays.push({ a, pts: trace((a * Math.PI) / 180) });
+    for (let a = -13; a <= 13.01; a += 1.3) rays.push({ a, ...trace((a * Math.PI) / 180) });
     for (let z = 0; z <= MAXZ; z += 100) ssp.push([(c(z) - 1480) / 90, z / MAXZ]);
     ready = true;
     readInks();
