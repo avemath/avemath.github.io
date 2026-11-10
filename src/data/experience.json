@@ -137,7 +137,8 @@
       "location": "Baton Rouge, LA",
       "end": "2028-05",
       "expected": true,
-      "notes": []
+      "notes": [],
+      "_todo": "TODO(ave): confirm the exact focus name on my plan of study (LSU ECE lists 'Communications and Signal Processing' as a graduate area)."
     },
     {
       "id": "bs",

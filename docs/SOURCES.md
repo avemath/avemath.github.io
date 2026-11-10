@@ -73,7 +73,8 @@ Documents in `docs/sources/` are kept locally and are never committed or publish
 
 Facts with no document behind them, confirmed by Ave directly. Each line gives the date she confirmed it.
 
-- 2026-11-06: open to summer 2027 internships in comms, embedded or DSP, Baton Rouge or remote (home status strip).
+- 2026-11-06: open to summer 2027 internships in comms, embedded or DSP, Baton Rouge or remote (home status strip). Withdrawn 2026-11-09.
+- 2026-11-09: not available for summer 2027 internships; the research assistantship likely runs through the summer. The status strip says "Graduate research assistant at LSU" instead, with no date. Degree focus is written "communications and signal processing" everywhere (LSU ECE's graduate area name).
 - 2026-11-06: land agent work since 2020, for Harold J. Anderson Inc., Lemoine Landman Services and Petro Land Ventures Inc. (résumé).
 - 2026-11-06: the Tiger Excellence Scholars Award and the Tiger Alumni Legacy Scholarship, all four years (résumé).
 - 2026-11-06: the LED visualizer was built in 2025, as a Christmas 2025 gift; its repo came later.

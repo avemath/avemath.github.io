@@ -57,7 +57,7 @@ How to add work and keep the site current, plus the rules every page follows.
 | Gallery clips | an mp4 and a WebVTT captions file in `public/media/`, a poster image beside the project's photos, and a `video:` entry in the project's `gallery` (see `rampage.md`). Transcode to H.264 at 720p or less, strip audio unless it matters, and keep each clip under about 5 MB. Clips never autoplay. |
 | Wiring photos | skip any where the wiring looks messy. A close-up of a board with its leads is fine; a tangle inside a chassis or sprawled across a bench is not. |
 | About: datasheet pins, characteristics, Integer feature | `src/data/about.json`. Pin photos go in `src/assets/offclock/`, named in the pin's `photo` as a path under `src/assets/`, with an `alt` and a short marker `caption`. A pin with no photo shows its line drawing (`art`). Pin text can link with `[words](/path/)`. |
-| Right now, Research, Open to (home) | `src/components/StatusStrip.astro` |
+| Right now, Research, Position (home) | `src/components/StatusStrip.astro` |
 | Experience, education, résumé | `src/data/experience.json` (the HTML résumé and PDF both read it) |
 | Skills | `src/data/skills.json` |
 | Field notes | `src/data/facts.json`. Each note has a `where`: the research band (`below`, `onr`, `bellhop`, `pool-alarm`) or `signals` for the home page Signals card. One note per place. |
