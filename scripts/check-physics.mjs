@@ -2,6 +2,7 @@
 // against the physics they claim. Run with `npm run test:physics` (part of `npm run verify`). Uses
 // Node's type stripping to load the same modules the pages run.
 import { MUNK, PROFILES, traceRay, fan, eigenrays, atRange } from '../src/lib/raytrace.ts';
+import arrivals from '../src/data/bellhop-arrivals.json' with { type: 'json' };
 
 let failures = 0;
 function check(name, ok, detail) {
@@ -60,6 +61,37 @@ for (const a of [6, 9, 11]) {
   const direct = eig.find((e) => e.surf === 0 && e.bot === 0);
   const want = Math.hypot(10_000, 500) / 1500;
   check('The isothermal direct eigenray arrives at distance / c', direct && Math.abs(direct.t - want) < 2e-3, direct ? `${direct.t.toFixed(4)} s, want ${want.toFixed(4)} s` : 'none found');
+}
+
+// Against BELLHOP itself: bellhopSim's comms scenario (shallow_water_profile with a 1000 m column,
+// source 50 m, receiver 15 km out at 100 m), whose arrivals BELLHOP computed (src/data/
+// bellhop-arrivals.json). For every bounce history BELLHOP reports, the browser tracer's eigenray
+// delays (relative to the first arrival) must land within 3 ms or 1% of BELLHOP's. BELLHOP drops
+// paths after the sand bottom has soaked them up; the browser tracer has no bottom loss, so only
+// the histories BELLHOP keeps are compared.
+{
+  const D = 1000;
+  const mixed = D * 0.1;
+  const base = D * 0.4;
+  const top = 1520 - 0.05 * mixed;
+  const comms = { id: 'comms', name: 'comms', zmax: D, rmax: 15_000, zs: 50, c: (z) => (z <= mixed ? 1520 - 0.05 * z : z <= base ? top + (1490 - top) * ((z - mixed) / (base - mixed)) : 1490 + 0.005 * (z - base)) };
+  const rays = fan(comms, 50, -80 * deg, 80 * deg, 6001, { rmax: 15_100, ds: 10, every: 1 });
+  const eig = eigenrays(rays, 15_000, 100);
+  const t0 = eig[0].t;
+  const bh = arrivals.comms.arrivals;
+  const kept = new Set(bh.map((a) => `${a.surface}/${a.bottom}`));
+  let compared = 0;
+  let worst = 0;
+  for (const e of eig) {
+    const k = `${e.surf}/${e.bot}`;
+    if (!kept.has(k)) continue;
+    const d = 1000 * (e.t - t0);
+    const near = Math.min(...bh.filter((a) => `${a.surface}/${a.bottom}` === k).map((a) => Math.abs(a.delay_ms - d) / Math.max(1, 0.01 * a.delay_ms) ));
+    worst = Math.max(worst, near);
+    compared++;
+  }
+  const missing = [...kept].filter((k) => !eig.some((e) => `${e.surf}/${e.bot}` === k));
+  check('Eigenray delays match BELLHOP on its comms scenario', compared >= 12 && !missing.length && worst <= 3, `${compared} eigenrays across ${kept.size} bounce histories, worst ${worst.toFixed(2)} of the allowed 3 (ms or 1%), first arrival ${t0.toFixed(3)} s; missing: ${missing.join(' ') || 'none'}`);
 }
 
 // Every bellhopSim profile traces to its full range without leaving the water.

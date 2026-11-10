@@ -27,10 +27,16 @@ Documents in `docs/sources/` are kept locally and are never committed or publish
 
 ## Plate I: the eigenray hero
 
-- **The rays are traced in the browser** (`src/scripts/eigenrays.ts`), not read from BELLHOP output: bellhopSim has no committed `.ray` file for its Munk case (its `docs/figures/` holds rendered PNGs and `figures.json`, which records settings, not ray paths).
+- **The rays are traced in the browser** (`src/lib/raytrace.ts`, shared with the Research ray tracer), not read from BELLHOP output: bellhopSim has no committed `.ray` file for its Munk case (its `docs/figures/` holds rendered PNGs and `figures.json`, which records settings, not ray paths).
 - **The model is bellhopSim's Munk profile:** c0 1500 m/s, channel axis 1300 m, B 1300 m, epsilon 0.00737, 5000 m of water, 100 km of range (`docs/figures/figures.json`, `deep_water.parameters`).
 - **The source is at 1000 m** for the plate, as the approved mockup draws it; bellhopSim's own Munk figure puts it on the axis at 1300 m.
-- **The tracer** is a simple Snell's-law step (100 m) with mirror reflections at the surface and bottom, 21 launch angles from -13 to +13 degrees. It is an illustration of the channel, not a BELLHOP run.
+- **The tracer** (since Nov 9) integrates BELLHOP's ray equations (r, z and zeta = sin(theta)/c, with xi = cos(theta)/c held fixed, which is Snell's law) by fourth-order Runge-Kutta, with mirror reflections at the surface and bottom; the plate draws 21 launch angles from -13 to +13 degrees. `scripts/check-physics.mjs` checks Snell's invariant along a ray (relative drift under 1e-7), that a Munk ray from 1000 m turns where c = c(zs)/cos(theta0), travel times in isothermal water, and (below) BELLHOP's own arrivals.
+
+## Fig. R3: the ray tracer on /research/
+
+- **Profiles** are bellhopSim's five from `src/profiles.py` with its default parameters: Munk (5000 m), surface duct (duct 100 m at 1520 m/s), Arctic (surface 1435 m/s, 4000 m), shallow water shelf (200 m, 1520 to 1490 m/s) and isothermal (1500 m/s). The defaults follow bellhopSim's deep-water figure (`scripts/export_figures.py`, `DEEP`): source on the axis at 1300 m, a fan of plus or minus 20 degrees, receiver at 65 km and 1300 m.
+- **No `.ray` or `.arr` files are committed in bellhopSim** (its `outputs/` holds PNGs only), so the browser tracer is compared with the BELLHOP arrivals this site already keeps (`src/data/bellhop-arrivals.json`, bellhopSim's comms scenario: a 1000 m shallow-water profile, source 50 m, receiver 15 km out at 100 m). Result (Nov 9): every one of the 17 bounce histories BELLHOP reports is found by the browser tracer, and its 22 eigenray delays for those histories land within 0.56 ms (or 1%) of BELLHOP's, relative to the first arrival. BELLHOP lists fewer paths overall (43 against the tracer's 138) because it drops paths once the sand bottom has absorbed them; the browser tracer has no bottom loss, so it keeps paths with many more bounces. That difference is said in the figure's note.
+- **Eigenrays** are found the way BELLHOP's eigenray mode finds them: a dense fan (361 rays), and wherever two neighbors with the same bounce history land on either side of the receiver, one ray between them passes through it.
 
 ## Plate III: the V2V constellation
 

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import MarginNote from '@/components/MarginNote.astro';
-import BellhopRays from '@/components/drawings/BellhopRays.astro';
+import RayTracer from '@/components/research/RayTracer.astro';
 import PoolSide from '@/components/drawings/PoolSide.astro';
 import SoundRace from '@/components/research/SoundRace.astro';
 import PoolPing from '@/components/research/PoolPing.astro';
@@ -142,13 +142,17 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
         <div class="rp__fig">
           <figure class="rfig plate">
             <div class="fig__bar">
-              <p class="fig__label">Arrivals, 15 km, sandy bottom</p>
-              <div class="tabset" role="tablist" aria-label="bellhopSim: views" data-tabs>
-                <button type="button" role="tab" id="r2-tab-live" aria-controls="r2-live" aria-selected="true" tabindex="0">Arrivals</button>
-                <button type="button" role="tab" id="r2-tab-drawing" aria-controls="r2-drawing" aria-selected="false" tabindex="-1">Drawing</button>
+              <p class="fig__label">The sound channel</p>
+              <div class="tabset" role="tablist" aria-label="Sound channel: views" data-tabs>
+                <button type="button" role="tab" id="r3-tab-rays" aria-controls="r3-rays" aria-selected="true" tabindex="0">Ray tracer</button>
+                <button type="button" role="tab" id="r3-tab-arr" aria-controls="r3-arr" aria-selected="false" tabindex="-1">BELLHOP arrivals</button>
               </div>
             </div>
-            <div id="r2-live" role="tabpanel" aria-labelledby="r2-tab-live">
+            <div id="r3-rays" role="tabpanel" aria-labelledby="r3-tab-rays">
+              <RayTracer />
+              <p class="fig__note">Traced in your browser through bellhopSim's sound speed profiles, with BELLHOP's ray equations. Ping sends a pulse along every ray at the local speed of sound; the bold rays are the eigenrays that reach the receiver. There is no bottom loss here, so paths that BELLHOP would let the seabed absorb still show.</p>
+            </div>
+            <div id="r3-arr" role="tabpanel" aria-labelledby="r3-tab-arr" hidden>
               <div class="arr-row">
                 <div class="arr-row__plot" role="group" aria-label="Arrivals chart: use the arrow keys to step through the arrivals" tabindex="0" aria-describedby="arr-read" data-arr-plot>
                   <div class="rfig__plot" data-draw data-hscroll="Arrivals plot">
@@ -178,13 +182,14 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
                 </div>
               </div>
               <script type="application/json" data-arr-data set:html={JSON.stringify(ch.arrivals)} />
-            </div>
-            <div id="r2-drawing" role="tabpanel" aria-labelledby="r2-tab-drawing" hidden>
-              <BellhopRays />
+              <p class="fig__note">
+                {ch.arrivals.length} arrivals from BELLHOP itself: 1000 m of water, source at 50 m, receiver 15 km out at 100 m, 3.5 kHz, sandy
+                bottom. The strongest is in green; {ch.n_within_20db} fall within 20 dB of it.
+              </p>
             </div>
             <figcaption class="plate__cap">
-              <b>Fig. R2.</b> {ch.arrivals.length} arrivals from BELLHOP: 1000 m of water, source at 50 m, receiver at 100 m, 3.5 kHz. The
-              strongest is in green; {ch.n_within_20db} fall within 20 dB of it.
+              <b>Fig. R3.</b> Sound bends toward the slow water. Rays and eigenrays in the browser, and the real arrivals BELLHOP computed for
+              bellhopSim's comms scenario.
             </figcaption>
           </figure>
         </div>

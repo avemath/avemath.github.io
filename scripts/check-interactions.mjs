@@ -23,7 +23,9 @@
 //                  scroll, and reduced motion jumps the needle
 //   race           Why sound, by keyboard only: distance slider, radio frequency, Send; the clock and
 //                  the spoken summary give the real times and where radio is lost in water
-//   arrivals       Fig. R2: hovering or arrowing through the arrivals names each one's path
+//   raytracer      Fig. R3 by keyboard: environment, source depth, Ping; the clock runs and the summary
+//                  names the eigenrays; dragging the plot moves the receiver
+//   arrivals       Fig. R3's BELLHOP view: hovering or arrowing through the arrivals names each one's path
 //   field-notes    notes start as bits, decode into text when scrolled to, and a tap replays them
 //   tool-panel     the client tool panels play their flow when scrolled to and keep the end state
 //   seafloor-drag  dragging open water on /research/ turns the camera; panels never start a drag
@@ -481,8 +483,44 @@ await test('race', async () => {
   await p.close();
 });
 
+await test('raytracer', async () => {
+  // Keyboard only: change the environment, move the source, Ping; the summary names the eigenrays.
+  const p = await page('/research/');
+  await settleOn(p, '[data-rt]');
+  const root = p.locator('[data-rt]');
+  const first = await p.locator('[data-rt-sum]').textContent();
+  if (!/^\d+ eigenrays?, first arrival [\d.]+ s, last [\d.]+ s/.test(first)) fail('raytracer', `the Munk default reads "${first}"`);
+  await p.locator('[data-rt-env]').focus();
+  await p.keyboard.press('ArrowDown');
+  if ((await p.locator('[data-rt-env]').inputValue()) !== 'surface-duct') fail('raytracer', 'ArrowDown on the environment does not pick the next profile');
+  await p.keyboard.press('Tab');
+  if (!(await p.locator('[data-rt-zs]').evaluate((e) => e === document.activeElement))) fail('raytracer', 'Tab does not reach the source depth');
+  const z0 = await p.locator('[data-rt-zs-out]').textContent();
+  for (let k = 0; k < 5; k++) await p.keyboard.press('ArrowRight');
+  if ((await p.locator('[data-rt-zs-out]').textContent()) === z0) fail('raytracer', 'the arrow keys do not move the source');
+  for (let k = 0; k < 4; k++) await p.keyboard.press('Tab');
+  if (!(await p.locator('[data-rt-ping]').evaluate((e) => e === document.activeElement))) fail('raytracer', 'Tab does not reach Ping');
+  await p.keyboard.press('Enter');
+  await p.waitForFunction(() => document.querySelector('[data-rt-clock]').textContent !== '0.00', null, { timeout: 4000 }).catch(() => fail('raytracer', 'Ping does not start the clock'));
+  await p.waitForFunction(() => document.querySelector('[data-rt]').hasAttribute('data-pinged'), null, { timeout: 15000 }).catch(() => fail('raytracer', 'the ping never finishes'));
+  const sum = await p.locator('[data-rt-sum]').textContent();
+  if (!/Surface duct/.test(sum)) fail('raytracer', `after the changes the summary reads "${sum}"`);
+  if ((await p.locator('[data-rt-sum]').getAttribute('aria-live')) !== 'polite') fail('raytracer', 'the summary is not a polite live region');
+  // Dragging on the plot moves the receiver.
+  const r0 = await p.locator('[data-rt-rr-out]').textContent();
+  const b = await p.locator('[data-rt-main]').boundingBox();
+  await p.mouse.move(b.x + b.width * 0.85, b.y + b.height * 0.6);
+  await p.mouse.down();
+  await p.mouse.move(b.x + b.width * 0.55, b.y + b.height * 0.4, { steps: 6 });
+  await p.mouse.up();
+  if ((await p.locator('[data-rt-rr-out]').textContent()) === r0) fail('raytracer', 'dragging on the plot does not move the receiver');
+  await p.close();
+});
+
 await test('arrivals', async () => {
   const p = await page('/research/');
+  await settleOn(p, '#r3-tab-arr');
+  await p.locator('#r3-tab-arr').click();
   await settleOn(p, '[data-arr-plot]');
   const read = () => p.locator('[data-arr-read]').textContent();
   const bars = p.locator('[data-arr]');
