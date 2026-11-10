@@ -1,0 +1,544 @@
+---
+// "How it connects" on /work/: the thread map (Concept A revised in docs/mockups/
+// work-concepts-2.html). Each line is a thread through the work; stations are the projects in the
+// order they started, each a round picture of the project (its cover through the image pipeline at
+// twice the circle's size, or a drawing for projects without one). A project on two threads is an
+// interchange: a capsule across both lines. Lines still running end in a dashed track to "now";
+// finished lines end in a bar. Year brackets run underneath.
+// Built here, at build time, in two shapes: across the page, and down it for phones (CSS shows the
+// one that fits), so it reads with no script. src/scripts/threadmap.ts adds the preview card on
+// hover or focus, selecting a project on the bench, the legend's highlighting and the draw-in.
+import { getImage } from 'astro:assets';
+import { type Project, typeLabels, statusLabels } from '@/lib/projects';
+import { projectWhen } from '@/lib/format';
+import { threads, benchSpot, type Thread } from '@/lib/bench';
+import LedSpectrum from './bench/LedSpectrum.astro';
+import V2v from './bench/V2v.astro';
+import BellhopPrint from './bench/BellhopPrint.astro';
+import AbstractStack from './bench/AbstractStack.astro';
+
+interface Props {
+  projects: Project[];
+}
+const all = Astro.props.projects;
+const P = [...all].filter((p) => p.data.threads.length).sort((a, b) => a.data.period.start.localeCompare(b.data.period.start) || a.data.order - b.data.order);
+const lane = Object.fromEntries(threads.map((t, i) => [t.id, i])) as Record<Thread, number>;
+const when = (p: Project) => projectWhen(p.data.period.start, p.data.period.end, p.data.status);
+// The name on the map: the full title when it is short, else the short name (never a web address),
+// without "(working title)".
+const nameOf = (p: Project) => {
+  const t = p.data.title.replace(/\s*\(working title\)/i, '');
+  const sh = p.data.short && !p.data.short.includes('.') ? p.data.short : undefined;
+  return t.length <= 22 || !sh ? t : sh;
+};
+
+// Pictures: covers at twice the station's drawn size.
+const pics = Object.fromEntries(
+  await Promise.all(P.filter((p) => p.data.cover).map(async (p) => [p.id, (await getImage({ src: p.data.cover!, width: 184, format: 'webp', quality: 70 })).src])),
+) as Record<string, string>;
+const cards = Object.fromEntries(
+  await Promise.all(P.filter((p) => p.data.cover).map(async (p) => [p.id, (await getImage({ src: p.data.cover!, width: 480, format: 'webp', quality: 70 })).src])),
+) as Record<string, string>;
+// Drawn stations: the mockup's icons, and the bench's own drawing where the mockup used a figure.
+const BENCH_DRAW: Record<string, any> = { 'led-audio-spectrum': LedSpectrum, 'v2v-bsm-ofdm': V2v, 'bellhop-sim': BellhopPrint, 'plv-abstract-builder': AbstractStack };
+
+type Shape = 'h' | 'v';
+const geo = (shape: Shape) => {
+  const n = P.length;
+  if (shape === 'h') {
+    const W = 1200, H = 600, x0 = 210, x1 = 1100, y0 = 200, LG = 74, R = 27;
+    return { W, H, R, LG, pos: (i: number, ln: number) => [x0 + (i * (x1 - x0)) / (n - 1), y0 + ln * LG] as [number, number] };
+  }
+  const W = 420, H = n * 78 + 90, x0 = 36, y0 = 50, LG = 42, R = 17;
+  return { W, H, R, LG, pos: (i: number, ln: number) => [x0 + ln * LG, y0 + i * 78] as [number, number] };
+};
+const years = (() => {
+  const out: { y: string; a: number; b: number }[] = [];
+  P.forEach((p, i) => {
+    const y = p.data.period.start.slice(0, 4);
+    if (!out.length || out[out.length - 1].y !== y) out.push({ y, a: i, b: i });
+    else out[out.length - 1].b = i;
+  });
+  return out;
+})();
+
+const build = (shape: Shape) => {
+  const g = geo(shape);
+  const v = shape === 'v';
+  const lines = threads.map((t) => {
+    const idx = P.map((p, i) => (p.data.threads.includes(t.id) ? i : -1)).filter((i) => i >= 0);
+    if (!idx.length) return null;
+    const a = g.pos(idx[0], lane[t.id]);
+    const b = g.pos(idx[idx.length - 1], lane[t.id]);
+    const running = P[idx[idx.length - 1]].data.status !== 'complete';
+    const end = v ? [b[0], g.H - 26] : [1185, b[1]];
+    return { t, a, b, running, end };
+  });
+  const stations = P.map((p, i) => {
+    const ls = p.data.threads.map((x) => lane[x]);
+    const lo = Math.min(...ls);
+    const hi = Math.max(...ls);
+    const a = g.pos(i, lo);
+    const b = g.pos(i, hi);
+    return { p, i, a, b, cx: (a[0] + b[0]) / 2, cy: (a[1] + b[1]) / 2, multi: lo !== hi };
+  });
+  return { g, v, lines, stations };
+};
+const H_ = build('h');
+const V_ = build('v');
+---
+
+<div class="tmap" data-tmap>
+  <div class="tmap__legend" role="group" aria-label="Highlight one thread">
+    {
+      threads.map((t) => (
+        <button type="button" class="tmap__key" style={`--c:var(${t.color})`} aria-pressed="false" data-line={t.id}>
+          {t.name}
+        </button>
+      ))
+    }
+  </div>
+  {
+    [H_, V_].map(({ g, v, lines, stations }) => (
+      <svg class:list={['tmap__svg', v ? 'tmap__svg--v' : 'tmap__svg--h']} viewBox={`0 0 ${g.W} ${g.H}`} role="group" aria-label={`Thread map of ${P.length} projects, in the order they started`} data-tmap-svg>
+        <defs>
+          {stations.map((s) => (
+            <clipPath id={`tm-${v ? 'v' : 'h'}-${s.p.id}`}>
+              <circle cx={s.cx} cy={s.cy} r={g.R} />
+            </clipPath>
+          ))}
+        </defs>
+        {years.map((yr) => {
+          const a = g.pos(yr.a, 0);
+          const b = g.pos(yr.b, threads.length - 1);
+          if (!v) {
+            const yy = g.pos(0, threads.length - 1)[1] + 60;
+            return (
+              <g class="tmap__yr">
+                <path d={`M${a[0] - 20} ${yy - 6}v6H${b[0] + 20}v-6`} />
+                <text x={(a[0] + b[0]) / 2} y={yy + 20} text-anchor="middle">
+                  {yr.y}
+                </text>
+              </g>
+            );
+          }
+          const xx = g.pos(0, threads.length - 1)[0] + 28;
+          return (
+            <g class="tmap__yr">
+              <path d={`M${xx - 6} ${a[1] - 20}h6V${b[1] + 20}h-6`} />
+              <text x={xx + 6} y={a[1] - 24}>
+                {yr.y}
+              </text>
+            </g>
+          );
+        })}
+        {lines.map(
+          (l) =>
+            l && (
+              <g class="tmap__line" data-lines={l.t.id} style={`--c:var(${l.t.color})`}>
+                <path class="tmap__track" d={`M${l.a[0]} ${l.a[1]}L${l.b[0]} ${l.b[1]}`} pathLength="1" />
+                {l.running ? <path class="tmap__now" d={`M${l.b[0]} ${l.b[1]}L${l.end[0]} ${l.end[1]}`} /> : <path class="tmap__end" d={v ? `M${l.b[0] - 12} ${l.b[1] + 34}h24` : `M${l.b[0] + 34} ${l.b[1] - 12}v24`} />}
+                {!v && (
+                  <text class="tmap__lname" x={l.a[0] - 38} y={l.a[1] + 4} text-anchor="end">
+                    {l.t.name}
+                  </text>
+                )}
+              </g>
+            ),
+        )}
+        {v ? (
+          <text class="tmap__yrtext" x={g.pos(0, 2)[0]} y={g.H - 8} text-anchor="middle">
+            now
+          </text>
+        ) : (
+          <text class="tmap__yrtext" x="1185" y={g.pos(0, threads.length - 1)[1] + 80} text-anchor="middle">
+            now
+          </text>
+        )}
+        {stations.map((s) => {
+          const p = s.p;
+          const R = g.R;
+          const Draw = BENCH_DRAW[p.id];
+          const spot = benchSpot(p.id);
+          return (
+            <g
+              class="tmap__stn"
+              tabindex="0"
+              role="button"
+              aria-label={`${p.data.title}, ${when(p)}, ${statusLabels[p.data.status]}. Show it on the bench.`}
+              data-stn={p.id}
+              data-lines={p.data.threads.join(' ')}
+              data-i={s.i}
+            >
+              {s.multi ? (
+                v ? (
+                  <rect class="tmap__halo" x={s.a[0] - R - 4} y={s.a[1] - R - 4} width={s.b[0] - s.a[0] + 2 * R + 8} height={2 * R + 8} rx={R + 4} />
+                ) : (
+                  <rect class="tmap__halo" x={s.a[0] - R - 4} y={s.a[1] - R - 4} width={2 * R + 8} height={s.b[1] - s.a[1] + 2 * R + 8} rx={R + 4} />
+                )
+              ) : (
+                <circle class="tmap__halo" cx={s.cx} cy={s.cy} r={R + 4} />
+              )}
+              <g clip-path={`url(#tm-${v ? 'v' : 'h'}-${p.id})`}>
+                {pics[p.id] ? (
+                  <image href={pics[p.id]} x={s.cx - R * 1.7} y={s.cy - R} width={R * 3.4} height={R * 2} preserveAspectRatio="xMidYMid slice" />
+                ) : (
+                  <>
+                    <circle class="tmap__dark" cx={s.cx} cy={s.cy} r={R} />
+                    {Draw && spot && (
+                      <svg x={s.cx - R} y={s.cy - R} width={2 * R} height={2 * R} viewBox={`${spot.x} ${spot.y} ${spot.w} ${spot.h}`} preserveAspectRatio="xMidYMid slice" class="bench tmap__benchart">
+                        <Draw spot={spot} perch={false} />
+                      </svg>
+                    )}
+                    {p.id === 'signals-playground' &&
+                      [2, 0, 3, 1].map((val, k) => <rect class="ic-g" x={s.cx - R * 0.6 + (k * R * 1.2) / 4 + 1} y={s.cy - R * 0.6 + (val * R * 1.2) / 4 + 1} width={(R * 1.2) / 4 - 2} height={(R * 1.2) / 4 - 2} />)}
+                    {p.id === 'onr-intelligent-data-management' &&
+                      (() => {
+                        const q = [[-0.5, -0.3], [0.1, -0.55], [0.55, -0.1], [-0.3, 0.45], [0.35, 0.45]].map(([x, y]) => [s.cx + x * R, s.cy + y * R]);
+                        return (
+                          <>
+                            {[[0, 1], [1, 2], [0, 3], [3, 4], [2, 4], [1, 3]].map(([a, b]) => <line class="ic-l" x1={q[a][0]} y1={q[a][1]} x2={q[b][0]} y2={q[b][1]} />)}
+                            {q.map(([x, y]) => <circle class="ic-g" cx={x} cy={y} r={R * 0.12} />)}
+                          </>
+                        );
+                      })()}
+                    {p.id === 'little-explorer-swim' &&
+                      [0, 1, 2].map((k) => (
+                        <>
+                          <rect class="ic-box" x={s.cx - R * 0.5} y={s.cy - R * 0.45 + k * R * 0.35} width={R * 0.22} height={R * 0.22} />
+                          <path class="ic-tick" d={`M${s.cx - R * 0.46} ${s.cy - R * 0.36 + k * R * 0.35} l${R * 0.08} ${R * 0.08} l${R * 0.14} -${R * 0.16}`} />
+                          <line class="ic-l" x1={s.cx - R * 0.18} y1={s.cy - R * 0.34 + k * R * 0.35} x2={s.cx + R * 0.5} y2={s.cy - R * 0.34 + k * R * 0.35} />
+                        </>
+                      ))}
+                    {p.id === 'acoustic-pool-alarm' && (
+                      <>
+                        <rect class="ic-pool" x={s.cx - R * 0.62} y={s.cy - R * 0.4} width={R * 1.24} height={R * 0.8} rx={R * 0.25} />
+                        {[0.15, 0.3].map((k) => (
+                          <circle class="ic-ring" cx={s.cx - R * 0.1} cy={s.cy} r={R * k} />
+                        ))}
+                        <circle class="ic-dot" cx={s.cx + R * 0.38} cy={s.cy + R * 0.15} r={R * 0.08} />
+                      </>
+                    )}
+                  </>
+                )}
+              </g>
+            </g>
+          );
+        })}
+        {stations.map((s) => {
+          if (!v) {
+            const ly = g.pos(0, 0)[1] - 44;
+            return (
+              <g class="tmap__lbl" data-lines={s.p.data.threads.join(' ')} aria-hidden="true">
+                <path class="tmap__lead" d={`M${s.cx} ${ly + 6}V${s.a[1] - g.R - 6}`} />
+                <text transform={`translate(${s.cx + 4} ${ly}) rotate(-38)`}>{nameOf(s.p)}</text>
+              </g>
+            );
+          }
+          const lx = g.pos(0, threads.length - 1)[0] + 50;
+          return (
+            <g class="tmap__lbl" data-lines={s.p.data.threads.join(' ')} aria-hidden="true">
+              <path class="tmap__lead" d={`M${s.b[0] + g.R + 6} ${s.cy}H${lx - 6}`} />
+              <text x={lx} y={s.cy + 5}>
+                {nameOf(s.p)}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    ))
+  }
+  <p class="tmap__scale">Stations are in the order each project started. Spacing is not to scale.</p>
+  <div class="tmap__cards" aria-hidden="true">
+    {
+      P.map((p) => (
+        <div class="tmap__card" data-card={p.id} hidden>
+          {cards[p.id] ? <img src={cards[p.id]} alt="" width="240" height="150" loading="lazy" decoding="async" /> : <div class="tmap__noimg" />}
+          <b>{nameOf(p)}</b>
+          <span>
+            {typeLabels[p.data.type]}, {when(p)}
+          </span>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  import { mountThreadMap } from '../../scripts/threadmap';
+  mountThreadMap();
+</script>
+
+<style>
+  .tmap {
+    position: relative;
+    padding: 1.1rem clamp(0.5rem, 2vw, 1.4rem) 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+
+  .tmap__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .tmap__key {
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .tmap__key::before {
+    content: '';
+    display: inline-block;
+    width: 22px;
+    height: 5px;
+    margin-right: 0.5rem;
+    border-radius: 3px;
+    background: var(--c);
+    vertical-align: 3px;
+  }
+
+  .tmap__key:hover {
+    border-color: var(--accent);
+  }
+
+  .tmap__key[aria-pressed='true'] {
+    border-color: var(--text);
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  .tmap__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Across the page from 640px; down it below. */
+  .tmap__svg--v {
+    display: none;
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 639px) {
+    .tmap__svg--h {
+      display: none;
+    }
+
+    .tmap__svg--v {
+      display: block;
+    }
+  }
+
+  .tmap__track,
+  .tmap__now,
+  .tmap__end {
+    fill: none;
+    stroke: var(--c);
+    stroke-linecap: round;
+  }
+
+  .tmap__track {
+    stroke-width: 9;
+  }
+
+  .tmap__now {
+    stroke-width: 9;
+    stroke-dasharray: 2 13;
+  }
+
+  .tmap__end {
+    stroke-width: 7;
+  }
+
+  /* The draw-in: tracks start undrawn only when script is there to draw them, and not with reduced
+     motion. */
+  .tmap[data-will-draw] .tmap__track {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .tmap[data-will-draw] :is(.tmap__now, .tmap__end) {
+    opacity: 0;
+  }
+
+  .tmap[data-drawn] .tmap__track {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.6s cubic-bezier(0.4, 0.1, 0.2, 1);
+  }
+
+  .tmap[data-drawn] :is(.tmap__now, .tmap__end) {
+    opacity: 1;
+    transition: opacity 0.4s 1.4s;
+  }
+
+  .tmap__lname {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    fill: var(--c);
+  }
+
+  .tmap__yr path {
+    fill: none;
+    stroke: var(--rule);
+    stroke-width: 1.5;
+  }
+
+  .tmap__yr text,
+  .tmap__yrtext {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--muted);
+  }
+
+  .tmap__stn {
+    cursor: pointer;
+    outline: none;
+  }
+
+  .tmap__halo {
+    fill: var(--bg);
+    stroke: var(--ink);
+    stroke-width: 3;
+    transition: stroke-width 0.2s;
+  }
+
+  .tmap__stn:hover .tmap__halo,
+  .tmap__stn:focus-visible .tmap__halo,
+  .tmap__stn.is-sel .tmap__halo {
+    stroke: var(--accent);
+    stroke-width: 5;
+  }
+
+  .tmap__stn:focus-visible .tmap__halo {
+    stroke: var(--focus);
+  }
+
+  .tmap__dark {
+    fill: #0e2a22;
+  }
+
+  .tmap__benchart {
+    overflow: hidden;
+  }
+
+  .ic-g {
+    fill: #7fd6a8;
+  }
+
+  .ic-l {
+    stroke: #a9bfb4;
+    stroke-width: 1.3;
+  }
+
+  .ic-box {
+    fill: none;
+    stroke: #e6efea;
+    stroke-width: 1.3;
+  }
+
+  .ic-tick {
+    fill: none;
+    stroke: #7fd6a8;
+    stroke-width: 2;
+  }
+
+  .ic-pool {
+    fill: #17403c;
+    stroke: #7ccac3;
+    stroke-width: 1.3;
+  }
+
+  .ic-ring {
+    fill: none;
+    stroke: #7ccac3;
+    stroke-width: 1;
+  }
+
+  .ic-dot {
+    fill: #eba8c4;
+  }
+
+  .tmap__lbl text {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    fill: var(--ink);
+  }
+
+  .tmap__lead {
+    stroke: var(--rule);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+
+  /* A highlighted thread: the rest dims. */
+  .tmap[data-focus] .tmap__line:not(.is-on) {
+    opacity: 0.14;
+  }
+
+  .tmap[data-focus] :is(.tmap__stn, .tmap__lbl):not(.is-on) {
+    opacity: 0.3;
+  }
+
+  .tmap__scale {
+    margin: 0.4rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* The preview card. */
+  .tmap__card {
+    position: absolute;
+    z-index: 3;
+    width: 240px;
+    padding: 5px;
+    border: 1px solid var(--ink);
+    background: var(--surface);
+    box-shadow: 0 12px 26px rgb(10 30 20 / 0.22);
+    pointer-events: none;
+  }
+
+  .tmap__card img,
+  .tmap__noimg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--rule);
+  }
+
+  .tmap__noimg {
+    background: var(--bench-mat);
+  }
+
+  .tmap__card b {
+    display: block;
+    padding: 6px 4px 2px;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  .tmap__card span {
+    display: block;
+    padding: 0 4px 4px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+</style>
