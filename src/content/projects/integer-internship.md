@@ -17,7 +17,7 @@ stack: [Acoustic measurement, Network simulation, Data analysis]
 cover: ../../assets/projects/integer-internship/wagon.jpg
 coverAlt: Three people seen from behind, walking across a sunny parking lot toward the cars, one in an LSU cap pushing a folding wagon loaded with gear.
 confidentiality: limited
-threads: [signals] # TODO(ave): confirm the thread for each project
+threads: [hardware, signals] # TODO(ave): confirm the thread for each project
 # TODO(ave): check wording of the summary, role and My role (Nov 10: the ONR work began during the Integer internship).
 ---
 

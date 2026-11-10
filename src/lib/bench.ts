@@ -21,7 +21,7 @@ export type Thread = (typeof threadIds)[number];
 export const threads: { id: Thread; name: string; color: string }[] = [
   { id: 'hardware', name: 'Hardware', color: '--gold' },
   { id: 'signals', name: 'Signals and sound', color: '--accent' },
-  { id: 'family', name: 'For my family', color: '--rose' },
+  { id: 'family', name: 'Water safety', color: '--rose' },
   { id: 'web', name: 'Websites and tools', color: '--lilac' },
   { id: 'land', name: 'Land', color: '--teal' },
 ];

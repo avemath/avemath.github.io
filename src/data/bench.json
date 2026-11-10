@@ -6,7 +6,7 @@
   "v2v-bsm-ofdm": {"x": 866, "y": 100, "w": 290, "h": 128, "tag": "V2V: two radios, two cars", "tagAt": [870, 264]},
   "bellhop-sim": {"x": 540, "y": 330, "w": 240, "h": 196, "tag": "bellhopSim figure", "tagAt": [548, 322]},
   "integer-internship": {"x": 70, "y": 340, "w": 216, "h": 176, "tag": "Integer: lab tank tests", "tagAt": [70, 548]},
-  "onr-intelligent-data-management": {"x": 322, "y": 336, "w": 184, "h": 142, "tag": "ONR research, public wording", "tagAt": [322, 500]},
+  "onr-intelligent-data-management": {"x": 322, "y": 336, "w": 184, "h": 142, "tag": "ONR research", "tagAt": [322, 500]},
   "landspace": {"x": 60, "y": 568, "w": 202, "h": 96, "tag": "Landspace, title maps", "tagAt": [60, 694]},
   "plv-abstract-builder": {"x": 284, "y": 562, "w": 162, "h": 116, "tag": "Abstract Builder", "tagAt": [284, 694]},
   "little-explorer-swim": {"x": 468, "y": 528, "w": 132, "h": 150, "tag": "Swim intake", "tagAt": [468, 694]},
