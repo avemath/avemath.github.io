@@ -182,6 +182,13 @@ const right = pins.slice(half).reverse();
     background: var(--ds-bg);
   }
 
+  /* Small phones: the chip needs every pixel for its pin names. */
+  @media (max-width: 379px) {
+    .ds__sheet {
+      padding: 12px 10px;
+    }
+  }
+
   /* The title block: part number, title, the note, and the revision box, like a datasheet header. */
   .ds__tb {
     display: grid;

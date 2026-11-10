@@ -29,6 +29,7 @@
 //   field-notes    notes start as bits, decode into text when scrolled to, and a tap replays them
 //   tool-panel     the client tool panels play their flow when scrolled to and keep the end state
 //   seafloor-drag  dragging open water on /research/ turns the camera; panels never start a drag
+//   three-only-research three.js loads on /research/ (after a visitor moves) and on no other page
 //   seafloor-still with reduced motion, /research/ never loads three.js and shows the still gradient
 //   playground     the mesh playground decodes a typed message exactly at high SNR and makes errors at low
 // Run after a build: part of `npm run test:layout`.
@@ -121,60 +122,70 @@ await test('nav', async () => {
 await test('hero-labels', async () => {
   for (const w of [1440, 390]) {
     const p = await page('/', { w, h: w < 600 ? 844 : 900 });
-    const cv = p.locator('[data-eigenrays]');
-    await cv.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
-    await p.waitForFunction(() => document.querySelector('[data-eigenrays]').__er?.ready(), null, { timeout: 15000 });
-    const bad = await cv.evaluate((el) => {
-      const er = el.__er;
-      const [W, H] = er.size();
-      const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
-      const out = [];
+    try {
+      const cv = p.locator('[data-eigenrays]');
+      await cv.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+      await p.waitForFunction(() => document.querySelector('[data-eigenrays]').__er?.ready(), null, { timeout: 15000 });
+      // 24 yaws by 5 pitches, one yaw per call so a slow machine never holds one call too long.
       let views = 0;
+      const out = [];
       for (let i = 0; i < 24; i++) {
-        for (let j = 0; j < 5; j++) {
+        const r = await cv.evaluate((el, i) => {
+          const er = el.__er;
+          const [W, H] = er.size();
+          const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+          const bad = [];
+          let n = 0;
           const yaw = -Math.PI + (2 * Math.PI * i) / 24;
-          const pitch = -0.1 + (1.2 * j) / 4;
-          er.setView(yaw, pitch);
-          views++;
-          const on = er.labels().filter((l) => l.on);
-          const avoid = er.avoid();
-          for (const l of on) {
-            if (l.box[0] < 0 || l.box[1] < 0 || l.box[2] > W || l.box[3] > H) out.push(`${l.key} leaves the canvas at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
-            for (const n of avoid) if (hit(l.box, n)) out.push(`${l.key} sits under a note at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
+          for (let j = 0; j < 5; j++) {
+            const pitch = -0.1 + (1.2 * j) / 4;
+            er.setView(yaw, pitch);
+            n++;
+            const on = er.labels().filter((l) => l.on);
+            const avoid = er.avoid();
+            const at = `yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`;
+            for (const l of on) {
+              if (l.box[0] < 0 || l.box[1] < 0 || l.box[2] > W || l.box[3] > H) bad.push(`${l.key} leaves the canvas at ${at}`);
+              for (const a of avoid) if (hit(l.box, a)) bad.push(`${l.key} sits under a note at ${at}`);
+            }
+            for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) if (hit(on[a].box, on[b].box)) bad.push(`${on[a].key} overlaps ${on[b].key} at ${at}`);
+            if (!on.length) bad.push(`no label shows at ${at}`);
           }
-          for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) if (hit(on[a].box, on[b].box)) out.push(`${on[a].key} overlaps ${on[b].key} at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
-          if (!on.length) out.push(`no label shows at yaw ${yaw.toFixed(2)} pitch ${pitch.toFixed(2)}`);
-        }
+          return { n, bad };
+        }, i);
+        views += r.n;
+        out.push(...r.bad);
       }
-      return { out, views };
-    });
-    if (bad.views < 120) fail('hero-labels', `only ${bad.views} views sampled`);
-    for (const m of bad.out.slice(0, 6)) fail('hero-labels', `${w}px: ${m}`);
-    // A real drag: the view turns, the leader still points at a turning point, and the rule holds.
-    const before = await cv.evaluate((el) => el.__er.labels().map((l) => l.box.join()).join('|'));
-    const b = await cv.boundingBox();
-    await p.mouse.move(b.x + b.width * 0.5, b.y + b.height * 0.5);
-    await p.mouse.down();
-    for (let k = 1; k <= 12; k++) await p.mouse.move(b.x + b.width * (0.5 - k * 0.03), b.y + b.height * (0.5 + k * 0.01));
-    await p.mouse.up();
-    await p.waitForTimeout(300);
-    const after = await cv.evaluate((el) => {
-      const er = el.__er;
-      const on = er.labels().filter((l) => l.on);
-      const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
-      let overlaps = 0;
-      for (let a = 0; a < on.length; a++) for (let c = a + 1; c < on.length; c++) if (hit(on[a].box, on[c].box)) overlaps++;
-      return { sig: er.labels().map((l) => l.box.join()).join('|'), overlaps, leader: er.leader() };
-    });
-    if (after.sig === before) fail('hero-labels', `${w}px: dragging the plate does not turn it`);
-    if (after.overlaps) fail('hero-labels', `${w}px: after a drag ${after.overlaps} labels overlap`);
-    if (!after.leader) fail('hero-labels', `${w}px: no leader line from the pinned note`);
-    await p.close();
+      if (views < 120) fail('hero-labels', `only ${views} views sampled`);
+      for (const m of out.slice(0, 6)) fail('hero-labels', `${w}px: ${m}`);
+      // A real drag: the view turns, the leader still points at a turning point, and the rule holds.
+      const before = await cv.evaluate((el) => el.__er.labels().map((l) => l.box.join()).join('|'));
+      const b = await cv.boundingBox();
+      await p.mouse.move(b.x + b.width * 0.5, b.y + b.height * 0.5);
+      await p.mouse.down();
+      for (let k = 1; k <= 12; k++) await p.mouse.move(b.x + b.width * (0.5 - k * 0.03), b.y + b.height * (0.5 + k * 0.01));
+      await p.mouse.up();
+      await p.waitForTimeout(300);
+      const after = await cv.evaluate((el) => {
+        const er = el.__er;
+        const on = er.labels().filter((l) => l.on);
+        const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+        let overlaps = 0;
+        for (let a = 0; a < on.length; a++) for (let c = a + 1; c < on.length; c++) if (hit(on[a].box, on[c].box)) overlaps++;
+        return { sig: er.labels().map((l) => l.box.join()).join('|'), overlaps, leader: er.leader() };
+      });
+      if (after.sig === before) fail('hero-labels', `${w}px: dragging the plate does not turn it`);
+      if (after.overlaps) fail('hero-labels', `${w}px: after a drag ${after.overlaps} labels overlap`);
+      if (!after.leader) fail('hero-labels', `${w}px: no leader line from the pinned note`);
+    } finally {
+      await p.close();
+    }
   }
 });
 
 // ---- the home page ----
-const home = await page('/');
+// One shared page for the home tests; a busy machine can be slow to load it, so it gets a second try.
+const home = await page('/').catch(() => page('/'));
 
 await test('signal-panel', async () => {
   const screen = home.locator('[data-sig-screen]');
@@ -212,7 +223,10 @@ const tabsOn = async (p, where) => {
   }
 };
 await test('tabs', async () => {
-  await tabsOn(home, '/');
+  // Its own page: the shared home page has live canvases running by now, which starve clicks on a busy machine.
+  const hp = await page('/');
+  await tabsOn(hp, '/');
+  await hp.close();
   const rp = await page('/work/rampage/');
   await tabsOn(rp, '/work/rampage/');
   await rp.close();
@@ -701,6 +715,21 @@ await test('surface', async () => {
   if (new URL(p.url()).pathname !== '/research/') fail('surface', 'Back to the surface left the Research page');
   if (!(await p.evaluate(() => document.activeElement?.id === 'research-title'))) fail('surface', 'the title does not take focus at the top');
   await p.close();
+});
+
+await test('three-only-research', async () => {
+  // Moved, scrolled and waited on: three.js (the seafloor scene's chunk) loads on /research/ and
+  // nowhere else.
+  for (const path of ['/', '/about/', '/work/', '/work/rampage/', '/research/']) {
+    const p = await page(path);
+    await p.mouse.move(200, 300);
+    await p.mouse.move(260, 340);
+    await p.evaluate(() => scrollBy(0, 600));
+    await p.waitForTimeout(1500);
+    const three = await p.evaluate(() => performance.getEntriesByType('resource').some((r) => /seafloor-scene|three\.module|\/three\./.test(r.name)));
+    if (path === '/research/' ? !three : three) fail('three-only-research', `${path}: three.js ${three ? 'loaded' : 'did not load'}`);
+    await p.close();
+  }
 });
 
 await test('seafloor-still', async () => {

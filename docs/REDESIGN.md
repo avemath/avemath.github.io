@@ -622,3 +622,37 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 - **About, Nov 9**: the AVE-26 chip has 12 pins (01 to 06 down the left, 07 to 12 up the right): VCC now has its latte photo ("my usual"), pin 11 READ is The Last Lecture, and pin 12 NC (No connect) is a drawn empty socket. The chip is taller to keep the pins spaced.
 - **RAMpage, Nov 9**: three new photos in the case study: the control link on the bench, the transmitter's aux channels beside Fail safe three ways, and an early stream test in Video that stays current.
 - **Tests**: the radio (drag, snap, keys, buttons, filter, phone swipe and no sideways scroll, reduced motion), the Signals card, the V2V caption at three widths, the race, the R2 arrivals, the field notes and the tool panels, in `scripts/check-interactions.mjs`. The crate tests are gone.
+
+## Polish, round 3 (November 9, 2026)
+
+### What changed
+
+- **About copy:** FIELD says goalie for varsity soccer and shortstop for varsity softball; READ leads with "I love to read."; FAIRE is "Ren Faire Day" throughout (title, caption, alt); the Mike print is "Thanking Mike for the best five years." (alt to match); the Tiger Stadium print is two handwritten lines, "Death Valley" and "chance of rain: NEVER", sized to the print (`Polaroid` takes `lines`) so both fit the strip at every width; Mom's quote is off the page (kept in `about.json` under `_removed`); the bit girl's "found her N times" line and its counter are gone (she stays).
+- **No internship line:** the home status strip's third column is "Position: Graduate research assistant at LSU" (no date). It was the only availability line on the site; the résumé, meta, JSON-LD and README had none, so the résumé PDF did not change. The contact form's first topic is "A job" instead of "Job or internship". The degree focus reads "communications and signal processing" everywhere it appears (it already did; the strip's "DSP" went with the line).
+- **About datasheet:** one sheet (a plate with the double hairline) with a title block across the top (AVE-26, Datasheet, the note, a Rev. / By / Sheet box), the chip and its print tray on the left and the characteristics on the right from 1200px; on phones the table sits under the tray on the same sheet. Each row names its pins in mono ("pins 02, 03, 04, 10"). Landed on #datasheet at 1440 by 900 or 1280 by 800, the chip, the pressed print and the table are all on screen (tested). The chip's big-screen zoom is gentler (1.42 at 2560) now that the table shares the row.
+- **Recommendations** is a full-width deep green band (#0e2a22, cards #133a2f; in dark mode #15342a with cards #1c4135), light ink, accents #7fd6a8. Every text pair is AA in both themes (lowest: muted on the dark card, 4.95:1), tested.
+- **Home hero:** "sound bends toward the slow water" stays pinned in the plate's top right corner with a thin leader to the ray turning point nearest it, redrawn as the view turns. The projected labels (source, c(z), axis, 0 m, 5000 m, 50 km, 100 km) go through a layout pass every frame: by priority, a label that would overlap a higher one, either note or the canvas edge fades out over about 120 ms and back when clear; labels have a halo where they cross rays. Tested at 24 yaws by 5 pitches at 1440 and 390, plus a drag.
+- **One ray tracer:** `src/lib/raytrace.ts` integrates BELLHOP's ray equations by fourth-order Runge-Kutta with bellhopSim's five profiles. The hero and the Research tracer both use it. `scripts/check-physics.mjs` (new, in `npm run verify`) checks Snell's invariant, Munk turning depths, travel times, and agreement with BELLHOP's own arrivals (every bounce history found, delays within 0.56 ms or 1%; see SOURCES.md).
+- **Research** (plan: `docs/research-panels-plan.md`): every panel is a two-column plate from 1024px (figure 7 of 12 columns on the left, text on the right), a glass sheet tinted by depth with the double hairline, a mono depth tag that matches a new depth gauge (the dive is the 0 to 5000 m Munk column over the page's scroll), and "Fig. R0" to "Fig. R4" captions in Bodoni italic. The intro merged into the first panel. Panels:
+  - **R0, the race:** four lanes split by a waterline (radio and sound in air, radio and sound in seawater), distance 10 m to 10 km (log), radio frequency (skin depth, 8.686 dB per skin depth, "lost" at 40 dB), sound frequency (Thorp, dB/km), a real clock and a playback label, and a spoken summary. Math in `src/lib/race.ts`, tested.
+  - **R1, the platform network:** unchanged content; nodes now sit above the moving message dots.
+  - **R2, new: the FH-BFSK mesh** on the real `src/lib/fhbfsk.ts` (compact playground), with the "13 pairs" note.
+  - **R3, the ray tracer:** profile, source depth, fan, receiver (drag or sliders), Ping with a running clock, eigenrays bold by bounce color, an arrivals stem plot, a polite summary; BELLHOP's real arrivals are the second view. The static ray drawing (`BellhopRays.astro`) is gone.
+  - **R4, the pool:** concept and side view, labeled not results.
+- **Tests:** hero labels (120 views at two widths, and a drag), the datasheet fit and the band contrast, every Research panel's two columns, depth tags and phone stacking, the race and the ray tracer by keyboard only, three.js loading only on /research/, and the physics checks. The hash landing and the test helper's network wait were hardened earlier in the round.
+- **Screenshots:** `docs/polish-3/` (WebP, full pages at 390 and 1440 in both themes, 1.8 MB).
+
+### TODO(ave), all of them (`grep -rn "TODO(ave)" src`)
+
+- `src/data/about.json`: check the wording of every pin note; FIELD (goalie and shortstop), FAIRE (faire spelling) and READ (add a favorite author or genre if you want) were changed this round.
+- `src/data/about.json`, `Datasheet.astro`: a photo of the bellows camera for THRIFT.
+- `src/data/about.json` `_removed`: Mom's quote, if you want it back somewhere with a lead-in.
+- `src/pages/about.astro`: the Death Valley caption and the Mike caption and alt; confirm the exact focus name on your plan of study.
+- `src/data/experience.json`: confirm the focus name (LSU ECE lists "Communications and Signal Processing").
+- `src/components/StatusStrip.astro`: check the Position wording; confirm with Dr. Wei whether the assistantship runs through summer 2027 (if yes, add "through summer 2027").
+- `src/components/ContactForm.astro`: "A job" (was "Job or internship").
+- `src/pages/research.astro`: the new "Getting bits through" panel's text.
+- `src/content/projects/rampage.md`: confirm the stream test photo was before the external antenna; if so, caption it as the internal-antenna baseline.
+- `src/lib/skills.ts`: Landspace's repo is private; make it public to link its files.
+- `src/scripts/fig/matrix.ts`: "Play a demo" plays a generated track; add a recorded clip if you want one.
+- `src/components/RampagePlate.astro`: a CAD render when you have the SolidWorks files.
