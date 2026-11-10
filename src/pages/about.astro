@@ -43,7 +43,6 @@ import ida from '@/assets/about/polaroid-ida.jpg';
           <a class="btn" href={site.resumePdf} download><Icon name="download" /> Résumé (PDF)</a>
         </div>
         <p class="ab-hero__cap">the scene behind this is the levee at dusk, drawn on a 48 by 16 LED grid</p>
-        <p class="hand ab-girl-count" data-girl-count aria-hidden="true"></p>
       </div>
       <FeatureCard />
     </div>
@@ -88,10 +87,11 @@ import ida from '@/assets/about/polaroid-ida.jpg';
     </div>
     <div class="ab-side">
     <figure class="ab-grad">
+      {/* TODO(ave): check wording (two-line caption, Nov 9). */}
       <Polaroid
         photo={tigerStadium}
         alt="Avery smiling in a white dress in front of Tiger Stadium."
-        caption="Tiger Stadium"
+        lines={['Death Valley', 'chance of rain: NEVER']}
         tilt={1.5}
         sizes="(min-width: 960px) 15rem, 60vw"
         class="ab-grad__lead"
@@ -104,25 +104,18 @@ import ida from '@/assets/about/polaroid-ida.jpg';
           tilt={-2.5}
           sizes="(min-width: 960px) 13rem, 45vw"
         />
+        {/* TODO(ave): check wording (Mike caption and alt, Nov 9). */}
         <Polaroid
           photo={gradTiger}
-          alt="Avery in a graduation gown hugging the bronze statue of Mike the Tiger, LSU's live tiger mascot."
-          caption="Saying goodbye to Mike"
+          alt="Avery in her graduation gown hugging the bronze statue of Mike the Tiger, LSU's mascot, to thank him for the best five years."
+          caption="Thanking Mike for the best five years."
           tilt={2}
           sizes="(min-width: 960px) 13rem, 45vw"
         />
       </div>
       <figcaption class="ab-grad__cap">May 2026. One degree down, one to go.</figcaption>
     </figure>
-    <figure class="ab-mom">
-      <blockquote>
-        <p>
-          “There's a girl who challenged me, every step of her childhood. If I said the sky was blue, Avery gave me the long side eye glare and
-          wanted to know ‘how so.’”
-        </p>
-      </blockquote>
-      <figcaption>My mom</figcaption>
-    </figure>
+    {/* TODO(ave): Mom's quote was removed from here (Nov 9); the text is kept in src/data/about.json under _removed. */}
     </div>
   </section>
   </div>
@@ -201,14 +194,6 @@ import ida from '@/assets/about/polaroid-ida.jpg';
 </BaseLayout>
 
 <style>
-  /* The bit girl's counter, written in once you find her (src/scripts/bit-girl.ts). The line is
-     reserved so nothing moves when it fills in. */
-  .ab-girl-count {
-    min-height: 1.6em;
-    margin-top: 0.5rem;
-    font-size: 1.125rem;
-  }
-
   /* The hero, Why underwater and the closing band sit on the sheet. */
   .ab-band {
     background: var(--sheet);
@@ -381,27 +366,6 @@ import ida from '@/assets/about/polaroid-ida.jpg';
 
   .ab-grad__cap {
     margin-top: 1.25rem;
-    font-size: 0.875rem;
-    color: var(--muted);
-  }
-
-  /* Mom's line under the prints: quiet, a hairline and plain text, not a second quote band. */
-  .ab-mom {
-    max-width: 26rem;
-    margin: 2.5rem 0 0;
-    padding-left: 1rem;
-    border-left: 2px solid var(--line);
-  }
-
-  .ab-mom blockquote {
-    margin: 0;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--text-soft);
-  }
-
-  .ab-mom figcaption {
-    margin-top: 0.5rem;
     font-size: 0.875rem;
     color: var(--muted);
   }

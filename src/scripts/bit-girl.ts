@@ -174,7 +174,6 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
   const perches = readPerches();
   if (!perches.length) return;
   const samples = samplesFor();
-  const counter = document.querySelector<HTMLElement>('[data-girl-count]');
 
   let W = 0;
   let H = 0;
@@ -204,7 +203,6 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
   let y = 0;
   let face = -1;
   let alpha = 1;
-  let found = 0;
   let hidden = false; // no usable perch at this width
   let mx = -1e4;
   let my = -1e4;
@@ -267,11 +265,6 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
     return [px + l[0] * S * f, py + l[1] * S];
   };
 
-  const tell = (from: number[], to: number[]) => {
-    found++;
-    if (counter) counter.textContent = `found her ${found} time${found === 1 ? '' : 's'}. She ran ${to[1] > from[1] ? 'down' : 'up'} the page.`;
-  };
-
   /** Somewhere to hide: off screen if possible, never where she is or where she just was. */
   const pickHide = () => {
     const ok = enabled().filter((i) => i !== cur);
@@ -295,7 +288,6 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
     if (i < 0) return;
     const from = [x, y];
     const to = perchPoint(perches[i]);
-    tell(from, to);
     prev = cur;
     dest = i;
     ranHere = false;

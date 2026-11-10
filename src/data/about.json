@@ -68,8 +68,8 @@
     {
       "label": "FIELD",
       "title": "Field",
-      "note": "Goalie for varsity soccer and varsity softball in high school. At LSU I played intramural flag football and softball until most of my team graduated. We won this one.",
-      "todo": "TODO(ave): check wording.",
+      "note": "Goalie for varsity soccer and shortstop for varsity softball in high school. At LSU I played intramural flag football and softball until most of my team graduated. We won this one.",
+      "todo": "TODO(ave): check wording (goalie and shortstop line, Nov 9).",
       "photo": "about/field-intramural-champs.jpg",
       "alt": "Avery's intramural team in matching champions shirts on a lit softball field at night.",
       "caption": "Field",
@@ -119,12 +119,12 @@
     },
     {
       "label": "FAIRE",
-      "title": "Ren Fair Day",
+      "title": "Ren Faire Day",
       "note": "Big fan. I go all in: costume, flower crown, the whole thing. Apparently I started early (that's me as a pirate with my big brother Rickey).",
-      "todo": "TODO(ave): check wording.",
+      "todo": "TODO(ave): check wording (faire spelling, Nov 9).",
       "photo": "about/faire-renfest.jpg",
-      "alt": "Avery in a blue Renaissance dress and flower crown, lying in the woods at a festival with friends and her dad.",
-      "caption": "Ren Fair Day",
+      "alt": "Avery in a blue Renaissance dress and flower crown, lying in the woods at a Renaissance faire with friends and her dad.",
+      "caption": "Ren Faire Day",
       "row": "Compatibility",
       "extra": {
         "photo": "about/polaroid-pirate.jpg",
@@ -145,11 +145,12 @@
     {
       "label": "READ",
       "title": "The Last Lecture",
-      "note": "My big brother Rickey handed me this a few years ago and said it changed his whole perspective. He wants it back, so I'm reading it slowly on purpose.",
+      "note": "I love to read. My big brother Rickey handed me this one a few years ago and said it changed his whole perspective. He wants it back, so I'm reading it slowly on purpose.",
       "photo": "about/read-last-lecture.jpg",
       "alt": "Avery's hand holding open The Last Lecture by Randy Pausch to the chapter The Dutch Uncle, outside in the sun.",
       "caption": "still owe Rickey this book back",
-      "row": ""
+      "row": "",
+      "todo": "TODO(ave): check wording. Add a favorite author or genre here if you want."
     },
     {
       "label": "NC",
@@ -161,5 +162,12 @@
       "caption": "No connect",
       "row": ""
     }
-  ]
+  ],
+  "_removed": {
+    "momQuote": {
+      "todo": "TODO(ave): removed from About (Nov 9) because it read disjointed there. Bring it back somewhere with a lead-in if you want.",
+      "text": "There's a girl who challenged me, every step of her childhood. If I said the sky was blue, Avery gave me the long side eye glare and wanted to know 'how so.'",
+      "by": "My mom"
+    }
+  }
 }
