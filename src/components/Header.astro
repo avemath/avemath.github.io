@@ -11,11 +11,11 @@ interface Props {
 
 const { label, section } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-// Projects and Websites open their sections of /work/, so the whole list is one click from any
-// page. Contact is the footer, which every page has.
+// Projects opens /work/ at the top, on the workbench; Websites opens its Client sites showcase.
+// Contact is the footer, which every page has.
 const nav = [
-  { href: '/work/#engineering', label: 'Projects', key: 'projects' },
-  { href: '/work/#websites', label: 'Websites', key: 'websites' },
+  { href: '/work/', label: 'Projects', key: 'projects' },
+  { href: '/work/#client-sites', label: 'Websites', key: 'websites' },
   { href: '/research/', label: 'Research', key: 'research' },
   { href: '/about/', label: 'About', key: 'about' },
   { href: '/contact/', label: 'Contact', key: 'contact' },

@@ -1,6 +1,7 @@
 // One test per interaction, so none can quietly disappear again. Each test drives the real built
 // page the way a visitor would and checks the result:
-//   nav            every nav item (desktop and the phone menu) lands on the right page or section
+//   nav            every nav item (desktop and the phone menu) lands on the right page or section;
+//                  Projects is current on /work/, Websites at its Client sites showcase
 //   hero-labels    the eigenray plate: at 24 yaws by 5 pitches (1440 and 390), no two visible labels
 //                  overlap, none leaves the canvas or sits under a note; a drag turns it and keeps that true
 //   signal-panel   the hero scope reads out where the mouse is; Hear it is a toggle button
@@ -98,8 +99,8 @@ const test = async (name, fn) => {
 // ---- nav ----
 await test('nav', async () => {
   const want = [
-    ['Projects', '/work/', '#engineering'],
-    ['Websites', '/work/', '#websites'],
+    ['Projects', '/work/', 'h1'],
+    ['Websites', '/work/', '#client-sites'],
     ['Research', '/research/', '#research-title'],
     ['About', '/about/', 'h1'],
     ['Contact', '/contact/', 'h1'],
@@ -122,6 +123,22 @@ await test('nav', async () => {
       if (top === null || top < -2 || top > 450) fail('nav', `${label} from ${from}: ${target} is not at the top of the screen (top ${top})`);
       await p.close();
     }
+  }
+  // On /work/: Projects is the current tab at the top; arriving at the showcase, Websites is.
+  {
+    const p = await page('/work/');
+    const cur = () => p.evaluate(() => [...new Set([...document.querySelectorAll('.site-header nav [aria-current]')].map((a) => a.textContent.trim()))].join());
+    if ((await cur()) !== 'Projects') fail('nav', `on /work/ the current tab is "${await cur()}", not Projects`);
+    await p.close();
+    const q = await page('/work/#client-sites');
+    await q.waitForTimeout(600);
+    const curQ = await q.evaluate(() => [...new Set([...document.querySelectorAll('.site-header nav [aria-current]')].map((a) => a.textContent.trim()))].join());
+    if (curQ !== 'Websites') fail('nav', `at /work/#client-sites the current tab is "${curQ}", not Websites`);
+    const href = await q.locator('.site-header nav').getByRole('link', { name: 'Websites', exact: true }).first().getAttribute('href');
+    if (href !== '/work/#client-sites') fail('nav', `the Websites tab links to ${href}`);
+    // Old links still work.
+    for (const id of ['engineering', 'research', 'websites']) if (!(await q.locator(`#${id}`).count())) fail('nav', `#${id} is gone from /work/`);
+    await q.close();
   }
   // The phone menu.
   for (const [label, path] of want.map(([l, p]) => [l, p])) {
