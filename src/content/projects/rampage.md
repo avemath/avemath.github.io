@@ -44,6 +44,7 @@ metrics:
   - { label: Max frame size, value: "65,000 B" }
 demo: weapon-logic
 # TODO(ave): confirm the camera test photo (rampage-camera-test.jpg, in Video that stays current) was before the external antenna; if so, caption it as the internal-antenna baseline.
+threads: [hardware] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

@@ -27,6 +27,7 @@ gallery:
     alt: A small purple microphone breakout board held between two fingers, labeled adjustable gain, with three wires soldered to its output, ground and power pads. A lit LED strip glows in the background.
     caption: The microphone module with its three leads soldered on.
 demo: spectrum
+threads: [hardware, signals] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

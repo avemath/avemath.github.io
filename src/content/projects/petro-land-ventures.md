@@ -32,6 +32,7 @@ client:
   name: Petro Land Ventures, Inc.
   kind: Land services firm, Duncansville, PA
   permission: true
+threads: [web, land] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

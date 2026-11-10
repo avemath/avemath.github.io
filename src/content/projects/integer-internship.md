@@ -16,6 +16,7 @@ stack: [Acoustic measurement, Network simulation, Data analysis]
 cover: ../../assets/projects/integer-internship/wagon.jpg
 coverAlt: Three people seen from behind, walking across a sunny parking lot toward the cars, one in an LSU cap pushing a folding wagon loaded with gear.
 confidentiality: limited
+threads: [signals] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

@@ -18,6 +18,7 @@ stack: [Digital communications, Signal processing, Networked autonomy]
 links:
   writeup: https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php
 confidentiality: limited
+threads: [signals] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

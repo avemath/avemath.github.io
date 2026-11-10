@@ -8,6 +8,7 @@ summary: "An alarm that listens underwater for a child falling into a backyard p
 role: "My own project. Early research and planning."
 keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "underwater sound"]
 stack: [Underwater acoustics, Signal processing, Prior-art review]
+threads: [signals, family] # TODO(ave): confirm the thread for each project
 ---
 
 <!-- NAME: working title until Avery picks one. Update the title then, and delete this comment. -->

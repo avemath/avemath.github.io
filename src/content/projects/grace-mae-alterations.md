@@ -29,6 +29,7 @@ client:
   name: Grace Mae Alterations
   kind: Bridal and tailoring studio, Pittsburgh, PA
   permission: true
+threads: [web] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

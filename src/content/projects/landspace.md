@@ -32,6 +32,7 @@ gallery:
 metrics:
   - { label: Instrument types, value: "~130" }
   - { label: Automated checks, value: "9 suites" }
+threads: [land] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

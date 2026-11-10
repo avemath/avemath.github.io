@@ -72,6 +72,8 @@ const projects = defineCollection({
       seoDescription: z.string().max(160).optional(),
       // Extra search terms for the command palette.
       keywords: z.array(z.string()).default([]),
+      // The lines of the /work/ thread map this project belongs to (names in src/lib/bench.ts).
+      threads: z.array(z.enum(['hardware', 'signals', 'family', 'web', 'land'])).default([]),
       // Which interactive demo to mount on the case study page, if any.
       demo: z.enum(['spectrum', 'weapon-logic', 'ofdm', 'signals']).optional(),
       draft: z.boolean().default(false),

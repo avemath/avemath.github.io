@@ -37,6 +37,7 @@ client:
   kind: Portfolio for a senior in mechanical engineering at LSU
   permission: true
 draft: false
+threads: [web] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context

@@ -22,6 +22,7 @@ metrics:
   - { label: "Runs on the radios, all at BER 0", value: "5" }
   - { label: Time to collision in the test scenario, value: "4.0 s" }
 demo: ofdm
+threads: [hardware, signals] # TODO(ave): confirm the thread for each project
 ---
 
 ## Context
