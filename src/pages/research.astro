@@ -2,13 +2,14 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import MarginNote from '@/components/MarginNote.astro';
 import RayTracer from '@/components/research/RayTracer.astro';
+import MeshPlayground from '@/components/playground/MeshPlayground.astro';
 import PoolSide from '@/components/drawings/PoolSide.astro';
 import SoundRace from '@/components/research/SoundRace.astro';
 import PoolPing from '@/components/research/PoolPing.astro';
 import Seafloor from '@/components/research/Seafloor.astro';
 import arrivalsData from '@/data/bellhop-arrivals.json';
 
-// Fig. R2: every arrival from the bellhopSim comms scenario (1000 m of water, sand bottom, source
+// Fig. R3 (BELLHOP arrivals view): every arrival from the bellhopSim comms scenario (1000 m of water, sand bottom, source
 // at 50 m, receiver 15 km away at 100 m, 3.5 kHz), recomputed with BELLHOP using the repo's own
 // export settings. The counts match docs/figures/figures.json in that repo.
 const ch = arrivalsData.comms;
@@ -132,6 +133,39 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             <a class="link" href="https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php">The public announcement</a>
           </p>
           <MarginNote where="onr" />
+        </div>
+      </div>
+    </section>
+
+    <section id="signals" class="wrap rpanel" style="--dp:50%" data-rpanel data-depth-panel data-perch="signals" data-perch-x="0.9 0.12" aria-labelledby="signals-title">
+      {/* TODO(ave): check wording. This panel is new on /research/ (Nov 9); its text is from the Signals playground write-up and the home card. */}
+      <p class="rpanel__tag" data-depth-tag hidden aria-hidden="true"></p>
+      <div class="rp">
+        <div class="rp__fig">
+          <figure class="rfig plate">
+            <div class="fig__bar">
+              <p class="fig__label">A packet through the water</p>
+              <p class="fig__label">FH-BFSK, live</p>
+            </div>
+            <MeshPlayground compact />
+            <figcaption class="plate__cap">
+              <b>Fig. R2.</b> One message as a JANUS style FH-BFSK packet: close ripples for a 1, wide ones for a 0, each bit a 6.25 ms chip
+              hopping between 13 tone pairs. The modem math runs in your browser.
+            </figcaption>
+          </figure>
+        </div>
+        <div class="rp__text">
+          <h2 id="signals-title" class="research__h2" data-decode>Getting bits through</h2>
+          <p class="zone-r__text">
+            I learn by building. The first tool I made while studying was a page for frequency-hopping BFSK, the modulation the JANUS underwater
+            acoustic standard uses. Send a packet and watch it cross the water: each bit is one 6.25 ms chip that hops between 13 tone pairs,
+            and a real detector decodes it on the far side.
+          </p>
+          <div class="zone-r__actions">
+            <a class="btn" href="/work/signals-playground/#playground">The full playground</a>
+            <a class="link" href="/work/signals-playground/">Case study</a>
+          </div>
+          <MarginNote where="signals" />
         </div>
       </div>
     </section>
@@ -406,6 +440,14 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     min-width: 0;
   }
 
+  /* The "Try" hint inside a caption: its own line, no rule above it. */
+  .plate__cap .fig__try {
+    display: block;
+    margin-top: 0.35rem;
+    padding: 0;
+    border-top: 0;
+  }
+
   .rp__text > :first-child {
     margin-top: 0;
   }
@@ -549,6 +591,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .net__node {
     position: absolute;
+    z-index: 2;
     translate: -50% -50%;
     min-width: 4.5rem;
     min-height: 2.5rem;
@@ -700,6 +743,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   /* R1: messages moving along the links. */
   .net :global(.net__msg) {
     position: absolute;
+    z-index: 1;
     width: 9px;
     height: 9px;
     margin: -4.5px 0 0 -4.5px;

@@ -338,6 +338,62 @@ for (const scheme of ['light', 'dark']) {
   console.log('About: the datasheet fits a laptop screen, stacks on phones, and the Recommendations band passes AA in both themes.');
 }
 
+// ---- Research: every panel is a full two-column plate at 1440, nothing scrolls sideways on phones ----
+{
+  for (const w of [1440, 390, 320]) {
+    for (const theme of ['light', 'dark']) {
+      const page = await browser.newPage({ viewport: { width: w, height: 900 } });
+      await page.route(...localOnly(base));
+      await page.goto(`${base}/research/`, { waitUntil: 'networkidle' });
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+      await page.waitForTimeout(400);
+      const v = await page.evaluate(() => {
+        const panels = [...document.querySelectorAll('[data-depth-panel]')].map((p) => {
+          const fig = p.querySelector('.rp__fig')?.getBoundingClientRect();
+          const text = p.querySelector('.rp__text')?.getBoundingClientRect();
+          const tag = p.querySelector('[data-depth-tag]');
+          return { id: p.id, fig: fig && fig.toJSON(), text: text && text.toJSON(), figCap: !!p.querySelector('.rp__fig figcaption b'), tag: tag && !tag.hidden ? tag.textContent : null };
+        });
+        return { panels, sw: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+      });
+      if (v.sw > 0) fail(`${w} ${theme} /research/: the page scrolls sideways by ${v.sw}px`);
+      if (v.panels.length < 5) fail(`${w} /research/: ${v.panels.length} panels, expected 5`);
+      for (const p of v.panels) {
+        if (!p.fig || !p.text || p.fig.height < 120 || p.text.height < 120) fail(`${w} /research/ #${p.id}: a column is empty (figure ${p.fig?.height | 0}px, text ${p.text?.height | 0}px)`);
+        if (!p.figCap) fail(`${w} /research/ #${p.id}: the figure has no "Fig." caption`);
+        if (!p.tag || !/^(0|-\d+) m$/.test(p.tag)) fail(`${w} /research/ #${p.id}: no depth tag (${p.tag})`);
+        if (w >= 1024) {
+          // Side by side: figure on the left, text on the right, the figure the wider of the two.
+          if (!(p.fig.right <= p.text.left + 1 && p.fig.width > p.text.width)) fail(`${w} /research/ #${p.id}: the figure is not the wide left column`);
+        } else if (p.fig.bottom > p.text.top + 1) fail(`${w} /research/ #${p.id}: the figure does not stack above the text`);
+      }
+      await page.close();
+    }
+  }
+  // The depth tags agree with the gauge: centered on a panel, the gauge reads its tag.
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await page.route(...localOnly(base));
+  await page.goto(`${base}/research/`, { waitUntil: 'networkidle' });
+  for (const id of ['onr', 'bellhop']) {
+    // Center it twice: what scrolls into view can still settle (a field note decodes) and move it.
+    let got;
+    for (let k = 0; k < 3; k++) {
+      got = await page.evaluate((id) => {
+        const p = document.getElementById(id);
+        const r = p.getBoundingClientRect();
+        scrollTo({ top: scrollY + r.top + r.height / 2 - innerHeight / 2, behavior: 'instant' });
+        return { tag: p.querySelector('[data-depth-tag]').dataset.depth };
+      }, id);
+      await page.waitForTimeout(700);
+    }
+    got = await page.evaluate((id) => ({ tag: document.getElementById(id).querySelector('[data-depth-tag]').dataset.depth }), id);
+    const gauge = await page.evaluate(() => document.querySelector('[data-depth-gauge]').dataset.depth);
+    if (Math.abs(Number(gauge) - Number(got.tag)) > 10) fail(`/research/ #${id}: the tag says ${got.tag} m but the gauge reads ${gauge} m when it is centered`);
+  }
+  await page.close();
+  console.log('Research: five two-column plates at 1440, stacked on phones, no sideways scroll, tags match the gauge.');
+}
+
 await browser.close();
 server.close();
 if (problems) {
