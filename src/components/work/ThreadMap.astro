@@ -23,7 +23,10 @@ interface Props {
   projects: Project[];
 }
 const all = Astro.props.projects;
-const P = [...all].filter((p) => p.data.threads.length).sort((a, b) => a.data.period.start.localeCompare(b.data.period.start) || a.data.order - b.data.order);
+// In start order; projects starting the same month go by their sameMonth field, then by order.
+const P = [...all]
+  .filter((p) => p.data.threads.length)
+  .sort((a, b) => a.data.period.start.localeCompare(b.data.period.start) || a.data.sameMonth - b.data.sameMonth || a.data.order - b.data.order);
 const lane = Object.fromEntries(threads.map((t, i) => [t.id, i])) as Record<Thread, number>;
 const when = (p: Project) => projectWhen(p.data.period.start, p.data.period.end, p.data.status);
 // The name on the map: the full title when it is short, else the short name (never a web address),

@@ -8,11 +8,12 @@
       "location": "Baton Rouge, LA",
       "start": "2026",
       "end": null,
-      "summary": "Office of Naval Research project with Integer Technologies, advised by Dr. Shuangqing Wei.",
+      "summary": "Continuing a different part of the Office of Naval Research project I started on at Integer Technologies, advised by Dr. Shuangqing Wei.",
       "bullets": [
         "Support LSU's side of Intelligent Data Management for Distributed Naval Platforms, a project building decision-making tools that help distributed autonomous maritime systems decide which data matters and how to share it."
       ],
-      "project": "onr-intelligent-data-management"
+      "project": "onr-intelligent-data-management",
+      "_todo": "TODO(ave): check wording (Nov 10: the ONR work began during the Integer internship)."
     },
     {
       "id": "integer-intern",

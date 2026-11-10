@@ -5,6 +5,7 @@ type: engineering
 tags: [engineering, research]
 order: 5
 period: { start: "2026-05" }
+sameMonth: 3
 status: complete
 summary: Jupyter notebooks that drive the BELLHOP ray model from Python, to show how sound bends, fades and echoes underwater and what that does to a BPSK link.
 outcome: With no equalizer, a BPSK link through the BELLHOP channel got about 3 bits in 10 wrong even at 20 dB SNR. The echoes caused the errors, not the noise.

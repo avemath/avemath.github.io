@@ -18,6 +18,9 @@ const projects = defineCollection({
       featured: z.boolean().default(false),
       // Lower numbers come first.
       order: z.number().default(100),
+      // Among projects that start in the same month, lower numbers come first wherever projects
+      // are sorted by date (the thread map, the bench).
+      sameMonth: z.number().default(0),
       period: z.object({ start: month, end: month.optional() }),
       status: z.enum(['live', 'ongoing', 'complete', 'archived']),
       summary: z.string().max(200),

@@ -5,11 +5,12 @@ type: research
 tags: [research, engineering]
 featured: true
 order: 13
-period: { start: "2026" }
+period: { start: "2026-05" }
+sameMonth: 2
 status: ongoing
-summary: Graduate research on an Office of Naval Research project with Integer Technologies, helping distributed autonomous maritime systems decide which data matters and how to share it.
-outcome: Sponsored research, ongoing through my M.S.
-role: Graduate research assistant on the LSU team, advised by Dr. Shuangqing Wei.
+summary: Office of Naval Research project with Integer Technologies. I started on it during my internship at Integer in summer 2026 and continue on a different part of it at LSU.
+outcome: Ongoing. I continue on a different part of the same project at LSU, through my M.S.
+role: Started during my internship at Integer Technologies in summer 2026; now a graduate research assistant at LSU, advised by Dr. Shuangqing Wei.
 team: An LSU team working with Integer Technologies engineers.
 seoTitle: "ONR research: Intelligent Data Management"
 seoDescription: "Graduate research on an Office of Naval Research project with Integer Technologies, helping distributed autonomous maritime systems decide which data matters."
@@ -19,6 +20,7 @@ links:
   writeup: https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php
 confidentiality: limited
 threads: [signals] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the summary, role and My role (Nov 10: the ONR work began during the Integer internship).
 ---
 
 ## Context
@@ -29,7 +31,7 @@ In 2024 the Office of Naval Research funded Integer Technologies and LSU to work
 
 ## My role
 
-I joined the project as a graduate research assistant in 2026. Dr. Aldo Duarte recommended me for it based on my software-defined radio work in his communications design course. My thesis-track M.S. is focused on communications and signal processing, which is where I contribute.
+I started on this project in summer 2026, during my internship at Integer Technologies. I'm continuing on a different part of the same project, Intelligent Data Management for Distributed Naval Platforms, as a graduate research assistant at LSU, advised by Dr. Shuangqing Wei. Dr. Aldo Duarte recommended me for the research post based on my software-defined radio work in his communications design course. My thesis-track M.S. is focused on communications and signal processing, which is where I contribute.
 
 ## What I can share
 
