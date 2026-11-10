@@ -421,6 +421,41 @@ for (const scheme of ['light', 'dark']) {
   console.log('Work: no sideways scroll at 320, 390, 768 and 1440 in both themes; every bench object is a 44px target.');
 }
 
+// ---- The contour texture is anchored to the page: every band's mask sits at minus its page offset ----
+{
+  let checked = 0;
+  for (const path of ['/', '/about/', '/work/', '/research/', '/contact/']) {
+    for (const w of [390, 1440]) {
+      for (const theme of ['light', 'dark']) {
+        const page = await browser.newPage({ viewport: { width: w, height: 900 }, colorScheme: theme });
+        await page.route(...localOnly(base));
+        await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForTimeout(300);
+        const bad = await page.evaluate(() => {
+          const out = [];
+          for (const b of document.querySelectorAll('.topo, .band-paper, .band-sheet')) {
+            const r = b.getBoundingClientRect();
+            if (!r.height) continue;
+            for (const pseudo of ['::before', '::after']) {
+              const pos = getComputedStyle(b, pseudo).maskPosition || getComputedStyle(b, pseudo).webkitMaskPosition || '';
+              const [mx, my] = pos.split(',')[0].trim().split(/\s+/).map(parseFloat);
+              const wantX = -(r.left + scrollX);
+              const wantY = -(r.top + scrollY);
+              if (!(Math.abs(mx - wantX) <= 1 && Math.abs(my - wantY) <= 1)) out.push(`${b.className.split(' ')[0]}${pseudo} at ${pos} for offset ${Math.round(-wantX)},${Math.round(-wantY)}`);
+            }
+          }
+          return { out, n: document.querySelectorAll('.topo, .band-paper, .band-sheet').length };
+        });
+        checked += bad.n;
+        for (const m of bad.out.slice(0, 4)) fail(`${w} ${theme} ${path}: texture not anchored to the page: ${m}`);
+        await page.close();
+      }
+    }
+  }
+  console.log(`Texture: every band's contour mask (${checked} bands checked) sits at its page offset on /, /about/, /work/, /research/ and /contact/.`);
+}
+
 await browser.close();
 server.close();
 if (problems) {

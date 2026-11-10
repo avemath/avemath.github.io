@@ -1320,8 +1320,9 @@ html[data-motion='reduce'] [data-proj] {
 
 /* ------------------------------------------------------------------
    The texture, with a little life. Every plain section (paper or sheet) and the home hero carry
-   the faint contour lines (public/topo.svg, tiled at one scale so the lines match from section to
-   section). With a fine pointer and motion welcome, a soft glow follows the cursor and brightens
+   the faint contour lines (public/topo.svg, whose edges meet with no break). The tile is anchored to the
+   page, not the section: src/scripts/texture.ts sets --topo-x and --topo-y to each band's offset
+   from the top left of the document, so the lines run on unbroken where two bands meet. With a fine pointer and motion welcome, a soft glow follows the cursor and brightens
    the lines under it (src/scripts/texture.ts sets --mx and --my). In dark mode a few plankton
    drift through the hero and the deep bands. All of it is behind the content (z-index -1),
    decorative, and transform or mask only, so it costs no layout.
@@ -1352,8 +1353,8 @@ html[data-motion='reduce'] [data-proj] {
 .band-paper::before,
 .band-sheet::before {
   background: var(--ink);
-  -webkit-mask: url('/topo.svg') 0 0 / 1600px 900px repeat;
-  mask: url('/topo.svg') 0 0 / 1600px 900px repeat;
+  -webkit-mask: url('/topo.svg') calc(-1 * var(--topo-x, 0px)) calc(-1 * var(--topo-y, 0px)) / 1600px 900px repeat;
+  mask: url('/topo.svg') calc(-1 * var(--topo-x, 0px)) calc(-1 * var(--topo-y, 0px)) / 1600px 900px repeat;
   opacity: 0.045;
 }
 
@@ -1368,11 +1369,11 @@ html[data-motion='reduce'] [data-proj] {
   display: none;
   background: var(--accent);
   -webkit-mask:
-    url('/topo.svg') 0 0 / 1600px 900px repeat,
+    url('/topo.svg') calc(-1 * var(--topo-x, 0px)) calc(-1 * var(--topo-y, 0px)) / 1600px 900px repeat,
     radial-gradient(circle 180px at var(--mx) var(--my), #000 0%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask:
-    url('/topo.svg') 0 0 / 1600px 900px repeat,
+    url('/topo.svg') calc(-1 * var(--topo-x, 0px)) calc(-1 * var(--topo-y, 0px)) / 1600px 900px repeat,
     radial-gradient(circle 180px at var(--mx) var(--my), #000 0%, transparent 100%);
   mask-composite: intersect;
   opacity: 0.55;

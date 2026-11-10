@@ -33,6 +33,7 @@
   "devDependencies": {
     "@types/three": "^0.187.0",
     "axe-core": "^4.13.0",
+    "d3-contour": "^4.0.3",
     "playwright": "^1.63.0"
   }
 }
