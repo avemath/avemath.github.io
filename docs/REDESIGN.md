@@ -544,8 +544,10 @@ Branch `specimen`, from `docs/mockups/specimen-study.html` and `docs/mockups/spe
 
 ### TODO(ave), all of them
 
-- `src/data/about.json`: check the wording of each of the ten pin notes (VCC, OUTSIDE, SNOW, FIELD, THRIFT, TYGA, SIDEQ, FILM, FAIRE, GND).
-- `src/data/about.json`, `Datasheet.astro`: a latte photo for VCC and a photo of the bellows camera for THRIFT.
+- `src/data/about.json`: check the wording of each of the pin notes (VCC, OUTSIDE, SNOW, FIELD, THRIFT, TYGA, SIDEQ, FILM, FAIRE, GND, READ, NC).
+- VCC latte photo: done (`about/vcc-latte.jpg`, Nov 9).
+- `src/data/about.json`, `Datasheet.astro`: still open, a photo of the bellows camera for THRIFT.
+- `src/content/projects/rampage.md`: confirm the stream test photo (`rampage-camera-test.jpg`, 7.8 FPS) was taken before the external antenna; if so, caption it as the internal-antenna baseline.
 - `src/lib/skills.ts`: Landspace's repo is private; make it public to link its files.
 - `src/scripts/fig/matrix.ts`: "Play a demo" plays the firmware's generated demo track (captioned "A generated demo track, not a recording."); add a recorded clip if you want one.
 - `src/components/plates/V2vConstellation.astro`: replace with run 4 received symbols if I can export them from MATLAB.
@@ -617,4 +619,6 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 - **Below the surface** still re-rendered without jellyfish (`nojellies`).
 - **Marquee and status strip** were too big on laptops (the 1.5 times size stacked on the large-screen scaling). The marquee is now 18px (1.2 times the original 15px) up to 1920 wide, in px so the root scaling does not stack, rising gently to 21px at 2560; the band follows the text. The status values are body large (19px at 1440), the labels as they were, with less padding. Checked at 1366, 1440, 1536, 1920 and 2560 against the screenshots from before this round.
 - **Toolbox**: the record crate is replaced by "Tune in", an old radio on the deep band (`src/components/Toolbox.astro`, `src/scripts/toolbox.ts`, data in `src/lib/skills.ts`): stations on a dial, drag and snap, arrow keys, Previous and Next, a scope from static to a clean signal, the locked skill's projects and files, and the same project filter. Concepts: `docs/mockups/skills-concepts.html`.
+- **About, Nov 9**: the AVE-26 chip has 12 pins (01 to 06 down the left, 07 to 12 up the right): VCC now has its latte photo ("my usual"), pin 11 READ is The Last Lecture, and pin 12 NC (No connect) is a drawn empty socket. The chip is taller to keep the pins spaced.
+- **RAMpage, Nov 9**: three new photos in the case study: the control link on the bench, the transmitter's aux channels beside Fail safe three ways, and an early stream test in Video that stays current.
 - **Tests**: the radio (drag, snap, keys, buttons, filter, phone swipe and no sideways scroll, reduced motion), the Signals card, the V2V caption at three widths, the race, the R2 arrivals, the field notes and the tool panels, in `scripts/check-interactions.mjs`. The crate tests are gone.

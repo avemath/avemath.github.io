@@ -4,7 +4,8 @@
 // viewport, that the toolbar's buttons are at least 44px tall, and that pressing Fire leaves the
 // plow on screen and moves it out. Space on the focused drawing must fire too. The drawing must fit
 // without scrolling sideways, with its labels at 13px or more on screen.
-// Then, at 320, 390, 768, 1440, 1920 and 2560 in both themes: the About chip and tray (every pin a 44px
+// Then, at 320, 390, 768, 1440, 1920 and 2560 in both themes: the About chip and tray (12 pins, 01 to
+// 06 down the left and 07 to 12 up the right, all beside the chip body; every pin a 44px
 // button inside the page, each press bringing out its own print, no sideways scroll); the Research
 // seafloor water covering the whole page edge to edge (the live scene fixed to the viewport) with no sideways scroll; and the bit girl on home, About
 // and Research: her canvas never takes a click, every perch she may use keeps her clear of text,
@@ -156,7 +157,30 @@ for (const scheme of ['light', 'dark']) {
     await page.evaluate(() => document.fonts.ready);
     if (await sideways()) fail(`${label} /about/: the page scrolls sideways`);
     const pins = await page.locator('[data-pin]').count();
-    if (pins !== 10) fail(`${label} /about/: ${pins} pins, not 10`);
+    if (pins !== 12) fail(`${label} /about/: ${pins} pins, not 12`);
+    // 01 to 06 down the left, 07 to 12 up the right, every pin beside the chip body, none overlapping.
+    const geo = await page.evaluate(() => {
+      const body = document.querySelector('.dip__body').getBoundingClientRect();
+      const ps = [...document.querySelectorAll('[data-pin]')].map((b) => ({ i: Number(b.dataset.pin), n: b.querySelector('.pin__num').textContent.replace(/\D/g, ''), r: b.getBoundingClientRect().toJSON() }));
+      return { body: body.toJSON(), ps };
+    });
+    const half = pins / 2;
+    for (const p of geo.ps) {
+      const left = p.r.right <= geo.body.left + 1;
+      const right = p.r.left >= geo.body.right - 1;
+      if (Number(p.n) !== p.i + 1) fail(`${label} /about/: pin ${p.i + 1} is numbered ${p.n}`);
+      if (p.i < half ? !left : !right) fail(`${label} /about/: pin ${p.i + 1} is on the wrong side of the chip`);
+      if (p.r.top < geo.body.top - 1 || p.r.bottom > geo.body.bottom + 1) fail(`${label} /about/: pin ${p.i + 1} hangs past the chip's ends`);
+    }
+    const byI = (i) => geo.ps.find((p) => p.i === i).r;
+    for (let i = 1; i < pins; i++) {
+      if (i === half) continue;
+      const a = byI(i - 1);
+      const b = byI(i);
+      // Left side runs down (each pin below the last); right side runs up.
+      const ok = i < half ? b.top >= a.bottom - 0.5 : b.bottom <= a.top + 0.5;
+      if (!ok) fail(`${label} /about/: pins ${i} and ${i + 1} are out of order or overlap`);
+    }
     const start = await page.locator('[data-pin][aria-pressed="true"]').getAttribute('data-pin');
     if (start !== '7') fail(`${label} /about/: pin ${Number(start) + 1} is out at the start, not 08 FILM`);
     for (let i = 0; i < pins; i++) {

@@ -1,6 +1,6 @@
 {
   "_todo": [
-    "TODO(ave): pins with no photo yet (VCC, THRIFT) show their line drawing (art) in the print frame. To add a photo, set photo to a path under src/assets/ (for example about/thrift.jpg) and add an alt.",
+    "TODO(ave): THRIFT has no photo yet and shows its line drawing (art) in the print frame. To add one, set photo to a path under src/assets/ (for example about/thrift.jpg) and add an alt.",
     "TODO(ave): every pin's note is a draft in your voice. Check the wording of each one."
   ],
   "feature": {
@@ -39,11 +39,10 @@
       "label": "VCC",
       "title": "Lattes",
       "note": "Runs on lattes. That's the whole spec.",
-      "todo": "TODO(ave): check wording. Add a latte photo when you have one.",
-      "photo": "",
-      "alt": "",
-      "art": "latte",
-      "caption": "Lattes",
+      "todo": "TODO(ave): check wording.",
+      "photo": "about/vcc-latte.jpg",
+      "alt": "A latte with cinnamon on top, next to a laptop showing this site's home page.",
+      "caption": "my usual",
       "row": "Supply"
     },
     {
@@ -142,6 +141,25 @@
       "alt": "A turtle in tall green grass.",
       "caption": "Ground",
       "row": "Operating environment"
+    },
+    {
+      "label": "READ",
+      "title": "The Last Lecture",
+      "note": "My big brother Rickey handed me this a few years ago and said it changed his whole perspective. He wants it back, so I'm reading it slowly on purpose.",
+      "photo": "about/read-last-lecture.jpg",
+      "alt": "Avery's hand holding open The Last Lecture by Randy Pausch to the chapter The Dutch Uncle, outside in the sun.",
+      "caption": "still owe Rickey this book back",
+      "row": ""
+    },
+    {
+      "label": "NC",
+      "title": "No connect",
+      "note": "Reserved for whatever I get into next.",
+      "photo": "",
+      "alt": "",
+      "art": "socket",
+      "caption": "No connect",
+      "row": ""
     }
   ]
 }

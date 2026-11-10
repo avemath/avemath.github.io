@@ -1,8 +1,8 @@
 // The About page's datasheet: one pin is pressed at a time. Pressing a pin (click, Enter or Space)
 // slides its print out of the chip into the tray and lights its row in the characteristics table.
-// The arrow keys move focus the way the chip looks: up and down along a side (pins 01 to 05 run
-// down the left, 06 to 10 up the right), left and right to the pin across; Home and End jump to
-// pins 01 and 10. Moving focus does not press. On a phone, a press
+// The arrow keys move focus the way the chip looks: up and down along a side (pins 01 to 06 run
+// down the left, 07 to 12 up the right), left and right to the pin across; Home and End jump to
+// pins 01 and 12. Moving focus does not press. On a phone, a press
 // scrolls the tray into view only when it is off screen.
 import { prefersReducedMotion } from './preferences';
 

@@ -57,6 +57,9 @@ const { bare = false, navLabel, section, footer = 'default', page, bitGirl = fal
           theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
         d.dataset.theme = theme;
+        // Arriving at a #section lands instantly: a smooth jump still under way when the page
+        // finishes loading can end in the wrong place. Smooth scrolling returns once landed.
+        if (location.hash.length > 1) d.dataset.landing = '';
         // The browser chrome follows the chosen theme, even when it differs from the system's.
         var pick = document.querySelector('meta[name="theme-color"][media*="' + theme + '"]');
         if (pick) document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.setAttribute('content', pick.getAttribute('content')); });
@@ -109,9 +112,21 @@ const { bare = false, navLabel, section, footer = 'default', page, bitGirl = fal
           const target = document.getElementById(id);
           if (target && !moved) target.scrollIntoView({ block: 'start', behavior: 'instant' });
         };
+        // Until a moment after load, any change in the page's height (images, fonts, figures
+        // laying out) lands again; then smooth scrolling comes back.
+        const ro = new ResizeObserver(land);
+        ro.observe(document.body);
+        const settle = () => {
+          land();
+          setTimeout(() => {
+            land();
+            ro.disconnect();
+            delete document.documentElement.dataset.landing;
+          }, 1200);
+        };
         document.fonts?.ready.then(land);
-        if (document.readyState === 'complete') land();
-        else addEventListener('load', land, { once: true });
+        if (document.readyState === 'complete') settle();
+        else addEventListener('load', settle, { once: true });
       }
       initHScroll();
     </script>

@@ -9,7 +9,7 @@
 // the mesh is on screen; with reduced motion nothing animates and the result shows at once.
 import { bitsToText, CHIP_S, C_WATER, channel, demodulate, FS, modulate, spectrogram, textToBits } from '../lib/fhbfsk';
 import { NU, NV, projector, rippleFreq, swell } from '../lib/mesh';
-import { token } from '../lib/tokens-client';
+import { token as readToken } from '../lib/tokens-client';
 import { prefersReducedMotion } from './preferences';
 
 /** The drawing's pace: one chip per 0.09 s on screen, 7 chips visible across the pane at a time. */
@@ -40,6 +40,10 @@ export function mountPlayground(root: HTMLElement) {
   const spec = $<HTMLCanvasElement>('[data-pg-spec]', el('canvas'));
   const hear = $<HTMLButtonElement>('[data-pg-hear]', el('button'));
   const hearLabel = $<HTMLElement>('[data-pg-hear-label]', el('span'));
+  // Colors read once per theme (getComputedStyle on every frame forces a style pass each time).
+  const tokens = new Map<string, string>();
+  const token = (name: string) => tokens.get(name) ?? (tokens.set(name, readToken(name)), tokens.get(name)!);
+  addEventListener('themechange', () => tokens.clear());
   const mctx = mesh.getContext('2d')!;
   const sctx = spec.getContext('2d')!;
 
@@ -302,9 +306,24 @@ export function mountPlayground(root: HTMLElement) {
       if (arrived >= run.bits.length) finish();
       else busy = true;
     } else drawMesh(run ? now - run.t0 : 0);
-    if ((busy || !prefersReducedMotion()) && onScreen && !document.hidden) raf = requestAnimationFrame(frame);
+    if (!onScreen || document.hidden) return;
+    // A packet or a ping moving: every frame. Only the slow swell: about 20 frames a second,
+    // which looks the same and costs a third as much.
+    if (busy) raf = requestAnimationFrame(frame);
+    else if (!prefersReducedMotion()) {
+      raf = -1;
+      idle = window.setTimeout(() => {
+        raf = requestAnimationFrame(frame);
+      }, 40);
+    }
   };
+  let idle = 0;
   const kick = () => {
+    // Something new (a send, a ping): cut an idle wait short.
+    if (raf === -1) {
+      clearTimeout(idle);
+      raf = 0;
+    }
     if (!raf && onScreen && !document.hidden) raf = requestAnimationFrame(frame);
   };
   new IntersectionObserver(([e]) => {

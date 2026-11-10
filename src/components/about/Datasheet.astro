@@ -1,6 +1,6 @@
 ---
-// The AVE-26 datasheet on /about/: a ten-pin chip with pins 01 to 05 down the left and 06 to 10 up
-// the right, like a real DIP. Every pin is a button; pressing one slides its print out of the
+// The AVE-26 datasheet on /about/: a twelve-pin chip with pins 01 to 06 down the left and 07 to 12
+// up the right, like a real DIP. Every pin is a button; pressing one slides its print out of the
 // chip into the tray, with a handwritten note taped beside it, and lights its row in the
 // characteristics table. Pin 08 (FILM) is out to start. Every pin, note, row and photo is in
 // src/data/about.json; src/scripts/datasheet.ts does the pressing.
@@ -8,12 +8,13 @@ import type { ImageMetadata } from 'astro';
 import about from '@/data/about.json';
 import Polaroid from './Polaroid.astro';
 
-type Art = 'latte' | 'bellows';
+type Art = 'latte' | 'bellows' | 'socket';
 type Extra = { photo: string; alt: string; caption: string };
 
 // Pin photos live in src/assets/about/ and src/assets/offclock/ (and one in the LED project's
-// folder), named by their path under src/assets/. A pin with no photo shows its line drawing.
-// TODO(ave): photos for VCC (a latte) and THRIFT (the bellows camera); see about.json.
+// folder), named by their path under src/assets/. A pin with no photo shows its line drawing
+// (NC, pin 12, is an empty socket on purpose).
+// TODO(ave): a photo for THRIFT (the bellows camera); see about.json.
 const files = import.meta.glob<{ default: ImageMetadata }>(['/src/assets/about/*.{jpg,jpeg,png,webp}', '/src/assets/offclock/*.{jpg,jpeg,png,webp}', '/src/assets/projects/led-audio-spectrum/*.jpg'], { eager: true });
 const photoAt = (path: string) => (path ? files[`/src/assets/${path}`]?.default : undefined);
 
@@ -35,9 +36,10 @@ const pins = about.pins.map((p, i) => ({
   extra: (p as { extra?: Extra }).extra,
   rowIndex: about.rows.findIndex((r) => r.key === p.row),
 }));
-const left = pins.slice(0, 5);
-// Up the right side: pin 10 at the top, pin 06 at the bottom.
-const right = pins.slice(5).reverse();
+const half = Math.ceil(pins.length / 2);
+const left = pins.slice(0, half);
+// Up the right side: the last pin at the top, the first of the right half at the bottom.
+const right = pins.slice(half).reverse();
 ---
 
 <section id="datasheet" class="ds wrap" aria-labelledby="ds-title">
@@ -261,7 +263,7 @@ const right = pins.slice(5).reverse();
     justify-content: center;
     gap: 6px;
     width: clamp(120px, 15vw, 190px);
-    min-height: 420px;
+    min-height: 480px;
     padding: 24px 12px;
     border-radius: 6px;
     background: var(--chip);
@@ -383,7 +385,7 @@ const right = pins.slice(5).reverse();
 
   @media (max-width: 859px) {
     .dip__body {
-      min-height: 400px;
+      min-height: 452px;
     }
   }
 

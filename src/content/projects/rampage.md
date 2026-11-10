@@ -43,6 +43,7 @@ metrics:
   - { label: Trigger to solenoid, average, value: "31.5 ms" }
   - { label: Max frame size, value: "65,000 B" }
 demo: weapon-logic
+# TODO(ave): confirm the camera test photo (rampage-camera-test.jpg, in Video that stays current) was before the external antenna; if so, caption it as the internal-antenna baseline.
 ---
 
 ## Context
@@ -66,13 +67,34 @@ The team was Avery Matherne (control software and systems integration), Chris Ca
 
 **Read the radio directly.** The Pico times RC pulses with pin interrupts on both edges in microseconds. Anything outside 900 to 2100 µs is thrown out as noise, and a switch only counts as on above 1700 µs and off below 1300 µs.
 
+<figure class="case__fig case__fig--print">
+
+![A FlySky FS-i6X transmitter on a workbench, with the FS-iA6B receiver, a Raspberry Pi Pico and green terminal breakout boards behind it.](../../assets/projects/rampage/rampage-bench-parts.jpg)
+
+<figcaption>The control link on the bench: FS-i6X transmitter, FS-iA6B receiver and the Pico on its breakout board.</figcaption>
+</figure>
+
 **The pneumatics, as built.** Two one-piece aluminum reservoirs rated 200 psi are charged before a match from an external compressor through a Schrader valve; there is no compressor on the robot, for vibration, power and weight. Each reservoir has its own quarter-inch inlet solenoid valve (12 V, 8.5 W), and both inlets open together on GP15. They feed one shared supply line, which drives two pneumatic cylinders, one above the other, each with its own rod and both pushing the one plow, about 80 lbf per cylinder at 200 psi. A half-inch exhaust solenoid valve (12 V, 16 W) on GP14 branches off the shared line to atmosphere. It sits open when idle so the plow stays pulled in, and it is forced open on any error or emergency stop.
 
 **Fire in a fixed sequence.** Each strike runs six steps: the exhaust stays open for 50 ms with the plow home, the exhaust closes, a 50 ms dwell, both inlets open for 400 ms to drive the plow out to full extension, the inlets close, and the exhaust reopens so the plow vents and retracts. Firing is edge-triggered, so holding the switch fires once, not repeatedly. There's a 500 ms cooldown and a hard limit of 17 activations in firmware, of which about the first six push with at least 30 lbf before reservoir pressure drops. The team's air analysis predicted five cycles of at least 30 lbf; testing measured six.
 
 **Fail safe three ways.** The kill switch is RC channel 5 and the weapon trigger is channel 6. A kill, a lost signal (either channel quiet for more than a second) or an error forces the exhaust open and cuts power to the FlySky receiver through a solid-state relay, which puts the motor controllers into failsafe. The kill switch also blocks firing if it is already on at power-up. The drive motors connect from the receiver straight to the ESC, with no software in the path. The status LED tells the pit crew which state the board is in from across the arena.
 
+<figure class="case__fig case__fig--print">
+
+![The transmitter's aux channel screen showing channel 5 set to switch C and channel 6 set to switch D.](../../assets/projects/rampage/rampage-transmitter-channels.jpg)
+
+<figcaption>Switch C on channel 5 is the kill switch; switch D on channel 6 fires the plow.</figcaption>
+</figure>
+
 **Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video from a fisheye Pi camera goes over UDP instead of TCP. Each frame is JPEG-encoded, and the adaptive quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. With an external antenna the stream averaged 17.4 FPS, 11.2 FPS more than with the internal antenna. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
+
+<figure class="case__fig">
+
+![A laptop showing the robot camera's fisheye view of a building lobby at 7.8 FPS, next to a terminal running pi4_video_stream.py.](../../assets/projects/rampage/rampage-camera-test.jpg)
+
+<figcaption>An early stream test in the lab, April 2025: the robot's fisheye view with the Pi's streaming log beside it.</figcaption>
+</figure>
 
 **Electronics.** A 4-in-1 BLHeli_32 70 A ESC, 650 Kv brushless motors, a 5S LiPo, a 100 A maxi fuse, and a 5 V to 3.3 V level shifter between the Pico and the 5 V side.
 

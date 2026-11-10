@@ -42,7 +42,7 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    html:not([data-motion='reduce']) {
+    html:not([data-motion='reduce'], [data-landing]) {
       scroll-behavior: smooth;
     }
   }

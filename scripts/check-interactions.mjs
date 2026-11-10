@@ -67,7 +67,7 @@ const test = async (name, fn) => {
   try {
     await fn();
   } catch (e) {
-    fail(name, e.message.split('\n')[0]);
+    fail(name, process.env.VERBOSE ? e.message.split('\n').slice(0, 25).join('\n') : e.message.split('\n')[0]);
   }
   if (problems === before) passed.push(name);
 };
@@ -215,18 +215,21 @@ await test('matrix', async () => {
 });
 
 await test('signals-card', async () => {
-  const card = home.locator('#signals');
-  await settleOn(home, '#signals');
+  // Its own page, closed after, so the live mesh is not left animating behind the later tests.
+  const sp = await page('/');
+  const card = sp.locator('#signals');
+  await settleOn(sp, '#signals');
   // The hop pattern lives on as the card's own view.
   await card.locator('[role="tab"][data-view="plate"]').click();
   if (!(await card.locator('[data-live-host]').isVisible())) fail('signals-card', 'the Hop pattern view does not show the hop tile');
   await card.locator('[role="tab"][data-view="live"]').click();
   const pg = card.locator('[data-pg]');
   if (!(await pg.isVisible())) return fail('signals-card', 'the Live view does not show the mesh');
-  await home.waitForFunction(() => document.querySelector('#signals [data-pg]')?.hasAttribute('data-ready'), null, { timeout: 10000 }).catch(() => fail('signals-card', 'the live mesh never drew (the still stays up)'));
+  await sp.waitForFunction(() => document.querySelector('#signals [data-pg]')?.hasAttribute('data-ready'), null, { timeout: 10000 }).catch(() => fail('signals-card', 'the live mesh never drew (the still stays up)'));
   await pg.locator('[data-pg-send]').click();
-  await home.waitForFunction(() => document.querySelector('#signals [data-pg]')?.dataset.state === 'done', null, { timeout: 20000 }).catch(() => fail('signals-card', 'Send a packet does not finish a send'));
+  await sp.waitForFunction(() => document.querySelector('#signals [data-pg]')?.dataset.state === 'done', null, { timeout: 20000 }).catch(() => fail('signals-card', 'Send a packet does not finish a send'));
   if (!(await card.locator('a[href="/work/signals-playground/"]').count())) fail('signals-card', 'no link to the full playground');
+  await sp.close();
 });
 
 await test('decode', async () => {
