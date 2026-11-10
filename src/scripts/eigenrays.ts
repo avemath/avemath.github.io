@@ -197,20 +197,26 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
   let leader: Pt | null = null;
   let lastLabelT = 0;
   let fading = 0;
-  const avoidBoxes = () => {
+  // The notes' boxes and the leader's start, in canvas pixels. They only move when the plate
+  // resizes (or the notes' font arrives), so they are measured then and kept, never read per frame:
+  // a layout read every frame would force the whole page to lay out on every frame.
+  let noteBoxes: number[][] = [];
+  let anchorPt: Pt | null = null;
+  const measureNotes = () => {
     const cr = cv.getBoundingClientRect();
-    return notes.map((n) => {
+    noteBoxes = notes.map((n) => {
       const r = n.getBoundingClientRect();
       return [(r.left - cr.left) * dpr, (r.top - cr.top) * dpr, (r.right - cr.left) * dpr, (r.bottom - cr.top) * dpr];
     });
+    if (!pinned || !pinned.offsetParent) anchorPt = null;
+    else {
+      // The leader starts under the pinned note's text, at its left end.
+      const r = pinned.getBoundingClientRect();
+      anchorPt = [(r.left + r.width * 0.25 - cr.left) * dpr, (r.bottom + 2 - cr.top) * dpr];
+    }
   };
-  // The leader starts under the pinned note's text, at its left end.
-  function noteAnchor(): Pt | null {
-    if (!pinned || !pinned.offsetParent) return null;
-    const cr = cv.getBoundingClientRect();
-    const r = pinned.getBoundingClientRect();
-    return [(r.left + r.width * 0.25 - cr.left) * dpr, (r.bottom + 2 - cr.top) * dpr];
-  }
+  const avoidBoxes = () => noteBoxes.map((b) => [...b]);
+  const noteAnchor = () => anchorPt;
   function drawLabels() {
     const px = Math.round(Math.max(26 * k, 11 * dpr));
     ctx.font = `500 ${px}px "JetBrains Mono Variable", "JetBrains Fallback", monospace`;
@@ -284,6 +290,7 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
       cv.height = H;
     }
     k = W / 1200;
+    measureNotes();
     draw();
   }
 
@@ -382,7 +389,10 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     readInks();
     resize();
     kick();
-    document.fonts?.ready.then(draw);
+    document.fonts?.ready.then(() => {
+      measureNotes();
+      draw();
+    });
   };
   if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1200 });
   else setTimeout(start, 200);

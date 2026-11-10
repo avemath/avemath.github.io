@@ -252,14 +252,14 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             <div class="fig__bar">
               <p class="fig__label">Pool, side view</p>
               <div class="tabset" role="tablist" aria-label="Pool alarm: views" data-tabs>
-                <button type="button" role="tab" id="r3-tab-concept" aria-controls="r3-concept" aria-selected="true" tabindex="0">Concept</button>
-                <button type="button" role="tab" id="r3-tab-drawing" aria-controls="r3-drawing" aria-selected="false" tabindex="-1">Drawing</button>
+                <button type="button" role="tab" id="r4-tab-concept" aria-controls="r4-concept" aria-selected="true" tabindex="0">Concept</button>
+                <button type="button" role="tab" id="r4-tab-drawing" aria-controls="r4-drawing" aria-selected="false" tabindex="-1">Drawing</button>
               </div>
             </div>
-            <div id="r3-concept" role="tabpanel" aria-labelledby="r3-tab-concept">
+            <div id="r4-concept" role="tabpanel" aria-labelledby="r4-tab-concept">
               <PoolPing />
             </div>
-            <div id="r3-drawing" role="tabpanel" aria-labelledby="r3-tab-drawing" hidden>
+            <div id="r4-drawing" role="tabpanel" aria-labelledby="r4-tab-drawing" hidden>
               <PoolSide />
             </div>
             <figcaption class="plate__cap"><b>Fig. R4.</b> A concept drawing of the idea, not results: nothing here is measured yet.</figcaption>

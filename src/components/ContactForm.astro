@@ -11,8 +11,8 @@ interface Props {
 const { idPrefix = 'cf', emailLine = true } = Astro.props;
 const id = (name: string) => `${idPrefix}-${name}`;
 const hasKey = Boolean(site.web3formsKey);
-// TODO(ave): check wording ('Job or internship' became 'A job', Nov 9: no internship line on the site).
-const topics = ['A job', 'Research', 'Website project', 'Something else'];
+// TODO(ave): check wording ('Job or internship' became 'A job', then 'Research or collaboration' on Nov 10). Also check its prompt.
+const topics = ['Research or collaboration', 'Research', 'Website project', 'Something else'];
 ---
 
 <form
@@ -246,7 +246,7 @@ const topics = ['A job', 'Research', 'Website project', 'Something else'];
 
 <script>
   const hints: Record<string, string> = {
-    'A job': 'What is the role, and where can I read more about it?',
+    'Research or collaboration': 'What is the project, and how would we work together?',
     Research: 'What are you working on, and where might my background fit?',
     'Website project': 'Tell me about the business, what the site needs to do, and any timeline.',
     'Something else': 'A sentence or two is plenty. Links are welcome.',
@@ -262,7 +262,7 @@ const topics = ['A job', 'Research', 'Website project', 'Something else'];
 
     // Preselect a topic from ?topic=website and adapt the message hint.
     const preset = new URLSearchParams(location.search).get('topic');
-    const map: Record<string, string> = { job: 'A job', research: 'Research', website: 'Website project' };
+    const map: Record<string, string> = { job: 'Research or collaboration', research: 'Research', website: 'Website project' };
     if (preset && map[preset]) {
       const radio = form.querySelector<HTMLInputElement>(`[data-topic="${map[preset]}"]`);
       if (radio) radio.checked = true;
@@ -279,7 +279,7 @@ const topics = ['A job', 'Research', 'Website project', 'Something else'];
     );
 
     // On the home page, follow the audience the visitor picked in the hero until they choose a topic themselves.
-    const byAudience: Record<string, string> = { hire: 'A job', research: 'Research', website: 'Website project' };
+    const byAudience: Record<string, string> = { hire: 'Research or collaboration', research: 'Research', website: 'Website project' };
     const followAudience = () => {
       if ((preset && map[preset]) || form.dataset.touched !== undefined) return;
       const aud = document.documentElement.dataset.audience ?? new URLSearchParams(location.search).get('for') ?? '';

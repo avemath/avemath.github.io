@@ -476,7 +476,7 @@ Branch `about-toolbox`, from the mockups in `docs/mockups/` (`about-mockup.html`
 
 ### TODO(ave)
 
-- THRIFT: take a photo of the bellows camera. The pin shows a drawing of it until then.
+- THRIFT: photo added Nov 10 (the Argus camera).
 
 Answered Nov 2: Mom's quote is under the prints in The longer version; the Ida print is in, with no credit line (Grandma Peggy took it); the FAIRE friends, the FAIRE text and the trach sentence are approved; the name is "Because of ADAM: Allies in the Drowning Awareness Movement". The Contemporary Pediatrics article is not about Adam: it is by Todd R. Porter, MD, and Nicole Hughes (June 16, 2021), about her son Levi, so it is not linked as Adam's story.
 
@@ -546,7 +546,7 @@ Branch `specimen`, from `docs/mockups/specimen-study.html` and `docs/mockups/spe
 
 - `src/data/about.json`: check the wording of each of the pin notes (VCC, OUTSIDE, SNOW, FIELD, THRIFT, TYGA, SIDEQ, FILM, FAIRE, GND, READ, NC).
 - VCC latte photo: done (`about/vcc-latte.jpg`, Nov 9).
-- `src/data/about.json`, `Datasheet.astro`: still open, a photo of the bellows camera for THRIFT.
+- THRIFT photo: done (`about/thrift-argus-camera.jpg`, Nov 10).
 - `src/content/projects/rampage.md`: confirm the stream test photo (`rampage-camera-test.jpg`, 7.8 FPS) was taken before the external antenna; if so, caption it as the internal-antenna baseline.
 - `src/lib/skills.ts`: Landspace's repo is private; make it public to link its files.
 - `src/scripts/fig/matrix.ts`: "Play a demo" plays the firmware's generated demo track (captioned "A generated demo track, not a recording."); add a recorded clip if you want one.
@@ -644,13 +644,12 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 
 ### TODO(ave), all of them (`grep -rn "TODO(ave)" src`)
 
-- `src/data/about.json`: check the wording of every pin note; FIELD (goalie and shortstop), FAIRE (faire spelling) and READ (add a favorite author or genre if you want) were changed this round.
-- `src/data/about.json`, `Datasheet.astro`: a photo of the bellows camera for THRIFT.
+- `src/data/about.json`: check the wording of every pin note; FIELD (goalie and shortstop), FAIRE (faire spelling), READ (add a favorite author or genre if you want) and THRIFT (the Argus camera, Nov 10) changed most recently.
 - `src/data/about.json` `_removed`: Mom's quote, if you want it back somewhere with a lead-in.
 - `src/pages/about.astro`: the Death Valley caption and the Mike caption and alt; confirm the exact focus name on your plan of study.
 - `src/data/experience.json`: confirm the focus name (LSU ECE lists "Communications and Signal Processing").
 - `src/components/StatusStrip.astro`: check the Position wording; confirm with Dr. Wei whether the assistantship runs through summer 2027 (if yes, add "through summer 2027").
-- `src/components/ContactForm.astro`: "A job" (was "Job or internship").
+- `src/components/ContactForm.astro`: "Research or collaboration" (was "Job or internship", then "A job").
 - `src/pages/research.astro`: the new "Getting bits through" panel's text.
 - `src/content/projects/rampage.md`: confirm the stream test photo was before the external antenna; if so, caption it as the internal-antenna baseline.
 - `src/lib/skills.ts`: Landspace's repo is private; make it public to link its files.

@@ -57,7 +57,7 @@ export const drawings: Record<string, string> = {
   'v2v-bsm-ofdm': '/#v2v-drawing',
   'led-audio-spectrum': '/#led-drawing',
   'signals-playground': '/#sig-drawing',
-  'bellhop-sim': '/research/#r2-drawing',
+  'bellhop-sim': '/research/#r3-rays',
   'acoustic-pool-alarm': '/research/#pool-alarm',
 };
 

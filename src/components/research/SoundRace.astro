@@ -407,8 +407,7 @@ const lanes = [
       set(l, '--x', x);
       set(l, '--on', s.radioWaterArrives ? 0.9 : 0);
       set(l, '--stop', reach);
-      const track = l.querySelector<HTMLElement>('.lane__track')!;
-      const stopPx = Math.max(10, reach * track.clientWidth);
+      const stopPx = Math.max(10, reach * trackW);
       const age = Math.min(1, t / Math.max(1e-9, playback() * 0.6));
       l.querySelectorAll<HTMLElement>('[data-ring]').forEach((r, k) => {
         const a = Math.max(0, Math.min(1, age * 1.6 - k * 0.25));
@@ -421,6 +420,11 @@ const lanes = [
       }
       clock.textContent = t.toFixed(t < 0.1 ? 4 : 3);
     };
+
+    // The track's width, kept from a ResizeObserver so no frame reads layout.
+    let trackW = 0;
+    const track = lane('radioWater').querySelector<HTMLElement>('.lane__track')!;
+    new ResizeObserver(([e]) => (trackW = e.contentRect.width)).observe(track);
 
     let raf = 0;
     const send = () => {

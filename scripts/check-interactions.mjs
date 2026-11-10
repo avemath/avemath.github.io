@@ -37,10 +37,17 @@ import { chromium } from 'playwright';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const { server, base } = serveDist('dist');
-const browser = await chromium.launch({
-  executablePath: process.env.CHROMIUM_PATH || undefined,
-  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
-});
+// Two browsers. Most tests use a plain one. Only the tests that need WebGL (the /research/
+// seafloor) get software GL through SwiftShader: with those flags every page is composited through
+// emulated GL, which cost about seven cores on the home page and starved the frames Playwright waits
+// for before a click, so tests timed out on a busy machine.
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+let glBrowserP = null;
+const glBrowser = () =>
+  (glBrowserP ??= chromium.launch({
+    executablePath: process.env.CHROMIUM_PATH || undefined,
+    args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+  }));
 let problems = 0;
 const passed = [];
 const fail = (test, msg) => {
@@ -48,7 +55,8 @@ const fail = (test, msg) => {
   console.log(`  FAIL ${test}: ${msg}`);
 };
 const page = async (path, opts = {}) => {
-  const p = await browser.newPage({ viewport: { width: opts.w ?? 1440, height: opts.h ?? 900 }, reducedMotion: opts.reduce ? 'reduce' : 'no-preference', hasTouch: !!opts.touch, isMobile: !!opts.touch });
+  const b = opts.gl ? await glBrowser() : browser;
+  const p = await b.newPage({ viewport: { width: opts.w ?? 1440, height: opts.h ?? 900 }, reducedMotion: opts.reduce ? 'reduce' : 'no-preference', hasTouch: !!opts.touch, isMobile: !!opts.touch });
   await p.route(...localOnly(base));
   // Loaded, then quiet on the network if it gets there soon (a busy machine can hold it off).
   await p.goto(`${base}${path}`, { waitUntil: 'load', timeout: 60000 });
@@ -646,7 +654,7 @@ await test('seafloor-drag', async () => {
     [1440, 900, false],
     [390, 844, true],
   ]) {
-    const p = await page('/research/', { w, h, touch });
+    const p = await page('/research/', { w, h, touch, gl: true });
     await p.mouse.move(10, 300);
     await p.mouse.move(12, 310);
     if (touch) await p.evaluate(() => dispatchEvent(new Event('touchstart')));
@@ -721,7 +729,7 @@ await test('three-only-research', async () => {
   // Moved, scrolled and waited on: three.js (the seafloor scene's chunk) loads on /research/ and
   // nowhere else.
   for (const path of ['/', '/about/', '/work/', '/work/rampage/', '/research/']) {
-    const p = await page(path);
+    const p = await page(path, { gl: true });
     await p.mouse.move(200, 300);
     await p.mouse.move(260, 340);
     await p.evaluate(() => scrollBy(0, 600));
@@ -778,6 +786,7 @@ await test('playground', async () => {
 });
 
 await browser.close();
+if (glBrowserP) await (await glBrowserP).close();
 server.close();
 console.log(`\ninteractions: ${passed.length} passed (${passed.join(', ')})`);
 if (problems) {

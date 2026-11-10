@@ -8,13 +8,12 @@ import type { ImageMetadata } from 'astro';
 import about from '@/data/about.json';
 import Polaroid from './Polaroid.astro';
 
-type Art = 'latte' | 'bellows' | 'socket';
+type Art = 'latte' | 'socket';
 type Extra = { photo: string; alt: string; caption: string };
 
 // Pin photos live in src/assets/about/ and src/assets/offclock/ (and one in the LED project's
 // folder), named by their path under src/assets/. A pin with no photo shows its line drawing
 // (NC, pin 12, is an empty socket on purpose).
-// TODO(ave): a photo for THRIFT (the bellows camera); see about.json.
 const files = import.meta.glob<{ default: ImageMetadata }>(['/src/assets/about/*.{jpg,jpeg,png,webp}', '/src/assets/offclock/*.{jpg,jpeg,png,webp}', '/src/assets/projects/led-audio-spectrum/*.jpg'], { eager: true });
 const photoAt = (path: string) => (path ? files[`/src/assets/${path}`]?.default : undefined);
 
