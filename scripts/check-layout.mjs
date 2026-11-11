@@ -340,11 +340,13 @@ for (const scheme of ['light', 'dark']) {
   console.log('About: the datasheet fits a laptop screen, stacks on phones, and the Recommendations band passes AA in both themes.');
 }
 
-// ---- Research: every panel is a full two-column plate at 1440, nothing scrolls sideways on phones ----
+// ---- Research: every panel is a full two-column plate at 1440 and 1280, fits on one screen there
+// (figure and text together, below the header), in a plate about 1160px wide and centered, with body
+// text of 16px or more and controls tall enough to use; nothing scrolls sideways on phones ----
 {
-  for (const w of [1440, 390, 320]) {
+  for (const [w, h] of [[1440, 900], [1280, 800], [390, 900], [320, 900]]) {
     for (const theme of ['light', 'dark']) {
-      const page = await browser.newPage({ viewport: { width: w, height: 900 } });
+      const page = await browser.newPage({ viewport: { width: w, height: h } });
       await page.route(...localOnly(base));
       await page.goto(`${base}/research/`, { waitUntil: 'networkidle' });
       await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
@@ -356,9 +358,13 @@ for (const scheme of ['light', 'dark']) {
           const fig = p.querySelector('.rp__fig')?.getBoundingClientRect();
           const text = p.querySelector('.rp__text')?.getBoundingClientRect();
           const tag = p.querySelector('[data-depth-tag]');
-          return { id: p.id, fig: fig && fig.toJSON(), text: text && text.toJSON(), figCap: !!p.querySelector('.rp__fig figcaption b'), tag: tag && !tag.hidden ? tag.textContent : null };
+          const box = p.getBoundingClientRect();
+          const body = [...p.querySelectorAll('.zone-r__text')].map((e) => parseFloat(getComputedStyle(e).fontSize));
+          const controls = [...p.querySelectorAll('button, select, input, a.btn')].filter((e) => e.getBoundingClientRect().width > 0 && !e.closest('[hidden]')).map((e) => ({ h: e.getBoundingClientRect().height, what: e.outerHTML.slice(0, 60) }));
+          return { id: p.id, box: box.toJSON(), body, controls, fig: fig && fig.toJSON(), text: text && text.toJSON(), figCap: !!p.querySelector('.rp__fig figcaption b'), tag: tag && !tag.hidden ? tag.textContent : null };
         });
-        return { panels, sw: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+        const hb = document.querySelector('[data-header]')?.getBoundingClientRect().bottom ?? 0;
+        return { panels, hb, cw: document.documentElement.clientWidth, sw: document.documentElement.scrollWidth - document.documentElement.clientWidth };
       });
       if (v.sw > 0) fail(`${w} ${theme} /research/: the page scrolls sideways by ${v.sw}px`);
       if (v.panels.length < 5) fail(`${w} /research/: ${v.panels.length} panels, expected 5`);
@@ -366,9 +372,17 @@ for (const scheme of ['light', 'dark']) {
         if (!p.fig || !p.text || p.fig.height < 120 || p.text.height < 120) fail(`${w} /research/ #${p.id}: a column is empty (figure ${p.fig?.height | 0}px, text ${p.text?.height | 0}px)`);
         if (!p.figCap) fail(`${w} /research/ #${p.id}: the figure has no "Fig." caption`);
         if (!p.tag || !/^(0|-\d+) m$/.test(p.tag)) fail(`${w} /research/ #${p.id}: no depth tag (${p.tag})`);
+        if (p.body.some((f) => f < 16)) fail(`${w} /research/ #${p.id}: body text under 16px (${p.body.join(', ')})`);
+        const small = p.controls.filter((c) => c.h < 36);
+        if (small.length) fail(`${w} /research/ #${p.id}: ${small.length} control(s) under 36px tall, first ${small[0].what}`);
         if (w >= 1024) {
           // Side by side: figure on the left, text on the right, the figure the wider of the two.
           if (!(p.fig.right <= p.text.left + 1 && p.fig.width > p.text.width)) fail(`${w} /research/ #${p.id}: the figure is not the wide left column`);
+          // One screen: the whole panel fits between the header and the bottom of the window.
+          if (p.box.height > h - v.hb + 0.5) fail(`${w}x${h} /research/ #${p.id}: the panel is ${Math.round(p.box.height)}px tall, more than the ${Math.round(h - v.hb)}px under the header`);
+          // A plate about 1160px wide at most, centered.
+          if (p.box.width > 1180.5) fail(`${w} /research/ #${p.id}: the plate is ${Math.round(p.box.width)}px wide, over 1180`);
+          if (Math.abs(p.box.left - (v.cw - p.box.right)) > 1.5) fail(`${w} /research/ #${p.id}: the plate is not centered`);
         } else if (p.fig.bottom > p.text.top + 1) fail(`${w} /research/ #${p.id}: the figure does not stack above the text`);
       }
       await page.close();
