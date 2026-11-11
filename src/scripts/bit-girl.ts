@@ -149,15 +149,34 @@ export function bodyBox(p: Perch, s = scaleFor(innerWidth)) {
 
 /** The perches she may use at this width: wide enough, inside the page, clear of all text, and
  *  clear of images and cards (a perch marked data-perch-inside, the seafloor, may stand on its own picture). */
+/** The bottom edge of the sticky header, in viewport pixels: she is never drawn above it. */
+export function headerBottom() {
+  const h = document.querySelector('[data-header]');
+  return h ? Math.max(0, h.getBoundingClientRect().bottom) : 0;
+}
+
+/** Room around her body box for what is drawn outside it, in pixels: a little at the top, more
+ *  below her feet for the projector ring and its glow (measured: up to 21px at 2560; nothing at the
+ *  sides). */
+const PAD = 4;
+const PAD_FEET = 24;
+
 export function usablePerches(perches: Perch[]) {
   const obs = obstacles();
   const pageW = document.documentElement.clientWidth;
+  const hb = headerBottom();
+  const maxScroll = Math.max(0, document.documentElement.scrollHeight - innerHeight);
   return perches
     .map((p, i) => ({ p, i }))
     .filter(({ p }) => {
       if (innerWidth < p.min) return false;
       const b = bodyBox(p);
       if (b[0] < 0 || b[2] > pageW) return false;
+      // Some scroll position must show all of her below the header and above the bottom edge;
+      // a perch that never can (too near the top of the page, say) is not used.
+      const lo = Math.max(0, b[3] + PAD_FEET - innerHeight);
+      const hi = Math.min(maxScroll, b[1] - PAD - hb);
+      if (lo > hi) return false;
       return !obs.some((o) => (o.text || !p.inside || !p.el.contains(o.el)) && o.box[0] < b[2] && o.box[2] > b[0] && o.box[1] < b[3] && o.box[3] > b[1]);
     })
     .map(({ i }) => i);
@@ -379,6 +398,40 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
     return vy > -40 && vy < H + 160 && x - scrollX > -60 && x - scrollX < W + 60;
   };
 
+  // Her whole figure, as drawn (every glyph, the ponytail, the projector ring and the glow), in
+  // page coordinates.
+  let headB = headerBottom();
+  const figureBox = (P: Pose, now: number) => {
+    let l = Infinity;
+    let t = Infinity;
+    let r = -Infinity;
+    let b = -Infinity;
+    for (const s of samples) {
+      const q = world(s, P, now, x, y, face);
+      if (q[0] < l) l = q[0];
+      if (q[0] > r) r = q[0];
+      if (q[1] < t) t = q[1];
+      if (q[1] > b) b = q[1];
+    }
+    l = Math.min(l, x - 22 * S - 1);
+    r = Math.max(r, x + 22 * S + 1);
+    b = Math.max(b, y + 3 + 5 * S + 1);
+    const g = Math.max(6, Math.round(8 * S * 1.15)) * 0.6 + (glow ? 6 : 0);
+    return [l - g, t - g, r + g, b + g];
+  };
+  /** How much of her to show where she stands now: 1 with room to spare, fading to 0 as any part
+   *  of her nears the header's bottom edge or an edge of the window, and 0 before anything could
+   *  cross one. So she is never cut off: she waits, out of sight, until her perch is in view. */
+  const FIT_PX = 24;
+  let lastBox: number[] | null = null;
+  const fit = (P: Pose, now: number) => {
+    const bx = figureBox(P, now);
+    const room = Math.min(bx[1] - scrollY - headB, H - (bx[3] - scrollY), bx[0] - scrollX, W - (bx[2] - scrollX));
+    lastBox = bx;
+    if (room <= 0) return 0;
+    return reduce() ? 1 : Math.min(1, room / FIT_PX);
+  };
+
   let drewEmpty = false;
   const draw = (now: number) => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -405,18 +458,19 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
         ctx.globalAlpha = 0.35 + 0.6 * Math.abs(Math.sin(u * Math.PI * 0.5 + 0.6));
         ctx.fillText(samples[k].g, qx - sx, qy - sy);
       });
-    } else if (!hidden && visible()) {
+    } else if (!hidden && visible() && fit(pose(now), now) > 0) {
       const P = pose(now);
       const still = reduce();
+      const shown = alpha * fit(P, now);
       // The projector ring under her feet.
-      ctx.globalAlpha = 0.5 * alpha;
+      ctx.globalAlpha = 0.5 * shown;
       for (let i = 0; i < 22; i++) {
         const a = (i / 22) * Math.PI * 2 + (still ? 0 : now / 900);
         ctx.fillRect(x - sx + Math.cos(a) * 22 * S - 1, y - sy + 3 + Math.sin(a) * 5 * S - 1, 2, 2);
       }
       for (const s of samples) {
         const p = world(s, P, now, x, y, face);
-        ctx.globalAlpha = alpha * (!still && Math.sin(now / 180 + s.f * 40) > 0.92 ? 0.35 : 0.92);
+        ctx.globalAlpha = shown * (!still && Math.sin(now / 180 + s.f * 40) > 0.92 ? 0.35 : 0.92);
         if (!still && Math.sin(now / 700 + s.f * 90) > 0.995) s.g = s.g === '0' ? '1' : '0';
         ctx.fillText(s.g, p[0] - sx, p[1] - sy);
       }
@@ -467,6 +521,7 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
     cv.width = Math.round(W * dpr);
     cv.height = Math.round(H * dpr);
     S = scaleFor(W);
+    headB = headerBottom();
     if (!enabled().includes(cur) && state !== 'warp' && state !== 'run') {
       const i = startAt();
       hidden = i < 0;
@@ -512,16 +567,33 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
   });
 
   // First frame once the page is idle; the loop starts when the visitor moves, scrolls or types.
+  let ready = false;
   const start = () => {
+    ready = true;
     readInk();
     const i = startAt();
     hidden = i < 0;
     if (i >= 0) cur = i;
     place(cur);
     size();
-    document.fonts?.ready.then(() => draw(performance.now()));
+    // If no perch was usable yet (the page still settling), look again once it has.
+    const recheck = () => {
+      if (!hidden) return;
+      const j = startAt();
+      hidden = j < 0;
+      if (j >= 0) {
+        cur = j;
+        place(cur);
+      }
+    };
+    document.fonts?.ready.then(() => {
+      recheck();
+      draw(performance.now());
+    });
+    if (document.readyState !== 'complete') addEventListener('load', recheck, { once: true });
     const engage = () => {
       engaged = true;
+      recheck();
       wake();
     };
     for (const ev of ['pointermove', 'pointerdown', 'scroll', 'keydown']) addEventListener(ev, engage, { once: true, passive: true });
@@ -537,6 +609,10 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
     get state() {
       return state;
     },
+    /** True once she is set up (sized and placed), a moment after she mounts. */
+    get ready() {
+      return ready;
+    },
     /** Every perch, whether she may use it, and her body's box there (page coordinates). */
     boxes: () => {
       const ok = usablePerches(perches);
@@ -548,8 +624,20 @@ export function mountBitGirl(cv: HTMLCanvasElement) {
     go: (i: number) => {
       prev = cur;
       cur = i;
+      hidden = false;
+      state = 'idle';
+      alpha = 1;
       place(cur);
       draw(performance.now());
     },
+    /** One perch's body box (page coordinates), without checking what it covers. */
+    box: (i: number) => {
+      const b = bodyBox(perches[i]);
+      return { left: b[0], top: b[1], right: b[2], bottom: b[3] };
+    },
+    /** Draw one frame where the page is scrolled now (for the fit test, which reads the pixels). */
+    render: () => draw(performance.now()),
+    headerBottom: () => headB,
+    figure: () => lastBox,
   };
 }

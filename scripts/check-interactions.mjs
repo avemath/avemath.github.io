@@ -1012,6 +1012,88 @@ await test('playground', async () => {
   await p.close();
 });
 
+// ---- the bit girl is never cut off: on every perch, at every scroll position, every pixel of her
+// (ponytail and projector ring included) is below the header and inside the window ----
+await test('girl-fit', async () => {
+  for (const path of ['/', '/about/', '/work/', '/research/']) {
+    for (const w of [390, 768, 1440]) {
+      const h = w === 390 ? 844 : w === 768 ? 1024 : 900;
+      const p = await page(path, { w, h });
+      await p.mouse.move(w - 3, h - 3);
+      await p.waitForFunction(() => window.__bitGirl?.ready, null, { timeout: 8000 });
+      const perches = await p.evaluate(() => window.__bitGirl.boxes().filter((b) => b.usable));
+      // No usable perch at this width (the bench's perches are for wide screens): she stays hidden.
+      for (const { i, ledge } of perches) {
+        const hb = await p.evaluate(() => window.__bitGirl.headerBottom());
+        // Scroll positions around where her top meets the header and her feet meet the bottom edge,
+        // worked out from her perch's box at the moment of scrolling (the page can still grow).
+        const offs = [];
+        for (let d = -90; d <= 90; d += 15) offs.push(['top', d], ['bottom', d]);
+        offs.push(['mid', 0], ['fit', 0]);
+        const bad = await p.evaluate(
+          ({ i, offs, hb, h }) => {
+            const g = window.__bitGirl;
+            const at = ([ref, d]) => {
+              const b = g.box(i);
+              if (ref === 'top') return b.top - hb + d;
+              if (ref === 'bottom') return b.bottom - h + d;
+              if (ref === 'mid') return (b.top + b.bottom) / 2 - h / 2;
+              return (Math.max(0, b.bottom + 24 - h) + b.top - 4 - hb) / 2;
+            };
+            const ys = offs;
+            g.go(i);
+            const cv = document.querySelector('[data-bit-girl]');
+            const ctx = cv.getContext('2d');
+            const k = cv.width / innerWidth;
+            const x0 = 0;
+            const x1 = cv.width;
+            const out = [];
+            let shown = 0;
+            for (const y of ys) {
+              const top0 = Math.round(Math.min(Math.max(0, at(y)), document.documentElement.scrollHeight - innerHeight));
+              scrollTo({ top: top0, behavior: 'instant' });
+              g.go(i);
+              g.render();
+              const img = ctx.getImageData(x0, 0, x1 - x0, cv.height).data;
+              let top = Infinity;
+              let bottom = -1;
+              let lo = Infinity;
+              let hi = -1;
+              const rw = x1 - x0;
+              for (let q = 3; q < img.length; q += 4) {
+                if (img[q] < 8) continue;
+                const px = (q - 3) / 4;
+                const row = Math.floor(px / rw);
+                const col = px % rw + x0;
+                if (row < top) top = row;
+                if (row > bottom) bottom = row;
+                if (col < lo) lo = col;
+                if (col > hi) hi = col;
+              }
+              if (bottom < 0) continue; // not shown here
+              shown++;
+              if (top < hb * k) out.push(`at scroll ${top0} her top is at ${Math.round(top / k)}px, above the header's bottom (${Math.round(hb)}px)`);
+              if (bottom >= cv.height - 1) out.push(`at scroll ${top0} she runs off the bottom of the window`);
+              if (lo <= 0 || hi >= cv.width - 1) out.push(`at scroll ${top0} she runs off the side of the window`);
+            }
+            if (!shown) {
+              const t = Math.round(Math.min(Math.max(0, at(['fit', 0])), document.documentElement.scrollHeight - innerHeight));
+              scrollTo({ top: t, behavior: 'instant' });
+              g.go(i);
+              g.render();
+              out.push(`she is never shown on it, even scrolled to the middle of the window (at ${t}: figure ${JSON.stringify(g.figure()?.map(Math.round))}, box ${JSON.stringify(g.box(i))}, state ${g.state}, cur ${g.cur})`);
+            }
+            return out;
+          },
+          { i, offs, hb, h },
+        );
+        if (bad.length) fail('girl-fit', `${path} at ${w}, perch ${i} (${ledge}): ${bad[0]}${bad.length > 1 ? ` (and ${bad.length - 1} more)` : ''}`);
+      }
+      await p.close();
+    }
+  }
+});
+
 // ---- term popovers: hover, focus, tap, Escape, tap outside; on screen, and no layout cost ----
 await test('terms', async () => {
   for (const vp of [{ w: 1440 }, { w: 390, h: 844, touch: true }]) {
