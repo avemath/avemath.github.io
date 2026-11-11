@@ -24,8 +24,7 @@ export const projects: Record<Project, { label: string; href: string; repo?: str
   bellhop: { label: 'bellhopSim', href: '/work/bellhop-sim/', repo: 'https://github.com/avemath/bellhopSim', public: true },
   signals: { label: 'Signals playground', href: '/work/signals-playground/', repo: 'https://github.com/avemath/avemath.github.io', public: true },
   led: { label: 'LED audio spectrum', href: '/work/led-audio-spectrum/', repo: 'https://github.com/avemath/led-audio-spectrum', public: true },
-  // TODO(ave): the Landspace repo is private, so its files are not linked. Make
-  // github.com/avemath/landspace public and set this to true to link them.
+  // The Landspace repo is private by choice, so its files are not linked.
   landspace: { label: 'Landspace', href: '/work/landspace/', repo: 'https://github.com/avemath/landspace', public: false },
   sites: { label: 'Client sites', href: '/#websites', public: true },
 };

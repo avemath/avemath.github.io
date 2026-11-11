@@ -6,9 +6,8 @@ import { token, mixHex } from '../../lib/tokens-client';
 import { createDemoTrack, createSpectrum, openMic, scrollFrame, scrollSteps, DEMO_FONT, FRAME_MS, FS, H, N, SCROLL_STEP_MS, W } from '../../lib/led-firmware';
 import { prefersReducedMotion } from '../preferences';
 
-// TODO(ave): "Play a demo" plays the firmware demo's generated track (kick, bass, arpeggio,
-// pad, hats), rendered to audio here. To use a short clip you recorded instead, add it to
-// public/media/ and play it through an AnalyserNode the way openMic() reads the microphone.
+// "Play a demo" plays the firmware demo's generated track (kick, bass, arpeggio, pad, hats),
+// rendered to audio here; the generated track stays (the recording was too blurry).
 const CLIP_SECONDS = 13;
 const CLIP_GAIN = 0.5;
 

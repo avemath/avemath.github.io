@@ -10,7 +10,7 @@ status: complete
 summary: Senior design capstone (2024 to 2025). I wrote the control software for a 30 lb pneumatic combat robot, splitting weapon safety and live video across two controllers so neither could stall the other.
 outcome: First place overall in the Bengal Bot Brawl, LSU's combat robotics competition.
 role: Lead programmer and systems integration. I owned the Pico W weapon and safety firmware, the Pi 4B video pipeline, and the test scripts.
-team: "Avery Matherne (control software, systems integration), Chris Cashen, Nicholas Woodroffe, Matthew van Winkle and Miles Mouton, advised by Dr. Adrian Stein."
+team: "Avery Matherne (computer engineering: control software and systems integration), Chris Cashen and Nicholas Woodroffe (mechanical), Matthew van Winkle and Miles Mouton (electrical), advised by Dr. Adrian Stein."
 seoDescription: "Control software for a 30 lb pneumatic combat robot: weapon safety on a Pico W, live video on a Pi 4B, and first place overall in LSU's Bengal Bot Brawl."
 keywords: ["robot", "combat robotics", "senior design", "capstone", "firmware", "pneumatic", "kill switch", "UDP video"]
 stack: [MicroPython, Python, Raspberry Pi Pico W, Raspberry Pi 4B, OpenCV, UDP, FlySky RC]
@@ -43,7 +43,6 @@ metrics:
   - { label: Trigger to solenoid, average, value: "31.5 ms" }
   - { label: Max frame size, value: "65,000 B" }
 demo: weapon-logic
-# TODO(ave): confirm the camera test photo (rampage-camera-test.jpg, in Video that stays current) was before the external antenna; if so, caption it as the internal-antenna baseline.
 threads: [hardware] # TODO(ave): confirm the thread for each project
 # TODO(ave): check wording of the spelled-out terms (ESC, TCP, FPS), Nov 10.
 ---
@@ -54,7 +53,7 @@ Combat is a rough place for electronics: vibration, interference, flaky radio li
 
 ## My role
 
-The team was Avery Matherne (control software and systems integration), Chris Cashen, Nicholas Woodroffe, Matthew van Winkle and Miles Mouton. The mechanical design and the pneumatic analysis were the mechanical team's work. I wrote the three programs: `pico_direct.py` (weapon and safety firmware on the Pico W), `pi4_direct.py` (the video pipeline on the Pi 4B) and `video_direct.py` (the receiver on the driver's laptop), plus the scripts we used to test latency and heat.
+The team was Avery Matherne (computer engineering: control software and systems integration), Chris Cashen and Nicholas Woodroffe (mechanical), Matthew van Winkle and Miles Mouton (electrical). I was the only computer engineer on the team, so the software was all mine. The mechanical design and the pneumatic analysis were the mechanical team's work. I wrote the three programs: `pico_direct.py` (weapon and safety firmware on the Pico W), `pi4_direct.py` (the video pipeline on the Pi 4B) and `video_direct.py` (the receiver on the driver's laptop), plus the scripts we used to test latency and heat.
 
 <figure class="case__fig">
 
@@ -89,13 +88,13 @@ The team was Avery Matherne (control software and systems integration), Chris Ca
 <figcaption>Switch C on channel 5 is the kill switch; switch D on channel 6 fires the plow.</figcaption>
 </figure>
 
-**Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video from a fisheye Pi camera goes over UDP instead of Transmission Control Protocol (TCP). Each frame is JPEG-encoded, and the adaptive quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. With an external antenna the stream averaged 17.4 frames per second (FPS), 11.2 FPS more than with the internal antenna. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
+**Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video from a fisheye Pi camera goes over UDP instead of Transmission Control Protocol (TCP). Each frame is JPEG-encoded, and the adaptive quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. With an external antenna the stream averaged 17.4 frames per second (FPS), 11.2 FPS more than with the internal antenna. The robot's metal body acted like a Faraday cage around the internal one, so the external antenna was necessary. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
 
 <figure class="case__fig">
 
 ![A laptop showing the robot camera's fisheye view of a building lobby at 7.8 FPS, next to a terminal running pi4_video_stream.py.](../../assets/projects/rampage/rampage-camera-test.jpg)
 
-<figcaption>An early stream test in the lab, April 2025: the robot's fisheye view with the Pi's streaming log beside it.</figcaption>
+<figcaption>Camera test before the external antenna went on. The robot's metal body acted like a Faraday cage, so the signal barely got out. That's why we added one.</figcaption>
 </figure>
 
 **Electronics.** A 4-in-1 BLHeli_32 70 A ESC, 650 Kv brushless motors, a 5S LiPo, a 100 A maxi fuse, and a 5 V to 3.3 V level shifter between the Pico and the 5 V side.
