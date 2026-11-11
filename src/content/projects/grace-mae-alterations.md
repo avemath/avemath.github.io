@@ -29,8 +29,7 @@ client:
   name: Grace Mae Alterations
   kind: Bridal and tailoring studio, Pittsburgh, PA
   permission: true
-threads: [web] # TODO(ave): confirm the thread for each project
-# TODO(ave): check wording of the spelled-out terms (SVG, SEO), Nov 10.
+threads: [web]
 ---
 
 ## Context

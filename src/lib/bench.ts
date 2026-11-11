@@ -17,6 +17,8 @@ export const moveTo = (spot: BenchSpot | undefined, ox: number, oy: number) => (
 // ---- Threads: the lines of the thread map ----
 export const threadIds = ['hardware', 'signals', 'family', 'web', 'land'] as const;
 export type Thread = (typeof threadIds)[number];
+// TODO(ave): confirm which threads each project belongs to (the `threads:` line in each project's
+// frontmatter): acoustic-pool-alarm, because-of-adam, bellhop-sim, grace-mae-alterations, integer-internship, landspace, led-audio-spectrum, little-explorer-swim, nicholas-domke, onr-intelligent-data-management, petro-land-ventures, plv-abstract-builder, rampage, signals-playground, v2v-bsm-ofdm.
 export const threads: { id: Thread; name: string; color: string }[] = [
   { id: 'hardware', name: 'Hardware', color: '--gold' },
   { id: 'signals', name: 'Signals and sound', color: '--accent' },

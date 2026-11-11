@@ -701,3 +701,25 @@ Mobile: / 95 (median of 94, 98, 95), /research/ 98 (median of 98, 89, 98), /abou
 | Desktop | all five | 100 | 100 | About 0.010 → 0 |
 
 Accessibility, best practices and SEO are 100 on every run. On this machine Lighthouse's headless Chrome sometimes holds the home page's first paint back by about a second (it does the same with the scripts, the masks or the filters removed, and on the before build); when it doesn't, home scores 97 with an LCP of 2.37 s. Check PageSpeed Insights on the live site after the push for the real number.
+
+## Fix round 2, November 10, 2026 (branch fixes-nov10)
+
+1. **The bit girl is never cut off.** Each frame she measures everything she draws (ponytail, projector ring, glow) and fades out as any of it nears the header's bottom edge or the window's edges, fully gone before anything could cross; she waits there until her perch is in view again. A perch that no scroll position can show whole (the Research top perch, under the header at the top of the page) is not used. A startup race that could leave her hidden all visit is fixed. Test: `girl-fit` in `check-interactions` places her on every usable perch at 390, 768 and 1440 on /, /about/, /work/ and /research/, scrolls through where she meets the header and the bottom, and reads the canvas pixels.
+2. **About datasheet.** The note is taped across its print's bottom edge toward the right-hand corner (the tape over the seam), for one print or two (FAIRE); the tray is as tall as its contents, so the sheet follows its tallest column. Chip, print with note and the top of the table fit at 1440 by 900 and 1280 by 800; phones stack chip, print with note, table.
+3. **Polaroids.** Modeled on film-graduation-print.jpg: 5% borders, a bottom strip about 21% of the frame's height whatever the photo's shape, the print's own off-white (`--photo`, #e7e3db, sampled and a touch less yellow; #cfcac1 in dark mode), a faint paper grain and a soft edge. The bench's client prints use the same proportions and paper. The graduation print still shows whole.
+4. **About copy.** Final pin notes (SNOW, FILM, FAIRE, GND), the land work sentence, the Mike caption and alt; the settled TODOs and Mom's quote are gone.
+5. **Status strip:** "Graduate research assistant at LSU, including summers." Contact topics settled.
+6. **Work page and the pool alarm.** The pool sketch says "drowning is usually silent". Everywhere, the alarm detects with underwater acoustics; nothing says it listens for a splash, a fall or a sound.
+7. **Research.** "Bit by bit". Every panel scaled down to a centered plate of 1160px at most, two columns from 1024px, and fits on one screen at 1440 by 900 and 1280 by 800 (a tighter tier for screens 860px tall or less). The depth gauge shows only where it has room beside the plate (1400px up); each panel's depth tag stays. Tests: panel height under the header, plate width and centering, body text 16px or more, controls 36px or taller.
+8. **Home FH-BFSK feature.** Under the mesh, the playground's own received spectrogram, the sent bits and Hear it (the same component and script, `bits` prop), loaded only near the screen; sound only on a press. Test: `signals-card` checks the bits, the button by keyboard, and that no audio starts before it.
+9. **Case study facts.** RAMpage: the camera test caption (before the external antenna; the metal body acted like a Faraday cage), the same point beside the antenna numbers, and the team's roles. CAD, Landspace and LED notes settled.
+10. **Checks.** All suites pass. The 13 "confirm the thread" and 12 "spelled-out terms" TODOs are now one each (`src/lib/bench.ts`, `src/data/glossary.json`).
+
+### Lighthouse (local, Lighthouse 12, three runs each, medians)
+
+| | / | /about/ | /work/ | /research/ |
+|---|---|---|---|---|
+| Mobile | 95 (93, 97, 95) | 98 | 97 | 92 |
+| Desktop | 100 | 100 | 100 | 100 |
+
+Accessibility, best practices and SEO 100 on every run; CLS 0 everywhere (Research desktop 0.001).

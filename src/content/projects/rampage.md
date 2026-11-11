@@ -43,8 +43,7 @@ metrics:
   - { label: Trigger to solenoid, average, value: "31.5 ms" }
   - { label: Max frame size, value: "65,000 B" }
 demo: weapon-logic
-threads: [hardware] # TODO(ave): confirm the thread for each project
-# TODO(ave): check wording of the spelled-out terms (ESC, TCP, FPS), Nov 10.
+threads: [hardware]
 ---
 
 ## Context

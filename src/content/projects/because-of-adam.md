@@ -34,7 +34,7 @@ client:
   permission: true
 # LATER: once acoustic-pool-alarm.md has a name and draft: false, link /work/acoustic-pool-alarm/ from "What I'd do next".
 # This is a YAML comment on purpose: an HTML comment in the body would ship in the page source.
-threads: [family, web] # TODO(ave): confirm the thread for each project
+threads: [family, web]
 ---
 
 ## Context

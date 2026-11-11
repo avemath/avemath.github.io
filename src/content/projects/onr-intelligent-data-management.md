@@ -19,7 +19,7 @@ stack: [Digital communications, Signal processing, Networked autonomy]
 links:
   writeup: https://lsu.edu/eng/news/2024/09/lsu-integer-partner-to-optimize-navy-and-marine-corps-operations.php
 confidentiality: limited
-threads: [signals] # TODO(ave): confirm the thread for each project
+threads: [signals]
 # TODO(ave): check wording of the summary, role and My role (Nov 10: the ONR work began during the Integer internship).
 ---
 

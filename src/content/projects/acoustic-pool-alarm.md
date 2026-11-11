@@ -8,7 +8,7 @@ summary: "An alarm that uses underwater acoustics to detect a child in trouble i
 role: "My own project. Early research and planning."
 keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "underwater sound"]
 stack: [Underwater acoustics, Signal processing, Prior-art review]
-threads: [signals, family] # TODO(ave): confirm the thread for each project
+threads: [signals, family]
 # TODO(ave): check wording of the summary (Nov 10: detecting with underwater acoustics, not listening).
 ---
 

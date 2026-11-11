@@ -12,8 +12,7 @@ outcome: Replaced a paper weekly interview sheet with forms and reports that fil
 role: Solo. I designed the form, wrote the Apps Script, and wrote the instructor's one-page guide.
 keywords: ["swim", "ISR", "forms", "Apps Script", "Google Sheets", "reports", "intake"]
 stack: [Google Apps Script, Google Forms, Google Sheets, Google Drive]
-threads: [family, web] # TODO(ave): confirm the thread for each project
-# TODO(ave): check wording of the spelled-out terms (ISR), Nov 10.
+threads: [family, web]
 ---
 
 ## Context

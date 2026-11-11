@@ -37,8 +37,7 @@ client:
   kind: Portfolio for a senior in mechanical engineering at LSU
   permission: true
 draft: false
-threads: [web] # TODO(ave): confirm the thread for each project
-# TODO(ave): check wording of the spelled-out terms (CAD), Nov 10.
+threads: [web]
 ---
 
 ## Context

@@ -13,8 +13,7 @@ role: Solo. Built to study, then cleaned up to share.
 keywords: ["radio", "communications", "FH-BFSK", "frequency hopping", "JANUS", "underwater acoustics", "BER", "QAM", "PSK", "matched filter", "multipath", "Web Audio"]
 stack: [TypeScript, Web Audio API, SVG, Canvas]
 demo: signals
-threads: [signals] # TODO(ave): confirm the thread for each project
-# TODO(ave): check wording of the spelled-out terms (Context, What's in it), Nov 10.
+threads: [signals]
 ---
 
 ## Context

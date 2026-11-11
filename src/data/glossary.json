@@ -1,5 +1,5 @@
 {
-  "_todo": "TODO(ave): check wording of every entry (Nov 10). Each meaning is written for someone who isn't an engineer.",
+  "_todo": "TODO(ave): check wording of every entry, and of the spelled-out terms on the pages (Nov 10): bellhop-sim.md (summary, WSL, V2V); grace-mae-alterations.md (SVG, SEO); landspace.md (KML, KMZ, PLSS, OCR); led-audio-spectrum.md (GPIO, FFT, AGC, I2S); little-explorer-swim.md (ISR); nicholas-domke.md (CAD); petro-land-ventures.md (SVG, ARIA, DOM, HTML); rampage.md (ESC, TCP, FPS); signals-playground.md (Context, What's in it); v2v-bsm-ofdm.md (summary, Context, receiver steps, hardware); SpectrumDemo.astro; OfdmDemo.astro. Each meaning is written for someone who isn't an engineer.",
   "_about": "Acronyms and names used on the site. term is how it appears; full is the spelled-out name (empty for names that aren't acronyms); meaning is one line. On every page the first use in body text spells the term out as 'full (term)', or the term is wrapped in <Term>; scripts/check-terms.mjs enforces it. Not listed on purpose: part numbers (ESP32, WS2812B, MAX4466, ADALM-PLUTO), the About chip's playful pin names (their notes say what they are), and everyday ones (PDF, LED, USB, LSU, NATO, CDC, CPR, FAQ, QR).",
   "terms": [
     { "term": "V2V", "full": "vehicle-to-vehicle", "meaning": "Cars talking directly to each other by radio." },

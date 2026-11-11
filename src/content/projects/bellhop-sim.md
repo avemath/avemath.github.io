@@ -35,8 +35,7 @@ metrics:
   - { label: "Delay spread within 20 dB of the strongest arrival", value: "2.1 s" }
   - { label: "BER at 20 dB SNR per sample, no equalizer", value: "0.30" }
   - { label: "Extra loss at 5 kHz vs 100 Hz, 100 km", value: "39 dB" }
-threads: [signals] # TODO(ave): confirm the thread for each project
-# TODO(ave): check wording of the spelled-out terms (summary, WSL, V2V), Nov 10.
+threads: [signals]
 ---
 
 ## Context
