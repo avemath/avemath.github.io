@@ -326,6 +326,17 @@ await test('matrix', async () => {
 await test('signals-card', async () => {
   // Its own page, closed after, so the live mesh is not left animating behind the later tests.
   const sp = await page('/');
+  // Count audio contexts: none may start before Hear it is pressed.
+  await sp.evaluate(() => {
+    window.__audio = 0;
+    const A = window.AudioContext;
+    window.AudioContext = class extends A {
+      constructor(...a) {
+        super(...a);
+        window.__audio++;
+      }
+    };
+  });
   const card = sp.locator('#signals');
   await settleOn(sp, '#signals');
   // The hop pattern lives on as the card's own view.
@@ -338,6 +349,16 @@ await test('signals-card', async () => {
   await pg.locator('[data-pg-send]').click();
   await sp.waitForFunction(() => document.querySelector('#signals [data-pg]')?.dataset.state === 'done', null, { timeout: 20000 }).catch(() => fail('signals-card', 'Send a packet does not finish a send'));
   if (!(await card.locator('a[href="/work/signals-playground/"]').count())) fail('signals-card', 'no link to the full playground');
+  // Under the water: the received spectrogram, the sent bits, and Hear it (a real button, by keyboard).
+  if (!(await pg.locator('[data-pg-spec]').isVisible())) fail('signals-card', 'no spectrogram under the mesh');
+  const bitsShown = ((await pg.locator('[data-pg-tx-bits]').textContent()) ?? '').replace(/\s/g, '');
+  if (!/^[01]{88}$/.test(bitsShown)) fail('signals-card', `the sent bits read "${bitsShown.slice(0, 20)}..."`);
+  if (await sp.evaluate(() => window.__audio)) fail('signals-card', 'audio started before Hear it was pressed');
+  const hearBtn = pg.locator('[data-pg-hear]');
+  await hearBtn.focus();
+  if (!(await hearBtn.evaluate((e) => e === document.activeElement && e.tagName === 'BUTTON'))) fail('signals-card', 'Hear it is not a focusable button');
+  await sp.keyboard.press('Enter');
+  await sp.waitForFunction(() => window.__audio > 0, null, { timeout: 5000 }).catch(() => fail('signals-card', 'Hear it (by keyboard) does not start the sound'));
   await sp.close();
 });
 

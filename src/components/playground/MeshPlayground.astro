@@ -15,8 +15,10 @@ interface Props {
   n?: string;
   /** The home page's version: the mesh, Send a packet and a link to the full playground. */
   compact?: boolean;
+  /** Compact only: also show the received spectrogram, the sent bits and Hear it (the home card). */
+  bits?: boolean;
 }
-const { n = 'VIII', compact = false } = Astro.props;
+const { n = 'VIII', compact = false, bits = false } = Astro.props;
 ---
 
 {
@@ -36,8 +38,33 @@ const { n = 'VIII', compact = false } = Astro.props;
         <span class="hand pg__note pg__note--tx" aria-hidden="true">sender</span>
         <span class="hand pg__note pg__note--rx" aria-hidden="true">tap the water ♡</span>
       </div>
+      {/* Under the water, as in the full playground: the received spectrogram (each chip a dash at its
+          tone) and the sent bits, and Hear it plays the packet. Same script, same link code. */}
+      {bits && (
+        <div class="pg__spec-wrap">
+          <canvas class="pg__spec" data-pg-spec role="img" aria-label={`Spectrogram of the received signal from ${F_LOW} to ${F_HIGH} Hz: each chip is a short dash at its tone, hopping up and down the band.`} />
+          <p class="pg__spec-k mono">
+            <span>{(F_HIGH / 1000).toFixed(1)} kHz</span>
+            <span>spectrogram, received</span>
+            <span>{(F_LOW / 1000).toFixed(2)} kHz</span>
+          </p>
+        </div>
+      )}
+      {bits && (
+        <div class="pg__sent">
+          <p class="pg__k">
+            Sent bits <span class="pg__dim">(8 per character)</span>
+          </p>
+          <p class="pg__bits mono" data-pg-tx-bits />
+        </div>
+      )}
       <div class="pg__bar">
         <button type="button" class="btn btn--primary" data-pg-send>Send a packet</button>
+        {bits && (
+          <button type="button" class="btn" data-pg-hear aria-pressed="false">
+            <span data-pg-hear-label>Hear it</span>
+          </button>
+        )}
         <p class="pg__sum mono" data-pg-sum aria-live="polite">“hi from Ave”, 88 bits, one 6.25 ms chip each</p>
         <a class="link pg__full" href="/work/signals-playground/#playground">Open the full playground</a>
       </div>
