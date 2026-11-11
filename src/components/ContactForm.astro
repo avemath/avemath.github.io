@@ -11,7 +11,8 @@ interface Props {
 const { idPrefix = 'cf', emailLine = true } = Astro.props;
 const id = (name: string) => `${idPrefix}-${name}`;
 const hasKey = Boolean(site.web3formsKey);
-// TODO(ave): check wording ('Job or internship' became 'A job', then 'Research or collaboration' on Nov 10, which also took over the separate Research topic). Also check its prompt.
+// 'Job or internship' became 'A job', then 'Research or collaboration' (Nov 10), which also took
+// over the separate Research topic.
 const topics = ['Research or collaboration', 'Website project', 'Something else'];
 ---
 
