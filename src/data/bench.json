@@ -1,5 +1,5 @@
 {
-  "_about": "Where each project sits on the /work/ workbench (a 1200 by 720 drawing): x and y place the object's top left corner, w and h are its size, tag is the small mono label always shown under it and tagAt is where that label starts. A project with no entry here still shows in the thread map and the index; the build prints a warning for it. TODO(ave): check wording of the tags.",
+  "_about": "Where each project sits on the /work/ workbench (a 1200 by 720 drawing): x and y place the object's top left corner, w and h are its size, tag is the small mono label always shown under it and tagAt is where that label starts. A project with no entry here still shows in the thread map and the index; the build prints a warning for it.",
   "rampage": {"x": 80, "y": 80, "w": 250, "h": 222, "tag": "RAMpage, 30 lb combat robot", "tagAt": [72, 320]},
   "led-audio-spectrum": {"x": 352, "y": 70, "w": 200, "h": 200, "tag": "LED spectrum, 16 by 16", "tagAt": [352, 290]},
   "signals-playground": {"x": 592, "y": 84, "w": 240, "h": 160, "tag": "Signals playground", "tagAt": [592, 264]},

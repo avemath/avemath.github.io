@@ -17,7 +17,6 @@ export const moveTo = (spot: BenchSpot | undefined, ox: number, oy: number) => (
 // ---- Threads: the lines of the thread map ----
 export const threadIds = ['hardware', 'signals', 'family', 'web', 'land'] as const;
 export type Thread = (typeof threadIds)[number];
-// TODO(ave): check wording of the thread names.
 export const threads: { id: Thread; name: string; color: string }[] = [
   { id: 'hardware', name: 'Hardware', color: '--gold' },
   { id: 'signals', name: 'Signals and sound', color: '--accent' },

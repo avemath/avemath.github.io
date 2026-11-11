@@ -4,11 +4,12 @@ type: research
 tags: [research, nonprofit]
 period: { start: "2026-10" }
 status: ongoing
-summary: "An alarm that listens underwater for a child falling into a backyard pool, built from my family's story and my background in underwater acoustics."
+summary: "An alarm that uses underwater acoustics to detect a child in trouble in a backyard pool, because drowning is usually silent. Built from my family's story and my background in underwater acoustics."
 role: "My own project. Early research and planning."
 keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "underwater sound"]
 stack: [Underwater acoustics, Signal processing, Prior-art review]
 threads: [signals, family] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the summary (Nov 10: detecting with underwater acoustics, not listening).
 ---
 
 <!-- NAME: working title until Avery picks one. Update the title then, and delete this comment. -->
@@ -23,7 +24,9 @@ Every option a family has today fails somewhere. Floating alarms that sense wave
 
 ## Why sound
 
-Sound travels well in water. It works at night and in cloudy water, it needs no camera, and it can reach under a pool cover. That's why I want an alarm that listens to the water instead of watching it.
+Sound travels well in water. It works at night and in cloudy water, it needs no camera, and it can reach under a pool cover. That's why I want an alarm that senses the water with sound instead of watching it with a camera.
+
+<!-- TODO(ave): check wording (Nov 10: senses the water with sound). -->
 
 ## Where it stands
 

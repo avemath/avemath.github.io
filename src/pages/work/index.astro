@@ -35,7 +35,7 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     <div class="wrap">
       <h1 class="section-title work-head__title">All work</h1>
       <p class="section-lede">
-        {order.length} projects, laid out on my bench. Choose anything to see what it is; every project has a case study. {/* TODO(ave): check wording. */}
+        {order.length} projects, laid out on my bench. Choose anything to see what it is; every project has a case study.
       </p>
       <nav class="filters" aria-label="Jump to a kind of work">
         <a class="filter" href="#all">All <span class="filter__n">{order.length}</span></a>
@@ -61,7 +61,6 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     <div class="wrap">
       <div class="work-sec__head">
         <h2 id="map-title" class="section-title section-title--sm" data-decode>How it connects</h2>
-        {/* TODO(ave): check wording. */}
         <p class="work-sec__intro">Each line is a thread through my work. Where two lines meet, a project belongs to both.</p>
       </div>
       <div class="work-map__box"><ThreadMap projects={order} /></div>

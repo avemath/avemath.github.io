@@ -1,6 +1,7 @@
 ---
-// The pool alarm as a sketch on graph paper: a pool, ripples spreading from a splash, the listener
-// on the wall, and a note in Kalam.
+// The pool alarm as a sketch on graph paper: a pool, ripples in the water, the sensor on the wall,
+// and a note in Kalam: drowning is usually silent, which is the whole point of the project, so the
+// alarm can't wait for a splash.
 import { moveTo, type BenchSpot } from '@/lib/bench';
 const { spot } = Astro.props as { spot: BenchSpot };
 ---
@@ -11,7 +12,6 @@ const { spot } = Astro.props as { spot: BenchSpot };
     <rect class="water pool" x="684" y="556" width="88" height="58" rx="18" />
     <g data-pool>{[0, 1].map((i) => <circle class="ripple" cx="714" cy="584" r={10 + i * 10} style={`opacity:${(0.6 - i * 0.25).toFixed(2)}`} />)}</g>
     <circle class="listener" cx="758" cy="600" r="4" />
-    {/* TODO(ave): check wording. */}
-    <text class="hw hw--sm" x="674" y="650">listens for a splash</text>
+    <text class="hw hw--sm" x="674" y="640"><tspan x="674">drowning is</tspan><tspan x="674" dy="15">usually silent</tspan></text>
   </g>
 </g>
