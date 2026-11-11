@@ -1,7 +1,6 @@
 {
   "_todo": [
-    "TODO(ave): pins with no photo show a line drawing in the print frame (only NC, pin 12, on purpose). To change a print, set photo to a path under src/assets/ and add an alt.",
-    "TODO(ave): every pin's note is a draft in your voice. Check the wording of each one."
+    "TODO(ave): pins with no photo show a line drawing in the print frame (only NC, pin 12, on purpose). To change a print, set photo to a path under src/assets/ and add an alt."
   ],
   "feature": {
     "org": "Integer Technologies",
@@ -39,7 +38,6 @@
       "label": "VCC",
       "title": "Lattes",
       "note": "Runs on lattes. That's the whole spec.",
-      "todo": "TODO(ave): check wording.",
       "photo": "about/vcc-latte.jpg",
       "alt": "A latte with cinnamon on top, next to a laptop showing this site's home page.",
       "caption": "my usual",
@@ -49,7 +47,6 @@
       "label": "OUTSIDE",
       "title": "Outside",
       "note": "Anywhere that isn't a desk. This is me and my little sister Lea out on the kayaks. I've also canoed with Bengals in the Wild, a hiking club at LSU.",
-      "todo": "TODO(ave): check wording.",
       "photo": "about/outside-kayak.jpg",
       "alt": "Avery and her little sister Lea smiling from kayaks on dark water at golden hour.",
       "caption": "Outside",
@@ -58,8 +55,7 @@
     {
       "label": "SNOW",
       "title": "Snow",
-      "note": "Me vs. the snowboard. The snowboard won this round.",
-      "todo": "TODO(ave): check wording.",
+      "note": "Me vs. the snowboard. Started young and still wiping out.",
       "photo": "about/snow-snowboard.jpg",
       "alt": "Avery as a kid, flat on her back in the snow in pink snow pants, her snowboard beside her.",
       "caption": "Snow",
@@ -69,7 +65,6 @@
       "label": "FIELD",
       "title": "Field",
       "note": "Goalie for varsity soccer and shortstop for varsity softball in high school. At LSU I played intramural flag football and softball until most of my team graduated. We won this one.",
-      "todo": "TODO(ave): check wording (goalie and shortstop line, Nov 9).",
       "photo": "about/field-intramural-champs.jpg",
       "alt": "Avery's intramural team in matching champions shirts on a lit softball field at night.",
       "caption": "Field",
@@ -79,7 +74,6 @@
       "label": "THRIFT",
       "title": "Old things",
       "note": "I go for the old stuff, not the clothes. My favorite find is this 1950s Argus camera, flash and bulb still attached, from the flea markets I used to go to with my grandparents.",
-      "todo": "TODO(ave): check wording (Argus camera note, Nov 10).",
       "photo": "about/thrift-argus-camera.jpg",
       "alt": "A 1950s Argus Super Seventy-Five box camera with its round flash reflector and flashbulb attached, on a wooden shelf.",
       "caption": "Old things",
@@ -89,7 +83,6 @@
       "label": "TYGA",
       "title": "Tyga",
       "note": "My Bengal. Head of quality control.",
-      "todo": "TODO(ave): check wording.",
       "photo": "offclock/tyga.jpg",
       "alt": "Tyga, a spotted cat with green eyes, sitting upright and looking straight at the camera.",
       "caption": "Tyga",
@@ -99,7 +92,6 @@
       "label": "SIDEQ",
       "title": "Side quests",
       "note": "[LED visualizers](/work/led-audio-spectrum/) for my sisters, [a pool alarm](/work/acoustic-pool-alarm/) I want to build, and a pile of soldering kits I swear I'll get to.",
-      "todo": "TODO(ave): check wording.",
       "photo": "projects/led-audio-spectrum/matrix-poster.jpg",
       "alt": "A 16 by 16 LED matrix lit up with an audio spectrum, columns of light rising from red at the bottom to white peaks.",
       "caption": "Side quests",
@@ -108,8 +100,7 @@
     {
       "label": "FILM",
       "title": "Graduation, with Grandma Joyce",
-      "note": "My Polaroid comes everywhere with me. I like having something I can hold from the days that matter, like this one.",
-      "todo": "TODO(ave): check wording.",
+      "note": "My Polaroid comes everywhere with me. I like having something tangible I can hold from the days that matter, like this one.",
       "photo": "about/film-graduation-print.jpg",
       "alt": "An instant print of Avery in her 2026 cap and gown holding her LSU diploma and sunflowers, cheek to cheek with her Grandma Joyce.",
       "caption": "",
@@ -119,8 +110,7 @@
     {
       "label": "FAIRE",
       "title": "Ren Faire Day",
-      "note": "Big fan. I go all in: costume, flower crown, the whole thing. Apparently I started early (that's me as a pirate with my big brother Rickey).",
-      "todo": "TODO(ave): check wording (faire spelling, Nov 9).",
+      "note": "Big fan. I go all in: costume, flower crown, the whole shebang. Apparently I started early (that's me as a pirate with my big brother Rickey).",
       "photo": "about/faire-renfest.jpg",
       "alt": "Avery in a blue Renaissance dress and flower crown, lying in the woods at a Renaissance faire with friends and her dad.",
       "caption": "Ren Faire Day",
@@ -134,8 +124,7 @@
     {
       "label": "GND",
       "title": "Ground",
-      "note": "The levee is where I go to reset. Sometimes a turtle is there too.",
-      "todo": "TODO(ave): check wording.",
+      "note": "The levee is where I go to reset. Sometimes there's a turtle sunbathing on the slope.",
       "photo": "about/gnd-turtle.jpg",
       "alt": "A turtle in tall green grass.",
       "caption": "Ground",
@@ -148,8 +137,7 @@
       "photo": "about/read-last-lecture.jpg",
       "alt": "Avery's hand holding open The Last Lecture by Randy Pausch to the chapter The Dutch Uncle, outside in the sun.",
       "caption": "still owe Rickey this book back",
-      "row": "",
-      "todo": "TODO(ave): check wording. Add a favorite author or genre here if you want."
+      "row": ""
     },
     {
       "label": "NC",
@@ -161,12 +149,5 @@
       "caption": "No connect",
       "row": ""
     }
-  ],
-  "_removed": {
-    "momQuote": {
-      "todo": "TODO(ave): removed from About (Nov 9) because it read disjointed there. Bring it back somewhere with a lead-in if you want.",
-      "text": "There's a girl who challenged me, every step of her childhood. If I said the sky was blue, Avery gave me the long side eye glare and wanted to know 'how so.'",
-      "by": "My mom"
-    }
-  }
+  ]
 }
