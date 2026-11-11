@@ -525,19 +525,10 @@ const right = pins.slice(half).reverse();
   }
 
   /* ---- The tray: the pressed pin's print and its note ---- */
+  /* The tray is as tall as what is in it, so the sheet follows its tallest column. */
   .tray {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 470px;
     scroll-margin-top: 5rem;
-  }
-
-  @media (max-width: 859px) {
-    .tray {
-      min-height: 0;
-    }
   }
 
   .slip {
@@ -571,15 +562,17 @@ const right = pins.slice(half).reverse();
     }
   }
 
+  /* The print, and the note taped across its bottom edge toward the right-hand corner: the note's
+     top overlaps the print a little, with the tape over the seam, like a note stuck to a photo. */
   .slip__grid {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: flex-start;
   }
 
   .slip :global(.slip__print) {
     position: relative;
-    width: min(270px, 100%);
+    width: min(240px, 84%);
   }
 
   /* A photo that is already a print shows whole, with no frame of its own, at the same outer width
@@ -604,8 +597,8 @@ const right = pins.slice(half).reverse();
   .note {
     position: relative;
     z-index: 2;
-    width: min(280px, 100%);
-    margin: 44px 0 0 -26px;
+    width: min(250px, 86%);
+    margin: -6px 0 0 auto;
     padding: 14px 18px 16px;
     transform: rotate(2.5deg);
     background: var(--note-paper) repeating-linear-gradient(var(--note-paper) 0 27px, var(--note-line) 27px 28px);
@@ -616,7 +609,7 @@ const right = pins.slice(half).reverse();
     content: '';
     position: absolute;
     top: -11px;
-    left: 30%;
+    left: 56%;
     width: 78px;
     height: 22px;
     transform: rotate(-5deg);
@@ -661,10 +654,10 @@ const right = pins.slice(half).reverse();
     outline-offset: 2px;
   }
 
-  /* Stacked: the note sits under the print, nudged right, clear of the print's caption. */
+  /* Phones: the same, with the print a little narrower than the note. */
   @media (max-width: 859px) {
     .note {
-      margin: 10px 0 0 18px;
+      width: min(280px, 88%);
     }
   }
 
