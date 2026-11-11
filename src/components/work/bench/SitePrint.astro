@@ -1,6 +1,7 @@
 ---
-// A client site as a print beside the laptop: a small picture of its cover, its name in Kalam, a
-// slight tilt. Pointing at it or focusing it puts the site on the laptop's screen (workbench.ts).
+// A client site as a print beside the laptop, in the proportions of a Polaroid 600 like the About
+// prints (5% borders, a bottom strip about 21% of the height, the print's off-white): a small
+// picture of its cover, its name in Kalam, a slight tilt. Pointing at it or focusing it puts the site on the laptop's screen (workbench.ts).
 import { moveTo, type BenchSpot } from '@/lib/bench';
 interface Props {
   spot: BenchSpot;
@@ -14,8 +15,9 @@ const x = spot.x + 4;
 const y = spot.y + 6;
 ---
 
-<g transform={`rotate(${tilt} ${x + 42} ${y + 55})`}>
-  <rect class="ln" x={x} y={y} width="84" height="108" rx="2" />
-  {src ? <image href={src} x={x + 6} y={y + 6} width="72" height="72" preserveAspectRatio="xMidYMin slice" /> : <rect class="screen" x={x + 6} y={y + 6} width="72" height="72" />}
-  <text class="print-name" x={x + 42} y={y + 98} text-anchor="middle">{name}</text>
+<g transform={`rotate(${tilt} ${x + 42} ${y + 53})`}>
+  <rect class="print-shadow" x={x + 1.5} y={y + 3} width="84" height="104" rx="1.5" />
+  <rect class="ln print" x={x} y={y} width="84" height="104" rx="1.5" />
+  {src ? <image href={src} x={x + 4.2} y={y + 4.2} width="75.6" height="75.6" preserveAspectRatio="xMidYMin slice" /> : <rect class="screen" x={x + 4.2} y={y + 4.2} width="75.6" height="75.6" />}
+  <text class="print-name" x={x + 42} y={y + 96} text-anchor="middle">{name}</text>
 </g>

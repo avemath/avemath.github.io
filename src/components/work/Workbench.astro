@@ -221,6 +221,17 @@ const order = [...placed].sort((a, b) => {
     fill: var(--screen);
   }
 
+  /* The client prints: the About prints' paper, a finer outline, a soft shadow under. */
+  .bench .ln.print {
+    fill: var(--photo);
+    stroke-width: 1.25;
+  }
+
+  .bench .print-shadow {
+    fill: var(--ink);
+    opacity: 0.14;
+  }
+
   .bench .ln.screen {
     fill: var(--screen);
   }
@@ -269,7 +280,7 @@ const order = [...placed].sort((a, b) => {
   .bench .print-name {
     font-family: var(--font-hand);
     font-size: 12px;
-    fill: var(--ink);
+    fill: var(--photo-ink);
   }
 
   .bench .rp-ram {

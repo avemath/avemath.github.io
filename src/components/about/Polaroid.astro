@@ -1,8 +1,10 @@
 ---
-// A photo on the About page, printed as a Polaroid: an off-white frame with a thin border on three
-// sides and a deep strip at the bottom (an 88-wide frame with a 23.5 strip), a caption written in
-// marker, a soft shadow and a slight tilt that straightens on hover or focus. With no photo yet,
-// the pin's line drawing goes in a square instead.
+// A photo on the About page, printed as a Polaroid, modeled on the real one in
+// film-graduation-print.jpg: thin even borders on the top and sides (5% of the frame's width) and a
+// deeper strip at the bottom (about 21% of the frame's height, whatever the photo's shape) with the
+// caption written in it; the paper is that print's off-white (--photo), with a very faint grain, a
+// soft edge and a soft shadow; a slight tilt straightens on hover or focus. With no photo yet, the
+// pin's line drawing goes in a square instead.
 // Photos are never cropped. By default the frame takes the photo's own shape: fixed width, height
 // follows. With fit="contain" (the datasheet's pin panel) the window stays square so the panel
 // keeps its height, and the whole photo sits inside it on the panel tint, with side margins for a
@@ -32,6 +34,10 @@ interface Props {
 
 const { photo, alt = '', art, artLabel, caption = '', lines, tilt = 2, sizes = '20rem', fit = 'natural', bare = false, class: cls } = Astro.props;
 const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.height}` : '';
+// The strip, in % of the frame's width (cqw), so it is about 21% of the frame's height: the frame is
+// 5% border, then the window (90% of the width, at the photo's shape), then the strip.
+const aspect = photo && fit === 'natural' ? photo.width / photo.height : 1;
+const strip = ((0.21 / 0.79) * (5 + 90 / aspect)).toFixed(2);
 ---
 
 {
@@ -42,7 +48,7 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
       </div>
     </figure>
   ) : (
-    <figure class:list={['pol', `pol--${fit}`, cls]} style={`--tilt:${tilt}deg`}>
+    <figure class:list={['pol', `pol--${fit}`, cls]} style={`--tilt:${tilt}deg;--strip:${strip}cqw`}>
       <div class="pol__img" style={shape}>
         {photo ? (
           <Picture src={photo} alt={alt} formats={['avif', 'webp']} widths={[320, 480, 640]} sizes={sizes} quality={80} loading="lazy" />
@@ -67,11 +73,17 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
   .pol {
     width: 100%;
     margin: 0;
-    padding: 5.1% 5.1% 0;
-    background: var(--photo);
+    padding: 5% 5% 0;
+    /* A very faint paper grain over the print's off-white. */
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.32 0 0 0 0 0.28 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E"),
+      var(--photo);
+    /* A soft edge, then the shadow it casts. */
     box-shadow:
-      0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent),
-      0 12px 24px -12px color-mix(in srgb, var(--ink) 45%, transparent);
+      inset 0 0 0 1px color-mix(in srgb, var(--ink) 6%, transparent),
+      inset 0 0 10px color-mix(in srgb, var(--ink) 5%, transparent),
+      0 1px 2px color-mix(in srgb, var(--ink) 16%, transparent),
+      0 10px 22px -12px color-mix(in srgb, var(--ink) 40%, transparent);
     rotate: var(--tilt);
     container-type: inline-size;
   }
@@ -113,12 +125,12 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
     object-fit: contain;
   }
 
-  /* The deep bottom strip: 23.5 of the frame's 88 wide, with the caption written in it. A long
-     caption on a small print may take two lines; the strip grows rather than clip it. */
+  /* The deeper bottom strip (--strip, about 21% of the frame's height), with the caption written in
+     it. A long caption on a small print may take two lines; the strip grows rather than clip it. */
   .pol__cap {
     display: flex;
     align-items: center;
-    min-height: 26.7cqw;
+    min-height: var(--strip, 26.7cqw);
     padding-block: 0.2em;
     padding-inline: 0.15em;
     font-family: 'Kalam', 'Segoe Print', 'Bradley Hand', cursive;
@@ -129,7 +141,7 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
   }
 
   /* Two handwritten lines: sized to the print's width so both always fit inside the strip
-     (26.7cqw tall: two lines at 1.05 line height need the type at about 11cqw or less). */
+     (at least 25cqw tall: two lines at 1.05 line height need the type at about 10cqw or less). */
   .pol__cap--lines {
     flex-direction: column;
     align-items: flex-start;

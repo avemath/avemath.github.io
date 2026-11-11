@@ -36,7 +36,9 @@
   --teal: #246a6c;
   --gold: #9a7637;
   --rose: #b0607f;
-  --photo: #fbfaf7;
+  /* Print paper: sampled from the white border of the real Polaroid in film-graduation-print.jpg
+     (a soft, slightly warm light gray), a touch less yellow. */
+  --photo: #e7e3db;
   --lilac-ink: #765c9c;
   --sage-ink: #48705b;
   --gold-ink: #81632e;
@@ -154,7 +156,8 @@
   --teal: #7ccac3;
   --gold: #e2c17e;
   --rose: #eba8c4;
-  --photo: #f2efea;
+  /* Dimmed a little so a print doesn't glare on the dark page. */
+  --photo: #cfcac1;
   --lilac-ink: var(--lilac);
   --sage-ink: var(--sage);
   --gold-ink: var(--gold);
