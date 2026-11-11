@@ -30,7 +30,7 @@ const delayTicks = Array.from({ length: maxDelay / 500 + 1 }, (_, i) => i * 500)
 const nodes = [
   { id: 'ship', label: 'ship', x: 16, y: 22, text: 'Surface ship: radio links through the air, acoustic links down into the water.' },
   { id: 'buoy', label: 'buoy', x: 62, y: 16, text: 'Buoy: sits at the surface, so it can pass messages between radio above and acoustic below.' },
-  { id: 'auv', label: 'AUV', x: 44, y: 58, text: 'AUV: underwater, so its only link is acoustic. Slow, delayed by seconds, and easy to lose.' },
+  { id: 'auv', label: 'AUV', x: 44, y: 58, text: 'Autonomous underwater vehicle (AUV): underwater, so its only link is acoustic. Slow, delayed by seconds, and easy to lose.' },
   { id: 'sensor', label: 'sensor', x: 80, y: 72, text: 'Sensor: collects data all day and can send only a little of it.' },
 ];
 const links = [
@@ -99,7 +99,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
               <p class="fig__label">Platform network</p>
               <p class="fig__label">hover a node</p>
             </div>
-            <div class="net" data-net data-draw>
+            <div class="net" data-net data-draw data-fig>
               <svg viewBox="0 0 100 90" preserveAspectRatio="none" class="net__links" aria-hidden="true">
                 {links.map((l) => <line x1={at(l.a).x} y1={at(l.a).y} x2={at(l.b).x} y2={at(l.b).y} class={`net__link net__link--${l.kind}`} data-a={l.a} data-b={l.b} />)}
               </svg>
@@ -114,8 +114,9 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
               <script type="application/json" data-net-nodes set:html={JSON.stringify(nodes.map(({ id, text }) => ({ id, text })))} />
             </div>
             <figcaption class="plate__cap">
-              <b>Fig. R1.</b> A drawing of the kind of network the project is about, not project data. Solid lines are radio, green lines
-              acoustic. The dots are messages: quick along the radio links, slow along the acoustic ones.
+              {/* TODO(ave): check wording (the node list). */}
+              <b>Fig. R1.</b> A drawing of the kind of network the project is about, not project data: a ship, a buoy, an autonomous
+              underwater vehicle (AUV) and a sensor. Solid lines are radio, green lines acoustic. The dots are messages: quick along the radio links, slow along the acoustic ones.
               <span class="fig__try"><span class="on-mouse">Hover</span><span class="on-touch">Tap</span> a node to see how it links to the others.</span>
             </figcaption>
           </figure>
@@ -123,7 +124,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
         <div class="rp__text">
           <h2 id="onr-title" class="research__h2" data-decode>Intelligent data management for distributed naval&nbsp;platforms</h2>
           <p class="zone-r__text">
-            ONR funded, with Integer Technologies. In the words of the public contract announcement, the project is “the development of
+            Funded by the Office of Naval Research (ONR), with Integer Technologies. In the words of the public contract announcement, the project is “the development of
             decision-making tools for data management on board distributed naval platforms.” Thesis track, expected May 2028.
           </p>
           <p class="zone-r__small">Advisor: Dr. Shuangqing Wei, LSU.</p>
@@ -143,13 +144,15 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       <div class="rp">
         <div class="rp__fig">
           <figure class="rfig plate">
-            <div class="fig__bar">
+            <div class="fig__bar" data-fig>
               <p class="fig__label">A packet through the water</p>
               <p class="fig__label">FH-BFSK, live</p>
             </div>
             <MeshPlayground compact />
             <figcaption class="plate__cap">
-              <b>Fig. R2.</b> One message as a JANUS style FH-BFSK packet: close ripples for a 1, wide ones for a 0, each bit a 6.25 ms chip
+              {/* TODO(ave): check wording. */}
+              <b>Fig. R2.</b> One message as a frequency-hopping binary frequency-shift keying (FH-BFSK) packet in the style of JANUS, the
+              NATO standard for underwater acoustic communication: close ripples for a 1, wide ones for a 0, each bit a 6.25 ms chip
               hopping between 13 tone pairs. The modem math runs in your browser.
             </figcaption>
           </figure>
@@ -157,7 +160,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
         <div class="rp__text">
           <h2 id="signals-title" class="research__h2" data-decode>Getting bits through</h2>
           <p class="zone-r__text">
-            I learn by building. The first tool I made while studying was a page for frequency-hopping BFSK, the modulation the JANUS underwater
+            I learn by building. The first tool I made while studying was a page for frequency-hopping binary frequency-shift keying (BFSK), the modulation the JANUS underwater
             acoustic standard uses. Send a packet and watch it cross the water: each bit is one 6.25 ms chip that hops between 13 tone pairs,
             and a real detector decodes it on the far side.
           </p>
@@ -175,7 +178,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       <div class="rp">
         <div class="rp__fig">
           <figure class="rfig plate">
-            <div class="fig__bar">
+            <div class="fig__bar" data-fig>
               <p class="fig__label">The sound channel</p>
               <div class="tabset" role="tablist" aria-label="Sound channel: views" data-tabs>
                 <button type="button" role="tab" id="r3-tab-rays" aria-controls="r3-rays" aria-selected="true" tabindex="0">Ray tracer</button>
@@ -184,7 +187,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             </div>
             <div id="r3-rays" role="tabpanel" aria-labelledby="r3-tab-rays">
               <RayTracer />
-              <p class="fig__note">Traced in your browser through bellhopSim's sound speed profiles, with BELLHOP's ray equations. Ping sends a pulse along every ray at the local speed of sound; the bold rays are the eigenrays that reach the receiver. There is no bottom loss here, so paths that BELLHOP would let the seabed absorb still show.</p>
+              <p class="fig__note">Traced in your browser through bellhopSim's sound speed profiles, with the ray equations of BELLHOP (a standard model of how sound travels underwater). Ping sends a pulse along every ray at the local speed of sound; the bold rays are the eigenrays that reach the receiver. There is no bottom loss here, so paths that BELLHOP would let the seabed absorb still show.</p>
             </div>
             <div id="r3-arr" role="tabpanel" aria-labelledby="r3-tab-arr" hidden>
               <div class="arr-row">
@@ -230,8 +233,8 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
         <div class="rp__text">
           <h2 id="bellhop-title" class="research__h2" data-decode>bellhopSim</h2>
           <p class="zone-r__text">
-            An interactive Python simulator around BELLHOP (a standard model of how sound travels underwater), built around the Munk deep-ocean case: eigenrays (the paths sound takes from source to receiver), arrival structure, delay spread within 20 dB of the
-            strongest arrival, and a BER sweep. While documenting it I found three physics bugs (range units, bottom density units, the BER
+            An interactive Python simulator around BELLHOP, built around the Munk deep-ocean case: eigenrays (the paths sound takes from source to receiver), arrival structure, delay spread within 20 decibels (dB) of the
+            strongest arrival, and a bit error rate (BER) sweep. While documenting it I found three physics bugs (range units, bottom density units, the BER
             model) and fixed them with regression tests.
           </p>
           <div class="zone-r__actions">
@@ -269,7 +272,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
           <h2 id="pool-title" class="research__h2">Acoustic Pool Alarm <span class="research__wt">(working title)</span></h2>
           <p class="zone-r__text">
             My own project. Can listening underwater in a home pool tell the difference between a kid swimming and a kid in
-            trouble, fast enough to matter? Right now: reviewing prior work and ASTM F2208, the standard for residential pool alarms, and
+            trouble, fast enough to matter? Right now: reviewing prior work and ASTM International's F2208, the standard for residential pool alarms, and
             planning the first bench tests.
           </p>
           <div class="zone-r__actions">

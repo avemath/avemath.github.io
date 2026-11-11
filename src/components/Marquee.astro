@@ -21,7 +21,7 @@ const items = [
 
 <div class="mq band-deep" aria-hidden="true">
   <div class="mq__track">
-    {[0, 1].map(() => <ul class="mq__list">{items.map((t) => <li>{t}</li>)}</ul>)}
+    {[0, 1].map(() => <ul class="mq__list">{items.map((t) => <li data-title>{t}</li>)}</ul>)}
   </div>
 </div>
 

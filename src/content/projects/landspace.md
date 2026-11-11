@@ -33,6 +33,7 @@ metrics:
   - { label: Instrument types, value: "~130" }
   - { label: Automated checks, value: "9 suites" }
 threads: [land] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (KML, KMZ, PLSS, OCR), Nov 10.
 ---
 
 ## Context
@@ -45,7 +46,7 @@ Title work happens in spreadsheets, PDFs, county websites and someone's memory. 
 
 **Let the data find the problems.** The chain-of-title view builds mineral, royalty and leasehold lanes from the patent forward. It flags gaps, over-conveyances, leases past their term with no release, estates with no probate or heirship instrument, and instruments that were never recorded. Flags are computed every time rather than stored, so they can't go stale, and any flag becomes a curative item in one click.
 
-**Map it.** Leaflet with drawing tools, GeoJSON, KML and KMZ import, satellite and topo basemaps, PLSS overlays, and parcels colored by research status or lease expiration.
+**Map it.** Leaflet with drawing tools, GeoJSON, Keyhole Markup Language (KML) and zipped Keyhole Markup Language (KMZ) import (the map files Google Earth uses), satellite and topo basemaps, Public Land Survey System (PLSS) overlays, and parcels colored by research status or lease expiration.
 
 **Your data stays yours.** Landspace is local-first. Projects live in IndexedDB with versioned, additive migrations, so an old project always opens with nothing lost. The app asks the browser for persistent storage and reminds you to back up. Cloud sync through Supabase is optional and protected by row-level security, and the newer change wins on conflict. A desktop build wraps the same app in Electron with context isolation on.
 
@@ -57,4 +58,4 @@ Landspace runs on the web and as a desktop app, with a guided tour and a sample 
 
 ## What I'd do next
 
-OCR for scanned instruments, so a deed image can become a draft record, and shared projects for small land teams.
+Optical character recognition (OCR) for scanned instruments, so a deed image can become a draft record, and shared projects for small land teams.

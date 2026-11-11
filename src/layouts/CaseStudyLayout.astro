@@ -1,4 +1,5 @@
 ---
+import Terms from '@/components/Terms.astro';
 import { Image, getImage } from 'astro:assets';
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
@@ -81,7 +82,7 @@ const jsonLd = [
           <ol>
             <li><a href="/work/" class="link">Work</a></li>
             <li><a href={`/work/#${sec}`} class="link">{workSections.find((s) => s.id === sec)!.label}</a></li>
-            <li aria-current="page">{d.title}</li>
+            <li aria-current="page" data-title>{d.title}</li>
           </ol>
         </nav>
 
@@ -133,7 +134,7 @@ const jsonLd = [
         <dl class="case__facts">
           <div>
             <dt class="label">My role</dt>
-            <dd>{d.role}</dd>
+            <dd><Terms text={d.role} /></dd>
           </div>
           {
             d.team && (
@@ -151,7 +152,7 @@ const jsonLd = [
             <dt class="label">Built with</dt>
             <dd>
               <ul class="flex flex-wrap gap-1.5 pt-1">
-                {d.stack.map((s) => <li class="chip">{s}</li>)}
+                {d.stack.map((s) => <li class="chip"><Terms text={s} /></li>)}
               </ul>
             </dd>
           </div>
@@ -189,8 +190,8 @@ const jsonLd = [
           <dl class="case__metrics">
             {d.metrics.map((m) => (
               <div>
-                <dd class="case__metric">{m.value}</dd>
-                <dt class="label">{m.label}</dt>
+                <dd class="case__metric"><Terms text={m.value} /></dd>
+                <dt class="label"><Terms text={m.label} /></dt>
               </div>
             ))}
           </dl>
@@ -211,7 +212,7 @@ const jsonLd = [
             <ol>
               {toc.map((h) => (
                 <li>
-                  <a href={`#${h.slug}`} data-toc-link>
+                  <a href={`#${h.slug}`} data-toc-link data-title>
                     {h.text}
                   </a>
                 </li>
@@ -267,7 +268,7 @@ const jsonLd = [
             <span class="label">
               <Icon name="arrow-left" class="inline h-3 w-3" /> Previous
             </span>
-            <span class="pager__title">{prev.data.title}</span>
+            <span class="pager__title" data-title>{prev.data.title}</span>
           </a>
         ) : (
           <a class="pager card card--lift" href="/work/">
@@ -284,7 +285,7 @@ const jsonLd = [
             <span class="label">
               Next <Icon name="arrow-right" class="inline h-3 w-3" />
             </span>
-            <span class="pager__title">{next.data.title}</span>
+            <span class="pager__title" data-title>{next.data.title}</span>
           </a>
         ) : (
           prev && (

@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import RampagePlate from '@/components/RampagePlate.astro';
 import Marquee from '@/components/Marquee.astro';
+import Term from '@/components/Term.astro';
 import Hero from '@/components/Hero.astro';
 import StatusStrip from '@/components/StatusStrip.astro';
 import AboutTeaser from '@/components/AboutTeaser.astro';
@@ -87,8 +88,11 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             note={`The transmitter and receiver that ran on the radios. The receiver stages, by line: ${v2vLines}. The live figure runs a browser port, src/lib/ofdm-rx.ts.`}
           />
           <Fragment slot="text">
+            {/* TODO(ave): check wording of the vehicle-to-vehicle opening. */}
             <p>
-              An OFDM radio link (data split across many narrow carriers at once), modeled on IEEE 802.11p (the car version of Wi-Fi), run over the air between two ADALM-PLUTO software radios.
+              A vehicle-to-vehicle (V2V) collision warning: each car broadcasts its position and speed, and the receiver works out the
+              time to collision and decides whether to warn the driver to brake. It runs on an orthogonal frequency-division multiplexing (OFDM) radio link (data
+              split across many narrow carriers at once), modeled on <Term term="IEEE" /> 802.11p (the car version of Wi-Fi), run over the air between two ADALM-PLUTO software radios.
               I designed and wrote the transmitter, the nine-stage receiver and the warning logic. One radio sends both cars' safety
               messages in turn; the other decodes them and computes time to collision. All five hardware runs decoded with zero bit errors.
             </p>
@@ -116,7 +120,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           />
           <Fragment slot="text">
             <p>
-              An ESP32 drives a 16 by 16 matrix from a microphone: 128 point FFT into 16 log spaced bands, an adaptive noise floor, AGC and
+              An ESP32 drives a 16 by 16 matrix from a microphone: 128 point FFT into 16 log spaced bands, an adaptive noise floor, automatic gain control (AGC) and
               debounced switching between the spectrum and an idle glow. Tuned so quiet, distant music still reads.
             </p>
           </Fragment>

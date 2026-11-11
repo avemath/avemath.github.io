@@ -1,4 +1,5 @@
 ---
+import Terms from '@/components/Terms.astro';
 // A client tool as a large feature panel, at the scale of the website displays above it on /work/.
 // An animated flow shows what the tool does, drawn from its case study: for the PLV Abstract
 // Builder, recorded documents stack into the run sheet and the abstract PDF assembles; for Little
@@ -112,7 +113,7 @@ const flowLabel =
     <h3 id={`tool-${project.id}`} class="tool__title">{d.title}</h3>
     <p class="tool__summary">{d.summary}</p>
     {d.outcome && <p class="tool__outcome">{d.outcome}</p>}
-    {d.stack && <p class="tool__stack mono">{d.stack.join(' · ')}</p>}
+    {d.stack && <p class="tool__stack mono"><Terms text={d.stack.join(' · ')} /></p>}
     <a class="btn tool__btn" href={projectHref(project)}>Case study</a>
   </div>
 </article>

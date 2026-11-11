@@ -7,7 +7,7 @@ featured: false
 order: 2
 period: { start: "2026-01", end: "2026-05" }
 status: complete
-summary: An 802.11p-style OFDM link I designed and wrote in MATLAB and ran over two software-defined radios, carrying two cars' safety messages to a time-to-collision brake warning.
+summary: A vehicle-to-vehicle (V2V) collision warning over an 802.11p-style orthogonal frequency-division multiplexing (OFDM) link I designed and wrote in MATLAB and ran on two software-defined radios.
 outcome: Five over-the-air runs, every one decoded with zero bit errors, ending in the brake warning.
 role: Final project for EE 4003 with lab partner Jason Phan. I designed and wrote the transmitter, receiver and warning logic, and ran all five hardware tests.
 team: Jason Phan, lab partner
@@ -23,15 +23,16 @@ metrics:
   - { label: Time to collision in the test scenario, value: "4.0 s" }
 demo: ofdm
 threads: [hardware, signals] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (summary, Context, receiver steps, hardware), Nov 10.
 ---
 
 ## Context
 
-Cars that talk to each other can warn a driver before a crash they can't see yet. In real systems each car broadcasts a Basic Safety Message (BSM), in the style of SAE J2735, about 10 times a second: who it is, how fast it's going, and where it is. The physical layer here is modeled on IEEE 802.11p: a 10 MHz channel, OFDM (the data split across many narrow subcarriers sent at once), BPSK and a rate 1/2 convolutional code.
+Cars that talk to each other can warn a driver before a crash they can't see yet. In real systems each car broadcasts a Basic Safety Message (BSM), in the style of the SAE International standard J2735, about 10 times a second: who it is, how fast it's going, and where it is. The physical layer here is modeled on the Institute of Electrical and Electronics Engineers (IEEE) 802.11p standard: a 10 MHz channel, OFDM (the data split across many narrow subcarriers sent at once), binary phase-shift keying (BPSK) and a rate 1/2 convolutional code.
 
 ## My role
 
-This was my final project for EE 4003, Communications Engineering Design, with my lab partner Jason Phan. We wrote the report together. I designed and wrote the transmitter, the receiver and the warning logic in MATLAB, and ran all five hardware tests. The sync chain extended my Lab 9 BPSK loopback; the project added OFDM channel estimation, MMSE equalization, the two-car decode and the warning logic.
+This was my final project for EE 4003, Communications Engineering Design, with my lab partner Jason Phan. We wrote the report together. I designed and wrote the transmitter, the receiver and the warning logic in MATLAB, and ran all five hardware tests. The sync chain extended my Lab 9 BPSK loopback; the project added OFDM channel estimation, minimum mean square error (MMSE) equalization, the two-car decode and the warning logic.
 
 ## Approach
 
@@ -43,7 +44,7 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 *Fig. 01 / Road scenario, Run 4.* The ground truth: what each car's message says before it goes on the air.
 
-**The frame.** Every packet is a preamble (PRE) of 63 BPSK symbols at 16 samples per symbol with root-raised-cosine pulses, a 256-symbol training sequence (TRAIN), one OFDM preamble symbol, four OFDM data symbols, and a guard of zeros. The OFDM symbols use 52 subcarriers at 156.25 kHz spacing: 48 data and 4 pilots at plus and minus 7 and 21, with a 16-sample cyclic prefix (1.6 microseconds at 10 MHz).
+**The frame.** Every packet is a preamble (PRE) of 63 BPSK symbols at 16 samples per symbol with root-raised-cosine pulses, a 256-symbol training sequence (TRAIN), one OFDM preamble symbol, four OFDM data symbols, and a guard of zeros. The OFDM symbols use 52 subcarriers at 156.25 kHz spacing: 48 data and 4 pilots at plus and minus 7 and 21, with a 16-sample cyclic prefix (CP), 1.6 microseconds at 10 MHz.
 
 **The receiver, in order.** All figures below are from Run 4: six inches apart, with a laptop lid between the radios. Their numbers are the ones in the final report.
 
@@ -59,7 +60,7 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 *Fig. 03 / Tau sweep, Run 4.* The score peaks at tau 0 for both cars.
 
-3. **CFO.** Estimate the carrier frequency offset from the PRE and spin it out. The transmitter injects a 5000 Hz offset on purpose; the estimates came back between about minus 5100 and minus 5900 Hz, the extra being the two Plutos' own oscillator error. An estimate above 200 kHz is rejected as noise.
+3. **Carrier frequency offset (CFO).** Estimate the offset from the PRE and spin it out. The transmitter injects a 5000 Hz offset on purpose; the estimates came back between about minus 5100 and minus 5900 Hz, the extra being the two Plutos' own oscillator error. An estimate above 200 kHz is rejected as noise.
 
 ![PRE constellations per car before and after CFO correction: before, the points smear around a ring; after, they collapse into two clusters. The estimates are minus 5812 Hz for Car 1 and minus 5907 Hz for Car 2.](../../assets/projects/v2v-bsm-ofdm/run4-fig4_cfo_correction.png)
 
@@ -71,13 +72,13 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 *Fig. 05 / TRAIN fit, Run 4.* The fit turns two rotated clusters into two clusters on the real axis.
 
-5. **Decision-directed PLL.** A BPSK phase-locked loop (PLL) with loop gain 0.001 and an 8-symbol burn-in tracks the residual phase on the PRE.
+5. **Decision-directed phase-locked loop (PLL).** A BPSK loop with loop gain 0.001 and an 8-symbol burn-in tracks the residual phase on the PRE.
 
 ![PRE constellations per car before and after the phase-locked loop: before, clusters slightly off the axis; after, centered on plus and minus one.](../../assets/projects/v2v-bsm-ofdm/run4-fig6_pll.png)
 
 *Fig. 06 / Decision-directed PLL, Run 4.* The loop pulls the last of the phase error out of the preamble.
 
-6. **OFDM demod and channel estimate.** Strip the 16-sample cyclic prefix, take the FFT, and divide the received OFDM preamble by the known one, subcarrier by subcarrier, to get the channel Hk.
+6. **OFDM demod and channel estimate.** Strip the 16-sample cyclic prefix, take the fast Fourier transform (FFT), and divide the received OFDM preamble by the known one, subcarrier by subcarrier, to get the channel Hk.
 
 ![The magnitude of the channel estimate across the 48 data subcarriers for both cars, between about 0.34 and 0.40.](../../assets/projects/v2v-bsm-ofdm/run4-fig7_channel_estimate.png)
 
@@ -106,7 +107,7 @@ This was my final project for EE 4003, Communications Engineering Design, with m
 
 ## Hardware and the five runs
 
-Two ADALM-PLUTO SDRs. The center frequency is 2.9 GHz, because the Pluto cannot reach the 5.9 GHz band real V2V uses. Sample rate 10 MHz, TX gain minus 10 dB, RX gain 40 dB, and each recording is 40 frames of 8192 samples, about 32.8 ms.
+Two ADALM-PLUTO SDRs. The center frequency is 2.9 GHz, because the Pluto cannot reach the 5.9 GHz band real V2V uses. Sample rate 10 MHz, transmitter (TX) gain minus 10 decibels (dB), receiver (RX) gain 40 dB, and each recording is 40 frames of 8192 samples, about 32.8 ms.
 
 ![The transmitted OFDM packet spectrum at baseband, flat across about minus 4 to plus 4 MHz and falling off outside.](../../assets/projects/v2v-bsm-ofdm/tx-spectrum-baseband.png)
 
@@ -138,4 +139,4 @@ Five over-the-air runs, every one decoded with zero bit errors for both cars, th
 
 ## What I'd do next
 
-Append tail bits so the Viterbi decoder's terminated mode matches the encoder, move from BPSK to QPSK on the data subcarriers, and record bit error rate against SNR over the air instead of only in simulation.
+Append tail bits so the Viterbi decoder's terminated mode matches the encoder, move from BPSK to quadrature phase-shift keying (QPSK) on the data subcarriers, and record bit error rate against signal-to-noise ratio (SNR) over the air instead of only in simulation.

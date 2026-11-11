@@ -8,7 +8,7 @@ order: 8
 period: { start: "2026-04", end: "2026-09" }
 status: live
 summary: A bridal alterations studio site with interactive guides that explain bustles and hems better than words can, and inquiry forms that arrive ready to quote.
-outcome: PageSpeed Insights 100 for accessibility and SEO, inquiries that arrive ready to quote, and about 435 fields the owner edits herself.
+outcome: PageSpeed Insights 100 for accessibility and search engine optimization (SEO), inquiries that arrive ready to quote, and about 435 fields the owner edits herself.
 role: Design, build, CMS, email, testing and launch.
 keywords: ["bridal", "sewing", "alterations", "Pittsburgh", "Sanity", "Next.js", "bustle"]
 stack: [Next.js, React, TypeScript, Sanity, Tailwind CSS, Framer Motion, Resend, Playwright, Vercel]
@@ -30,6 +30,7 @@ client:
   kind: Bridal and tailoring studio, Pittsburgh, PA
   permission: true
 threads: [web] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (SVG, SEO), Nov 10.
 ---
 
 ## Context
@@ -38,7 +39,7 @@ The site had three jobs: explain bustles, timelines and fittings to brides befor
 
 ## Approach
 
-**Explain with drawings.** The bustle explorer is an animated gown drawn in SVG. Pick American, French, Austrian, ballroom or a detachable train, pick a sweep, chapel or cathedral length, then scrub or press "Bustle it" to watch the pickup points travel along gold arrows in back and side views. A matching hem explorer shows trouser breaks across shoes and leg cuts. Both have accessible names and step-by-step captions, and both hold still under reduced motion.
+**Explain with drawings.** The bustle explorer is an animated gown drawn in Scalable Vector Graphics (SVG). Pick American, French, Austrian, ballroom or a detachable train, pick a sweep, chapel or cathedral length, then scrub or press "Bustle it" to watch the pickup points travel along gold arrows in back and side views. A matching hem explorer shows trouser breaks across shoes and leg cuts. Both have accessible names and step-by-step captions, and both hold still under reduced motion.
 
 **A thread you can follow.** The process section is a hand-authored cubic SVG path. A running stitch follows the scroll with a needle leading it, and each step's dot fills as the thread passes.
 
@@ -50,7 +51,7 @@ The site had three jobs: explain bustles, timelines and fittings to brides befor
 
 ## Outcome
 
-PageSpeed Insights scores the home page 100 for accessibility and SEO. Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
+PageSpeed Insights scores the home page 100 for accessibility and search engine optimization (SEO). Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
 
 ## What I'd do next
 

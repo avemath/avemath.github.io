@@ -25,7 +25,7 @@ const schemes = [
   <div class="sig" data-signals>
     <div class="sig__note">
       <p>
-        <strong>From the JANUS standard</strong> (the NATO standard for underwater modems), as reported in public papers: the 9440 to 13600 Hz band (center 11520 Hz, 4160 Hz wide),
+        <strong>From JANUS</strong> (the NATO standard for underwater modems), as reported in public papers: the 9440 to 13600 Hz band (center 11520 Hz, 4160 Hz wide),
         13 tone pairs (26 tones, 160 Hz apart), and 6.25 ms chips (160 per second).
       </p>
       <p>
@@ -57,7 +57,8 @@ const schemes = [
     <!-- 1. FH-BFSK -->
     <section class="sig__panel" role="tabpanel" id="sig-panel-fh" aria-labelledby="sig-tab-fh" data-panel="fh">
       <p class="sig__explain">
-        Frequency-hopping BFSK sends one chip at a time. Each chip jumps to one of 13 tone pairs, then plays the low tone of the pair for a 0
+        {/* TODO(ave): check wording. */}
+        Frequency-hopping binary frequency-shift keying (FH-BFSK) sends one chip at a time. Each chip jumps to one of 13 tone pairs, then plays the low tone of the pair for a 0
         or the high tone for a 1. Click or press Enter on a column to flip its bit, and press play to hear it slowed down.
       </p>
       <p class="sig__flag"><strong>The hop order here is made up. The real order is set by the standard.</strong></p>

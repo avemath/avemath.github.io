@@ -27,7 +27,7 @@ Sound travels well in water. It works at night and in cloudy water, it needs no 
 
 ## Where it stands
 
-I haven't built anything yet. Right now I'm reviewing prior work and ASTM F2208, the standard for residential pool alarms, and planning my first bench tests.
+I haven't built anything yet. Right now I'm reviewing prior work and ASTM International's F2208, the standard for residential pool alarms, and planning my first bench tests.
 
 ## What I'll measure first
 

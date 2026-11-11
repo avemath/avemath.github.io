@@ -7,7 +7,7 @@ featured: false
 order: 9
 period: { start: "2026-10" }
 status: live
-summary: A portfolio and long-form résumé for a senior in mechanical engineering at LSU, styled like an engineering drawing, with his real CAD as a 3D model.
+summary: A portfolio and long-form résumé for a senior in mechanical engineering at LSU, styled like an engineering drawing, with a 3D model from his real computer-aided design (CAD) files.
 outcome: A portfolio drawn like an engineering sheet, with no build step and one file to edit.
 role: Design, build, content, 3D model pipeline, hosting.
 keywords: ["mechanical engineering", "portfolio", "three.js", "CAD", "dot matrix", "LSU"]
@@ -38,6 +38,7 @@ client:
   permission: true
 draft: false
 threads: [web] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (CAD), Nov 10.
 ---
 
 ## Context

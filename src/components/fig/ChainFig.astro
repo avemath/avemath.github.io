@@ -18,7 +18,7 @@ const runs = [
 ---
 
 <div class="cf" data-cf>
-  <div class="cf__plot" data-draw>
+  <div class="cf__plot" data-draw data-fig>
     <ol class="cf__chain" aria-label="Receiver stages, in signal order">
       {
         stages.map((s, i) => (
@@ -51,8 +51,11 @@ const runs = [
   <p class="fig__try"><span class="on-mouse">Hover</span><span class="on-touch">Tap</span> a stage, then step through to the brake warning.</p>
   <div class="cf__runs">
     <p class="cf__foot">
-      The view above is simulated in the browser: one packet at 5 kHz of offset and 18 dB SNR. No raw capture was kept from the radios.
-      Run 4's figures for every stage are under How it works. The five over-the-air runs, all at BER 0.0000:
+      {/* TODO(ave): check wording. */}
+      The view above is simulated in the browser: one packet with 5 kHz of carrier frequency offset (CFO) and an 18 decibel (dB)
+      signal-to-noise ratio (SNR). No raw capture was kept from the radios. The other short names are the phase-locked loop (PLL), the
+      minimum mean square error (MMSE) equalizer and the Basic Safety Message (BSM). Run 4's figures for every stage are under How it
+      works. The five over-the-air runs, all at a bit error rate (BER) of 0.0000:
     </p>
     <table class="cf__table">
       <thead>

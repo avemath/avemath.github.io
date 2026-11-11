@@ -7,7 +7,7 @@ order: 5
 period: { start: "2026-05" }
 sameMonth: 3
 status: complete
-summary: Jupyter notebooks that drive the BELLHOP ray model from Python, to show how sound bends, fades and echoes underwater and what that does to a BPSK link.
+summary: Notebooks that drive BELLHOP (a program that traces sound paths through the ocean) from Python, to show how sound bends and echoes and what that does to a binary phase-shift keying (BPSK) link.
 outcome: With no equalizer, a BPSK link through the BELLHOP channel got about 3 bits in 10 wrong even at 20 dB SNR. The echoes caused the errors, not the noise.
 role: Solo. Code, notebooks and figures.
 keywords: ["sonar", "underwater", "ocean", "acoustics", "ray tracing", "SOFAR", "multipath", "transmission loss", "Python", "Jupyter"]
@@ -36,6 +36,7 @@ metrics:
   - { label: "BER at 20 dB SNR per sample, no equalizer", value: "0.30" }
   - { label: "Extra loss at 5 kHz vs 100 Hz, 100 km", value: "39 dB" }
 threads: [signals] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (summary, WSL, V2V), Nov 10.
 ---
 
 ## Context
@@ -46,7 +47,7 @@ BELLHOP is the standard ray-tracing model for underwater sound. I wanted to see 
 
 **Two notebooks, one set of modules.** The main notebook has seven sections. It builds a sound speed profile from six presets (Munk deep ocean, shallow water, Arctic and a surface duct among them), traces rays, maps transmission loss over range and depth, lists the multipath arrivals at a receiver with their delay spread and coherence bandwidth, compares up to four saved scenarios, and runs the sonar equation to turn loss into SNR. The second notebook animates the rays as the source moves deeper, sweeps frequency from 100 Hz to 5 kHz, adds a continental shelf that slopes from 200 m to 3500 m, and runs the comms simulator. The controls are ipywidgets sliders and dropdowns, and the notebooks and the figure export share the same Python modules.
 
-**Make a Windows program read Linux paths.** I run Jupyter in WSL, but BELLHOP is a Windows .exe, and it can't open a Linux path like `/tmp/...`. One `configure()` call at the top of each notebook puts BELLHOP on the `PATH`, points the temp folder somewhere Windows can see, and patches arlpy's call to `bellhop.exe` so every path goes through `wslpath -w` first.
+**Make a Windows program read Linux paths.** I run Jupyter in Windows Subsystem for Linux (WSL), but BELLHOP is a Windows .exe, and it can't open a Linux path like `/tmp/...`. One `configure()` call at the top of each notebook puts BELLHOP on the `PATH`, points the temp folder somewhere Windows can see, and patches arlpy's call to `bellhop.exe` so every path goes through `wslpath -w` first.
 
 **Send bits through the ocean.** The comms simulator turns BELLHOP's arrivals into a complex impulse response, sends BPSK through it at complex baseband, adds noise and decides each bit by its sign. The receiver locks to the strongest path's delay and phase and has no equalizer. The same bits also go through plain noise, so the two error rates can be compared directly.
 
@@ -68,4 +69,4 @@ These spreads are long because this is an idealized model. The surface is perfec
 
 ## The connection to my V2V radio
 
-My [V2V radio link](/work/v2v-bsm-ofdm/) fights the same problems: multipath, delay spread, and a receiver that has to find the start of each packet and undo the channel. That's why it has a preamble for timing and phase and an equalizer on every subcarrier. Its cyclic prefix covers 1.6 µs of echoes. Underwater, the paths within 20 dB of the strongest arrival spread over 730 ms in the comms case, so a receiver would have to handle echoes hundreds of thousands of times longer. The BER curve that levels off at 0.30 shows what happens without equalization.
+My [vehicle-to-vehicle (V2V) radio link](/work/v2v-bsm-ofdm/) fights the same problems: multipath, delay spread, and a receiver that has to find the start of each packet and undo the channel. That's why it has a preamble for timing and phase and an equalizer on every subcarrier. Its cyclic prefix covers 1.6 µs of echoes. Underwater, the paths within 20 dB of the strongest arrival spread over 730 ms in the comms case, so a receiver would have to handle echoes hundreds of thousands of times longer. The BER curve that levels off at 0.30 shows what happens without equalization.

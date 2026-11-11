@@ -1,4 +1,5 @@
 ---
+import Terms from '@/components/Terms.astro';
 // The /work/ workbench (Concept D in docs/mockups/work-concepts-2.html): the bench from above on a
 // green cutting mat, one object per project, each a real button. Choosing one (click, tap, Enter
 // or Space) opens its detail under the bench and puts its slug in the address; arrow keys move
@@ -135,11 +136,13 @@ const order = [...placed].sort((a, b) => {
                 <span>{when(p)}</span>
                 <span>{statusLabels[d.status]}</span>
               </p>
-              {d.outcome && <p class="bd__out">{d.outcome}</p>}
-              <p class="bd__role">{d.role}</p>
+              {d.outcome && <p class="bd__out"><Terms text={d.outcome} scope={p.id} /></p>}
+              <p class="bd__role"><Terms text={d.role} scope={p.id} /></p>
               <ul class="bd__tools" aria-label="Tools">
                 {d.stack.slice(0, 6).map((t) => (
-                  <li>{t}</li>
+                  <li>
+                    <Terms text={t} scope={p.id} />
+                  </li>
                 ))}
               </ul>
               <p class="bd__links">

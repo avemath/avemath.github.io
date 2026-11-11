@@ -36,7 +36,7 @@ const picoNotes: { text: string; lines: [number, number] }[] = [
           />
           <Fragment slot="text">
             <p>
-              A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the RC receiver with hardware
+              A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the radio control (RC) receiver with hardware
               interrupts, sequences the inlet and exhaust valves, and holds a hard limit of 17 activations in firmware, of which about the
               first six push with at least 30 lbf before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust and cuts the
               receiver's power through a solid-state relay. A Pi 4B streams video over UDP on its own, so a video crash never touches the

@@ -3,10 +3,11 @@ import DemoShell from './DemoShell.astro';
 import Icon from '../Icon.astro';
 ---
 
+{/* TODO(ave): check wording of the spelled-out FFT and AGC. */}
 <DemoShell
   id="spectrum"
   title="The visualizer, ported to the web"
-  lede="This runs the firmware's signal chain in JavaScript: 128 samples at 10 kHz, Hamming window, FFT, the same 16 band edges, noise gate, AGC, smoothing, peak dots and silence detection. Watch it fall back to the idle glow when the track goes quiet."
+  lede="This runs the firmware's signal chain in JavaScript: 128 samples at 10 kHz, Hamming window, fast Fourier transform (FFT), the same 16 band edges, noise gate, automatic gain control (AGC), smoothing, peak dots and silence detection. Watch it fall back to the idle glow when the track goes quiet."
   note="The demo track is generated in your browser. Microphone audio never leaves your device; it is processed in memory and dropped."
 >
   <div class="spec" data-spectrum>

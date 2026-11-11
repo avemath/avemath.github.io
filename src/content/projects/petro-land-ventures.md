@@ -33,6 +33,7 @@ client:
   kind: Land services firm, Duncansville, PA
   permission: true
 threads: [web, land] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (SVG, ARIA, DOM, HTML), Nov 10.
 ---
 
 ## Context
@@ -47,9 +48,9 @@ Those two visitors want completely different things. I also do contract land wor
 
 **Show the work.** A sample work page walks through fictional versions of real deliverables (an ownership report, a runsheet, a lease acquisition report, an ownership tree) with numbered reader's notes. Clients can judge the quality before they pick up the phone.
 
-**A map that respects the keyboard.** The coverage map is hand-built SVG. A state can belong to more than one basin, the basin tabs are a proper ARIA tablist with arrow, Home and End keys, and each state is a focusable button.
+**A map that respects the keyboard.** The coverage map is hand-built Scalable Vector Graphics (SVG). A state can belong to more than one basin, the basin tabs are a proper Accessible Rich Internet Applications (ARIA) tablist with arrow, Home and End keys, and each state is a focusable button.
 
-**Details that don't show.** Scroll reveals stagger by visual row so a grid animates left to right whatever the DOM order, and the hiding class is only added by JavaScript so no-JS visitors still get the whole page. Count-up stats keep the final number in the HTML and hide the animation from screen readers. Photos are washed and compressed at build time from 6 MB of originals down to about 160 KB.
+**Details that don't show.** Scroll reveals stagger by visual row so a grid animates left to right whatever the Document Object Model (DOM) order, and the hiding class is only added by JavaScript so no-JS visitors still get the whole page. Count-up stats keep the final number in the HyperText Markup Language (HTML) and hide the animation from screen readers. Photos are washed and compressed at build time from 6 MB of originals down to about 160 KB.
 
 **Owner-editable.** Sveltia CMS sits at /studio behind GitHub sign-in through a small Cloudflare Worker. Saving rebuilds the site in a minute or two, and I wrote a plain-English editing guide for every page. Sections hide themselves when their content is empty, so nothing ever shows up half-finished.
 

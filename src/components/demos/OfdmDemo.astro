@@ -12,10 +12,11 @@ const stages = [
 <DemoShell
   id="ofdm"
   title="Clean up a received packet, one stage at a time"
-  lede="Add a carrier frequency offset and noise, then switch on each receiver stage in order and watch the constellations snap into place. Left: the single-carrier sync symbols. Right: the 48 data subcarriers of the OFDM payload after a three-path channel."
-  note="A simplified browser model of the MATLAB receiver, not the original code. It uses the same frame numbers (10 MHz, 16 samples per symbol, 64-point FFT, CP 16, 48 data and 4 pilot subcarriers) and the same channel delays (0, 100 and 250 ns at 0, −5 and −9 dB). The FFT window starts three samples into the cyclic prefix, a common choice that the channel estimate absorbs. The raw BER is counted before Viterbi decoding."
+  lede="Add a carrier frequency offset (CFO) and noise, set as a signal-to-noise ratio (SNR), then switch on each receiver stage in order and watch the constellations snap into place. Left: the single-carrier sync symbols. Right: the 48 data subcarriers of the OFDM payload after a three-path channel."
+  note="A simplified browser model of the MATLAB receiver, not the original code. It uses the same frame numbers (10 MHz, 16 samples per symbol, a 64-point fast Fourier transform (FFT), a 16-sample cyclic prefix (CP), 48 data and 4 pilot subcarriers) and the same channel delays (0, 100 and 250 ns at 0, −5 and −9 decibels (dB)). The FFT window starts three samples into the cyclic prefix, a common choice that the channel estimate absorbs. The raw bit error rate (BER) is counted before Viterbi decoding."
 >
-  <div class="ofdm" data-ofdm>
+  {/* TODO(ave): check wording of the spelled-out terms in the lede and note. */}
+  <div class="ofdm" data-ofdm data-fig>
     <div class="ofdm__controls">
       <div class="slider">
         <div class="slider__top"><label for="ofdm-cfo">Carrier offset</label><output class="mono" for="ofdm-cfo" data-out="cfo">5.0 kHz</output></div>

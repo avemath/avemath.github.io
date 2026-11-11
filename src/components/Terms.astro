@@ -1,0 +1,35 @@
+---
+// Text with its acronyms explained on demand: the first time each glossary term appears on the page,
+// it becomes a <Term>; later uses stay plain. For tight places that render data as text (tool
+// chips, the résumé, labels). Body text spells terms out instead (see src/data/glossary.json).
+import glossary from '@/data/glossary.json';
+import Term from './Term.astro';
+
+interface Props {
+  text: string;
+  /** Count "first use" within this group instead of the whole page: for panels shown one at a time
+   * (the workbench's project details), so each panel explains its own terms. */
+  scope?: string;
+}
+const { text, scope } = Astro.props;
+const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const re = new RegExp(`(?<![\\w-])(${glossary.terms.map((g) => esc(g.term)).sort((a, b) => b.length - a.length).join('|')})(s?)(?![\\w])`, 'g');
+// Which terms this page has already explained (shared with <Term>, per page).
+const locals = Astro.locals as Record<string, unknown>;
+const pageSeen = (locals.termsSeen ??= new Set<string>()) as Set<string>;
+const scopes = (locals.termsScopes ??= new Map<string, Set<string>>()) as Map<string, Set<string>>;
+if (scope && !scopes.has(scope)) scopes.set(scope, new Set<string>());
+const seen: Set<string> = scope ? scopes.get(scope)! : pageSeen;
+const parts: ({ t: string } | { term: string; label: string })[] = [];
+let last = 0;
+for (const m of text.matchAll(re)) {
+  if (seen.has(m[1])) continue;
+  seen.add(m[1]);
+  parts.push({ t: text.slice(last, m.index) });
+  parts.push({ term: m[1], label: m[0] });
+  last = m.index! + m[0].length;
+}
+parts.push({ t: text.slice(last) });
+---
+
+{parts.map((p) => ('term' in p ? <Term term={p.term} label={p.label} /> : p.t))}

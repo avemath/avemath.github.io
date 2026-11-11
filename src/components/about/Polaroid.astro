@@ -11,6 +11,7 @@
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import PrintArt from './PrintArt.astro';
+import Terms from '@/components/Terms.astro';
 
 interface Props {
   photo?: ImageMetadata;
@@ -52,11 +53,11 @@ const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.
       {lines?.length ? (
         <figcaption class="pol__cap pol__cap--lines">
           {lines.map((l) => (
-            <span>{l}</span>
+            <span><Terms text={l} /></span>
           ))}
         </figcaption>
       ) : (
-        <figcaption class="pol__cap">{caption}</figcaption>
+        <figcaption class="pol__cap"><Terms text={caption} /></figcaption>
       )}
     </figure>
   )

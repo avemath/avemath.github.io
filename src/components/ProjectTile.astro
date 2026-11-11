@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import Terms from '@/components/Terms.astro';
 import type { ImageMetadata } from 'astro';
 import Icon from './Icon.astro';
 import ProjectArt from './ProjectArt.astro';
@@ -87,7 +88,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
     <H class="tile__title">
       <a href={href} class="stretched">{d.title}</a>
     </H>
-    <p class="tile__summary">{size === 'md' ? (d.outcome ?? d.summary) : d.summary}</p>
+    <p class="tile__summary"><Terms text={size === 'md' ? (d.outcome ?? d.summary) : d.summary} /></p>
     {
       lead && (
         <p class="tile__metric">
@@ -96,10 +97,10 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
         </p>
       )
     }
-    {size !== 'md' && d.outcome && <p class="tile__outcome mono">→ {d.outcome}</p>}
+    {size !== 'md' && d.outcome && <p class="tile__outcome mono">→ <Terms text={d.outcome} /></p>}
 
     <ul class="tile__chips" aria-label="Built with">
-      {chips.map((c) => <li class="chip">{c}</li>)}
+      {chips.map((c) => <li class="chip"><Terms text={c} /></li>)}
     </ul>
 
     <div class="tile__links">

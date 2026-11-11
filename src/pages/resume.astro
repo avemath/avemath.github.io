@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
+import Terms from '@/components/Terms.astro';
 import experience from '@/data/experience.json';
 import skills from '@/data/skills.json';
 import site from '@/data/site.json';
@@ -53,11 +54,11 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
                 <h3 class="r-title">{e.school}</h3>
                 <span class="r-when">{e.expected ? `Expected ${formatMonth(e.end)}` : formatMonth(e.end)}</span>
               </div>
-              <p class="r-sub">{e.degree}</p>
+              <p class="r-sub"><Terms text={e.degree} /></p>
               {e.notes.length > 0 && (
                 <ul class="r-list">
                   {e.notes.map((n) => (
-                    <li>{n}</li>
+                    <li><Terms text={n} /></li>
                   ))}
                 </ul>
               )}
@@ -79,7 +80,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
               </div>
               <ul class="r-list">
                 {r.bullets.map((b) => (
-                  <li>{b}</li>
+                  <li><Terms text={b} /></li>
                 ))}
               </ul>
             </div>
@@ -101,7 +102,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
               <p class="r-sub">{p.role}</p>
               <ul class="r-list">
                 {p.bullets.map((b) => (
-                  <li>{b}</li>
+                  <li><Terms text={b} /></li>
                 ))}
               </ul>
             </div>
@@ -122,7 +123,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
               </div>
               <ul class="r-list">
                 {r.bullets.map((b) => (
-                  <li>{b}</li>
+                  <li><Terms text={b} /></li>
                 ))}
               </ul>
             </div>
@@ -137,7 +138,7 @@ const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '');
             skills.map((g) => (
               <div>
                 <dt>{g.resume}:</dt>
-                <dd>{g.items.map((item) => <span class="r-skill">{item}</span>)}</dd>
+                <dd>{g.items.map((item) => <span class="r-skill"><Terms text={item} /></span>)}</dd>
               </div>
             ))
           }

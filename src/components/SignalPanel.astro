@@ -13,13 +13,13 @@ const { empty = false } = Astro.props;
 ---
 
 <figure class="sig" data-sig data-empty={empty ? '' : undefined} aria-labelledby="sig-cap">
-  <div class="sig__screen" data-sig-screen>
+  <div class="sig__screen" data-sig-screen data-fig>
     <canvas class="sig__canvas" aria-hidden="true"></canvas>
     <div class="sig__scope" data-sig-scope tabindex="0" role="img" aria-label={empty ? 'An empty scope: no signal on any tone. Use the arrow keys to move the cursors.' : `A frequency hopping preamble: ${CHIPS} chips of ${CHIP_MS} ms, each one tone between ${F_LOW} and ${F_HIGH} Hz. Use the arrow keys to read chip by chip.`}></div>
     <span class="sig__cur sig__cur--v" data-sig-v aria-hidden="true"></span>
     <span class="sig__cur sig__cur--h" data-sig-h aria-hidden="true"></span>
     <p class="sig__read mono" data-sig-read aria-hidden="true"></p>
-    <p class="sig__cap mono" id="sig-cap">{empty ? 'No carrier, JANUS band, 2 kHz / div' : 'FH-BFSK preamble, JANUS band, 2 kHz / div'}</p>
+    <p class="sig__cap mono" id="sig-cap">{empty ? 'No carrier, 2 kHz / div' : 'FH-BFSK preamble, JANUS band, 2 kHz / div'}</p>
     <p class="sig__hint" data-sig-hint>move the mouse to read the signal</p>
     {
       !empty && (
@@ -42,8 +42,10 @@ const { empty = false } = Astro.props;
       <span class="sig__do sig__do--mouse">Move your mouse to read it.</span><span class="sig__do sig__do--touch">Tap Hear it to listen.</span>
     </span>
     <span class="sig__tech">
+      {/* TODO(ave): check wording. */}
       {DURATION_MS} ms on air, played ten times slower. The band, the {PAIRS} tone pairs and the chip length follow JANUS, the NATO
-      standard for underwater modems; the hop order is the playground's own.
+      standard for underwater modems; the scheme is frequency-hopping binary frequency-shift keying (FH-BFSK), and the hop order is
+      the playground's own.
     </span>
   </figcaption>
     )

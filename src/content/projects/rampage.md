@@ -45,6 +45,7 @@ metrics:
 demo: weapon-logic
 # TODO(ave): confirm the camera test photo (rampage-camera-test.jpg, in Video that stays current) was before the external antenna; if so, caption it as the internal-antenna baseline.
 threads: [hardware] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (ESC, TCP, FPS), Nov 10.
 ---
 
 ## Context
@@ -79,7 +80,7 @@ The team was Avery Matherne (control software and systems integration), Chris Ca
 
 **Fire in a fixed sequence.** Each strike runs six steps: the exhaust stays open for 50 ms with the plow home, the exhaust closes, a 50 ms dwell, both inlets open for 400 ms to drive the plow out to full extension, the inlets close, and the exhaust reopens so the plow vents and retracts. Firing is edge-triggered, so holding the switch fires once, not repeatedly. There's a 500 ms cooldown and a hard limit of 17 activations in firmware, of which about the first six push with at least 30 lbf before reservoir pressure drops. The team's air analysis predicted five cycles of at least 30 lbf; testing measured six.
 
-**Fail safe three ways.** The kill switch is RC channel 5 and the weapon trigger is channel 6. A kill, a lost signal (either channel quiet for more than a second) or an error forces the exhaust open and cuts power to the FlySky receiver through a solid-state relay, which puts the motor controllers into failsafe. The kill switch also blocks firing if it is already on at power-up. The drive motors connect from the receiver straight to the ESC, with no software in the path. The status LED tells the pit crew which state the board is in from across the arena.
+**Fail safe three ways.** The kill switch is RC channel 5 and the weapon trigger is channel 6. A kill, a lost signal (either channel quiet for more than a second) or an error forces the exhaust open and cuts power to the FlySky receiver through a solid-state relay, which puts the motor controllers into failsafe. The kill switch also blocks firing if it is already on at power-up. The drive motors connect from the receiver straight to the electronic speed controller (ESC), with no software in the path. The status LED tells the pit crew which state the board is in from across the arena.
 
 <figure class="case__fig case__fig--print">
 
@@ -88,7 +89,7 @@ The team was Avery Matherne (control software and systems integration), Chris Ca
 <figcaption>Switch C on channel 5 is the kill switch; switch D on channel 6 fires the plow.</figcaption>
 </figure>
 
-**Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video from a fisheye Pi camera goes over UDP instead of TCP. Each frame is JPEG-encoded, and the adaptive quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. With an external antenna the stream averaged 17.4 FPS, 11.2 FPS more than with the internal antenna. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
+**Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video from a fisheye Pi camera goes over UDP instead of Transmission Control Protocol (TCP). Each frame is JPEG-encoded, and the adaptive quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. With an external antenna the stream averaged 17.4 frames per second (FPS), 11.2 FPS more than with the internal antenna. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
 
 <figure class="case__fig">
 

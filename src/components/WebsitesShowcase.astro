@@ -1,4 +1,5 @@
 ---
+import Terms from '@/components/Terms.astro';
 // The client sites as the large alternating showcase: a big browser frame (with the phone view)
 // on one side, what the business needed, what I did and a few numbers on the other. Only sites
 // whose owner gave permission (client.permission) are shown. Because of ADAM and Grace Mae each
@@ -71,11 +72,11 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
                   </p>
                   <p class="label site__kind">{p.data.client?.kind}</p>
                   <h3 class="site__title">{p.data.title}</h3>
-                  <p class="site__summary">{p.data.summary}</p>
+                  <p class="site__summary"><Terms text={p.data.summary} /></p>
                   <div class="site__facts">
                     <dl class="site__did">
                       <dt class="label">What I did</dt>
-                      <dd>{p.data.role}</dd>
+                      <dd><Terms text={p.data.role} /></dd>
                     </dl>
                     {data && (
                       <>

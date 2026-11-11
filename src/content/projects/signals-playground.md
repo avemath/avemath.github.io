@@ -14,25 +14,26 @@ keywords: ["radio", "communications", "FH-BFSK", "frequency hopping", "JANUS", "
 stack: [TypeScript, Web Audio API, SVG, Canvas]
 demo: signals
 threads: [signals] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (Context, What's in it), Nov 10.
 ---
 
 ## Context
 
 I learn by building. I wanted to see and hear these ideas, not just read the equations, so I started making small tools while I studied. This page collects five of them and cleans them up to share.
 
-The first one was a standalone page for frequency-hopping BFSK, the modulation the JANUS underwater acoustic standard uses. The other four cover the basics underneath every link I've worked on: where symbols land in noise, how often bits flip, how a receiver finds a packet, and what echoes do.
+The first one was a standalone page for FH-BFSK, the frequency-hopping modulation the JANUS underwater acoustic standard uses. The other four cover the basics underneath every link I've worked on: where symbols land in noise, how often bits flip, how a receiver finds a packet, and what echoes do.
 
 ## What's in it
 
 **Frequency hopping.** A port of my FH-BFSK chip visualizer. Each chip hops to one of 13 tone pairs and sends the low or high tone of that pair. You can click a column to flip its bit, play one chip or the whole sequence slowed down (only when you press play), and switch between three pitch mappings, from an exaggerated gap that's easy to hear to the real 9.5 to 13.5 kHz tones.
 
-**Constellations.** BPSK, QPSK, 8-PSK and 16-QAM with the average symbol energy set to 1, and a slider for E<sub>s</sub>/N<sub>0</sub>. The noise is seeded, so the cloud grows and shrinks smoothly instead of flickering, and every symbol the receiver gets wrong turns red.
+**Constellations.** Binary phase-shift keying (BPSK), quadrature phase-shift keying (QPSK), 8-PSK (eight phases) and 16-QAM (16 points of quadrature amplitude modulation) with the average symbol energy set to 1, and a slider for E<sub>s</sub>/N<sub>0</sub>. The noise is seeded, so the cloud grows and shrinks smoothly instead of flickering, and every symbol the receiver gets wrong turns red.
 
-**Bit errors.** Theory curves for all four schemes from 0 to 20 dB, and a simulate button that sends up to a million random bits per point through noise in your browser and plots the measured error rate on top. Building this one turned up two mistakes in my old study guide: it plotted 8-PSK with E<sub>b</sub> standing in for E<sub>s</sub> and no divide by 3, and it said 16-QAM needs about 10 dB more than BPSK. It's about 4 dB more at a BER of 1e-5. A small check script now runs with every build and fails if the formulas drift: Q(1) has to come out near 0.1587, BPSK has to reach 1e-5 near 9.6 dB, and 16-QAM has to need about 4 dB more than QPSK.
+**Bit errors.** Theory curves for all four schemes from 0 to 20 decibels (dB), and a simulate button that sends up to a million random bits per point through noise in your browser and plots the measured error rate on top. Building this one turned up two mistakes in my old study guide: it plotted 8-PSK with E<sub>b</sub> standing in for E<sub>s</sub> and no divide by 3, and it said 16-QAM needs about 10 dB more than BPSK. It's about 4 dB more at a bit error rate (BER) of 1e-5. A small check script now runs with every build and fails if the formulas drift: Q(1) has to come out near 0.1587, BPSK has to reach 1e-5 near 9.6 dB, and 16-QAM has to need about 4 dB more than QPSK.
 
 **Matched filter.** A random ±1 preamble hidden at a random spot in noise, the received signal, and the correlation output with its peak. Sliders for noise and preamble length show how a longer preamble makes the peak stand out: four times the length gives four times the peak, while the noise in the output only doubles.
 
-**Multipath.** A stream of BPSK symbols through a two or three path channel, with sliders for each echo's delay and gain. Once an echo is a good part of a symbol late, it smears into the next one. That's why my [V2V receiver](/work/v2v-bsm-ofdm/) put a cyclic prefix in front of every OFDM symbol, and why FH-BFSK hops to a new tone pair on every chip.
+**Multipath.** A stream of BPSK symbols through a two or three path channel, with sliders for each echo's delay and gain. Once an echo is a good part of a symbol late, it smears into the next one. That's why my [vehicle-to-vehicle (V2V) receiver](/work/v2v-bsm-ofdm/) put a cyclic prefix in front of every orthogonal frequency-division multiplexing (OFDM) symbol, and why FH-BFSK hops to a new tone pair on every chip.
 
 ## What's real and what's simplified
 

@@ -28,6 +28,7 @@ gallery:
     caption: The microphone module with its three leads soldered on.
 demo: spectrum
 threads: [hardware, signals] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (GPIO, FFT, AGC, I2S), Nov 10.
 ---
 
 ## Context
@@ -38,7 +39,7 @@ I built two of them, one for each of my sisters. Each one scrolls that sister's 
 
 ## Approach
 
-**Three parts and one supply.** A 5 V, 10 A supply feeds the LED matrix directly, since 256 LEDs can pull up to about 5 A depending on brightness. The ESP32 runs on USB, drives the matrix data line from GPIO 5, and powers the microphone from its 3.3 V pin. All the grounds are tied together, so the data signal and the supply share one reference.
+**Three parts and one supply.** A 5 V, 10 A supply feeds the LED matrix directly, since 256 LEDs can pull up to about 5 A depending on brightness. The ESP32 runs on USB, drives the matrix data line from general-purpose input/output (GPIO) pin 5, and powers the microphone from its 3.3 V pin. All the grounds are tied together, so the data signal and the supply share one reference.
 
 <figure class="wiring">
   <div class="wiring__frame" data-hscroll="Wiring diagram">
@@ -123,7 +124,7 @@ The connections, as built:
 
 Recommended, not in the first build: a 300 to 500 Ω resistor in series on the data line, close to the matrix DIN, and a 1000 µF capacitor across the matrix 5 V and GND.
 
-**Sample, window, transform.** The ESP32 grabs 128 samples at 10 kHz from an analog microphone, removes the DC offset, applies a Hamming window and runs an FFT. Each bin is about 78 Hz wide.
+**Sample, window, transform.** The ESP32 grabs 128 samples at 10 kHz from an analog microphone, removes the DC offset, applies a Hamming window and runs a fast Fourier transform (FFT). Each bin is about 78 Hz wide.
 
 **Bands that match how we hear.** The 16 columns are built from roughly logarithmic groups of bins covering about 156 Hz to 4 kHz, so bass doesn't get one column while the treble gets twelve. A noise gate drops the electrical hiss.
 
@@ -133,7 +134,7 @@ Recommended, not in the first build: a 300 to 500 Ω resistor in series on the d
 
 **Something to look at in silence.** When it's quiet the matrix fades into a slow radial breathing glow instead of going dark. Peak dots hold for a moment and then fall, which is what makes a spectrum feel alive.
 
-**Tuned by experiment.** The code keeps the history of its own tuning in comments: sensitivity raised from 2.6 to 4.5 to pick up distant music, the AGC decay slowed from 0.03 to 0.008 for more range, the noise gate raised from 6 to 20 to filter electrical noise, since the first build has no capacitor across the matrix power.
+**Tuned by experiment.** The code keeps the history of its own tuning in comments: sensitivity raised from 2.6 to 4.5 to pick up distant music, the automatic gain control (AGC) decay slowed from 0.03 to 0.008 for more range, the noise gate raised from 6 to 20 to filter electrical noise, since the first build has no capacitor across the matrix power.
 
 ## Outcome
 
@@ -141,4 +142,4 @@ It runs on its own and handles the cases I built it for: quiet music, distant so
 
 ## What I'd do next
 
-Move sampling from a busy-wait loop to the ESP32's I2S peripheral for steadier timing. I'd also fix the thresholds so the exit level stays below the enter level at every noise level. In a quiet room the floor values already do that (enter above 25, exit below 18), but once the baseline climbs past about 13 the multipliers flip them, and the frame debounce ends up doing all the work.
+Move sampling from a busy-wait loop to the ESP32's Inter-IC Sound (I2S) peripheral for steadier timing. I'd also fix the thresholds so the exit level stays below the enter level at every noise level. In a quiet room the floor values already do that (enter above 25, exit below 18), but once the baseline climbs past about 13 the multipliers flip them, and the frame debounce ends up doing all the work.

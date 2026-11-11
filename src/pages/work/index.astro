@@ -65,6 +65,11 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
         <p class="work-sec__intro">Each line is a thread through my work. Where two lines meet, a project belongs to both.</p>
       </div>
       <div class="work-map__box"><ThreadMap projects={order} /></div>
+      {/* TODO(ave): check wording. */}
+      <p class="work-map__key">
+        Short names on the bench and the map: vehicle-to-vehicle (V2V), orthogonal frequency-division multiplexing (OFDM) and the
+        Office of Naval Research (ONR).
+      </p>
     </div>
   </section>
 
@@ -105,7 +110,7 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
             <ul class="ix__list">
               {s.projects.map((p) => (
                 <li class="ix__row">
-                  <a class="ix__name" href={projectHref(p)}>
+                  <a class="ix__name" href={projectHref(p)} data-title>
                     {p.data.title}
                   </a>
                   <span class="ix__kind">{typeLabels[p.data.type]}</span>
@@ -241,6 +246,13 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
 
   .work-map__box {
     margin-top: 1.5rem;
+  }
+
+  .work-map__key {
+    margin-top: 1rem;
+    max-width: 44rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
   }
 
   .work-sites__tools {

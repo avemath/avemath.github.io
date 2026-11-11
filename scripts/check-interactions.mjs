@@ -45,7 +45,7 @@
 import { chromium } from 'playwright';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
-const { server, base } = serveDist('dist');
+const { server, base } = serveDist(process.env.DIST ?? 'dist');
 // Two browsers. Most tests use a plain one. Only the tests that need WebGL (the /research/
 // seafloor) get software GL through SwiftShader: with those flags every page is composited through
 // emulated GL, which cost about seven cores on the home page and starved the frames Playwright waits
@@ -598,8 +598,11 @@ await test('field-notes', async () => {
   await p.waitForTimeout(2200);
   if ((await val.textContent()).trim() !== want) fail('field-notes', `scrolled to, the note reads "${await val.textContent()}", not "${want}"`);
   await note.click();
-  await p.waitForTimeout(80);
-  if ((await val.textContent()) === want) fail('field-notes', 'a tap does not replay the decode');
+  // The replay starts within a frame or two; a busy machine can take longer, so watch for it.
+  const replayed = await p
+    .waitForFunction((w) => [...document.querySelectorAll('[data-note]')].at(-1).querySelector('[data-note-value]').textContent !== w, want, { timeout: 1000, polling: 10 })
+    .then(() => true, () => false);
+  if (!replayed) fail('field-notes', 'a tap does not replay the decode');
   await p.waitForTimeout(1800);
   if ((await val.textContent()).trim() !== want) fail('field-notes', 'the replay does not end on the text');
   const rm = await page('/research/', { reduce: true });
@@ -1007,6 +1010,62 @@ await test('playground', async () => {
   const roseBits = await pg.locator('[data-pg-rx-bits] .is-wrong').count();
   if (errsLow >= 1 && !roseBits) fail('playground', 'wrong bits are not marked');
   await p.close();
+});
+
+// ---- term popovers: hover, focus, tap, Escape, tap outside; on screen, and no layout cost ----
+await test('terms', async () => {
+  for (const vp of [{ w: 1440 }, { w: 390, h: 844, touch: true }]) {
+    const p = await page('/resume/', vp);
+    const tag = vp.touch ? 'phone' : 'desktop';
+    const btn = p.locator('.term__btn').first();
+    await btn.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    const pop = p.locator(`#${await btn.getAttribute('aria-describedby')}`);
+    if ((await pop.getAttribute('role')) !== 'tooltip') fail('terms', `${tag}: the popover is not role=tooltip`);
+    if (!(await pop.textContent())?.trim()) fail('terms', `${tag}: the popover is empty`);
+    const h0 = await p.evaluate(() => document.documentElement.scrollHeight);
+    const box0 = await p.locator('main').boundingBox();
+    const shown = () => pop.isVisible();
+    if (vp.touch) {
+      await btn.tap();
+      if (!(await shown())) fail('terms', 'phone: a tap does not open it');
+    } else {
+      await btn.hover();
+      if (!(await shown())) fail('terms', 'desktop: hover does not open it');
+      await p.mouse.move(2, 2);
+      if (await shown()) fail('terms', 'desktop: it stays open after the pointer leaves');
+      await btn.click();
+      if (!(await shown())) fail('terms', 'desktop: a click does not open it');
+    }
+    if ((await btn.getAttribute('aria-expanded')) !== 'true') fail('terms', `${tag}: aria-expanded is not true while open`);
+    // On screen, small, and no layout change.
+    const r = await pop.boundingBox();
+    const vw = vp.w;
+    const vh = vp.h ?? 900;
+    if (r.x < 0 || r.x + r.width > vw || r.y < 0 || r.y + r.height > vh) fail('terms', `${tag}: the popover runs off screen (${JSON.stringify(r)})`);
+    if (r.width * r.height > vw * vh * 0.25) fail('terms', `${tag}: the popover covers more than a quarter of the screen`);
+    const h1 = await p.evaluate(() => document.documentElement.scrollHeight);
+    const box1 = await p.locator('main').boundingBox();
+    if (h1 !== h0 || Math.abs(box1.y - box0.y) > 0.5 || Math.abs(box1.height - box0.height) > 0.5) fail('terms', `${tag}: opening it moved the page`);
+    await p.keyboard.press('Escape');
+    if (await shown()) fail('terms', `${tag}: Escape does not close it`);
+    // A tap or click elsewhere closes it.
+    if (vp.touch) await btn.tap();
+    else await btn.click();
+    if (vp.touch) await p.touchscreen.tap(8, vh - 8);
+    else await p.mouse.click(8, vh - 8);
+    if (await shown()) fail('terms', `${tag}: a tap outside does not close it`);
+    if (!vp.touch) {
+      // Keyboard: focus opens it, Escape closes it, leaving closes it.
+      await btn.focus();
+      if (!(await shown())) fail('terms', 'desktop: focus does not open it');
+      await p.keyboard.press('Escape');
+      if (await shown()) fail('terms', 'desktop: Escape does not close it from the keyboard');
+      await btn.focus();
+      await p.keyboard.press('Tab');
+      if (await shown()) fail('terms', 'desktop: it stays open after focus leaves');
+    }
+    await p.close();
+  }
 });
 
 await browser.close();

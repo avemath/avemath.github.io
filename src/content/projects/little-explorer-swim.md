@@ -13,11 +13,12 @@ role: Solo. I designed the form, wrote the Apps Script, and wrote the instructor
 keywords: ["swim", "ISR", "forms", "Apps Script", "Google Sheets", "reports", "intake"]
 stack: [Google Apps Script, Google Forms, Google Sheets, Google Drive]
 threads: [family, web] # TODO(ave): confirm the thread for each project
+# TODO(ave): check wording of the spelled-out terms (ISR), Nov 10.
 ---
 
 ## Context
 
-Infant Swim Resource lessons start with a check-in on how the child ate, slept and felt that day, because it changes what's safe in the water. My dad became an ISR instructor and a Red Cross CPR instructor in 2020, after my little brother's accident. My dad's ISR business, Little Explorer Swim, tracked that on a paper weekly interview sheet. Paper gets lost, it's hard to read across weeks, and it can't be in two places at once. I built the replacement and wrote a plain-language guide so the instructor never has to touch code.
+Infant Swim Resource (ISR) lessons start with a check-in on how the child ate, slept and felt that day, because it changes what's safe in the water. My dad became an ISR instructor and a Red Cross CPR instructor in 2020, after my little brother's accident. My dad's ISR business, Little Explorer Swim, tracked that on a paper weekly interview sheet. Paper gets lost, it's hard to read across weeks, and it can't be in two places at once. I built the replacement and wrote a plain-language guide so the instructor never has to touch code.
 
 ## Approach
 
