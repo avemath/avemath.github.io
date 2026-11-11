@@ -11,7 +11,15 @@ import site from '@/data/site.json';
 import bodoniUrl from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-wght-normal.woff2?url';
 import bodoniItalicUrl from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-wght-italic.woff2?url';
 
-const fontPreloads = [bodoniUrl, bodoniItalicUrl];
+// Hanken Grotesk sets the body text, including the hero's lines (often the largest text on a phone).
+import hankenUrl from '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2?url';
+
+// A page whose first screen also uses the handwriting or the mono face asks for them too, so they
+// arrive before the first paint instead of swapping in after it (About).
+import kalamUrl from '@fontsource/kalam/files/kalam-latin-400-normal.woff2?url';
+import monoUrl from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+
+const extraFonts = { hand: kalamUrl, mono: monoUrl };
 
 interface Props {
   title?: string;
@@ -31,9 +39,12 @@ interface Props {
   page?: string;
   /** The bit girl lives on this page (home, About, Research); the footer is one of her perches. */
   bitGirl?: boolean;
+  /** Faces beyond the body and display ones that this page's first screen uses, to preload. */
+  preloadFonts?: (keyof typeof extraFonts)[];
 }
 
-const { bare = false, navLabel, section, footer = 'default', page, bitGirl = false, ...seo } = Astro.props;
+const { bare = false, navLabel, section, footer = 'default', page, bitGirl = false, preloadFonts = [], ...seo } = Astro.props;
+const fontPreloads = [hankenUrl, bodoniUrl, bodoniItalicUrl, ...preloadFonts.map((f) => extraFonts[f])];
 ---
 
 <!doctype html>

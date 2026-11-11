@@ -25,7 +25,8 @@ function anchorTexture() {
   const soon = () => {
     if (!raf) raf = requestAnimationFrame(measure);
   };
-  measure();
+  // The first measure waits for the next frame, so starting up forces no layout of its own.
+  soon();
   const ro = new ResizeObserver(soon);
   ro.observe(document.body);
   bands().forEach((b) => ro.observe(b));

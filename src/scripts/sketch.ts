@@ -23,23 +23,31 @@ function run(svg: SVGElement) {
 
 export function initSketches() {
   if (prefersReducedMotion() || !('IntersectionObserver' in window)) return;
+  // The observer's first report says where each sketch starts, so setting up reads no layout: one
+  // already on screen (and with a size) at load is left alone, one below is set pending then.
+  const seen = new WeakSet<Element>();
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
-        if (!e.isIntersecting) continue;
         const svg = e.target as SVGElement;
+        if (!seen.has(svg)) {
+          seen.add(svg);
+          const r = e.boundingClientRect;
+          if (r.width && r.top < innerHeight && r.bottom > 0) {
+            io.unobserve(svg);
+            continue;
+          }
+          svg.classList.add('sketch-pending');
+          continue;
+        }
+        if (!e.isIntersecting) continue;
         io.unobserve(svg);
         run(svg);
       }
     },
     { threshold: 0.3 },
   );
-  document.querySelectorAll<SVGElement>('[data-sketch]').forEach((svg) => {
-    const r = svg.getBoundingClientRect();
-    if (r.width && r.top < innerHeight && r.bottom > 0) return;
-    svg.classList.add('sketch-pending');
-    io.observe(svg);
-  });
+  document.querySelectorAll<SVGElement>('[data-sketch]').forEach((svg) => io.observe(svg));
   window.addEventListener('motionchange', () => {
     if (!prefersReducedMotion()) return;
     io.disconnect();

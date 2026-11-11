@@ -7,31 +7,45 @@ import { prefersReducedMotion } from './preferences';
 
 export function initDecodeHeadings() {
   if (prefersReducedMotion() || !('IntersectionObserver' in window)) return;
+  // The observer's first report for each heading says where it starts, so nothing here reads
+  // layout: a heading already on the first screen is left alone, and one below it is set up for the
+  // effect then, long before it scrolls into view.
+  const seen = new WeakSet<Element>();
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
+        const h = e.target as HTMLElement;
+        if (!seen.has(h)) {
+          seen.add(h);
+          if (e.boundingClientRect.top < innerHeight) {
+            io.unobserve(h);
+            continue;
+          }
+          prepare(h);
+          continue;
+        }
         if (!e.isIntersecting) continue;
-        io.unobserve(e.target);
-        run(e.target as HTMLElement);
+        io.unobserve(h);
+        run(h);
       }
     },
     { threshold: 0.6 },
   );
-  document.querySelectorAll<HTMLElement>('[data-decode]').forEach((h) => {
-    // Plain-text headings only, and only ones that start below the first screen.
-    if (h.children.length || h.getBoundingClientRect().top < innerHeight) return;
-    const text = h.textContent!.trim();
-    h.textContent = '';
-    const real = document.createElement('span');
-    real.className = 'dh__real';
-    real.textContent = text;
-    const fx = document.createElement('span');
-    fx.className = 'dh__fx';
-    fx.setAttribute('aria-hidden', 'true');
-    h.classList.add('dh');
-    h.append(real, fx);
-    io.observe(h);
-  });
+  // Plain-text headings only.
+  document.querySelectorAll<HTMLElement>('[data-decode]').forEach((h) => !h.children.length && io.observe(h));
+}
+
+function prepare(h: HTMLElement) {
+  const text = h.textContent!.trim();
+  h.textContent = '';
+  const real = document.createElement('span');
+  real.className = 'dh__real';
+  real.textContent = text;
+  const fx = document.createElement('span');
+  fx.className = 'dh__fx';
+  fx.setAttribute('aria-hidden', 'true');
+  h.classList.add('dh');
+  h.append(real, fx);
 }
 
 function run(h: HTMLElement) {

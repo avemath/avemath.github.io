@@ -1327,13 +1327,38 @@ html[data-motion='reduce'] [data-proj] {
    drift through the hero and the deep bands. All of it is behind the content (z-index -1),
    decorative, and transform or mask only, so it costs no layout.
    ------------------------------------------------------------------ */
+/* The offsets and the glow's position don't inherit: a script changes them on a band, and only the
+   band's own ::before and ::after (which take them with `inherit` below) restyle, not everything
+   inside the band. */
+@property --topo-x {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --topo-y {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --mx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: -999px;
+}
+
+@property --my {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: -999px;
+}
+
 .topo,
 .band-paper,
 .band-sheet {
   position: relative;
   isolation: isolate;
-  --mx: -999px;
-  --my: -999px;
 }
 
 .topo::before,
@@ -1347,6 +1372,10 @@ html[data-motion='reduce'] [data-proj] {
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  --topo-x: inherit;
+  --topo-y: inherit;
+  --mx: inherit;
+  --my: inherit;
 }
 
 .topo::before,

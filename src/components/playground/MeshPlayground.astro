@@ -345,6 +345,7 @@ const { n = 'VIII', compact = false } = Astro.props;
 </style>
 
 <script>
-  import { mountPlayground } from '../../scripts/playground';
-  document.querySelectorAll<HTMLElement>('[data-pg]').forEach(mountPlayground);
+  import { whenNear } from '../../scripts/idle';
+  // Each playground's code downloads and sets up only once it nears the screen.
+  document.querySelectorAll<HTMLElement>('[data-pg]').forEach((pg) => whenNear(pg, () => import('../../scripts/playground').then((m) => m.mountPlayground(pg))));
 </script>

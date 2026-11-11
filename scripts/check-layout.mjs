@@ -215,6 +215,8 @@ for (const scheme of ['light', 'dark']) {
     for (const path of ['/', '/about/', '/research/']) {
       await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
       await page.evaluate(() => document.fonts.ready);
+      // She arrives on the visitor's first move.
+      await page.mouse.move(4, 4);
       await page.waitForFunction(() => window.__bitGirl, null, { timeout: 5000 });
       const girl = await page.evaluate((src) => {
         const textsAt = new Function(`return (${src})()`);

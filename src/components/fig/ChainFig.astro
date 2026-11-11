@@ -281,6 +281,7 @@ const runs = [
 </style>
 
 <script>
-  import { mountChain } from '../../scripts/fig/chain';
-  document.querySelectorAll<HTMLElement>('[data-cf]').forEach(mountChain);
+  import { whenNear } from '../../scripts/idle';
+  // The receiver's code downloads only once the figure nears the screen.
+  document.querySelectorAll<HTMLElement>('[data-cf]').forEach((cf) => whenNear(cf, () => import('../../scripts/fig/chain').then((m) => m.mountChain(cf))));
 </script>

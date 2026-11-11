@@ -111,8 +111,10 @@ const first = tools[0];
 </section>
 
 <script>
-  import { initToolbox } from '../scripts/toolbox';
-  initToolbox();
+  import { whenNear } from '../scripts/idle';
+  // The dial's code downloads and sets up only once it nears the screen.
+  const radio = document.querySelector('[data-radio]');
+  if (radio) whenNear(radio, () => import('../scripts/toolbox').then((m) => m.initToolbox()));
 </script>
 
 <style>

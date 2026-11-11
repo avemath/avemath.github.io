@@ -57,11 +57,25 @@ export function initDrawIn() {
   const els = [...document.querySelectorAll<HTMLElement>('[data-draw]')];
   // A plot clipped to nothing never counts as on screen, so each one is watched through its parent.
   const plotOf = new Map<Element, HTMLElement>();
+  // The observer's first report for each plot says where it starts, so setting up reads no layout:
+  // anything already on screen at load is left alone (the first paint never has a hidden figure),
+  // and anything below is set pending then, before it can scroll into view.
+  const seen = new WeakSet<Element>();
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
-        if (!e.isIntersecting) continue;
         const el = plotOf.get(e.target)!;
+        if (!seen.has(e.target)) {
+          seen.add(e.target);
+          const r = e.boundingClientRect;
+          if (r.top < innerHeight && r.bottom > 0) {
+            io.unobserve(e.target);
+            continue;
+          }
+          el.classList.add('draw-pending');
+          continue;
+        }
+        if (!e.isIntersecting) continue;
         io.unobserve(e.target);
         el.classList.remove('draw-pending');
         el.classList.add('draw-run');
@@ -70,11 +84,8 @@ export function initDrawIn() {
     },
     { threshold: 0.25 },
   );
-  // Anything already on screen at load is left alone, so the first paint never has a hidden figure.
   for (const el of els) {
-    const r = el.getBoundingClientRect();
-    if ((r.top < innerHeight && r.bottom > 0) || !el.parentElement) continue;
-    el.classList.add('draw-pending');
+    if (!el.parentElement) continue;
     plotOf.set(el.parentElement, el);
     io.observe(el.parentElement);
   }

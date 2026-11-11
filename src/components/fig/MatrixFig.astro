@@ -115,6 +115,7 @@
 </style>
 
 <script>
-  import { mountMatrix } from '../../scripts/fig/matrix';
-  document.querySelectorAll<HTMLElement>('[data-mf]').forEach(mountMatrix);
+  import { whenNear } from '../../scripts/idle';
+  // The firmware port downloads and sets up only once the figure nears the screen.
+  document.querySelectorAll<HTMLElement>('[data-mf]').forEach((mf) => whenNear(mf, () => import('../../scripts/fig/matrix').then((m) => m.mountMatrix(mf)), '600px'));
 </script>

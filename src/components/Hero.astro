@@ -148,5 +148,7 @@ import SignalPanel from './SignalPanel.astro';
 
 <script>
   import { mountEigenrays } from '../scripts/eigenrays';
-  document.querySelectorAll<HTMLCanvasElement>('[data-eigenrays]').forEach(mountEigenrays);
+  import { whenNear } from '../scripts/idle';
+  // Set up in the first quiet moment once the plate is near the screen, after the headline paints.
+  document.querySelectorAll<HTMLCanvasElement>('[data-eigenrays]').forEach((cv) => whenNear(cv, () => mountEigenrays(cv)));
 </script>

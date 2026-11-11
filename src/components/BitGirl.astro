@@ -25,9 +25,21 @@
 
 <script>
   import { mountBitGirl } from '../scripts/bit-girl';
-  // She arrives once the page has loaded and the browser is idle, so she never competes with it.
-  const go = () => document.querySelectorAll<HTMLCanvasElement>('[data-bit-girl]').forEach(mountBitGirl);
-  const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 2000 }) : setTimeout(go, 300));
-  if (document.readyState === 'complete') idle();
-  else addEventListener('load', idle, { once: true });
+  // She arrives once the page has loaded and the visitor first scrolls, touches, moves the pointer or
+  // presses a key, in the browser's next idle moment: picking a perch measures the page's text, so a
+  // page nobody is using yet never pays for it.
+  let gone = false;
+  const go = () => {
+    if (gone) return;
+    gone = true;
+    document.querySelectorAll<HTMLCanvasElement>('[data-bit-girl]').forEach(mountBitGirl);
+  };
+  const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 600 }) : setTimeout(go, 100));
+  const engage = () => {
+    for (const ev of EVENTS) removeEventListener(ev, engage);
+    if (document.readyState === 'complete') idle();
+    else addEventListener('load', idle, { once: true });
+  };
+  const EVENTS = ['scroll', 'pointermove', 'pointerdown', 'touchstart', 'keydown', 'wheel'];
+  for (const ev of EVENTS) addEventListener(ev, engage, { passive: true });
 </script>

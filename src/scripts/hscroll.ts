@@ -31,7 +31,7 @@ export function initHScroll() {
       hint.textContent = 'Scroll sideways to see all of it.';
       el.after(hint);
     }
+    // The observer's first report sets it up, so starting up forces no layout of its own.
     ro.observe(el);
-    update(el);
   }
 }

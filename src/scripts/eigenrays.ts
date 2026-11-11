@@ -382,8 +382,21 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
   };
 
   // Trace and draw once the page has painted and the browser is idle.
-  const start = () => {
-    for (let a = -13; a <= 13.01; a += 1.3) rays.push({ a, ...trace((a * Math.PI) / 180) });
+  // The rays are traced a few at a time in idle slices, so no single task runs long; the drawing
+  // appears once all of them are done, exactly as before.
+  const angles: number[] = [];
+  for (let a = -13; a <= 13.01; a += 1.3) angles.push(a);
+  const start = (deadline?: IdleDeadline) => {
+    const until = performance.now() + Math.max(8, Math.min(30, deadline?.timeRemaining() ?? 12));
+    while (rays.length < angles.length && performance.now() < until) {
+      const a = angles[rays.length];
+      rays.push({ a, ...trace((a * Math.PI) / 180) });
+    }
+    if (rays.length < angles.length) {
+      if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 300 });
+      else setTimeout(start, 0);
+      return;
+    }
     for (let z = 0; z <= MAXZ; z += 100) ssp.push([(c(z) - 1480) / 90, z / MAXZ]);
     ready = true;
     readInks();

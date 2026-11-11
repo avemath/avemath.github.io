@@ -307,8 +307,8 @@ export function mountSignalPanel(fig: HTMLElement) {
   });
   document.addEventListener('visibilitychange', () => document.hidden && sources.length && stop());
 
+  // The observer's first report sizes and draws the panel; no separate first draw.
   new ResizeObserver(resize).observe(screen);
-  resize();
 
   // Touch screens: the preamble drifts in from the right once, slowly, and stops.
   if (!empty && matchMedia('(hover: none)').matches && !prefersReducedMotion()) {
