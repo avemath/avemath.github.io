@@ -65,6 +65,8 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
             <span data-pg-hear-label>Hear it</span>
           </button>
         )}
+        {/* TODO(ave): check wording (Nov 11: Hear it is lowered). */}
+        {bits && <p class="pg__lowered">Hear it plays the packet three octaves lower, so it isn't shrill.</p>}
         <p class="pg__sum mono" data-pg-sum aria-live="polite">“hi from Ave”, 88 bits, one 6.25 ms chip each</p>
         <a class="link pg__full" href="/work/signals-playground/#playground">Open the full playground</a>
       </div>
@@ -84,6 +86,8 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
     </label>
     <button type="submit" class="btn btn--primary" data-pg-send>Send</button>
     <button type="button" class="btn" data-pg-hear aria-pressed="false"><span data-pg-hear-label>Hear it</span></button>
+    {/* TODO(ave): check wording (Nov 11: Hear it is lowered). */}
+    <p class="pg__lowered">Hear it plays the packet three octaves lower (and so eight times slower), so it isn't shrill.</p>
   </form>
 
   <p class="pg__k">Sent bits <span class="pg__dim">(8 per character)</span></p>
@@ -262,6 +266,13 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.6rem 1.25rem;
+  }
+
+  .pg__lowered {
+    flex: 1 0 100%;
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
   }
 
   .pg__sum {

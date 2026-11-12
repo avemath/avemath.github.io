@@ -4,7 +4,7 @@
 // (seed 87), and the bits come from the same seeded generator.
 // No DOM here, so scripts/check-comms.mjs can test it.
 import { mulberry32 } from './comms.ts';
-import { DF, F_LOW, PAIRS, hopSequence, toneHz } from './fhbfsk.ts';
+import { DF, F_LOW, LISTEN_PITCH, PAIRS, hopSequence, toneHz } from './fhbfsk.ts';
 
 export const CHIPS = 32;
 export const CHIP_MS = 6.25;
@@ -37,15 +37,16 @@ export const tones = Array.from({ length: PAIRS * 2 }, (_, k) => F_LOW + (k + 0.
 // #region how:synth
 /**
  * The preamble as audio samples, starting exactly at chip 0. Each chip is a pure tone at its
- * hop frequency, with a raised-cosine ramp up and down over RAMP_MS at both ends, so the level
- * never jumps between chips and there are no clicks.
+ * hop frequency lowered by LISTEN_PITCH (three octaves, so it isn't shrill), with a raised-cosine
+ * ramp up and down over RAMP_MS at both ends, so the level never jumps between chips and there are
+ * no clicks.
  */
-export function synthesize(chips: Chip[], sampleRate: number, stretch = LISTEN_STRETCH, level = 0.18) {
+export function synthesize(chips: Chip[], sampleRate: number, stretch = LISTEN_STRETCH, level = 0.18, pitch = LISTEN_PITCH) {
   const chipLen = Math.round((CHIP_MS * stretch * sampleRate) / 1000);
   const ramp = Math.round((RAMP_MS * sampleRate) / 1000);
   const out = new Float32Array(chipLen * chips.length);
   chips.forEach((c, i) => {
-    const w = (2 * Math.PI * c.hz) / sampleRate;
+    const w = (2 * Math.PI * c.hz * pitch) / sampleRate;
     for (let n = 0; n < chipLen; n++) {
       const edge = Math.min(n, chipLen - 1 - n);
       const env = edge >= ramp ? 1 : 0.5 - 0.5 * Math.cos((Math.PI * edge) / ramp);

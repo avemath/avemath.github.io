@@ -71,7 +71,15 @@ check('Playback is 2 s long and starts at chip 0', audio.length === 2 * sr && au
 // join is no bigger than the largest step inside a steady tone.
 let maxJoin = 0;
 for (let i = 1; i < CHIPS; i++) maxJoin = Math.max(maxJoin, Math.abs(audio[i * chipLen] - audio[i * chipLen - 1]));
-const steady = 0.18 * 2 * Math.sin((Math.PI * 13600) / sr);
+const { LISTEN_PITCH } = await import('../src/lib/fhbfsk.ts');
+const steady = 0.18 * 2 * Math.sin((Math.PI * 13600 * LISTEN_PITCH) / sr);
+// Listening is lowered three octaves: count the first chip's zero crossings.
+{
+  let zc = 0;
+  for (let n = 1; n < chipLen; n++) if ((audio[n - 1] < 0) !== (audio[n] < 0)) zc++;
+  const hz = (zc / 2) / (chipLen / sr);
+  check('Playback is three octaves below the real tone', Math.abs(hz - chips[0].hz * LISTEN_PITCH) < 15 && LISTEN_PITCH === 1 / 8, `${hz.toFixed(0)} Hz for a ${chips[0].hz} Hz chip`);
+}
 check('No clicks at chip joins', maxJoin < 1e-3 && maxJoin < steady, `largest join step ${maxJoin.toExponential(2)}`);
 
 // The mesh playground's link (src/lib/fhbfsk.ts): text to bits and back, a clean channel decodes

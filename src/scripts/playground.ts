@@ -7,7 +7,7 @@
 // reaches the far side. Wrong bits and characters are marked. Clicking or tapping the mesh drops a
 // ping. Hear it plays the exact transmitted waveform. One rAF loop, only while something moves and
 // the mesh is on screen; with reduced motion nothing animates and the result shows at once.
-import { bitsToText, CHIP_S, C_WATER, channel, demodulate, FS, modulate, spectrogram, textToBits } from '../lib/fhbfsk';
+import { bitsToText, CHIP_S, C_WATER, channel, demodulate, FS, LISTEN_PITCH, modulate, spectrogram, textToBits } from '../lib/fhbfsk';
 import { NU, NV, projector, rippleFreq, swell } from '../lib/mesh';
 import { token as readToken } from '../lib/tokens-client';
 import { prefersReducedMotion } from './preferences';
@@ -433,13 +433,15 @@ export function mountPlayground(root: HTMLElement) {
     buf.copyToChannel(data, 0);
     src = ctx.createBufferSource();
     src.buffer = buf;
+    // Three octaves lower (and so eight times slower), so it isn't shrill.
+    src.playbackRate.value = LISTEN_PITCH;
     src.connect(ctx.destination);
     src.onended = () => mine === playId && stopAudio();
     src.start(ctx.currentTime + 0.05);
     hear.disabled = false;
     hear.setAttribute('aria-pressed', 'true');
     hearLabel.textContent = 'Stop';
-    live.textContent = `Playing the packet: ${run.bits.length} chips, ${(run.bits.length * CHIP_S).toFixed(2)} s.`;
+    live.textContent = `Playing the packet three octaves lower: ${run.bits.length} chips, ${((run.bits.length * CHIP_S) / LISTEN_PITCH).toFixed(1)} s.`;
   });
   document.addEventListener('visibilitychange', () => document.hidden && src && stopAudio());
 
