@@ -662,6 +662,11 @@
   stroke-width: 2;
 }
 
+.dw__svg .s--echo {
+  stroke: var(--rose);
+  stroke-width: 2;
+}
+
 .dw__svg .s--soft {
   stroke: var(--line-strong);
 }

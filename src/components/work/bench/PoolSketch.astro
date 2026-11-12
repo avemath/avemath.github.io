@@ -1,7 +1,8 @@
 ---
-// The pool alarm as a sketch on graph paper: a pool, ripples in the water, the sensor on the wall,
-// and a note in Kalam: drowning is usually silent, which is the whole point of the project, so the
-// alarm can't wait for a splash.
+// The pool alarm as a sketch on graph paper: a pool, the alarm on the wall, sound rippling out from
+// the alarm into the water (kept inside the pool), and a note in Kalam: drowning is usually silent,
+// which is the whole point of the project, so the alarm sends its own sound instead of waiting for
+// one.
 import { moveTo, type BenchSpot } from '@/lib/bench';
 const { spot } = Astro.props as { spot: BenchSpot };
 ---
@@ -9,9 +10,10 @@ const { spot } = Astro.props as { spot: BenchSpot };
 <g transform={moveTo(spot, 616, 524)}>
   <g transform="translate(-44 0)">
     <rect class="ln graph" x="662" y="528" width="132" height="148" rx="2" transform="rotate(-4 728 600)" />
+    <clipPath id="bench-pool-water"><rect x="684" y="556" width="88" height="58" rx="18" /></clipPath>
     <rect class="water pool" x="684" y="556" width="88" height="58" rx="18" />
-    <g data-pool>{[0, 1].map((i) => <circle class="ripple" cx="714" cy="584" r={10 + i * 10} style={`opacity:${(0.6 - i * 0.25).toFixed(2)}`} />)}</g>
-    <circle class="listener" cx="758" cy="600" r="4" />
+    <g data-pool clip-path="url(#bench-pool-water)">{[0, 1].map((i) => <circle class="ripple" cx="766" cy="585" r={10 + i * 10} style={`opacity:${(0.6 - i * 0.25).toFixed(2)}`} />)}</g>
+    <circle class="listener" cx="766" cy="585" r="4" />
     <text class="hw hw--sm" x="674" y="640"><tspan x="674">drowning is</tspan><tspan x="674" dy="15">usually silent</tspan></text>
   </g>
 </g>

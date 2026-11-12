@@ -1,28 +1,47 @@
 ---
-// The pool alarm idea as a moving cross-section: a swimmer crosses the pool at the surface, and
-// every kick sends sound spreading through the water toward a listener on the wall. A concept
-// drawing, not results: nothing here is measured. Animates only while on screen; with reduced
-// motion it is one still frame.
+// The pool alarm idea as a moving cross-section: an alarm on the pool wall, under the water line,
+// sends a sound pulse out through the water every 2.5 s. A child upright in the water, arms out near
+// the surface, bobs slowly in place (head just above the water line, then just below, on a 3 s
+// cycle) and makes no sound. When a pulse reaches the child it reflects, and the echo travels back
+// to the alarm, which blinks when it arrives. The timing is the geometry: both waves spread at one
+// speed, and each echo starts the moment its pulse's radius reaches the child's current position.
+// A concept drawing, not results: nothing here is measured. Animates only while on screen and with
+// the tab visible; with reduced motion it is one still frame (a pulse reaching the child, an echo
+// on its way back).
 ---
 
 <div class="pp" data-pp>
-  <svg viewBox="0 0 640 260" class="pp__svg" role="img" aria-label="Concept drawing, not results: a pool seen from the side. A swimmer moves along the surface and sound spreads out through the water in rings toward a listener mounted on the pool wall.">
+  <svg
+    viewBox="0 0 640 260"
+    class="pp__svg"
+    role="img"
+    aria-label="Concept drawing, not results: a pool seen from the side. An alarm on the pool wall, below the water line, sends a sound pulse through the water. The pulse reflects off a child upright in the water near the surface, and the echo travels back to the alarm."
+  >
     <defs>
       <clipPath id="pp-water"><path d="M40 70 H600 V210 Q600 226 584 226 H56 Q40 226 40 210 Z" /></clipPath>
     </defs>
     <path class="pp__pool" d="M40 40 V210 Q40 226 56 226 H584 Q600 226 600 210 V40" />
     <path class="pp__water" d="M40 70 H600 V210 Q600 226 584 226 H56 Q40 226 40 210 Z" />
+    <g clip-path="url(#pp-water)">
+      <g data-pp-pulses></g>
+      <g data-pp-echoes></g>
+    </g>
     <path class="pp__line" d="M40 70 H600" />
-    <g clip-path="url(#pp-water)" data-pp-rings></g>
-    <g class="pp__swimmer" data-pp-swimmer>
-      <circle cx="0" cy="-6" r="7" />
-      <path d="M-4 0 L-30 4 M-12 1 L-24 -8 M2 -2 L18 -10" />
+    <!-- The child: upright, arms out to the sides near the surface; only bobs up and down. -->
+    <g class="pp__kid" data-pp-kid transform="translate(300 70)">
+      <circle cx="0" cy="-10" r="8" />
+      <path d="M0 -2 V30 M0 6 L-20 2 M0 6 L20 2 M0 30 L-7 50 M0 30 L7 50" />
     </g>
-    <g class="pp__mic">
-      <rect x="586" y="150" width="10" height="22" rx="2" />
-      <path d="M586 161 H570" />
+    <!-- The alarm: a small device on the right wall, below the water line, with a light that blinks
+         when an echo comes home. -->
+    <g class="pp__alarm" data-pp-alarm>
+      <circle class="pp__glow" cx="592" cy="156" r="9" />
+      <rect x="586" y="148" width="12" height="26" rx="2" />
+      <circle class="pp__led" cx="592" cy="156" r="3" />
     </g>
-    <text class="pp__t" x="586" y="196" text-anchor="end">listener on the wall</text>
+    <text class="pp__t" x="592" y="196" text-anchor="end">alarm</text>
+    <text class="pp__t pp__t--pulse" x="468" y="112" text-anchor="middle">sound pulse</text>
+    <text class="pp__t pp__t--echo" x="440" y="212" text-anchor="middle">echo</text>
     <text class="pp__t" x="48" y="60">water line</text>
     <text class="pp__badge" x="592" y="30" text-anchor="end">concept drawing, not results</text>
   </svg>
@@ -57,28 +76,61 @@
     stroke-width: 2;
   }
 
-  .pp__swimmer circle {
+  .pp__svg :global(.pp__ring--echo) {
+    stroke: var(--rose);
+  }
+
+  .pp__kid circle {
     fill: var(--surface);
     stroke: var(--text);
     stroke-width: 2;
   }
 
-  .pp__swimmer path,
-  .pp__mic path {
+  .pp__kid path {
     fill: none;
     stroke: var(--text);
     stroke-width: 2;
     stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
-  .pp__mic rect {
+  .pp__alarm rect {
+    fill: var(--surface);
+    stroke: var(--text);
+    stroke-width: 2;
+  }
+
+  .pp__led {
+    fill: var(--muted);
+    transition: fill 0.12s;
+  }
+
+  .pp__glow {
     fill: var(--rose);
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+
+  .pp__alarm[data-blink] .pp__led {
+    fill: var(--rose);
+  }
+
+  .pp__alarm[data-blink] .pp__glow {
+    opacity: 0.35;
   }
 
   .pp__t {
     font-family: var(--font-mono);
     font-size: 14px;
     fill: var(--muted);
+  }
+
+  .pp__t--pulse {
+    fill: var(--accent-ink);
+  }
+
+  .pp__t--echo {
+    fill: var(--rose-ink);
   }
 
   .pp__badge {
@@ -93,64 +145,148 @@
 
   document.querySelectorAll<HTMLElement>('[data-pp]').forEach((root) => {
     const svg = root.querySelector('svg')!;
-    const rings = root.querySelector<SVGGElement>('[data-pp-rings]')!;
-    const swimmer = root.querySelector<SVGGElement>('[data-pp-swimmer]')!;
+    const pulsesG = root.querySelector<SVGGElement>('[data-pp-pulses]')!;
+    const echoesG = root.querySelector<SVGGElement>('[data-pp-echoes]')!;
+    const kid = root.querySelector<SVGGElement>('[data-pp-kid]')!;
+    const alarm = root.querySelector<SVGGElement>('[data-pp-alarm]')!;
     const NS = 'http://www.w3.org/2000/svg';
-    // A ring is born at the swimmer every 0.7 s and spreads at a steady speed while fading.
-    let born: { x: number; t: number; el: SVGCircleElement }[] = [];
-    const swimAt = (t: number) => 120 + (Math.sin(t * 0.35) * 0.5 + 0.5) * 360;
-    const draw = (t: number) => {
-      const x = swimAt(t);
-      swimmer.setAttribute('transform', `translate(${x.toFixed(1)} 72)${Math.cos(t * 0.35) < 0 ? ' scale(-1 1)' : ''}`);
-      if (!born.length || t - born[born.length - 1].t > 0.7) {
-        const el = document.createElementNS(NS, 'circle');
-        el.setAttribute('class', 'pp__ring');
-        rings.append(el);
-        born.push({ x, t, el });
+
+    // Geometry, in drawing units. The alarm's face is where sound leaves and arrives.
+    const E = { x: 586, y: 161 };
+    const KID_X = 300;
+    const WATER = 70;
+    const SPEED = 200; // units per second, the same for the pulse and its echo
+    const EVERY = 2.5; // a new pulse every 2.5 s
+    const BOB = 3; // one bob every 3 s
+    const FADE_AT = 620; // a ring is gone by this radius
+    // The child's head sits at the water line, rising 10 units above it and dipping 10 below.
+    const bobY = (t: number) => WATER + 10 * Math.sin((2 * Math.PI * t) / BOB);
+    // Where a pulse reflects: the middle of the child's chest.
+    const chest = (t: number) => ({ x: KID_X, y: bobY(t) + 10 });
+
+    const ring = (cls: string) => {
+      const g = document.createElementNS(NS, 'g');
+      for (let k = 0; k < 2; k++) {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('class', `pp__ring${cls}`);
+        g.append(c);
       }
-      born = born.filter((r) => {
-        const age = t - r.t;
-        if (age > 3.2) {
-          r.el.remove();
+      return g;
+    };
+    // A wave is drawn as two thin arcs a little apart, fading as it spreads.
+    const place = (g: SVGGElement, x: number, y: number, r: number) => {
+      const cs = g.children;
+      for (let k = 0; k < cs.length; k++) {
+        const rr = Math.max(0, r - k * 9);
+        cs[k].setAttribute('cx', x.toFixed(1));
+        cs[k].setAttribute('cy', y.toFixed(1));
+        cs[k].setAttribute('r', rr.toFixed(1));
+        (cs[k] as SVGElement).style.opacity = rr > 0 ? String(Math.max(0, (1 - (rr / FADE_AT) ** 2) * (k ? 0.45 : 0.9))) : '0';
+      }
+    };
+
+    type Pulse = { t0: number; g: SVGGElement; echoed: boolean };
+    type Echo = { t0: number; x: number; y: number; reach: number; g: SVGGElement; home: boolean };
+    let pulses: Pulse[] = [];
+    let echoes: Echo[] = [];
+    let nextPulse = 0.4;
+    let blinkUntil = 0;
+
+    const draw = (t: number) => {
+      kid.setAttribute('transform', `translate(${KID_X} ${bobY(t).toFixed(1)})`);
+      if (t >= nextPulse) {
+        const g = ring('');
+        pulsesG.append(g);
+        pulses.push({ t0: nextPulse, g, echoed: false });
+        nextPulse += EVERY;
+      }
+      pulses = pulses.filter((p) => {
+        const r = SPEED * (t - p.t0);
+        if (r > FADE_AT + 20) {
+          p.g.remove();
           return false;
         }
-        r.el.setAttribute('cx', r.x.toFixed(1));
-        r.el.setAttribute('cy', '74');
-        r.el.setAttribute('r', (age * 90).toFixed(1));
-        r.el.style.opacity = String(Math.max(0, 0.9 - age / 3.4));
+        place(p.g, E.x, E.y, r);
+        // The echo starts the moment this pulse's front reaches the child where the child is now.
+        const c = chest(t);
+        if (!p.echoed && r >= Math.hypot(c.x - E.x, c.y - E.y)) {
+          p.echoed = true;
+          const g = ring(' pp__ring--echo');
+          echoesG.append(g);
+          echoes.push({ t0: t, x: c.x, y: c.y, reach: Math.hypot(c.x - E.x, c.y - E.y), g, home: false });
+        }
         return true;
       });
+      echoes = echoes.filter((e) => {
+        const r = SPEED * (t - e.t0);
+        if (r > FADE_AT + 20) {
+          e.g.remove();
+          return false;
+        }
+        place(e.g, e.x, e.y, r);
+        if (!e.home && r >= e.reach) {
+          e.home = true;
+          blinkUntil = t + 0.35;
+        }
+        return true;
+      });
+      alarm.toggleAttribute('data-blink', t < blinkUntil);
     };
-    // Reduced motion: one still frame with a few rings already spread.
+
+    // Reduced motion: one still frame. A pulse whose front has just reached the child, and an echo
+    // a little way back toward the alarm.
     if (prefersReducedMotion()) {
-      for (const [x, r] of [[300, 60], [300, 140], [300, 220]]) {
-        const el = document.createElementNS(NS, 'circle');
-        el.setAttribute('class', 'pp__ring');
-        el.setAttribute('cx', String(x));
-        el.setAttribute('cy', '74');
-        el.setAttribute('r', String(r));
-        el.style.opacity = String(0.9 - r / 300);
-        rings.append(el);
-      }
-      swimmer.setAttribute('transform', 'translate(300 72)');
+      const c = chest(0);
+      const d = Math.hypot(c.x - E.x, c.y - E.y);
+      const p = ring('');
+      pulsesG.append(p);
+      place(p, E.x, E.y, d);
+      const e = ring(' pp__ring--echo');
+      echoesG.append(e);
+      place(e, c.x, c.y, d * 0.45);
+      kid.setAttribute('transform', `translate(${KID_X} ${bobY(0)})`);
       return;
     }
+
     let raf = 0;
     let onScreen = false;
-    const t0 = performance.now();
+    let paused = false; // set by the frames hook below
+    // The clock only runs while it animates, so the waves pick up where they left off.
+    let clock = 0;
+    let last = 0;
     const loop = (now: number) => {
       raf = 0;
-      if (!onScreen || document.hidden) return;
-      draw((now - t0) / 1000);
+      if (!onScreen || document.hidden || paused) return;
+      clock += Math.min(0.05, (now - last) / 1000);
+      last = now;
+      draw(clock);
+      raf = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (raf || !onScreen || document.hidden) return;
+      last = performance.now();
       raf = requestAnimationFrame(loop);
     };
     new IntersectionObserver(([e]) => {
       onScreen = e.isIntersecting;
-      if (onScreen && !raf) raf = requestAnimationFrame(loop);
+      start();
     }).observe(svg);
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && onScreen && !raf) raf = requestAnimationFrame(loop);
-    });
+    document.addEventListener('visibilitychange', start);
+    // For the tests and the frames in docs/pool-ping/: draw the scene at a given time.
+    (root as HTMLElement & { __pp?: unknown }).__pp = {
+      at: (t: number) => {
+        paused = true;
+        pulses.forEach((p) => p.g.remove());
+        echoes.forEach((e) => e.g.remove());
+        pulses = [];
+        echoes = [];
+        nextPulse = 0.4;
+        blinkUntil = 0;
+        for (let s = 0; s <= t; s += 1 / 60) draw(s);
+        clock = t;
+      },
+      state: () => ({ pulses: pulses.length, echoes: echoes.length, blink: alarm.hasAttribute('data-blink') }),
+    };
     draw(0);
   });
 </script>

@@ -1,34 +1,52 @@
 ---
-// The pool alarm's idea in side view: a swimmer at the surface and the sound spreading through the
-// water, straight and off the walls and floor. It shows no sensors: how many there will be and
-// where they go is not decided, and the project stays at "senses the water with sound": it detects,
-// using underwater acoustics, since drowning is usually silent. Nothing is built yet.
-// TODO(ave): check wording of the first two legend lines (Nov 10).
+// The pool alarm's idea in side view, matching the moving drawing on /research/ (PoolPing): an alarm
+// on the pool wall, below the water line, sends sound out into the water (arcs from the alarm), and
+// the echo off a child upright at the surface comes back toward it (rose arcs from the child). The
+// dashed paths are the extra echoes off the floor and the far wall, a little later. The child makes
+// no sound: the alarm detects with underwater acoustics, by its own pulse and the echoes, since
+// drowning is usually silent. A drawing of the idea; nothing is built yet.
+// TODO(ave): check wording of the legend (Nov 11: the alarm sends sound and reads the echoes).
 import Drawing from './Drawing.astro';
 ---
 
 <Drawing
   title="Acoustic pool alarm: the idea, side view"
-  label="A backyard pool in side view with a swimmer at the surface and sound spreading through the water, directly and off the walls and floor."
+  label="A backyard pool in side view. An alarm on the pool wall, below the water line, sends sound into the water. The sound reflects off a child upright at the surface, and the echo travels back to the alarm, along with later echoes off the floor and the far wall."
   viewBox="0 0 640 250"
   legend={[
-    'The alarm senses the water with sound rather than watching it.',
-    'A swimmer at the surface. The question is whether underwater acoustics can tell someone in trouble from someone swimming.',
-    'Many echoes: in a pool every sound also arrives off the walls and the floor, a little later.',
+    'The alarm sends sound into the water and reads the echoes that come back.',
+    'A child upright at the surface, barely moving and making no noise. The question is whether the echoes can tell that apart from someone swimming.',
+    'Many echoes: in a pool, sound also comes back off the walls and the floor, a little later.',
   ]}
   note="A drawing of the idea, not a measurement. Nothing is built yet."
 >
   <path class="s" pathLength="1" d="M24 30 V222 H616 V30"></path>
   <path class="s s--soft s--dash" pathLength="1" d="M24 50 H616"></path>
   <text class="t t--muted" x="30" y="44">water line</text>
-  <rect class="s f" pathLength="1" x="306" y="40" width="22" height="40"></rect>
-  <path class="s s--hot" pathLength="1" d="M277 82 A40 40 0 0 0 357 82"></path>
-  <path class="s s--hot" pathLength="1" d="M237 82 A80 80 0 0 0 397 82"></path>
-  <path class="s s--hot" pathLength="1" d="M197 82 A120 120 0 0 0 437 82"></path>
-  <path class="s s--soft s--dash" pathLength="1" d="M317 82 L220 222 L24 196"></path>
-  <path class="s s--soft s--dash" pathLength="1" d="M317 82 L560 222 L616 190"></path>
 
-  <g class="co"><circle cx="520" cy="110" r="10.5"></circle><text x="520" y="114">1</text></g>
-  <g class="co"><circle cx="350" cy="56" r="10.5"></circle><text x="350" y="60">2</text></g>
-  <g class="co"><circle cx="220" cy="200" r="10.5"></circle><text x="220" y="204">3</text></g>
+  <!-- Extra echoes, a little later: off the floor and off the far wall, back to the alarm. -->
+  <path class="s s--soft s--dash" pathLength="1" d="M300 92 L452 222 L600 136"></path>
+  <path class="s s--soft s--dash" pathLength="1" d="M300 92 L24 168 L600 136"></path>
+
+  <!-- The sound going out from the alarm. -->
+  <path class="s s--hot" pathLength="1" d="M582.9 76.0 A50 50 0 0 0 582.9 170.0"></path>
+  <path class="s s--hot" pathLength="1" d="M528.6 53.0 A100 100 0 0 0 554.4 212.0"></path>
+  <path class="s s--hot" pathLength="1" d="M467.3 53.0 A150 150 0 0 0 479.3 212.0"></path>
+
+  <!-- The echo coming back from the child. -->
+  <path class="s s--echo" pathLength="1" d="M336.2 53.0 A40 40 0 0 1 316.9 106.3"></path>
+  <path class="s s--echo" pathLength="1" d="M378.2 53.0 A80 80 0 0 1 333.8 142.5"></path>
+  <path class="s s--echo" pathLength="1" d="M418.8 53.0 A120 120 0 0 1 350.7 178.8"></path>
+
+  <!-- The child: upright, head at the water line, arms out near the surface. -->
+  <circle class="s f" pathLength="1" cx="300" cy="44" r="8"></circle>
+  <path class="s" pathLength="1" d="M300 52 V84 M300 60 L278 56 M300 60 L322 56 M300 84 L293 104 M300 84 L307 104"></path>
+
+  <!-- The alarm on the wall. -->
+  <rect class="s f" pathLength="1" x="602" y="110" width="12" height="26" rx="2"></rect>
+  <text class="t t--mono t--muted" x="612" y="186" text-anchor="end">alarm</text>
+
+  <g class="co"><circle cx="556" cy="96" r="10.5"></circle><text x="556" y="100">1</text></g>
+  <g class="co"><circle cx="268" cy="36" r="10.5"></circle><text x="268" y="40">2</text></g>
+  <g class="co"><circle cx="452" cy="204" r="10.5"></circle><text x="452" y="208">3</text></g>
 </Drawing>

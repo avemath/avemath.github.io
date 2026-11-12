@@ -211,8 +211,10 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             <svg viewBox="0 0 320 120" class="mini__pool" aria-hidden="true">
               <path d="M30 30 H290 V100 H30 Z" />
               <path class="mini__water" d="M30 42 H290" />
+              {/* A child's head at the water line; the alarm on the wall sends sound out to it. */}
               <circle cx="160" cy="42" r="4" />
-              <path class="mini__ray" d="M142 46 A18 18 0 0 0 178 46 M126 46 A34 34 0 0 0 194 46 M110 46 A50 50 0 0 0 210 46" />
+              <rect class="mini__alarm" x="279" y="62" width="7" height="14" rx="1" />
+              <path class="mini__ray" d="M276 56.1 A16 16 0 0 0 276 83.9 M265.2 44.1 A32 32 0 0 0 265.2 95.9 M243.6 44 A48 48 0 0 0 243.6 96" />
             </svg>
           </div>
           <div class="mini__body">
@@ -388,6 +390,12 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
   .mini__pool .mini__ray {
     stroke: var(--accent);
+  }
+
+  .mini__pool .mini__alarm {
+    fill: var(--surface);
+    stroke: var(--text);
+    stroke-width: 1.25;
   }
 
   .mini__note {
