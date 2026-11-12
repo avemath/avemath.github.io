@@ -433,7 +433,7 @@ export function mountPlayground(root: HTMLElement) {
     buf.copyToChannel(data, 0);
     src = ctx.createBufferSource();
     src.buffer = buf;
-    // Three octaves lower (and so eight times slower), so it isn't shrill.
+    // The recording at an eighth of its speed: eight times slower, so three octaves lower.
     src.playbackRate.value = LISTEN_PITCH;
     src.connect(ctx.destination);
     src.onended = () => mine === playId && stopAudio();
@@ -441,7 +441,7 @@ export function mountPlayground(root: HTMLElement) {
     hear.disabled = false;
     hear.setAttribute('aria-pressed', 'true');
     hearLabel.textContent = 'Stop';
-    live.textContent = `Playing the packet three octaves lower: ${run.bits.length} chips, ${((run.bits.length * CHIP_S) / LISTEN_PITCH).toFixed(1)} s.`;
+    live.textContent = `Playing the packet eight times slower, so three octaves lower: ${run.bits.length} chips, ${((run.bits.length * CHIP_S) / LISTEN_PITCH).toFixed(1)} s.`;
   });
   document.addEventListener('visibilitychange', () => document.hidden && src && stopAudio());
 

@@ -46,9 +46,10 @@ export function hopSequence(n: number, seed: number) {
 
 /** Sample rate of every waveform here, and the JANUS chip length. */
 export const FS = 48000;
-/** Listening only: every Hear it plays the tones this much lower, three octaves (the 9.4 to 13.6 kHz
- *  band comes out at about 1.2 to 1.7 kHz), so it isn't shrill. The drawings and the link use the
- *  real band. */
+/** Listening only, an eighth: the hero panel synthesizes each tone at an eighth of its frequency
+ *  (three octaves lower; its chips are stretched ten times separately), and the playground plays its
+ *  recording at an eighth of its speed (eight times slower, so three octaves lower). The 9.4 to
+ *  13.6 kHz band comes out at about 1.2 to 1.7 kHz. The drawings and the link use the real band. */
 export const LISTEN_PITCH = 1 / 8;
 export const CHIP_S = 6.25e-3;
 export const CHIP_N = Math.round(FS * CHIP_S); // 300 samples
