@@ -3,7 +3,9 @@
 //   nav            every nav item (desktop and the phone menu) lands on the right page or section;
 //                  Projects is current on /work/, Websites at its Client sites showcase
 //   hero-labels    the eigenray plate: at 24 yaws by 5 pitches (1440 and 390), no two visible labels
-//                  overlap, none leaves the canvas or sits under a note; a drag turns it and keeps that true
+//                  overlap, none leaves the canvas or sits under a note; the note's ring sits on its
+//                  highlighted ray's turning point and its leader crosses no text; small turns keep
+//                  the same ray; a drag turns it and keeps that true
 //   signal-panel   the hero scope reads out where the mouse is; Hear it is a toggle button
 //   marquee        hovering the strip pauses it
 //   tabs           every figure card's tabs show their own view (home and the RAMpage case study)
@@ -183,6 +185,31 @@ await test('hero-labels', async () => {
             }
             for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) if (hit(on[a].box, on[b].box)) bad.push(`${on[a].key} overlaps ${on[b].key} at ${at}`);
             if (!on.length) bad.push(`no label shows at ${at}`);
+            // The note's ray: the ring sits on the highlighted ray's turning point, and the leader
+            // (straight or one bend) never crosses label or note text.
+            const pt = er.pointer();
+            if (pt) {
+              if (Math.hypot(pt.ring[0] - pt.turnAt[0], pt.ring[1] - pt.turnAt[1]) > 2) bad.push(`the ring is off its turning point at ${at}`);
+              let dmin = Infinity;
+              for (let q = 1; q < pt.line.length; q++) {
+                const [a, b] = [pt.line[q - 1], pt.line[q]];
+                const vx = b[0] - a[0], vy = b[1] - a[1];
+                const u = Math.max(0, Math.min(1, ((pt.ring[0] - a[0]) * vx + (pt.ring[1] - a[1]) * vy) / (vx * vx + vy * vy || 1)));
+                dmin = Math.min(dmin, Math.hypot(a[0] + u * vx - pt.ring[0], a[1] + u * vy - pt.ring[1]));
+              }
+              if (dmin > 2) bad.push(`the ring is ${dmin.toFixed(1)}px off the highlighted ray at ${at}`);
+              if (pt.route.length < 2 || pt.route.length > 3) bad.push(`the leader has ${pt.route.length - 2} bends at ${at}`);
+              const cross = (a, b, box) => {
+                for (let s = 0; s <= 40; s++) {
+                  const x = a[0] + ((b[0] - a[0]) * s) / 40, y = a[1] + ((b[1] - a[1]) * s) / 40;
+                  if (x > box[0] && x < box[2] && y > box[1] && y < box[3]) return true;
+                }
+                return false;
+              };
+              for (let q = 1; q < pt.route.length; q++)
+                for (const box of [...avoid, ...on.map((l) => l.box)])
+                  if (cross(pt.route[q - 1], pt.route[q], box)) bad.push(`the leader crosses text at ${at}`);
+            }
           }
           return { n, bad };
         }, i);
@@ -190,6 +217,21 @@ await test('hero-labels', async () => {
         out.push(...r.bad);
       }
       if (views < 120) fail('hero-labels', `only ${views} views sampled`);
+      // It keeps its ray: over small turns it switches only when it has to, not every frame.
+      const switches = await cv.evaluate((el) => {
+        const er = el.__er;
+        let n = 0;
+        let last = null;
+        for (let i = 0; i <= 20; i++) {
+          er.setView(-0.62 + i * 0.01, 0.32);
+          const pt = er.pointer();
+          const id = pt && `${pt.ray}/${pt.slice}/${pt.turn}`;
+          if (last && id !== last) n++;
+          last = id;
+        }
+        return n;
+      });
+      if (switches > 3) fail('hero-labels', `${w}px: the note's ray switched ${switches} times over a small turn`);
       for (const m of out.slice(0, 6)) fail('hero-labels', `${w}px: ${m}`);
       // A real drag: the view turns, the leader still points at a turning point, and the rule holds.
       const before = await cv.evaluate((el) => el.__er.labels().map((l) => l.box.join()).join('|'));
@@ -618,12 +660,21 @@ await test('field-notes', async () => {
   await settleOn(p, '[data-note] >> nth=-1');
   await p.waitForTimeout(2200);
   if ((await val.textContent()).trim() !== want) fail('field-notes', `scrolled to, the note reads "${await val.textContent()}", not "${want}"`);
-  await note.click();
+  // The note's own click, not a tap at a screen position: after other /research/ tests a positional
+  // tap sometimes missed it, which made this test flaky without the page being wrong.
+  await note.evaluate((n) => n.click());
   // The replay starts within a frame or two; a busy machine can take longer, so watch for it.
   const replayed = await p
     .waitForFunction((w) => [...document.querySelectorAll('[data-note]')].at(-1).querySelector('[data-note-value]').textContent !== w, want, { timeout: 1000, polling: 10 })
     .then(() => true, () => false);
-  if (!replayed) fail('field-notes', 'a tap does not replay the decode');
+  if (!replayed) {
+    const why = await note.evaluate((n) => {
+      const r = n.getBoundingClientRect();
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return `under the tap: ${top?.tagName}.${top?.className?.baseVal ?? top?.className}, masked ${n.dataset.masked !== undefined}, motion ${document.documentElement.dataset.motion ?? 'unset'}, box ${Math.round(r.top)}..${Math.round(r.bottom)} of ${innerHeight}`;
+    });
+    fail('field-notes', `a tap does not replay the decode (${why})`);
+  }
   await p.waitForTimeout(1800);
   if ((await val.textContent()).trim() !== want) fail('field-notes', 'the replay does not end on the text');
   const rm = await page('/research/', { reduce: true });

@@ -5,8 +5,11 @@
 // output for this case, so the rays are traced here (see docs/SOURCES.md).
 //
 // The long note ("sound bends toward the slow water") is HTML pinned to the plate's top right
-// corner, out of the 3D scene, with a thin leader line to the ray turning point nearest it, redrawn
-// as the view turns. The projected labels (depth and range ticks, the source, c(z), the axis) go
+// corner, out of the 3D scene. It points at one ray: that ray is drawn along its whole length in the
+// rose accent, a little thicker, with a small open ring exactly on one of its turning points, and a
+// leader (straight, or with one bend) runs from under the note to the ring without crossing any
+// text. As the view turns it keeps the same ray while that turning point stays in view and clear of
+// the labels; only then does it pick another (the one nearest the note), with a short crossfade. The projected labels (depth and range ticks, the source, c(z), the axis) go
 // through a layout pass every frame: by priority, a label that would overlap a higher one, either
 // note, or the canvas edge fades out over about 120 ms, and back in once it is clear.
 //
@@ -39,7 +42,7 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
   const wrap = cv.parentElement!;
   const pinned = wrap.querySelector<HTMLElement>('[data-er-pinned]');
   const notes = [...wrap.querySelectorAll<HTMLElement>('[data-er-note]')];
-  const rays: { a: number; pts: Pt[]; turns: Pt[] }[] = [];
+  const rays: { a: number; pts: Pt[]; turns: Pt[]; hl: Pt[] }[] = [];
   const ssp: Pt[] = [];
   let ready = false;
 
@@ -152,41 +155,165 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     ctx.arc(s[0], s[1], 7 * k, 0, Math.PI * 2);
     ctx.fill();
 
-    // The leader from the pinned note to the turning point nearest it, then the labels.
-    const anchor = noteAnchor();
-    if (anchor) {
-      let best: Pt | null = null;
-      let bd = Infinity;
-      for (let i = 0; i < SLICES; i++) {
-        const phi = -SPREAD / 2 + (SPREAD * i) / (SLICES - 1);
-        for (const r of rays)
-          for (const t of r.turns) {
-            const q = world(t[0], t[1], phi);
-            if (q[0] < 0 || q[1] < 0 || q[0] > W || q[1] > H) continue;
-            const d = Math.hypot(q[0] - anchor[0], q[1] - anchor[1]);
-            if (d < bd) {
-              bd = d;
-              best = q;
-            }
-          }
+    // The labels' layout comes first, so the pointer can keep clear of them; then the highlighted
+    // ray, its ring and the leader; then the labels on top.
+    const labels = layoutLabels();
+    pointAt(boxes);
+    paintLabels(labels);
+  }
+
+  // ---- The note's ray: one ray, one turning point, a ring and a leader ----
+  type Sel = { ri: number; si: number; ti: number };
+  let sel: Sel | null = null;
+  let selA = 0; // its fade, 0 to 1
+  let old: { sel: Sel; a: number } | null = null; // the one fading out
+  let selT = 0;
+  let ring: Pt | null = null;
+  let route: Pt[] = [];
+  const phiOf = (si: number) => -SPREAD / 2 + (SPREAD * si) / (SLICES - 1);
+  const turnPt = (s: Sel): Pt => {
+    const t = rays[s.ri].turns[s.ti];
+    return world(t[0], t[1], phiOf(s.si));
+  };
+  const ringR = () => Math.max(4.5 * dpr, 6 * k);
+  // Does the segment a to b pass through the box (in canvas pixels)?
+  const crosses = (a: Pt, b: Pt, box: number[]) => {
+    let t0 = 0;
+    let t1 = 1;
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    for (const [pp, q] of [
+      [-dx, a[0] - box[0]],
+      [dx, box[2] - a[0]],
+      [-dy, a[1] - box[1]],
+      [dy, box[3] - a[1]],
+    ]) {
+      if (pp === 0) {
+        if (q < 0) return false;
+        continue;
       }
-      if (best) {
-        leader = best;
-        ctx.globalAlpha = 0.85;
-        ctx.strokeStyle = ink['--rose'];
-        ctx.lineWidth = Math.max(1, 1.4 * k);
-        ctx.beginPath();
-        ctx.moveTo(anchor[0], anchor[1]);
-        ctx.lineTo(best[0], best[1]);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = ink['--rose'];
-        ctx.beginPath();
-        ctx.arc(best[0], best[1], Math.max(3, 5 * k), 0, Math.PI * 2);
-        ctx.fill();
+      const r = q / pp;
+      if (pp < 0) {
+        if (r > t1) return false;
+        if (r > t0) t0 = r;
+      } else {
+        if (r < t0) return false;
+        if (r < t1) t1 = r;
       }
     }
-    drawLabels();
+    return t0 <= t1;
+  };
+  // A clear way from the note to the ring: straight, or with one bend; null if every way crosses text.
+  const routeTo = (A: Pt, q: Pt, text: number[][]): Pt[] | null => {
+    const R = ringR();
+    for (const path of [[A, q], [A, [q[0], A[1]] as Pt, q], [A, [A[0], q[1]] as Pt, q]]) {
+      // The last leg stops at the ring's edge.
+      const last = path[path.length - 2];
+      const d = Math.hypot(q[0] - last[0], q[1] - last[1]);
+      if (d <= R + 2) continue;
+      const end: Pt = [q[0] - ((q[0] - last[0]) * R) / d, q[1] - ((q[1] - last[1]) * R) / d];
+      const pts = [...path.slice(0, -1), end];
+      let ok = true;
+      for (let i = 1; i < pts.length && ok; i++) for (const b of text) if (crosses(pts[i - 1], pts[i], b)) ok = false;
+      if (ok) return pts;
+    }
+    return null;
+  };
+  // Is this turning point usable: in view, its ring clear of the text, and a clear leader to it?
+  const usable = (s: Sel, A: Pt, text: number[][]) => {
+    const q = turnPt(s);
+    const m = 10 * k + ringR();
+    if (q[0] < m || q[1] < m || q[0] > W - m || q[1] > H - m) return null;
+    const R = ringR() + 3 * dpr;
+    if (text.some((b) => q[0] + R > b[0] && q[0] - R < b[2] && q[1] + R > b[1] && q[1] - R < b[3])) return null;
+    return routeTo(A, q, text);
+  };
+  function pointAt(labels: { box: number[]; on: boolean }[]) {
+    const A = noteAnchor();
+    ring = null;
+    route = [];
+    if (!A) return;
+    const pad = 1 * dpr;
+    const text = [...avoidBoxes(), ...labels.filter((l) => l.on).map((l) => l.box)].map((b) => [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad]);
+    let way = sel ? usable(sel, A, text) : null;
+    if (!way) {
+      // Another: the usable turning point nearest the note.
+      let best: Sel | null = null;
+      let bestWay: Pt[] | null = null;
+      let bd = Infinity;
+      for (let si = 0; si < SLICES; si++)
+        rays.forEach((r, ri) =>
+          r.turns.forEach((_, ti) => {
+            const s = { ri, si, ti };
+            const q = turnPt(s);
+            const d = Math.hypot(q[0] - A[0], q[1] - A[1]);
+            if (d >= bd) return;
+            const w = usable(s, A, text);
+            if (w) {
+              bd = d;
+              best = s;
+              bestWay = w;
+            }
+          }),
+        );
+      if (sel && best) old = { sel, a: selA };
+      if (best && (!sel || (best as Sel).ri !== sel.ri || (best as Sel).si !== sel.si || (best as Sel).ti !== sel.ti)) selA = sel ? 0 : 1;
+      sel = best;
+      way = bestWay;
+    }
+    // The crossfade: about 200 ms, or at once with reduced motion.
+    const now = performance.now();
+    const dt = selT ? Math.min(100, now - selT) : 1000;
+    selT = now;
+    const snap = prefersReducedMotion();
+    selA = snap ? 1 : Math.min(1, selA + dt / 200);
+    if (old) {
+      old.a = snap ? 0 : Math.max(0, old.a - dt / 200);
+      if (old.a <= 0) old = null;
+    }
+    if (old) paintRay(old.sel, old.a);
+    if (!sel || !way) return;
+    paintRay(sel, selA);
+    const q = turnPt(sel);
+    ring = q;
+    route = way;
+    const R = ringR();
+    ctx.globalAlpha = selA;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    // The leader.
+    ctx.strokeStyle = ink['--rose'];
+    ctx.lineWidth = Math.max(1.2 * dpr, 1.4 * k);
+    ctx.beginPath();
+    way.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+    ctx.stroke();
+    // The ring: a halo in the plate's color, then the open ring itself.
+    ctx.strokeStyle = ink['--surface'];
+    ctx.lineWidth = Math.max(2, 4.5 * k);
+    ctx.beginPath();
+    ctx.arc(q[0], q[1], R, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = ink['--rose'];
+    ctx.lineWidth = Math.max(1.5 * dpr, 2 * k);
+    ctx.beginPath();
+    ctx.arc(q[0], q[1], R, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    if ((selA < 1 || old) && !fading) fading = requestAnimationFrame(() => ((fading = 0), draw()));
+  }
+  // The highlighted ray, the whole length of it, in the rose accent and a little thicker.
+  const hlLine = (s: Sel) => rays[s.ri].hl.map((p) => world(p[0], p[1], phiOf(s.si)));
+  function paintRay(s: Sel, a: number) {
+    const pts = hlLine(s);
+    ctx.globalAlpha = 0.95 * a;
+    ctx.strokeStyle = ink['--rose'];
+    // A little thicker than the others, and never a hairline on a small plate.
+    ctx.lineWidth = Math.max(1.8 * dpr, 2.4 * k);
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+    ctx.stroke();
+    ctx.globalAlpha = 1;
   }
 
   // ---- Labels: a layout pass every frame ----
@@ -194,7 +321,6 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
   const alpha = new Map<string, number>();
   const target = new Map<string, number>();
   let boxes: { key: string; box: number[]; on: boolean }[] = [];
-  let leader: Pt | null = null;
   let lastLabelT = 0;
   let fading = 0;
   // The notes' boxes and the leader's start, in canvas pixels. They only move when the plate
@@ -217,8 +343,10 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
   };
   const avoidBoxes = () => noteBoxes.map((b) => [...b]);
   const noteAnchor = () => anchorPt;
-  function drawLabels() {
+  let labelPx = 0;
+  function layoutLabels() {
     const px = Math.round(Math.max(26 * k, 11 * dpr));
+    labelPx = px;
     ctx.font = `500 ${px}px "JetBrains Mono Variable", "JetBrains Fallback", monospace`;
     const mu = ink['--muted'];
     const sp = world(0, ZS / MAXZ, 0);
@@ -250,6 +378,10 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
       target.set(l.key, on ? 1 : 0);
       boxes.push({ key: l.key, box, on });
     }
+    return labels;
+  }
+  function paintLabels(labels: Label[]) {
+    ctx.font = `500 ${labelPx}px "JetBrains Mono Variable", "JetBrains Fallback", monospace`;
     // Fade toward the targets: about 120 ms, or at once with reduced motion.
     const now = performance.now();
     const dt = lastLabelT ? Math.min(100, now - lastLabelT) : 1000;
@@ -376,7 +508,13 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     },
     labels: () => boxes.map((b) => ({ ...b })),
     avoid: () => avoidBoxes(),
-    leader: () => leader,
+    leader: () => ring,
+    /** The note's ray: which one, the ring, the ray as drawn, the leader's points, and the turning
+     *  point worked out again from the camera, for the tests. */
+    pointer: () =>
+      sel && ring
+        ? { ray: sel.ri, slice: sel.si, turn: sel.ti, ring, line: hlLine(sel), route, turnAt: turnPt(sel), r: ringR() }
+        : null,
     size: () => [W, H],
     ready: () => ready,
   };
@@ -390,7 +528,11 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     const until = performance.now() + Math.max(8, Math.min(30, deadline?.timeRemaining() ?? 12));
     while (rays.length < angles.length && performance.now() < until) {
       const a = angles[rays.length];
-      rays.push({ a, ...trace((a * Math.PI) / 180) });
+      const tr = trace((a * Math.PI) / 180);
+      // The ray with its turning points put into the line in range order, so the highlighted ray
+      // passes exactly through the ring.
+      const hl = [...tr.pts, ...tr.turns].sort((u, v) => u[0] - v[0]);
+      rays.push({ a, ...tr, hl });
     }
     if (rays.length < angles.length) {
       if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 300 });
