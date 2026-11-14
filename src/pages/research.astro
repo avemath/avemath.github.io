@@ -364,8 +364,16 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   @media (max-width: 1023px) {
     .rpanel__tag {
       position: static;
+      min-height: 1.25rem;
       margin: -0.25rem 0 0.5rem;
+      line-height: 1.25rem;
       text-align: right;
+    }
+
+    /* The line is held before the script fills the tag in, so nothing shifts. */
+    .rpanel__tag[hidden] {
+      display: block;
+      visibility: hidden;
     }
   }
 
