@@ -282,6 +282,20 @@ const isCurrent = (key: string) =>
       display: none;
     }
   }
+
+  /* Phones: the brand and the icon buttons are 44px tap targets. */
+  @media (max-width: 767px) {
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    .icon-btn {
+      min-width: 44px;
+      height: 44px;
+    }
+  }
 </style>
 
 <script>

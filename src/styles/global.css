@@ -569,6 +569,14 @@
   cursor: pointer;
 }
 
+/* Phones: tabs and small buttons are 44px tap targets. */
+@media (max-width: 767px) {
+  .tabset [role='tab'],
+  .btn--small {
+    min-height: 44px;
+  }
+}
+
 .tabset [role='tab']:hover {
   border-color: var(--text);
 }

@@ -242,6 +242,19 @@ try {
     left: 1.1rem;
     background: var(--accent);
   }
+
+  /* Phones: every footer link is a 44px tap target. */
+  @media (max-width: 767px) {
+    .foot__link,
+    .foot__site a,
+    .foot__small a {
+      display: inline-flex;
+      align-items: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding-block: 0;
+    }
+  }
 </style>
 
 <script>
