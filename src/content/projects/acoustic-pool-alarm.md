@@ -10,9 +10,9 @@ keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "und
 stack: [Underwater acoustics, Signal processing, Prior-art review]
 threads: [signals, family]
 # TODO(ave): check wording of the summary (Nov 10: detecting with underwater acoustics, not listening).
+# NAME: working title until Avery picks one. Update the title then, and delete this comment.
+# TODO(ave): check wording of "Why sound" (Nov 10: senses the water with sound).
 ---
-
-<!-- NAME: working title until Avery picks one. Update the title then, and delete this comment. -->
 
 ## Why
 
@@ -25,8 +25,6 @@ Every option a family has today fails somewhere. Floating alarms that sense wave
 ## Why sound
 
 Sound travels well in water. It works at night and in cloudy water, it needs no camera, and it can reach under a pool cover. That's why I want an alarm that senses the water with sound instead of watching it with a camera.
-
-<!-- TODO(ave): check wording (Nov 10: senses the water with sound). -->
 
 ## Where it stands
 
