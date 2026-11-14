@@ -359,6 +359,16 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     color: var(--muted);
   }
 
+  /* Below 1024px the figure spans the panel's top, so the tag takes its own line above it instead of
+     sliding under the plate. */
+  @media (max-width: 1023px) {
+    .rpanel__tag {
+      position: static;
+      margin: -0.25rem 0 0.5rem;
+      text-align: right;
+    }
+  }
+
   /* The depth gauge: fixed at the right edge from 1400px, the same reading as the panels' tags. */
   .rgauge {
     position: fixed;
