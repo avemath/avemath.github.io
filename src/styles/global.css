@@ -560,7 +560,7 @@
 .tabset [role='tab'] {
   min-height: 2.25rem;
   padding: 0.3rem 0.7rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   background: var(--surface);
   font-size: 0.875rem;
   font-weight: 700;
