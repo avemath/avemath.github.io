@@ -52,7 +52,7 @@ Combat is a rough place for electronics: vibration, interference, flaky radio li
 
 ## My role
 
-The team was Avery Matherne (computer engineering: control software and systems integration), Chris Cashen and Nicholas Woodroffe (mechanical), Matthew van Winkle and Miles Mouton (electrical). I was the only computer engineer on the team, so the software was all mine. The mechanical design and the pneumatic analysis were the mechanical team's work. I wrote the three programs: `pico_direct.py` (weapon and safety firmware on the Pico W), `pi4_direct.py` (the video pipeline on the Pi 4B) and `video_direct.py` (the receiver on the driver's laptop), plus the scripts we used to test latency and heat.
+The team was Avery Matherne (computer engineering: control software and systems integration), Chris Cashen and Nicholas Woodroffe (mechanical), Matthew van Winkle and Miles Mouton (electrical). I was the only computer engineering student on the team, so the software was all mine. The mechanical design and the pneumatic analysis were the mechanical team's work. I wrote the three programs: `pico_direct.py` (weapon and safety firmware on the Pico W), `pi4_direct.py` (the video pipeline on the Pi 4B) and `video_direct.py` (the receiver on the driver's laptop), plus the scripts we used to test latency and heat.
 
 <figure class="case__fig">
 
