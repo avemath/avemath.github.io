@@ -53,10 +53,10 @@ export async function getWorkOrder() {
 
 /** Where each project's schematic drawing is: a hash naming its tab panel opens that tab. */
 export const drawings: Record<string, string> = {
-  rampage: '/#rampage-drawing',
+  rampage: '/work/rampage/#rampage-drawing',
   'v2v-bsm-ofdm': '/#v2v-drawing',
   'led-audio-spectrum': '/#led-drawing',
-  'signals-playground': '/#sig-drawing',
+  'signals-playground': '/#signals-drawing',
   'bellhop-sim': '/research/#r3-rays',
   'acoustic-pool-alarm': '/research/#pool-alarm',
 };
