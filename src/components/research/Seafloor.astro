@@ -15,7 +15,7 @@ const still = Object.values(stills)[0]?.default;
 ---
 
 <div class="abyss" aria-hidden="true" data-girl-ignore>
-  {still && <Image src={still} alt="" class="abyss__still" widths={[640, 960, 1280, 1600]} sizes="100vw" loading="eager" fetchpriority="high" quality={72} />}
+  {still && <Image src={still} alt="" data-overlap="layered" class="abyss__still" widths={[640, 960, 1280, 1600]} sizes="100vw" loading="eager" fetchpriority="high" quality={72} />}
   <div class="abyss__live" data-seafloor></div>
 </div>
 

@@ -19,7 +19,7 @@ const { src, mobile, alt, url, widths = [480, 680, 960, 1280], sizes = '(min-wid
 const host = url ? displayUrl(url) : '';
 ---
 
-<figure class="frame">
+<figure class="frame" data-overlap={mobile ? 'layered' : undefined}>
   <div class="frame__window" data-live-media={live ? '' : undefined}>
     <div class="frame__bar" aria-hidden="true">
       <span class="frame__dots"><i></i><i></i><i></i></span>

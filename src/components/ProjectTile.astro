@@ -34,7 +34,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
 
 <article class={`tile tile--${size} card card--lift`} style={style} data-reveal data-tags={[d.type, ...d.tags].join(' ')}>
   <div class="tile__inner">
-  <div class="tile__media">
+  <div class="tile__media" data-overlap={d.links.live ? 'layered' : undefined}>
     {
       size === 'xl' && d.cover && d.links.live ? (
         <div class="tile__stage">
