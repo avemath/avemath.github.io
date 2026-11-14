@@ -268,8 +268,8 @@ for (const scheme of ['light', 'dark']) {
     return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
   };
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
-  // Landed on #datasheet at a laptop size, the chip, the pressed pin's print and the first table
-  // row are all on screen below the header.
+  // Landed on #datasheet at a laptop size, the chip, the pressed pin's print and note, and the
+  // first table row are all on screen below the header.
   for (const [w, h] of [[1440, 900], [1280, 800]]) {
     for (const scheme of ['light', 'dark']) {
       const page = await browser.newPage({ viewport: { width: w, height: h }, colorScheme: scheme });
@@ -284,12 +284,13 @@ for (const scheme of ['light', 'dark']) {
           head: r(document.querySelector('.site-header')).bottom,
           chip: r(document.querySelector('.dip')),
           print: r(slip.querySelector('.pol, .pol-bare')),
+          note: r(slip.querySelector('.note')),
           row: r(document.querySelector('.ch tbody tr')),
           sheet: r(document.querySelector('.ds__sheet')),
           table: r(document.querySelector('.ch')),
         };
       });
-      for (const [k, b] of [['chip', v.chip], ['print', v.print], ['first table row', v.row]]) {
+      for (const [k, b] of [['chip', v.chip], ['print', v.print], ['note', v.note], ['first table row', v.row]]) {
         if (b.top < v.head - 1 || b.bottom > h + 1) fail(`${w}x${h} ${scheme} /about/#datasheet: the ${k} is not on screen (${Math.round(b.top)} to ${Math.round(b.bottom)})`);
       }
       if (v.table.top < v.sheet.top || v.table.bottom > v.sheet.bottom) fail(`${w}x${h} /about/: the table is not on the datasheet sheet`);

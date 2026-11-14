@@ -98,17 +98,7 @@ const right = pins.slice(half).reverse();
       {
         pins.map((p) => (
           <article class:list={['slip', { 'slip--two': p.extra }]} data-slip={p.i} hidden={p.i !== START} aria-labelledby={`slip-${p.i}`}>
-            {p.extra && (
-              <Polaroid
-                photo={photoAt(p.extra.photo)}
-                alt={p.extra.alt}
-                caption={p.extra.caption}
-                tilt={5}
-                sizes="(min-width: 860px) 175px, 130px"
-                class="slip__mini"
-              />
-            )}
-            <div class="slip__grid">
+            <div class="slip__prints">
               <Polaroid
                 photo={p.photo}
                 alt={p.alt}
@@ -116,18 +106,28 @@ const right = pins.slice(half).reverse();
                 caption={p.caption}
                 tilt={-2}
                 bare={!p.frame}
-                sizes="(min-width: 860px) 270px, 70vw"
+                sizes={p.extra ? '(min-width: 860px) 210px, 56vw' : '(min-width: 860px) 260px, 70vw'}
                 class:list={['slip__print', { 'slip__print--bare': !p.frame }]}
               />
-              <div class="note">
-                <span class="note__meta">
-                  PIN {p.n} {p.label}
-                </span>
-                <h3 id={`slip-${p.i}`} class="note__title">
-                  {p.title}
-                </h3>
-                <p class="note__text">{parts(p.note).map((s) => (s.href ? <a href={s.href}>{s.text}</a> : s.text))}</p>
-              </div>
+              {p.extra && (
+                <Polaroid
+                  photo={photoAt(p.extra.photo)}
+                  alt={p.extra.alt}
+                  caption={p.extra.caption}
+                  tilt={3}
+                  sizes="(min-width: 860px) 150px, 38vw"
+                  class="slip__mini"
+                />
+              )}
+            </div>
+            <div class="note">
+              <span class="note__meta">
+                PIN {p.n} {p.label}
+              </span>
+              <h3 id={`slip-${p.i}`} class="sr-only">
+                {p.title}
+              </h3>
+              <p class="note__text">{parts(p.note).map((s) => (s.href ? <a href={s.href}>{s.text}</a> : s.text))}</p>
             </div>
           </article>
         ))
@@ -165,10 +165,10 @@ const right = pins.slice(half).reverse();
 </script>
 
 <style>
-  /* One datasheet page: a single plate with a title block across the top, the chip and its print
-     tray on the left and the characteristics on the right (from 1200px; stacked below, the
-     table directly under the tray). Sized so that, landed on #datasheet at 1440 by 900 or 1280 by
-     800, the chip, the pressed pin's print and the first rows of the table all show at once. */
+  /* One datasheet page: a single plate with a title block across the top, the chip with its print
+     tray beside it (from 860px; stacked below), and the characteristics table under both. Sized so
+     that, landed on #datasheet at 1440 by 900 or 1280 by 800, the chip, the pressed pin's print and
+     note, and the first row of the table all show at once. */
   .ds {
     padding-block: 2rem 1.5rem;
     /* html's scroll-padding-top already clears the header. */
@@ -259,14 +259,8 @@ const right = pins.slice(half).reverse();
     margin-top: 1rem;
   }
 
-  @media (min-width: 1200px) {
-    .ds__body {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-      align-items: start;
-    }
-  }
-
-  /* The chip and the tray side by side from 860px (6 to 5), stacked below. */
+  /* The chip and the tray side by side from 860px, stacked below; the characteristics table under
+     both, across the sheet. */
   .ds__main {
     display: grid;
     gap: 2rem;
@@ -300,28 +294,21 @@ const right = pins.slice(half).reverse();
     }
   }
 
-  /* The room above leaves the bit girl space to stand on the chip. */
+  /* The room above leaves the bit girl space to stand on the chip. The chip keeps a set width; the
+     tray takes the rest, room for the print and its note side by side. */
   @media (min-width: 860px) {
     .ds__main {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
       align-items: start;
       padding-top: 2.25rem;
     }
-  }
 
-  /* Beside the table the chip's column is narrower: a slimmer body and shorter legs keep every pin
-     name clear of its number. */
-  @media (min-width: 1200px) {
-    .ds__body .dip__body {
-      width: 136px;
+    .ds__body {
+      gap: 1.5rem;
     }
 
-    .ds__body .pin__leg {
-      flex-basis: 22px;
-    }
-
-    .ds__body .pin {
-      gap: 7px;
+    .dip__body {
+      min-height: 416px;
     }
   }
 
@@ -351,7 +338,7 @@ const right = pins.slice(half).reverse();
     align-items: center;
     justify-content: center;
     gap: 6px;
-    width: clamp(120px, 15vw, 190px);
+    width: clamp(120px, 15vw, 150px);
     min-height: 440px;
     padding: 24px 12px;
     border-radius: 6px;
@@ -534,8 +521,6 @@ const right = pins.slice(half).reverse();
   .slip {
     position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 14px;
     transform-origin: 0 50%;
   }
 
@@ -562,43 +547,49 @@ const right = pins.slice(half).reverse();
     }
   }
 
-  /* The print, and the note taped across its bottom edge toward the right-hand corner: the note's
-     top overlaps the print a little, with the tape over the seam, like a note stuck to a photo. */
-  .slip__grid {
-    display: flex;
-    flex-direction: column;
+  /* The print (or FAIRE's two) and, beside it, the note taped to the sheet with a small gap: nothing
+     covers a photo or a caption. Where the tray is too narrow for both, the note drops under the
+     print, again with a gap. The tilts are small enough that the gaps hold. */
+  .slip {
+    flex-flow: row wrap;
     align-items: flex-start;
+    gap: 24px 22px;
+  }
+
+  .slip__prints {
+    display: flex;
+    flex: 0 1 260px;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
   }
 
   .slip :global(.slip__print) {
     position: relative;
-    width: min(240px, 84%);
+    width: 100%;
   }
 
-  /* A photo that is already a print shows whole, with no frame of its own, at the same outer width
-     as the framed prints (the .slip__print widths above apply to it too). */
+  /* FAIRE: the two prints side by side, the pirate print smaller and a little lower, a gap between
+     their frames. */
+  .slip--two .slip__prints {
+    flex-basis: 380px;
+  }
 
-  /* FAIRE: a second, larger print up top, overlapping the corner. */
+  .slip--two :global(.slip__print) {
+    width: 58%;
+  }
+
   .slip :global(.slip__mini) {
-    position: absolute;
-    top: -18px;
-    right: -6px;
-    z-index: 3;
-    width: 175px;
-  }
-
-  @media (max-width: 859px) {
-    .slip :global(.slip__mini) {
-      width: 130px;
-    }
+    width: 39%;
+    margin-top: 40px;
   }
 
   /* The note: lined paper, taped on, in Kalam. */
   .note {
     position: relative;
-    z-index: 2;
-    width: min(250px, 86%);
-    margin: -6px 0 0 auto;
+    flex: 1 1 210px;
+    max-width: 280px;
+    margin-top: 14px;
     padding: 14px 18px 16px;
     transform: rotate(2.5deg);
     background: var(--note-paper) repeating-linear-gradient(var(--note-paper) 0 27px, var(--note-line) 27px 28px);
@@ -625,16 +616,6 @@ const right = pins.slice(half).reverse();
     color: var(--note-meta);
   }
 
-  .note__title {
-    margin: 0;
-    font-family: var(--font-hand);
-    font-size: 22px;
-    font-weight: 400;
-    line-height: 28px;
-    letter-spacing: 0;
-    color: var(--note-title);
-  }
-
   .note__text {
     margin: 0;
     font-family: var(--font-hand);
@@ -654,25 +635,18 @@ const right = pins.slice(half).reverse();
     outline-offset: 2px;
   }
 
-  /* Phones: the same, with the print a little narrower than the note. */
-  @media (max-width: 859px) {
-    .note {
-      width: min(280px, 88%);
-    }
-  }
-
+  /* Phones: the note under the print, as wide as the tray allows. */
   @media (max-width: 479px) {
-    .slip--two .slip__grid {
-      padding-top: 0;
+    .note {
+      max-width: none;
     }
 
-    .slip :global(.slip__print) {
-      width: min(230px, 74%);
+    .slip__prints {
+      flex-basis: min(240px, 100%);
     }
 
-    .slip :global(.slip__mini) {
-      width: 110px;
-      right: 0;
+    .slip--two .slip__prints {
+      flex-basis: 100%;
     }
   }
 
@@ -732,23 +706,6 @@ const right = pins.slice(half).reverse();
 
   .ch tr.is-on th {
     color: var(--text);
-  }
-
-  /* Beside the chip the column is narrow: the key column narrows with it. */
-  @media (min-width: 1200px) {
-    .ch {
-      margin-top: 2.25rem;
-    }
-
-    .ch th {
-      width: 9.5rem;
-      padding-inline: 0.5rem 0.75rem;
-    }
-
-    .ch td {
-      padding-inline: 0 0.5rem;
-      font-size: 0.875rem;
-    }
   }
 
   @media (max-width: 479px) {
