@@ -1547,23 +1547,27 @@ html[data-motion='reduce'] .plankton {
 }
 
 @media (max-width: 599px) {
+  /* Phones: the figure takes the full width and the arrows sit in a row under it, so they never
+     cover an axis or a label. */
   .fv__stage {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .fv__stage > :not(.fv__nav) {
+    grid-row: 1;
+    grid-column: 1 / -1;
   }
 
   .fv__nav {
-    position: absolute;
-    top: 50%;
-    z-index: 1;
-    transform: translateY(-50%);
+    grid-row: 2;
   }
 
   .fv__nav--prev {
-    left: 4px;
+    justify-self: start;
   }
 
   .fv__nav--next {
-    right: 4px;
+    justify-self: end;
   }
 }
 
