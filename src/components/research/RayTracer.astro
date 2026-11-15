@@ -203,5 +203,8 @@ import { PROFILES } from '@/lib/raytrace';
 
 <script>
   import { mountRayTracer } from '../../scripts/raytracer';
-  document.querySelectorAll<HTMLElement>('[data-rt]').forEach(mountRayTracer);
+  import { whenNear } from '../../scripts/idle';
+  // Tracing the rays is the heaviest thing on the page, so it waits until the figure is near the
+  // screen (and the browser has a quiet moment) instead of running at load.
+  document.querySelectorAll<HTMLElement>('[data-rt]').forEach((el) => whenNear(el, () => mountRayTracer(el)));
 </script>
