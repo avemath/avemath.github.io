@@ -16,6 +16,7 @@
       "_todo": "TODO(ave): check wording (Nov 10: the ONR work began during the Integer internship)."
     },
     {
+      "_todo": "TODO(ave): confirm Integer is OK with this wording (underwater network simulation).",
       "id": "integer-intern",
       "kind": "engineering",
       "title": "Engineering Intern",

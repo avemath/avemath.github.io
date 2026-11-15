@@ -19,6 +19,7 @@ coverAlt: Three people seen from behind, walking across a sunny parking lot towa
 confidentiality: limited
 threads: [hardware, signals]
 # TODO(ave): check wording of the summary, role and My role (Nov 10: the ONR work began during the Integer internship).
+# TODO(ave): confirm Integer is OK with this wording ("underwater network simulation tools", in the summary and My role).
 ---
 
 ## Context
