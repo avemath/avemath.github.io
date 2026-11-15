@@ -921,7 +921,8 @@
   max-width: 68.75rem;
   height: auto;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--plot-paper);
+  filter: var(--plot-dim);
 }
 
 .prose p:has(> img) + p {
@@ -1515,7 +1516,8 @@ html[data-motion='reduce'] .plankton {
   display: block;
   padding: 0;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--plot-paper);
+  filter: var(--plot-dim);
   cursor: zoom-in;
 }
 
@@ -1611,7 +1613,8 @@ html[data-motion='reduce'] .plankton {
   width: 6.5rem;
   padding: 0;
   border: 2px solid transparent;
-  background: #fff;
+  background: var(--plot-paper);
+  filter: var(--plot-dim);
   cursor: pointer;
   opacity: 0.75;
 }
@@ -1674,7 +1677,8 @@ html[data-motion='reduce'] .plankton {
   width: 100%;
   max-height: calc(96vh - 9rem);
   object-fit: contain;
-  background: #fff;
+  background: var(--plot-paper);
+  filter: var(--plot-dim);
 }
 
 .fv__full-cap {

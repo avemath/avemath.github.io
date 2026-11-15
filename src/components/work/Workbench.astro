@@ -228,8 +228,18 @@ const order = [...placed].sort((a, b) => {
   }
 
   .bench .print-shadow {
-    fill: var(--ink);
+    fill: var(--print-shade);
     opacity: 0.14;
+  }
+
+  /* The site screenshots on the bench (the laptop, the prints) dim in dark mode like every other screenshot. */
+  .bench image {
+    filter: var(--plot-dim);
+  }
+
+  /* Black on the dark mat needs more weight to read as a shadow. */
+  [data-theme='dark'] .bench .print-shadow {
+    opacity: 0.45;
   }
 
   .bench .ln.screen {
