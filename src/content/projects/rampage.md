@@ -44,6 +44,7 @@ metrics:
   - { label: Max frame size, value: "65,000 B" }
 demo: weapon-logic
 threads: [hardware]
+# TODO(ave): confirm switch A (firmware and deck say SwA; the transmitter photo's screen shows channel 5 on SwC, so the alt still says switch C).
 ---
 
 ## Context
@@ -84,7 +85,7 @@ The team was Avery Matherne (computer engineering: control software and systems 
 
 ![The transmitter's aux channel screen showing channel 5 set to switch C and channel 6 set to switch D.](../../assets/projects/rampage/rampage-transmitter-channels.jpg)
 
-<figcaption>Switch C on channel 5 is the kill switch; switch D on channel 6 fires the plow.</figcaption>
+<figcaption>Switch A on channel 5 is the kill switch; switch D on channel 6 fires the plow.</figcaption>
 </figure>
 
 **Video that stays current.** In live control, a slightly old frame shown on time beats a perfect frame shown late, so video from a fisheye Pi camera goes over UDP instead of Transmission Control Protocol (TCP). Each frame is JPEG-encoded, and the adaptive quality steps down from 80 to 50 until the frame fits in a single 65,000-byte datagram. With an external antenna the stream averaged 17.4 frames per second (FPS), 11.2 FPS more than with the internal antenna. The robot's metal body acted like a Faraday cage around the internal one, so the external antenna was necessary. If it still doesn't fit, the frame is skipped instead of split. Every frame carries a burned-in timestamp so we could check latency by eye, and the laptop shows "NO SIGNAL" and reconnects on its own if frames stop.
