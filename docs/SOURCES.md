@@ -73,6 +73,10 @@ Documents in `docs/sources/` are kept locally and are never committed or publish
   - August 30, 2021: after Hurricane Ida, Ave's grandpa waded through his yard to check on his boats and crab traps. The Ida photo on /about/ was taken by Ave's grandma Peggy.
   - October 3, 2020: Dad became a Red Cross CPR instructor in summer 2020.
 - **Adam's story** is shared in Ave's words, as approved (see the children and family rule in the project notes).
+- **Approved photos of family** (only these may show; no other photos of Adam, Ave's sisters or other children without Ave's say-so):
+  - `family-adam.jpg` (Ave, her dad and Adam), approved Nov 2026.
+  - `polaroid-pirate.jpg` and `polaroid-bayou-boat.jpg` on /about/, approved Nov 2026.
+  - `outside-kayak.jpg` (Ave and her little sister Lea on kayaks, the OUTSIDE pin on /about/), approved 2026-11-15.
 - **Because of ADAM's name and status**: "Because of ADAM: Allies in the Drowning Awareness Movement", described as a nonprofit, not a 501(c)(3), until its tax-exempt status is reinstated (BcofADAM `docs/LAUNCH-CHECKLIST.md`).
 
 ## Confirmed by Ave
@@ -89,6 +93,7 @@ Facts with no document behind them, confirmed by Ave directly. Each line gives t
 - 2026-11-06: none of the four client sites were paid work.
 - 2026-11-06: the acoustic pool alarm is Ave's own project; Because of ADAM is the reason it exists, not a partner.
 - 2026-11-06: Integer's thruster characterization sentence may stay (no numbers).
+- 2026-11-15: the kayak photo of Ave and Lea (OUTSIDE pin on /about/) may show.
 - 2026-11-06: keep as written: "Because of ADAM" (short form) on the résumé, "Grace Mae Alterations", the PLV Abstract Builder "AI reading step" line, and "quoted up front" on Services.
 
 ## The /work/ workbench (Nov 10)
