@@ -54,7 +54,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     <p class="rgauge" data-depth-gauge hidden aria-hidden="true"><span class="rgauge__k">depth</span><b data-depth-read>0 m</b></p>
     <div class="rs__content">
     <section id="below" class="wrap rpanel" style="--dp:4%" data-rpanel data-depth-panel data-perch="below" data-perch-x="0.9 0.12" aria-labelledby="research-title">
-      <p class="rpanel__tag" data-depth-tag hidden aria-hidden="true"></p>
+      <p class="rpanel__tag" data-depth-tag aria-hidden="true"></p>
       <div class="rp">
         <div class="rp__fig">
           <figure class="rfig plate">
@@ -93,7 +93,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     </section>
 
     <section id="onr" class="wrap rpanel" style="--dp:28%" data-rpanel data-depth-panel data-perch="onr" data-perch-x="0.9 0.12" aria-labelledby="onr-title">
-      <p class="rpanel__tag" data-depth-tag hidden aria-hidden="true"></p>
+      <p class="rpanel__tag" data-depth-tag aria-hidden="true"></p>
       <div class="rp">
         <div class="rp__fig">
           <figure class="rfig plate" data-perch="net" data-perch-x="0.85">
@@ -141,7 +141,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     </section>
 
     <section id="signals" class="wrap rpanel" style="--dp:50%" data-rpanel data-depth-panel data-perch="signals" data-perch-x="0.9 0.12" aria-labelledby="signals-title">
-      <p class="rpanel__tag" data-depth-tag hidden aria-hidden="true"></p>
+      <p class="rpanel__tag" data-depth-tag aria-hidden="true"></p>
       <div class="rp">
         <div class="rp__fig">
           <figure class="rfig plate">
@@ -176,7 +176,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     </section>
 
     <section id="bellhop" class="wrap rpanel" style="--dp:70%" data-rpanel data-depth-panel data-perch="bellhop" data-perch-x="0.9 0.12" aria-labelledby="bellhop-title">
-      <p class="rpanel__tag" data-depth-tag hidden aria-hidden="true"></p>
+      <p class="rpanel__tag" data-depth-tag aria-hidden="true"></p>
       <div class="rp">
         <div class="rp__fig">
           <figure class="rfig plate">
@@ -251,7 +251,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
     <section id="pool-alarm" class="wrap rpanel" style="--dp:96%" data-rpanel data-depth-panel data-perch="pool-alarm" data-perch-x="0.9 0.12" aria-labelledby="pool-title">
       {/* NAME: working title until Avery picks one. Update the title here and in acoustic-pool-alarm.md then, and delete this comment. */}
-      <p class="rpanel__tag" data-depth-tag hidden aria-hidden="true"></p>
+      <p class="rpanel__tag" data-depth-tag aria-hidden="true"></p>
       <div class="rp">
         <div class="rp__fig">
           <figure class="rfig plate rfig--pool">
@@ -351,6 +351,11 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     margin-top: clamp(12rem, 40vh, 28rem);
   }
 
+  /* Empty until the script reads the depth; it keeps its place meanwhile, so nothing shifts. */
+  .rpanel__tag:empty {
+    visibility: hidden;
+  }
+
   .rpanel__tag {
     position: absolute;
     top: 14px;
@@ -373,11 +378,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
       text-align: right;
     }
 
-    /* The line is held before the script fills the tag in, so nothing shifts. */
-    .rpanel__tag[hidden] {
-      display: block;
-      visibility: hidden;
-    }
+
   }
 
   /* The depth gauge: fixed at the right edge from 1400px, the same reading as the panels' tags. */
