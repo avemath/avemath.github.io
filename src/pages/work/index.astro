@@ -1,8 +1,8 @@
 ---
 // /work/: the workbench (every project as an object on my bench, chosen to see its detail), the
 // thread map ("How it connects"), the client sites' showcase rows and tools, and "Every project",
-// a compact index grouped as Engineering, Research, and Websites and client tools. The groups keep
-// the ids #engineering, #research and #websites, so existing links and the nav highlighting work.
+// a compact index grouped as Engineering, Research, and Websites and client tools, closed to start. The
+// groups keep the ids #engineering, #research and #websites: a link to one opens the index and lands there.
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ToolPanel from '@/components/ToolPanel.astro';
 import WebsitesShowcase from '@/components/WebsitesShowcase.astro';
@@ -100,6 +100,13 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
         <h2 id="index-title" class="section-title section-title--sm" data-decode>Every project</h2>
         <p class="work-sec__intro">{order.length} projects, each with a case study.</p>
       </div>
+      {/* Closed to start, so the page doesn't list everything a third time. A link to #engineering, #research or
+          #websites opens it and lands on that group (the script below). TODO(ave): check wording of the summary. */}
+      <details class="ix-all" data-ix>
+        <summary class="ix-all__sum">
+          <span class="ix-all__show">Show the list, by kind</span>
+          <span class="ix-all__hide">Hide the list</span>
+        </summary>
       {
         sections.map((s) => (
           <section class="ix" id={s.id} aria-labelledby={`${s.id}-title`}>
@@ -124,6 +131,7 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
           </section>
         ))
       }
+      </details>
     </div>
   </section>
 
@@ -161,6 +169,31 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     ).observe(sites);
   }
   addEventListener('hashchange', fromHash);
+
+  // "Every project" starts closed. A hash or a link that names one of its groups opens it first, so the
+  // jump lands on the group (Chromium opens a <details> for a fragment by itself; the others don't).
+  const ix = document.querySelector<HTMLDetailsElement>('[data-ix]');
+  const inIndex = (id: string) => {
+    const t = id ? document.getElementById(id) : null;
+    return ix && t && ix.contains(t) ? t : null;
+  };
+  const openForHash = () => {
+    const t = inIndex(decodeURIComponent(location.hash.slice(1)));
+    if (!t || !ix) return;
+    ix.open = true;
+    requestAnimationFrame(() => t.scrollIntoView({ block: 'start' }));
+  };
+  openForHash();
+  addEventListener('hashchange', openForHash);
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a[href*="#"]');
+    if (!a || a.pathname !== location.pathname) return;
+    const t = inIndex(decodeURIComponent(a.hash.slice(1)));
+    if (!t || !ix) return;
+    ix.open = true;
+    // The same hash twice fires no hashchange, so scroll here too.
+    if (a.hash === location.hash) requestAnimationFrame(() => t.scrollIntoView({ block: 'start' }));
+  });
 </script>
 
 <style>
@@ -266,6 +299,51 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     display: grid;
     gap: clamp(2.5rem, 5vw, 4rem);
     margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  /* ---- Every project: closed to start, opened by its summary or by a link to a group ---- */
+  .ix-all__sum {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    margin-top: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .ix-all__sum::-webkit-details-marker {
+    display: none;
+  }
+
+  .ix-all__sum::before {
+    content: '+';
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+    line-height: 1;
+  }
+
+  .ix-all[open] > .ix-all__sum::before {
+    content: '\00d7';
+  }
+
+  .ix-all__sum:hover::before {
+    border-color: var(--text);
+  }
+
+  .ix-all__sum:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .ix-all[open] .ix-all__show,
+  .ix-all:not([open]) .ix-all__hide {
+    display: none;
   }
 
   /* ---- Every project: one row each, grouped ---- */
