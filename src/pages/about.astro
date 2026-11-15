@@ -1,7 +1,7 @@
 ---
 // About holds the person; Projects and Websites hold the work. Hero over the levee in pixels,
-// the AVE-26 datasheet (pins and photos in src/data/about.json), the longer version, the
-// recommendations as pull quotes, why underwater, and a closing band, all on the Specimen tokens.
+// the AVE-26 datasheet (pins and photos in src/data/about.json), the recommendations as pull quotes,
+// the longer version, why underwater, and a closing band, all on the Specimen tokens.
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
 import PixelScene from '@/components/about/PixelScene.astro';
@@ -50,6 +50,9 @@ import ida from '@/assets/about/polaroid-ida.jpg';
   </section>
 
   <div class="band-paper"><Datasheet /></div>
+
+  {/* Recommendations right after the datasheet, so they are not buried (Nov 15). */}
+  <PullQuotes />
 
   <div class="band-sheet">
   <section class="wrap ab-long" aria-labelledby="long-title">
@@ -117,8 +120,6 @@ import ida from '@/assets/about/polaroid-ida.jpg';
     </div>
   </section>
   </div>
-
-  <PullQuotes />
 
   <section class="ab-why ab-band" aria-labelledby="why-title">
     <div class="wrap ab-why__grid">
