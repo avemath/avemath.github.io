@@ -16,7 +16,8 @@ import Drawing from './Drawing.astro';
     'The Pico W reads the kill switch (CH5, GP18) and the trigger (CH6, GP19) with hardware pin interrupts. Trigger to solenoid: 31.5 ms on average.',
     'It runs the valve sequence: exhaust (GP14) open 50 ms, closed, a 50 ms dwell, both inlets (GP15) open 400 ms, exhaust open again to vent.',
     'Video goes its own way: the Pi 4B sends JPEG frames over UDP to the driver laptop, so a video crash never touches the weapon.',
-    'A kill, a lost signal or an error opens the exhaust and cuts the receiver\'s power through the solid-state relay, which puts the ESC into failsafe, within 35 ms.',
+    // TODO(ave): check wording (Nov 15: 35 ms is sourced for the kill switch only).
+    'A kill, a lost signal or an error opens the exhaust and cuts the receiver\'s power through the solid-state relay, which puts the ESC into failsafe. The kill switch does it within 35 ms.',
   ]}
   note="No wire joins the Pico W and the Pi: the two systems are independent."
 >
