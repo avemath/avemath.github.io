@@ -7,9 +7,8 @@
 //     photo's image area, data-overlap or not.
 //   - A part of the page where layering is the design opts out as a whole with
 //     data-overlap="layered" on its container: nothing inside it is checked. Used today on the
-//     website mockups (a phone screenshot over the desktop one), the project tiles with a live
-//     address chip over the cover, and the full-width backdrop stills behind the home page's
-//     closing band and the research page. Each is listed in docs/AUDIT-2026-11-14.md for review.
+//     website mockups (a phone screenshot over the desktop one) and the full-width backdrop stills
+//     behind the home page's closing band and the research page. Each is listed in docs/AUDIT-2026-11-14.md for review.
 //   - Fixed and sticky layers (the header, the bit girl, the depth gauge) move with the scroll and
 //     are left to check-layout.mjs.
 // Then the About datasheet's edges: at every width from 320 to 1920 and for every pin, nothing in
