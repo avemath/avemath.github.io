@@ -222,13 +222,14 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
               </div>
               <script type="application/json" data-arr-data set:html={JSON.stringify(ch.arrivals)} />
               <p class="fig__note">
-                {ch.arrivals.length} arrivals from BELLHOP itself: 1000 m of water, source at 50 m, receiver 15 km out at 100 m, 3.5 kHz, sandy
+                {ch.arrivals.length} arrivals simulated by BELLHOP itself: 1000 m of water, source at 50 m, receiver 15 km out at 100 m, 3.5 kHz, sandy
                 bottom. The strongest is in green; {ch.n_within_20db} fall within 20 dB of it.
               </p>
             </div>
             <figcaption class="plate__cap">
-              <b>Fig. R3.</b> Sound bends toward the slow water. Rays and eigenrays in the browser, and the real arrivals BELLHOP computed for
-              bellhopSim's comms scenario.
+              {/* TODO(ave): check wording (Nov 15: marked as simulation). */}
+              <b>Fig. R3.</b> Sound bends toward the slow water. Simulated: rays and eigenrays traced in the browser, and the arrivals BELLHOP
+              computed for bellhopSim's comms scenario.
             </figcaption>
           </figure>
         </div>

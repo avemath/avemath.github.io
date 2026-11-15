@@ -17,25 +17,26 @@ links:
 gallery:
   - src: ../../assets/projects/bellhop-sim/ssp_and_rays.png
     alt: Two plots side by side. On the left, sound speed against depth curves to a minimum of 1500 meters per second near 1300 meters deep. On the right, 50 colored rays leave a source at 1300 meters and arc up and down across 100 kilometers of ocean, some bending back before the surface and others bouncing off the sand bottom at 5000 meters.
-    caption: The Munk deep-water profile and 50 rays traced from the slowest depth, where sound gets trapped.
+    caption: Simulated with BELLHOP. The Munk deep-water profile and 50 rays traced from the slowest depth, where sound gets trapped.
   - src: ../../assets/projects/bellhop-sim/tl_map.png
     alt: A color map of transmission loss over 100 kilometers of range and 5000 meters of depth. Dark blue low-loss regions fan out from the source and form arching bands, and the loss rises toward green at long range.
-    caption: Transmission loss from the same source. The low-loss bands follow the ray paths.
+    caption: Simulated with BELLHOP. Transmission loss from the same source. The low-loss bands follow the ray paths.
   - src: ../../assets/projects/bellhop-sim/arrivals.png
     alt: A stem plot of 35 sound arrivals at a receiver 65 kilometers away, by delay and amplitude. The two strongest arrive first and never touch the surface or bottom, then a long tail of weaker paths that bounced off the surface or bottom follows. An arrow marks the 7 paths within 20 dB of the strongest arrival, spread over 2128 milliseconds.
-    caption: One ping at 65 km arrives as 35 echoes. The 7 within 20 dB of the strongest arrival spread over 2.1 seconds.
+    caption: Simulated with BELLHOP. One ping at 65 km arrives as 35 echoes. The 7 within 20 dB of the strongest arrival spread over 2.1 seconds.
   - src: ../../assets/projects/bellhop-sim/ber_vs_snr.png
     alt: Bit error rate against SNR per sample, measured on the total received power, on a log scale. The theoretical BPSK curve for plain noise falls steeply below one in ten thousand by 10 dB, while the simulated link through the BELLHOP channel levels off near 0.3 from minus 2 to 20 dB.
-    caption: BPSK through the BELLHOP channel against plain noise, by SNR per sample on the total received power. With no equalizer, more power doesn't help.
+    caption: Simulated with BELLHOP. BPSK through the BELLHOP channel against plain noise, by SNR per sample on the total received power. With no equalizer, more power doesn't help.
   - src: ../../assets/projects/bellhop-sim/frequency_sweep.png
     alt: Transmission loss against range at 100 meters depth for five frequencies from 100 Hz to 5000 Hz. All five curves start together, then spread apart with range, and the 5000 Hz curve ends far below the others at 100 kilometers.
-    caption: The same path at five frequencies. Higher frequencies lose much more over distance.
+    caption: Simulated with BELLHOP. The same path at five frequencies. Higher frequencies lose much more over distance.
 metrics:
   - { label: "Arrivals at 65 km", value: "35" }
   - { label: "Delay spread within 20 dB of the strongest arrival", value: "2.1 s" }
   - { label: "BER at 20 dB SNR per sample, no equalizer", value: "0.30" }
   - { label: "Extra loss at 5 kHz vs 100 Hz, 100 km", value: "39 dB" }
 threads: [signals]
+# TODO(ave): check wording (Nov 15: every gallery caption starts "Simulated with BELLHOP.").
 ---
 
 ## Context
