@@ -41,26 +41,30 @@ client:
   kind: Land services firm, Duncansville, PA
   permission: true
 threads: [web, land]
+# TODO(ave): check wording (Nov 15: restructured for the business owner; the technical details moved to Under the hood; the reading-step line is kept as approved).
 ---
 
-## Context
+## What Petro Land Ventures needed
 
 A land abstract is slow, manual work, and it's easy to get wrong. Someone pulls every recorded deed, mortgage, lease and easement for a parcel, types each one into a run sheet, writes the Ownership Report, then assembles a PDF where every book and page reference opens its document. [Petro Land Ventures](/work/petro-land-ventures/) needed a faster way to go from a stack of county records to a finished abstract, built the way their abstracts already are. I also do contract land work for the firm, and I'd already built [Landspace](/work/landspace/) for my own title work, so I knew the steps.
 
-## Approach
+## What I built
 
 **Six steps, and a person checks each one.** Documents, Read, Run sheet, Ownership Report, Links and Build sit on a rail on the left. The tool does the first draft; the examiner confirms every row, and the build won't run until they tick a box saying they checked each row against its document. A gap in the report stays a placeholder such as [DATE] instead of a guess.
 
-**Everything runs in the browser.** PDF reading, OCR for scans with no text layer, the run sheet checks, the report, Excel and Word output, and the linked PDF are all built on the person's computer. Jobs live in the browser's own storage, with no cloud copy.
+**The finished pieces, ready to send.** It produces the Excel run sheet, the Ownership Report as PDF and Word, and one abstract PDF with every document attached and linked. A second mode adds the attachments and links to an abstract that was already finished in Word.
 
-**One optional step leaves the computer.** An optional AI reading step can turn each document into fields. It's off every time the page opens. When it's on, a small server passes each document through and stores nothing, and its logs never include names, file names or document text. With it off, the server is never called.
-
-**A login in front of everything.** The whole site sits behind a login with a one-time code sent to an approved email address, and the list of who can sign in changes without a code change.
+**Private by default.** The whole site sits behind a login with a one-time code sent to an approved email address, and the list of who can sign in changes without a code change. The work happens on the person's own computer, with no cloud copy.
 
 **A free practice tour.** A 39-card tour walks a practice job of five made-up documents through all six steps. Each document shows one feature, like a blank date line or an upside-down scan to turn, and nothing is sent or saved while it's open. The screenshots here use that practice job, so every name and record in them is made up.
 
-**Tests on fictional documents.** Unit tests with 950 checks, and browser tests that replay recorded reads of 12 fictional documents, so the tests never spend anything or touch a real record.
+## What changed for the firm
 
-## Outcome
+A stack of county records becomes a linked abstract in six steps, with the examiner checking every row. It's live at a private address behind the login.
 
-It's live at a private address behind the login. It produces the Excel run sheet, the Ownership Report as PDF and Word, and one abstract PDF with every document attached and linked. A second mode adds the attachments and links to an abstract that was already finished in Word.
+## Under the hood
+
+- **Everything runs in the browser.** PDF reading, OCR for scans with no text layer, the run sheet checks, the report, Excel and Word output, and the linked PDF are all built on the person's computer. Jobs live in the browser's own storage, with no cloud copy.
+- **One optional step leaves the computer.** An optional AI reading step can turn each document into fields. It's off every time the page opens. When it's on, a small server passes each document through and stores nothing, and its logs never include names, file names or document text. With it off, the server is never called.
+- The stack: JavaScript, pdf.js, pdf-lib, Tesseract OCR, docx and IndexedDB in the browser, with Cloudflare Workers and Cloudflare Access.
+- **Tests on fictional documents.** Unit tests with 950 checks, and browser tests (Playwright) that replay recorded reads of 12 fictional documents, so the tests never spend anything or touch a real record.

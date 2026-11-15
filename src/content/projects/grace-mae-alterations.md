@@ -30,28 +30,33 @@ client:
   kind: Bridal and tailoring studio, Pittsburgh, PA
   permission: true
 threads: [web]
+# TODO(ave): check wording (Nov 15: restructured for the business owner; the technical details moved to Under the hood).
 ---
 
-## Context
+## What Grace needed
 
-The site had three jobs: explain bustles, timelines and fittings to brides before they walk in; collect inquiries with the details Grace needs to quote; and let her switch bridal booking between open and waitlist herself. Grace is my sister, a formally trained designer and a former lead alterations specialist at David's Bridal, now running her own studio in Pittsburgh.
+Grace is my sister, a formally trained designer and a former lead alterations specialist at David's Bridal, now running her own studio in Pittsburgh. Her site had three jobs: explain bustles, timelines and fittings to brides before they walk in; collect inquiries with the details she needs to quote; and let her switch bridal booking between open and waitlist herself.
 
-## Approach
+## What I built
 
-**Explain with drawings.** The bustle explorer is an animated gown drawn in Scalable Vector Graphics (SVG). Pick American, French, Austrian, ballroom or a detachable train, pick a sweep, chapel or cathedral length, then scrub or press "Bustle it" to watch the pickup points travel along gold arrows in back and side views. A matching hem explorer shows trouser breaks across shoes and leg cuts. Both have accessible names and step-by-step captions, and both hold still under reduced motion.
+**Guides that show instead of tell.** The bustle explorer is an animated gown. Pick American, French, Austrian, ballroom or a detachable train, pick a sweep, chapel or cathedral length, then press "Bustle it" to watch the pickup points travel in back and side views. A matching hem explorer shows trouser breaks across shoes and leg cuts.
 
-**A thread you can follow.** The process section is a hand-authored cubic SVG path. A running stitch follows the scroll with a needle leading it, and each step's dot fills as the thread passes.
-
-**Inquiries that arrive complete.** The contact form branches for tailoring, the bridal waitlist and bridal parties. Clients can attach up to five photos, compressed in the browser to stay under the server's upload limit, and an optional photo check tells them right away whether their pictures show what Grace needs. Resend emails Grace a formatted inquiry and sends the client a confirmation with prep instructions for their service.
+**Inquiries that arrive complete.** The contact form changes with the request: tailoring, the bridal waitlist or a bridal party. Clients can attach up to five photos, and an optional photo check tells them right away whether their pictures show what Grace needs. Grace gets a formatted inquiry by email, and the client gets a confirmation with prep instructions for their service.
 
 **After the fitting.** Each finished dress can get a printable care card with a QR code that opens a private page: care notes, before and after photos, and how to bustle that exact dress.
 
-**Owner-editable, and tested.** Sanity Studio is embedded at /studio with about 435 text fields generated from shared specs, and a test checks the specs, the site and the seed data never drift apart. CI runs lint, build, and 16 Playwright suites with axe accessibility checks on every push.
+**A thread you can follow.** The steps of the process are stitched together: a running stitch follows the scroll with a needle leading it, and each step's dot fills as the thread passes.
 
-## Outcome
+## What changed for Grace
 
-PageSpeed Insights scores the home page 100 for accessibility and search engine optimization (SEO). Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
+Inquiries arrive ready to quote, and Grace edits about 435 text fields of the site herself. PageSpeed Insights scores the home page 100 for accessibility and search engine optimization (SEO).
 
-## What I'd do next
+## Under the hood
 
-Mobile performance scored 98 on PageSpeed Insights on Nov 1, 2026, with 100 for accessibility, best practices and SEO; desktop scored 100 across the board. Earlier runs scored lower on mobile, mostly from the hero imagery and the Studio bundle.
+- The stack: Next.js, React, TypeScript, Sanity, Tailwind CSS, Framer Motion, Resend, Playwright and Vercel.
+- The bustle and hem explorers are drawn in Scalable Vector Graphics (SVG). Both have accessible names and step-by-step captions, and both hold still under reduced motion. The process thread is a hand-authored cubic SVG path.
+- Photos are compressed in the browser to stay under the server's upload limit. Resend sends the emails.
+- Sanity Studio is embedded at /studio, with the text fields generated from shared specs, and a test checks the specs, the site and the seed data never drift apart.
+- CI runs lint, build, and 16 Playwright suites with axe accessibility checks on every push.
+- Structured data covers the business, the founder's credentials and priced services, with an image sitemap for the portfolio.
+- Mobile performance scored 98 on PageSpeed Insights on Nov 1, 2026, with 100 for accessibility, best practices and SEO; desktop scored 100 across the board. Earlier runs scored lower on mobile, mostly from the hero imagery and the Studio bundle.

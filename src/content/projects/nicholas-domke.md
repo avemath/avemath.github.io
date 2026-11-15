@@ -38,27 +38,32 @@ client:
   permission: true
 draft: false
 threads: [web]
+# TODO(ave): check wording (Nov 15: restructured for the reader; the technical details moved to Under the hood).
 ---
 
-## Context
+## What Nicholas needed
 
 Nicholas is a senior in mechanical engineering at LSU applying to graduate programs for fall 2027. He needed a portfolio and a long-form résumé to send with his applications. I did the design, build and content, and I host it.
 
-## Approach
+## What I built
 
-**Dot matrix, on paper.** The look is based on nothing.tech: dot-matrix lettering, a black hero, and grey sections with a faint dot grid like a drafting table, where the cards sit like sheets of paper.
+**A portfolio drawn like an engineering sheet.** Dot-matrix lettering, a black hero, and grey sections with a faint dot grid like a drafting table, where the cards sit like sheets of paper. The footer is a title block with a revision letter. A gear in the top bar turns as you scroll, and the bar shows which section you're in, like a sheet label. On a computer, the pointer in the hero becomes a crosshair that snaps to the dot grid and shows its coordinates in inches.
 
-**Engineering-drawing touches.** The footer is a title block with a revision letter. A gear in the top bar turns as you scroll, and the bar shows which section you're in, like a sheet label. On a computer, the pointer in the hero becomes a CAD crosshair that snaps to the dot grid and shows its coordinates in inches.
+**His real CAD.** The welding arm card shows a 3D model made from his own design files, drawn in the same line style. Hovering (or tapping on a phone) pulls the tool at the end of the arm apart like an assembly drawing.
 
-**His real CAD.** The welding arm card shows a 3D model converted from his CAD files, drawn in the same line style. The three.js library only loads when the card is about to scroll into view. Hovering (or tapping on a phone) explodes the end effector like an assembly drawing, and if a browser can't show 3D, the card keeps its line drawing.
+**One file to edit.** Every word and link lives in one file that Nicholas can edit on github.com, and a saved edit is live in about a minute.
 
-**One file to edit.** Every word and link lives in one content.js file that Nicholas can edit on github.com. There's no build step, so a saved edit is live in about a minute.
+**A résumé that prints.** The résumé page is built from the same words and styled like his PDF, so it prints cleanly. It leaves his phone number off on purpose, since the repo is public.
 
-**A résumé that prints.** The résumé page is built from the same data and styled like his PDF, so it prints cleanly. It leaves his phone number off on purpose, since the repo is public.
+## What changed for Nicholas
 
-## Outcome
+He has a portfolio drawn like an engineering sheet to send with his applications, with no build step and one file to edit.
 
-The site is live on GitHub Pages: plain HTML, CSS and JavaScript, and a 174 KB 3D model.
+## Under the hood
+
+- Plain HTML, CSS and JavaScript on GitHub Pages, with no build step. The words and links live in content.js.
+- The look is based on nothing.tech.
+- The 3D model is converted from his CAD files: a 174 KB model shown with three.js, which only loads when the card is about to scroll into view. Hovering explodes the end effector, and if a browser can't show 3D, the card keeps its line drawing.
 
 ## What I'd do next
 
