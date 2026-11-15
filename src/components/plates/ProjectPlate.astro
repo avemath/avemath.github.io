@@ -53,7 +53,7 @@ const { n, title, href, desc, tags, note } = Astro.props;
     margin-top: 0.3rem;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--muted);
   }
 
@@ -72,19 +72,19 @@ const { n, title, href, desc, tags, note } = Astro.props;
   }
 
   .pplate__desc {
-    font-size: 0.97rem;
+    font-size: var(--fs-16);
     color: var(--muted);
   }
 
   .pplate__note {
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     font-style: italic;
     color: var(--muted);
   }
 
   .pplate__tags {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: var(--fs-13);
     color: var(--teal);
   }
 </style>

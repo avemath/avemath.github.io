@@ -191,7 +191,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
     align-self: flex-start;
     gap: 0.45rem;
     margin: 0;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -204,7 +204,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
   }
 
   .tile__title {
-    font-size: 1.35rem;
+    font-size: var(--fs-22);
     font-weight: 600;
     letter-spacing: -0.015em;
   }
@@ -228,7 +228,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
 
   .tile__summary {
     color: var(--text-soft);
-    font-size: 0.97rem;
+    font-size: var(--fs-16);
     line-height: 1.55;
   }
 
@@ -241,7 +241,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
   }
 
   .tile__outcome {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--accent-ink);
   }
 
@@ -265,7 +265,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
     gap: 1rem;
     padding-top: 0.85rem;
     border-top: 1px dashed var(--line);
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
   }
 
   .tile__cta {
@@ -311,7 +311,7 @@ const lead = metric && d.confidentiality !== 'limited' ? d.metrics?.[0] : undefi
 
   .tile__stage :global(.frame__window) {
     border-bottom: 0;
-    border-radius: 0.85rem 0.85rem 0 0;
+    border-radius: var(--radius-14) var(--radius-14) 0 0;
   }
 
   .tile__stage :global(.frame__phone) {

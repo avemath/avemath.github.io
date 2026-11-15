@@ -114,7 +114,7 @@ const kind = isWebsite(project) && d.links.live ? displayUrl(d.links.live) : typ
   }
 
   .wc__title {
-    font-size: 1.25rem;
+    font-size: var(--fs-20);
     letter-spacing: -0.01em;
     line-height: 1.15;
   }
@@ -131,7 +131,7 @@ const kind = isWebsite(project) && d.links.live ? displayUrl(d.links.live) : typ
     display: flex;
     flex-wrap: wrap;
     gap: 0 1rem;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     font-weight: 600;
   }
 
@@ -144,13 +144,13 @@ const kind = isWebsite(project) && d.links.live ? displayUrl(d.links.live) : typ
   }
 
   .wc__summary {
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--text-soft);
   }
 
   .wc__live {
     margin-top: auto;
     padding-top: 0.4rem;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
   }
 </style>

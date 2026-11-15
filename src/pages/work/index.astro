@@ -228,7 +228,7 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     border: 1px solid var(--line-strong);
     background: var(--surface);
     color: var(--text);
-    font-size: 0.92rem;
+    font-size: var(--fs-15);
     font-weight: 600;
     text-decoration: none;
   }
@@ -239,7 +239,7 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
 
   .filter__n {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     font-weight: 400;
   }
 
@@ -284,7 +284,7 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     margin-top: 1rem;
     max-width: 44rem;
     color: var(--muted);
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
   }
 
   .work-sites__tools {
@@ -356,12 +356,12 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     display: flex;
     align-items: baseline;
     gap: 0.6rem;
-    font-size: 1.375rem;
+    font-size: var(--fs-22);
   }
 
   .ix__n {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     font-weight: 400;
     color: var(--muted);
   }
@@ -399,13 +399,13 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
   .ix__when,
   .ix__status {
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     color: var(--muted);
   }
 
   .ix__cs {
     justify-self: end;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
   }
 
   /* Phones: the name on its own line, then kind, dates, status and the link, wrapping as words. */

@@ -213,7 +213,7 @@ const right = pins.slice(half).reverse();
 
   .ds__note {
     max-width: 34em;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--muted);
   }
 
@@ -222,7 +222,7 @@ const right = pins.slice(half).reverse();
     margin: 0;
     border: 1px solid var(--rule);
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--fs-12);
   }
 
   .ds__rev div {
@@ -341,7 +341,7 @@ const right = pins.slice(half).reverse();
     width: clamp(120px, 15vw, 150px);
     min-height: 440px;
     padding: 24px 12px;
-    border-radius: 6px;
+    border-radius: var(--radius-6);
     background: var(--chip);
     color: var(--chip-ink);
   }
@@ -444,7 +444,7 @@ const right = pins.slice(half).reverse();
   .pin:focus-visible .pin__nm {
     outline: 2px solid var(--focus);
     outline-offset: 3px;
-    border-radius: 2px;
+    border-radius: var(--radius-2);
   }
 
   .pin[aria-pressed='true'] .pin__leg {
@@ -661,7 +661,7 @@ const right = pins.slice(half).reverse();
     padding: 0 0 0.625rem;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 1.125rem;
+    font-size: var(--fs-18);
     text-align: left;
     color: var(--muted);
   }
@@ -680,7 +680,7 @@ const right = pins.slice(half).reverse();
   .ch th {
     width: 13rem;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     font-weight: 400;
     line-height: 1.5;
     color: var(--muted);
@@ -690,12 +690,12 @@ const right = pins.slice(half).reverse();
   .ch__pins {
     display: block;
     margin-top: 0.15rem;
-    font-size: 0.75rem;
+    font-size: var(--fs-12);
     color: var(--accent-ink);
   }
 
   .ch td {
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     line-height: 1.45;
   }
 

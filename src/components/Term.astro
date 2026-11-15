@@ -119,7 +119,7 @@ const id = `term-${term.replace(/[^\w]/g, '')}-${Math.random().toString(36).slic
   .term__btn:focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: var(--radius-2);
   }
 
   /* Out of the flow: fixed in place by the script, so it never moves the page. */
@@ -128,12 +128,12 @@ const id = `term-${term.replace(/[^\w]/g, '')}-${Math.random().toString(36).slic
     z-index: 60;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line-strong);
-    border-radius: 6px;
+    border-radius: var(--radius-6);
     background: var(--surface);
     box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.45);
     color: var(--text);
     font-family: var(--font-sans);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     font-weight: 400;
     font-style: normal;
     letter-spacing: 0;

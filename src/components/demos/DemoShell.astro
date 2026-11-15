@@ -33,7 +33,7 @@ const { id, title, lede, note } = Astro.props;
     padding: clamp(1.25rem, 3.5vw, 2.5rem);
     border: 1px solid var(--line);
     border-top: 2px solid var(--accent);
-    border-radius: 1rem;
+    border-radius: var(--radius-16);
     background: var(--surface);
     box-shadow: var(--shadow);
   }
@@ -57,7 +57,7 @@ const { id, title, lede, note } = Astro.props;
   .demo__note {
     margin-top: 1.25rem;
     max-width: 28em;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 </style>

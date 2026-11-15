@@ -82,7 +82,7 @@ const quotes = testimonials.filter((t) => t.approved);
     padding: clamp(1.25rem, 2.4vw, 2rem);
     border: 1px solid var(--deep-line);
     border-left: 3px solid var(--deep-accent);
-    border-radius: 4px;
+    border-radius: var(--radius-4);
     background: var(--pq-card);
   }
 
@@ -105,7 +105,7 @@ const quotes = testimonials.filter((t) => t.approved);
     flex-direction: column;
     gap: 0.2rem;
     margin-top: auto;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--deep-ink);
   }
 
@@ -116,7 +116,7 @@ const quotes = testimonials.filter((t) => t.approved);
 
   .pq__ctx {
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     color: var(--deep-muted);
   }
 </style>

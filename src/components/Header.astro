@@ -50,17 +50,17 @@ const isCurrent = (key: string) =>
 
     <div class="site-header__end">
       {label && <p class="nav-label mono" data-nav-label>{label}</p>}
-      <button type="button" class="icon-btn kbd-btn" data-palette-open aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K" aria-label="Jump to a page or project" title="Jump to (Ctrl K)">
+      <button type="button" class="btn btn--small icon-btn kbd-btn" data-palette-open aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K" aria-label="Jump to a page or project" title="Jump to (Ctrl K)">
         <Icon name="search" />
       </button>
-      <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+      <button type="button" class="btn btn--small icon-btn" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
         <Icon name="sun" class="theme-icon theme-icon--sun h-[1.15em] w-[1.15em]" />
         <Icon name="moon" class="theme-icon theme-icon--moon h-[1.15em] w-[1.15em]" />
       </button>
 
       <!-- Phone menu. A native disclosure, so it opens before any JavaScript loads. -->
       <details class="mnav" data-mnav>
-        <summary class="icon-btn mnav__button">
+        <summary class="btn btn--small icon-btn mnav__button">
           <Icon name="menu" class="mnav__icon mnav__icon--open h-[1.15em] w-[1.15em]" />
           <Icon name="close" class="mnav__icon mnav__icon--close h-[1.15em] w-[1.15em]" />
           Menu
@@ -115,7 +115,7 @@ const isCurrent = (key: string) =>
 
   .brand {
     font-weight: 700;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     text-decoration: none;
     white-space: nowrap;
   }
@@ -138,7 +138,7 @@ const isCurrent = (key: string) =>
   .nav-link {
     display: inline-block;
     padding: 0.5rem 0.75rem;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     font-weight: 600;
     text-decoration: none;
     color: var(--text);
@@ -169,33 +169,20 @@ const isCurrent = (key: string) =>
   .nav-label {
     min-width: 8ch;
     margin-right: 0.5rem;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     text-align: right;
     color: var(--text-soft);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
 
+  /* The header's buttons are the small secondary button (.btn .btn--small), sized for an icon. */
   .icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     gap: 0.5rem;
-    min-width: 2.5rem;
-    height: 2.5rem;
+    min-width: 44px;
     padding-inline: 0.65rem;
-    border: 1px solid var(--line-strong);
-    background: transparent;
-    color: var(--text);
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: border-color 0.2s;
   }
 
-  .icon-btn:hover {
-    border-color: var(--text);
-  }
 
   .kbd-btn {
     display: none;
@@ -252,7 +239,7 @@ const isCurrent = (key: string) =>
     width: 100%;
     padding: 0.85rem 0.25rem;
     border-bottom: 1px solid var(--line);
-    font-size: 1.15rem;
+    font-size: var(--fs-18);
     font-weight: 700;
     color: var(--text);
     text-align: left;
@@ -266,7 +253,7 @@ const isCurrent = (key: string) =>
 
   .mnav__search {
     border-bottom: 0;
-    font-size: 1rem;
+    font-size: var(--fs-16);
     font-weight: 500;
     color: var(--text-soft);
   }
@@ -283,17 +270,12 @@ const isCurrent = (key: string) =>
     }
   }
 
-  /* Phones: the brand and the icon buttons are 44px tap targets. */
+  /* Phones: the brand is a 44px tap target (the buttons already are). */
   @media (max-width: 767px) {
     .brand {
       display: inline-flex;
       align-items: center;
       min-height: 44px;
-    }
-
-    .icon-btn {
-      min-width: 44px;
-      height: 44px;
     }
   }
 </style>

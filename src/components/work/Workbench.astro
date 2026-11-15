@@ -514,7 +514,7 @@ const order = [...placed].sort((a, b) => {
   /* Phones get the bench as a shelf to scroll sideways, starting at the robot. The page itself
      never scrolls sideways: only the shelf does. */
   .bench-shelf {
-    border-radius: 16px;
+    border-radius: var(--radius-16);
   }
 
   .bench {
@@ -542,13 +542,13 @@ const order = [...placed].sort((a, b) => {
   }
 
   .bench-hint--wide {
-    font-size: 1.0625rem;
+    font-size: var(--fs-17);
   }
 
   .bench-hint--swipe {
     display: none;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     color: var(--muted);
   }
 
@@ -623,7 +623,7 @@ const order = [...placed].sort((a, b) => {
     gap: 0.25rem 1rem;
     margin-top: 0.5rem;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     color: var(--muted);
   }
 
@@ -633,7 +633,7 @@ const order = [...placed].sort((a, b) => {
 
   .bd__role {
     margin-top: 0.35rem;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--muted);
   }
 
@@ -649,9 +649,9 @@ const order = [...placed].sort((a, b) => {
   .bd__tools li {
     padding: 0.15rem 0.7rem;
     border: 1px solid var(--rule);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--surface);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
   }
 
   .bd__links {

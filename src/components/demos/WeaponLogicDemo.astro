@@ -144,7 +144,7 @@ import DemoShell from './DemoShell.astro';
     gap: 0.9rem;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-12);
     background: var(--bg);
     text-align: left;
     cursor: pointer;
@@ -159,7 +159,7 @@ import DemoShell from './DemoShell.astro';
     flex: none;
     width: 1.6rem;
     height: 2.6rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-8);
     background: var(--surface-2);
     border: 1px solid var(--line-strong);
   }
@@ -170,7 +170,7 @@ import DemoShell from './DemoShell.astro';
     width: 0.5rem;
     height: 1.25rem;
     margin-left: -0.25rem;
-    border-radius: 0.25rem;
+    border-radius: var(--radius-4);
     background: var(--muted);
     bottom: 0.2rem;
     transition:
@@ -190,12 +190,12 @@ import DemoShell from './DemoShell.astro';
   .sw__name {
     display: block;
     font-weight: 600;
-    font-size: 0.92rem;
+    font-size: var(--fs-15);
   }
 
   .sw__ch {
     display: block;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -223,7 +223,7 @@ import DemoShell from './DemoShell.astro';
 
   .wl__state-name {
     font-family: var(--font-display);
-    font-size: 1.35rem;
+    font-size: var(--fs-22);
     font-weight: 500;
   }
 
@@ -250,12 +250,12 @@ import DemoShell from './DemoShell.astro';
     gap: 0.2rem;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line);
-    border-radius: 0.6rem;
+    border-radius: var(--radius-10);
     background: var(--bg);
   }
 
   .valve__val {
-    font-size: 0.95rem;
+    font-size: var(--fs-15);
     font-weight: 600;
   }
 
@@ -315,7 +315,7 @@ import DemoShell from './DemoShell.astro';
 
   .shots :global(li) {
     height: 0.7rem;
-    border-radius: 0.2rem;
+    border-radius: var(--radius-4);
     background: var(--accent);
   }
 
@@ -327,10 +327,10 @@ import DemoShell from './DemoShell.astro';
     height: 16rem;
     margin-top: 0.75rem;
     padding: 0.75rem;
-    border-radius: 0.6rem;
+    border-radius: var(--radius-10);
     background: var(--screen);
     color: var(--screen-ink);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     line-height: 1.6;
     overflow-y: auto;
   }
@@ -356,8 +356,8 @@ import DemoShell from './DemoShell.astro';
     margin-top: 1.25rem;
     padding: 0.9rem 1.1rem;
     border: 1px dashed var(--line-strong);
-    border-radius: 0.75rem;
-    font-size: 0.92rem;
+    border-radius: var(--radius-12);
+    font-size: var(--fs-15);
     color: var(--text-soft);
   }
 

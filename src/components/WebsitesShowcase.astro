@@ -220,7 +220,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     }
 
     .site__metric {
-      font-size: 1.5rem !important;
+      font-size: var(--fs-24) !important;
     }
 
     /* While a live version runs it needs the full width too. */
@@ -252,7 +252,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     margin-bottom: 0.9rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--line);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -301,7 +301,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 
   .pq__by {
     margin-top: 0.85rem;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--muted);
   }
 
@@ -324,12 +324,12 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 
   .site__facts dd {
     margin-top: 0.25rem;
-    font-size: 0.95rem;
+    font-size: var(--fs-15);
   }
 
   .site__measured {
     margin-top: 0.4rem;
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     color: var(--muted);
   }
 
@@ -367,7 +367,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 
   .site__unit {
     margin-left: 0.2rem;
-    font-size: 1rem;
+    font-size: var(--fs-16);
     font-weight: 700;
     letter-spacing: 0;
   }
@@ -380,7 +380,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 
   .site__more dd {
     margin-top: 0.15rem;
-    font-size: 1rem;
+    font-size: var(--fs-16);
   }
 
   .sites__how {

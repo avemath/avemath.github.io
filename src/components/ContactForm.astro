@@ -125,7 +125,7 @@ const topics = ['Research or collaboration', 'Website project', 'Something else'
 
   .field label,
   .field legend {
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
     font-weight: 500;
     color: var(--text);
   }
@@ -140,11 +140,11 @@ const topics = ['Research or collaboration', 'Website project', 'Something else'
     width: 100%;
     padding: 0.75rem 0.9rem;
     border: 1px solid var(--line-strong);
-    border-radius: 0.7rem;
+    border-radius: var(--radius-12);
     background: var(--bg);
     color: var(--text);
     font: inherit;
-    font-size: 1rem;
+    font-size: var(--fs-16);
     transition:
       border-color 0.2s,
       box-shadow 0.2s;
@@ -162,12 +162,12 @@ const topics = ['Research or collaboration', 'Website project', 'Something else'
   }
 
   .field__hint {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
   .field__err {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--danger);
   }
 
@@ -198,8 +198,8 @@ const topics = ['Research or collaboration', 'Website project', 'Something else'
     display: inline-block;
     padding: 0.5rem 0.9rem;
     border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-14);
     color: var(--text-soft);
     transition:
       background-color 0.2s,
@@ -231,7 +231,7 @@ const topics = ['Research or collaboration', 'Website project', 'Something else'
 
   .cform__status {
     padding: 1rem 1.1rem;
-    border-radius: 0.8rem;
+    border-radius: var(--radius-12);
     border: 1px solid var(--line);
     background: var(--surface-2);
   }

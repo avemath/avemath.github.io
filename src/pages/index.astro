@@ -98,7 +98,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             </p>
           </Fragment>
           <Fragment slot="actions">
-            <button type="button" class="btn btn--solid" data-step>Step through the receiver</button>
+            <button type="button" class="btn btn--primary" data-step>Step through the receiver</button>
             <a class="btn" href="/work/v2v-bsm-ofdm/">Case study</a>
           </Fragment>
         </FigureCard>
@@ -125,7 +125,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             </p>
           </Fragment>
           <Fragment slot="actions">
-            <button type="button" class="btn btn--solid" data-mic>Try it with your mic</button>
+            <button type="button" class="btn btn--primary" data-mic>Try it with your mic</button>
             <a class="btn" href="https://github.com/avemath/led-audio-spectrum">Firmware</a>
             <a class="link projects__cs" href="/work/led-audio-spectrum/">Case study</a>
           </Fragment>
@@ -172,7 +172,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
             <div class="sig-note"><MarginNote where="signals" /></div>
           </Fragment>
           <Fragment slot="actions">
-            <a class="btn btn--solid" href="/work/signals-playground/#playground">Open the playground</a>
+            <a class="btn btn--primary" href="/work/signals-playground/#playground">Open the playground</a>
             <a class="btn" href="/work/signals-playground/">Case study</a>
           </Fragment>
         </FigureCard>
@@ -261,7 +261,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   }
 
   .projects__note {
-    font-size: 1rem;
+    font-size: var(--fs-16);
     color: var(--text-soft);
   }
 
@@ -297,14 +297,14 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
   .fc-plate__note {
     margin-top: 0.75rem;
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     font-style: italic;
     color: var(--muted);
   }
 
   .projects__more {
     margin-top: 1.75rem;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--muted);
   }
 
@@ -410,7 +410,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
   }
 
   .mini__title {
-    font-size: 1.1875rem;
+    font-size: var(--fs-19);
     letter-spacing: -0.01em;
   }
 
@@ -424,7 +424,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
   .mini__wt {
     font-weight: 400;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--muted);
   }
 
@@ -433,7 +433,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
     flex-wrap: wrap;
     gap: 0 1rem;
     margin-top: 0.2rem;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     font-weight: 600;
   }
 
@@ -447,7 +447,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
   .mini__text {
     margin-top: 0.35rem;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
     color: var(--text-soft);
   }
 </style>

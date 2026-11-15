@@ -23,7 +23,7 @@ const { empty = false } = Astro.props;
     <p class="sig__hint" data-sig-hint>move the mouse to read the signal</p>
     {
       !empty && (
-        <button type="button" class="sig__play" data-sig-play aria-pressed="false">
+        <button type="button" class="sig__play btn btn--small" data-sig-play aria-pressed="false">
           <svg viewBox="0 0 12 12" aria-hidden="true">
             <path d="M2 1.5v9l8-4.5z" fill="currentColor" />
           </svg>
@@ -124,7 +124,7 @@ const { empty = false } = Astro.props;
     padding: 0.35rem 0.5rem;
     border: 1px solid var(--screen-line);
     background: var(--screen);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     line-height: 1.45;
     white-space: pre;
     color: var(--screen-ink);
@@ -140,7 +140,7 @@ const { empty = false } = Astro.props;
   .sig__hint {
     position: absolute;
     left: 0.75rem;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
     pointer-events: none;
   }
@@ -160,23 +160,16 @@ const { empty = false } = Astro.props;
     }
   }
 
+  /* The small secondary button (.btn .btn--small) in the scope's colors. */
   .sig__play {
+    --btn-bg: var(--screen);
+    --btn-fg: var(--screen-ink);
+    --btn-line: var(--screen-ink);
     position: absolute;
     z-index: 1;
     right: 0.75rem;
     bottom: 0.6rem;
-    display: inline-flex;
-    align-items: center;
     gap: 0.5rem;
-    min-height: 2.5rem;
-    padding: 0.35rem 0.8rem;
-    border: 1px solid var(--screen-ink);
-    border-radius: 999px;
-    background: var(--screen);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--screen-ink);
-    cursor: pointer;
   }
 
   /* While it plays, a thin bar along the bottom edge shows how far through the 2 s it is. */
@@ -197,7 +190,7 @@ const { empty = false } = Astro.props;
   }
 
   .sig__play[aria-pressed='true'] {
-    border-color: var(--accent);
+    --btn-line: var(--accent);
   }
 
   .sig__note {
@@ -208,11 +201,11 @@ const { empty = false } = Astro.props;
   }
 
   .sig__plain {
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
   }
 
   .sig__tech {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
   }
 
   /* The second sentence of the caption matches the device: a mouse reads, a finger listens. */

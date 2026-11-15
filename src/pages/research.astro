@@ -280,7 +280,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             planning the first bench tests.
           </p>
           <div class="zone-r__actions">
-            <a class="btn btn--line-accent" href="/work/acoustic-pool-alarm/">Follow along</a>
+            <a class="btn" href="/work/acoustic-pool-alarm/">Follow along</a>
             <a class="link" href="/work/because-of-adam/">Because of ADAM</a>
           </div>
           <MarginNote where="pool-alarm" />
@@ -362,7 +362,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     right: 18px;
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     letter-spacing: 0.04em;
     color: var(--muted);
   }
@@ -411,7 +411,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   }
 
   .rgauge b {
-    font-size: 1rem;
+    font-size: var(--fs-16);
     font-weight: 500;
     font-variant-numeric: tabular-nums;
   }
@@ -439,7 +439,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   .rs__look {
     display: inline-block;
     margin-top: 0.9rem;
-    font-size: 1.0625rem;
+    font-size: var(--fs-17);
     cursor: grab;
   }
 
@@ -508,7 +508,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     }
 
     .rfig :global(.fig__note) {
-      font-size: 0.8125rem;
+      font-size: var(--fs-13);
     }
 
     /* The ray tracer's ocean section is wide and shallow: a wider window. */
@@ -586,7 +586,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .zone-r__small {
     margin-top: 1rem;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -601,7 +601,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .zone-r__links {
     margin-top: 1rem;
-    font-size: 0.9375rem;
+    font-size: var(--fs-15);
   }
 
   /* ---- Figures on dark water ---- */
@@ -624,7 +624,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     padding: 0.55rem 0.75rem;
     border: 1px solid var(--line);
     background: var(--surface);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -711,7 +711,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     padding: 0.3rem 0.6rem;
     border: 1px solid var(--text);
     background: var(--surface);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text);
     cursor: pointer;
   }
@@ -731,7 +731,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
     border: 1px solid var(--line-strong);
     background: var(--paper);
     color: var(--text);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     line-height: 1.45;
   }
 
@@ -848,7 +848,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
 
   .arr-sketch__read {
     margin-top: 0.35rem;
-    font-size: 0.8125rem;
+    font-size: var(--fs-13);
     line-height: 1.45;
     color: var(--text-soft);
   }

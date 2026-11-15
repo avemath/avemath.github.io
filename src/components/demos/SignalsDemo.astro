@@ -348,9 +348,9 @@ const schemes = [
     padding: 0.75rem 1rem;
     border: 1px solid var(--line);
     border-left: 3px solid var(--accent);
-    border-radius: 0.6rem;
+    border-radius: var(--radius-10);
     background: var(--bg);
-    font-size: 0.88rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -360,7 +360,7 @@ const schemes = [
     gap: 0.4rem;
     padding: 0.35rem;
     border: 1px solid var(--line);
-    border-radius: 0.9rem;
+    border-radius: var(--radius-14);
     background: var(--bg);
   }
 
@@ -371,11 +371,11 @@ const schemes = [
     min-height: 2.5rem;
     padding: 0.45rem 0.85rem;
     border: 1px solid transparent;
-    border-radius: 0.6rem;
+    border-radius: var(--radius-10);
     background: transparent;
     color: var(--text-soft);
     font: inherit;
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
     font-weight: 600;
     cursor: pointer;
   }
@@ -392,7 +392,7 @@ const schemes = [
   }
 
   .sig__tab-n {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -414,19 +414,19 @@ const schemes = [
   .sig__flag {
     padding: 0.6rem 0.85rem;
     border-left: 3px solid var(--amber);
-    border-radius: 0.4rem;
+    border-radius: var(--radius-6);
     background: var(--surface-2);
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
   }
 
   .sig__h {
-    font-size: 1.05rem;
+    font-size: var(--fs-17);
     font-weight: 600;
   }
 
   .sig__small,
   .sig__hint {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
     max-width: 30em;
   }
@@ -468,7 +468,7 @@ const schemes = [
 
   .sig__msg {
     min-height: 1.4em;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -478,14 +478,14 @@ const schemes = [
     padding: 0;
     margin: 0;
     list-style: none;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
   .sig__scroll {
     overflow-x: auto;
     border: 1px solid var(--line);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-12);
     background: var(--bg);
   }
 
@@ -505,7 +505,7 @@ const schemes = [
   .field {
     display: grid;
     gap: 0.4rem;
-    font-size: 0.92rem;
+    font-size: var(--fs-15);
     align-content: start;
   }
 
@@ -522,7 +522,7 @@ const schemes = [
 
   .slider small,
   .field small {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -532,10 +532,10 @@ const schemes = [
     min-height: 2.5rem;
     padding: 0.4rem 0.6rem;
     border: 1px solid var(--line-strong);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-8);
     background: var(--bg);
     color: var(--text);
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
   }
 
   .seg {
@@ -569,9 +569,9 @@ const schemes = [
     min-height: 2.25rem;
     padding: 0.35rem 0.8rem;
     border: 1px solid var(--line-strong);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--bg);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     font-weight: 600;
   }
 
@@ -591,7 +591,7 @@ const schemes = [
     padding: 0.75rem;
     margin: 0;
     border: 1px solid var(--line);
-    border-radius: 0.6rem;
+    border-radius: var(--radius-10);
     background: var(--bg);
   }
 
@@ -603,7 +603,7 @@ const schemes = [
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    font-size: 0.9rem;
+    font-size: var(--fs-14);
   }
 
   .check input {
@@ -614,7 +614,7 @@ const schemes = [
     margin: 0;
     padding: 0.75rem;
     border: 1px solid var(--line);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-12);
     background: var(--bg);
     min-width: 0;
   }
@@ -658,12 +658,12 @@ const schemes = [
   .stats > div {
     padding: 0.55rem 0.75rem;
     border: 1px solid var(--line);
-    border-radius: 0.6rem;
+    border-radius: var(--radius-10);
     background: var(--bg);
   }
 
   .stats dt {
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-soft);
@@ -671,7 +671,7 @@ const schemes = [
 
   .stats dd {
     margin-top: 0.15rem;
-    font-size: 0.92rem;
+    font-size: var(--fs-15);
     font-variant-numeric: tabular-nums;
   }
 
@@ -682,7 +682,7 @@ const schemes = [
     padding: 0;
     margin: 0.6rem 0 0;
     list-style: none;
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     color: var(--text-soft);
   }
 
@@ -691,7 +691,7 @@ const schemes = [
     width: 0.7rem;
     height: 0.7rem;
     margin-right: 0.4rem;
-    border-radius: 2px;
+    border-radius: var(--radius-2);
     vertical-align: -1px;
   }
 
@@ -715,7 +715,7 @@ const schemes = [
     min-width: min(100%, 36rem);
     border-collapse: collapse;
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: var(--fs-14);
     font-variant-numeric: tabular-nums;
   }
 

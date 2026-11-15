@@ -1,6 +1,6 @@
 # Design system: Specimen
 
-A field notebook of engraved plates: paper by day, a glowing night bench after dark. Figures sit in plate frames (a double hairline) with "Fig. N." captions in Bodoni italic, and every plate is drawn from Ave's own data. The approved mockups are `docs/mockups/specimen-study.html` and `docs/mockups/specimen-choices.html`; what changed is in [REDESIGN.md](REDESIGN.md#specimen).
+A field notebook of engraved plates: paper by day, a glowing night bench after dark. Figures sit in plate frames (a double hairline) with "Fig. N." captions in Bodoni italic (figures inside case study prose label themselves in mono), and every plate is drawn from Ave's own data. The approved mockups are `docs/mockups/specimen-study.html` and `docs/mockups/specimen-choices.html`; what changed is in [REDESIGN.md](REDESIGN.md#specimen).
 
 The live reference is `/styleguide/` (not linked or indexed). Toggle the theme to check both palettes.
 
@@ -21,15 +21,17 @@ Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme=
 | `--green-strong` (`--accent-ink`, `--accent-strong`, `--focus`) | `#1f5e44` | `#7fd6a8` | links, small accent text, focus rings: 6.8:1 on paper, 7.3:1 on sheet; paper text on it is 6.8:1 |
 | `--deep`, `--deep-ink`, `--deep-muted`, `--deep-accent` | `#0e2a22`, `#e6efea`, `#9db0a6`, `#7fd6a8` | same | the deep band (footer, marquee, Research teaser): 13.0:1, 6.7:1, 8.8:1 |
 | `--teal`, `--lilac`, `--rose`, `--gold`, `--sage` and their `*-ink` | as before | as before | only the eigenray plate, data figures and the handwritten notes; `*-ink` is 4.9:1 or better on light paper |
-| `--photo` | `#fbfaf7` | `#f2efea` | print borders |
+| `--photo` | `#e7e3db` | `#cfcac1` | print borders (the graduation print's off-white) |
 | `--screen` and `--screen-*` | `#0f1a16` | `#08100d` | the oscilloscope, the LED matrix, the spectrogram: dark in both themes |
 | `--bit` | `#1e8a5a` | `#5cf2a6` (with glow) | the bit girl |
+| `--plot-paper`, `--plot-dim` | `#fff`, none | `#d1d4d1`, `brightness(0.82)` | white plots and site screenshots: as they are in light, dimmed in dark so they don't glare |
+| `--print-shade` | `--ink` | `#000` | what print shadows are made of, so in dark they shade instead of glowing |
 
 Green is the accent for links, buttons, headings and focus; purple is no longer a UI accent. Prints and handwritten notes stay light in both themes (`--photo-ink`, `--note-*`). Outside CSS, `src/lib/theme.ts` (the two theme-color tags), `src/lib/tokens-client.ts` (canvases) and `scripts/render-assets.mjs` (favicon, social cards) read the tokens, so `npm run assets` follows any change.
 
 ### Surfaces
 
-Sections alternate paper, sheet and the deep band (`.band-paper`, `.band-sheet`, `.band-deep` in `global.css`) so no two neighbors share a background; the footer is always deep. `.band-deep` re-points the role tokens, so anything inside reads light on deep green. Plates on sheet sections get `--plate-shadow`. Every paper and sheet section and the home hero carry the faint contour texture (`public/topo.svg` from `scripts/gen-topo.mjs`, about 5%, tiled at one scale); with a fine pointer a soft glow brightens the lines under the cursor (`src/scripts/texture.ts`), and in dark mode a few plankton drift through the hero and the deep bands. The glow and the plankton are off with reduced motion. The Research teaser draws the same lines glowing over a still of the seafloor. Research panels are a muted, translucent surface (`#e8efea` at 90%, `#16241f` at 88%) with the water blurred behind; inside them muted text is `#4a5751` in light mode so it keeps 5.2:1 over the darkest water.
+Sections alternate paper, sheet and the deep band (`.band-paper`, `.band-sheet`, `.band-deep` in `global.css`) so no two neighbors share a background; the footer is always deep. `.band-deep` re-points the role tokens, so anything inside reads light on deep green. Plates on sheet sections get `--plate-shadow`. Every paper and sheet section and the home hero carry the faint contour texture (`public/topo.svg` from `scripts/gen-topo.mjs`, about 5%, tiled at one scale); with a fine pointer a soft glow brightens the lines under the cursor (`src/scripts/texture.ts`), and in dark mode a few plankton drift through the hero and the deep bands. The glow and the plankton are off with reduced motion. The Research teaser draws the same lines glowing over a still of the seafloor. Research panels are a muted, translucent surface that deepens with the dive (light `#e4f0e8` to `#d2dde6`, dark `#1b302a` to `#0f1a25`, at 90%) with the water blurred behind; inside them muted text is `#46534d` in light mode and `#a3b6ac` in dark, so it keeps AA over the darkest water.
 
 ## Type
 
@@ -38,13 +40,26 @@ The root size is 16px up to 1440 wide and grows to about 19.8px at 2560 (capped)
 - **Bodoni Moda** (display): headings at weight 400 (h3 and h4 at 500), italic for accents (`h1 em` is green), plate numbers and "Fig. N." captions.
 - **Hanken Grotesk** (body): 17px/1.5.
 - **JetBrains Mono** (data, pin names, labels, code).
-- **Kalam** (handwritten notes and captions only).
+- **Kalam** (handwritten notes and captions only, `--font-hand`).
+
+The type scale is a set of tokens named by their size in pixels at the 16px root: `--fs-12`, `--fs-13`, `--fs-14`, `--fs-15`, `--fs-16`, `--fs-17` (body), `--fs-18`, `--fs-19`, `--fs-20`, `--fs-22`, `--fs-24`, `--fs-28`, `--fs-32`. Every rem font size in a component uses one. Left as they are on purpose: display headings (their own `clamp()` sizes), the arrow glyphs in the figure viewer (1.6rem), the datasheet chip and notes (px, so its zoom is the only thing scaling them) and the labels inside SVG drawings (px in the drawing's own units).
 
 All are self-hosted from Fontsource, Latin only, `font-display: swap`. Bodoni Moda roman and italic (the hero name) are preloaded. Each family has a fallback face sized to its metrics (`src/styles/fonts.css`, measured with `scripts/measure-fallback.mjs` against Georgia, Arial and Courier New; Hanken Grotesk also has Roboto and DejaVu Sans faces for systems without Arial), so the swap does not move the layout.
 
 ## Shape
 
-Square corners on cards and buttons. Buttons: 2px border, 50px tall, weight 700. Paper cards: 1px border and a soft shadow. Numbered callouts are the only round things.
+Cards, plates, tabs and chips have square corners; paper cards have a 1px border and a soft shadow. Buttons are pills. Rounded corners elsewhere (the radio, the demo panels, the palette, the browser frames, the field notes) use the radius tokens, named by their size in pixels: `--radius-2`, `--radius-4`, `--radius-6`, `--radius-8`, `--radius-10`, `--radius-12`, `--radius-14`, `--radius-16`, `--radius-18` and `--radius-pill`. Circles are `50%`.
+
+### Buttons
+
+One button, two styles, in `global.css`:
+
+- **Secondary** (`.btn`): a pill with a 1px line in the text color, transparent fill, 46px tall, weight 500, `--fs-15`. The line turns green on hover.
+- **Primary** (`.btn--primary`): the same pill filled with ink, paper text; green on hover.
+- **Small** (`.btn--small`): a size for either, still 44px tall.
+- **Text link** (`.link`): underlined, weight 600, for links in running text.
+
+A button in a special place keeps the style and only sets its colors through `--btn-bg`, `--btn-fg` and `--btn-line`: Try it on the site pictures (surface fill), Hear it on the scope (the scope's colors), the header's search, theme and menu buttons (small, sized for an icon). Choice groups made of radio inputs (the playground's options) are not buttons and keep their own segmented style.
 
 ## Motion
 
