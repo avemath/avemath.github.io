@@ -542,11 +542,17 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     for (let z = 0; z <= MAXZ; z += 100) ssp.push([(c(z) - 1480) / 90, z / MAXZ]);
     ready = true;
     readInks();
-    resize();
-    kick();
-    document.fonts?.ready.then(() => {
-      measureNotes();
-      draw();
+    // Size and draw in the next frame, a task of its own, so tracing, reading the inks and drawing
+    // never add up to one long task. resize() measures the notes and draws; only if the fonts were
+    // still loading is there a second pass once they land.
+    requestAnimationFrame(() => {
+      resize();
+      kick();
+      if (document.fonts && document.fonts.status !== 'loaded')
+        document.fonts.ready.then(() => {
+          measureNotes();
+          draw();
+        });
     });
   };
   if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1200 });
