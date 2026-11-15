@@ -728,6 +728,30 @@ Accessibility, best practices and SEO 100 on every run; CLS 0 everywhere (Resear
 
 The audit of November 14 (docs/AUDIT-2026-11-14.md) answered and approved. One commit per item.
 
+### What changed, by item
+
+1. RAMpage: the transmitter caption says switch A, as the firmware (`CH5_PIN = 18  # SwA`) and the deck do. The photo's own screen shows channel 5 on SwC, so its alt text still says switch C.
+2. Integer: "underwater network simulation tools" stays.
+3. The kayak photo of Ave and Lea is approved; SOURCES.md now lists every approved family photo.
+4. Web work: no change to the nav or the hero for now.
+5. /research/: the lede says what Ave studies (how sound carries information through water) and why (underwater communication and the pool alarm idea), with no ONR methods.
+6. RAMpage: "within 35 ms" is the kill switch's figure only, in the system drawing's legend too.
+7. Dark mode: new tokens `--plot-paper`, `--plot-dim` and `--print-shade`. In dark, white plots and every site screenshot drop to 82% brightness, and Polaroid and bench print shadows are black, so they shade instead of glowing. Checked at 1440 and 390 (`docs/proposals-nov15/dark/`).
+8. Website tiles: the live address sits under the picture, and the tiles no longer opt out of the no-cover test.
+9. About: the FILM note names Grandma Joyce again.
+10. About: Recommendations come right after the datasheet, still on the deep green band.
+11. /research/ ends with "Working on something similar, or want to talk underwater acoustics? Get in touch", linking to /contact/?topic=research.
+12. bellhopSim: every gallery caption starts "Simulated with BELLHOP."; Fig. R3, the hero's Fig. 1 and the home card say simulated too.
+13. /work/: "Every project" is a list you open and close, closed to start. A link to #engineering, #research or #websites opens it and lands on that group; the summary is a 44px control.
+14. The six client case studies read for the owner: what they needed, what I built, what changed for them, then "Under the hood" with the stack, hosting, CMS, tests and speed. No new claims or numbers; Because of ADAM says "the nonprofit".
+15. Design system: one secondary (`.btn`) and one primary (`.btn--primary`) button, with `.btn--small` 44px everywhere and `.link` for text links. Try it, Hear it and the header buttons are the small secondary button in their own colors; `btn--solid` and `btn--line-accent` are gone. Type scale `--fs-12` to `--fs-32` and radii `--radius-2` to `--radius-18` and `--radius-pill`; every rem font size and radius in a component uses one (near misses moved by 1px or less). DESIGN.md matches the code. Visible changes: the header's search, theme and menu buttons are round; Try it is a pill; Hear it and the small buttons are 44px tall; the pool alarm's "Follow along" lost its green outline. Before and after in `docs/proposals-nov15/design-system/`.
+16. Speed: the ray tracer on /research/ waits until its figure is near the screen (it was a 260 ms long task at load); the hero plate draws once, in its own frame; and the research depth tag holds its line from the first paint (Tailwind's `[hidden]` rule had beaten the Nov 14 fix, a 0.023 layout shift).
+
+LIGHTHOUSE_NOV15
+
 ### Open TODO(ave)
 
 - TODO(ave): decide whether to promote web work (Services in nav, hero line). For now the nav and the hero stay as they are (audit S1).
+- TODO(ave): confirm switch A on RAMpage (the transmitter photo shows SwC). `src/content/projects/rampage.md`.
+- TODO(ave): confirm Integer is OK with "underwater network simulation tools". `integer-internship.md`, `experience.json`.
+- TODO(ave): check wording of the new copy: the /research/ lede and closing line, the RAMpage drawing's 35 ms line, the FILM note, the "Simulated" labels (bellhopSim gallery, Fig. R3, Fig. 1, the home card), the six client case studies, and the /work/ list's summary.
