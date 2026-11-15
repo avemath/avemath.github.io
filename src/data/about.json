@@ -1,5 +1,6 @@
 {
   "_todo": [
+    "TODO(ave): check wording of the FILM note (Nov 15: Grandma Joyce added back now that notes have no headings).",
     "TODO(ave): pins with no photo show a line drawing in the print frame (only NC, pin 12, on purpose). To change a print, set photo to a path under src/assets/ and add an alt."
   ],
   "feature": {
@@ -100,7 +101,7 @@
     {
       "label": "FILM",
       "title": "Graduation, with Grandma Joyce",
-      "note": "My Polaroid comes everywhere with me. I like having something tangible I can hold from the days that matter, like this one.",
+      "note": "My Polaroid comes everywhere with me. I like having something tangible I can hold from the days that matter, like this one with Grandma Joyce.",
       "photo": "about/film-graduation-print.jpg",
       "alt": "An instant print of Avery in her 2026 cap and gown holding her LSU diploma and sunflowers, cheek to cheek with her Grandma Joyce.",
       "caption": "",
