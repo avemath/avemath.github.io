@@ -29,11 +29,17 @@ try {
   <div class="wrap foot">
     {
       variant === 'research' ? (
-        <p class="foot__back">
-          <a class="btn" href="#research-title" data-surface>Back to the surface</a>
-          <a class="foot__link" href="/">Home</a>
-          <a class="foot__link" href="/#websites">Or see the websites</a>
-        </p>
+        <div class="foot__research">
+          {/* TODO(ave): check wording (Nov 15: research closing line). */}
+          <p class="foot__close">
+            Working on something similar, or want to talk underwater acoustics? <a class="link" href="/contact/?topic=research">Get in touch</a>.
+          </p>
+          <p class="foot__back">
+            <a class="btn" href="#research-title" data-surface>Back to the surface</a>
+            <a class="foot__link" href="/">Home</a>
+            <a class="foot__link" href="/#websites">Or see the websites</a>
+          </p>
+        </div>
       ) : variant === 'links' ? null : (
         <div>
           <p class="foot__hi">Say hi.</p>
@@ -112,6 +118,13 @@ try {
   .site-footer--deep .foot {
     align-items: center;
     padding-block: 2rem;
+  }
+
+  /* The research page's last word: a line that asks for a conversation, above the way back up. */
+  .foot__close {
+    max-width: 44em;
+    margin-bottom: 1.25rem;
+    font-size: 1.125rem;
   }
 
   .foot__back {
