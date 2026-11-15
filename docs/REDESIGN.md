@@ -723,3 +723,11 @@ Accessibility, best practices and SEO are 100 on every run. On this machine Ligh
 | Desktop | 100 | 100 | 100 | 100 |
 
 Accessibility, best practices and SEO 100 on every run; CLS 0 everywhere (Research desktop 0.001).
+
+## Approved proposals, November 15, 2026 (branch proposals-nov15)
+
+The audit of November 14 (docs/AUDIT-2026-11-14.md) answered and approved. One commit per item.
+
+### Open TODO(ave)
+
+- TODO(ave): decide whether to promote web work (Services in nav, hero line). For now the nav and the hero stay as they are (audit S1).
