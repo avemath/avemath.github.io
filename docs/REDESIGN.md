@@ -747,7 +747,47 @@ The audit of November 14 (docs/AUDIT-2026-11-14.md) answered and approved. One c
 15. Design system: one secondary (`.btn`) and one primary (`.btn--primary`) button, with `.btn--small` 44px everywhere and `.link` for text links. Try it, Hear it and the header buttons are the small secondary button in their own colors; `btn--solid` and `btn--line-accent` are gone. Type scale `--fs-12` to `--fs-32` and radii `--radius-2` to `--radius-18` and `--radius-pill`; every rem font size and radius in a component uses one (near misses moved by 1px or less). DESIGN.md matches the code. Visible changes: the header's search, theme and menu buttons are round; Try it is a pill; Hear it and the small buttons are 44px tall; the pool alarm's "Follow along" lost its green outline. Before and after in `docs/proposals-nov15/design-system/`.
 16. Speed: the ray tracer on /research/ waits until its figure is near the screen (it was a 260 ms long task at load); the hero plate draws once, in its own frame; and the research depth tag holds its line from the first paint (Tailwind's `[hidden]` rule had beaten the Nov 14 fix, a 0.023 layout shift).
 
-LIGHTHOUSE_NOV15
+### Speed and Lighthouse (Nov 15)
+
+Measured with nothing else running, Lighthouse 13.6, three runs each, medians. Local runs serve the build gzipped, as GitHub Pages does (without compression the 200 to 335 KB pages inflate the simulated LCP). Live runs are https://avemath.github.io, which still serves main; live scores moved a lot between sessions on the same code (home 86 in the morning, 95 in the afternoon), so the before and after below compares main and this branch locally, on the same machine and server.
+
+| Mobile | main (local) | This branch (local) | Target |
+|---|---|---|---|
+| Home | 98, TBT 178 ms | 98, TBT 150 ms | 95 |
+| /research/ | 86, TBT 393 ms, CLS 0.023 | 96, TBT 145 ms, CLS 0 | 90 |
+
+Largest long tasks on a throttled phone (Lighthouse, median run): on /research/ the 290 ms task (the ray tracer at load, which Lighthouse charged to tokens-client) is gone; the largest left is about 160 ms of layout and style. On home the hero plate's draw is no longer folded into the tracing task; what is left is the first layout of a large page (about 180 ms) and the scope's idle setup (about 75 ms). A trace at 4x CPU shows the same: /research/ blocking went from 607 ms to 51 ms in the first 8 s, home from 170 ms to 59 to 97 ms.
+
+This branch, local:
+
+| Page | Form | Perf | A11y | BP | SEO | LCP | CLS | TBT | Perf runs |
+|---|---|---|---|---|---|---|---|---|---|
+| / | mobile | 98 | 100 | 100 | 100 | 1.0 s | 0.000 | 150 ms | 98, 96, 99 |
+| /about/ | mobile | 98 | 100 | 100 | 100 | 2.3 s | 0.000 | 34 ms | 98, 98, 98 |
+| /work/ | mobile | 99 | 100 | 100 | 100 | 1.0 s | 0.000 | 109 ms | 97, 99, 100 |
+| /research/ | mobile | 96 | 100 | 100 | 100 | 2.6 s | 0.000 | 145 ms | 96, 96, 93 |
+| /work/grace-mae-alterations/ | mobile | 99 | 100 | 100 | 100 | 2.2 s | 0.000 | 33 ms | 98, 99, 99 |
+| / | desktop | 100 | 100 | 100 | 100 | 0.3 s | 0.000 | 0 ms | 100, 100, 100 |
+| /about/ | desktop | 100 | 100 | 100 | 100 | 0.6 s | 0.000 | 0 ms | 100, 100, 100 |
+| /work/ | desktop | 100 | 100 | 100 | 100 | 0.6 s | 0.000 | 0 ms | 100, 100, 100 |
+| /research/ | desktop | 100 | 100 | 100 | 100 | 0.6 s | 0.001 | 0 ms | 100, 100, 100 |
+| /work/grace-mae-alterations/ | desktop | 100 | 100 | 100 | 100 | 0.5 s | 0.000 | 0 ms | 100, 100, 100 |
+
+Live (main), for reference:
+
+| Page | Form | Perf | A11y | BP | SEO | LCP | CLS | TBT | Perf runs |
+|---|---|---|---|---|---|---|---|---|---|
+| / | mobile | 95 | 100 | 100 | 100 | 1.2 s | 0.000 | 242 ms | 93, 95, 98 |
+| /about/ | mobile | 100 | 100 | 100 | 100 | 1.8 s | 0.000 | 52 ms | 100, 100, 98 |
+| /work/ | mobile | 99 | 100 | 100 | 100 | 1.1 s | 0.000 | 98 ms | 99, 100, 99 |
+| /research/ | mobile | 90 | 100 | 100 | 100 | 2.0 s | 0.023 | 372 ms | 91, 90, 89 |
+| /work/grace-mae-alterations/ | mobile | 100 | 100 | 100 | 100 | 1.7 s | 0.000 | 29 ms | 100, 100, 99 |
+| / | desktop | 100 | 100 | 100 | 100 | 0.4 s | 0.000 | 0 ms | 100, 100, 100 |
+| /about/ | desktop | 100 | 100 | 100 | 100 | 0.4 s | 0.000 | 0 ms | 100, 100, 100 |
+| /work/ | desktop | 100 | 100 | 100 | 100 | 0.5 s | 0.000 | 0 ms | 100, 100, 100 |
+| /research/ | desktop | 100 | 100 | 100 | 100 | 0.5 s | 0.002 | 12 ms | 100, 100, 100 |
+| /work/grace-mae-alterations/ | desktop | 100 | 100 | 100 | 100 | 0.4 s | 0.000 | 0 ms | 100, 100, 100 |
+
 
 ### Open TODO(ave)
 
