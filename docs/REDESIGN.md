@@ -730,7 +730,7 @@ The audit of November 14 (docs/AUDIT-2026-11-14.md) answered and approved. One c
 
 ### What changed, by item
 
-1. RAMpage: the transmitter caption says switch A, as the firmware (`CH5_PIN = 18  # SwA`) and the deck do. The photo's own screen shows channel 5 on SwC, so its alt text still says switch C.
+1. RAMpage: the transmitter caption and alt text say "the kill switch on channel 5", with no switch letter (the firmware and deck say SwA; the photo's screen shows SwC). Settled with Ave on Nov 15.
 2. Integer: "underwater network simulation tools" stays.
 3. The kayak photo of Ave and Lea is approved; SOURCES.md now lists every approved family photo.
 4. Web work: no change to the nav or the hero for now.
@@ -792,6 +792,5 @@ Live (main), for reference:
 ### Open TODO(ave)
 
 - TODO(ave): decide whether to promote web work (Services in nav, hero line). For now the nav and the hero stay as they are (audit S1).
-- TODO(ave): confirm switch A on RAMpage (the transmitter photo shows SwC). `src/content/projects/rampage.md`.
 - TODO(ave): confirm Integer is OK with "underwater network simulation tools". `integer-internship.md`, `experience.json`.
 - TODO(ave): check wording of the new copy: the /research/ lede and closing line, the RAMpage drawing's 35 ms line, the FILM note, the "Simulated" labels (bellhopSim gallery, Fig. R3, Fig. 1, the home card), the six client case studies, and the /work/ list's summary.
