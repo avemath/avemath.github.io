@@ -53,9 +53,12 @@ const { empty = false } = Astro.props;
 </figure>
 
 <style>
+  /* The scope is a container: its hint and Hear it button share the bottom edge only when it is wide
+     enough for both, whatever the window is doing. */
   .sig {
     margin: 0;
     min-width: 0;
+    container-type: inline-size;
   }
 
   /* A scope screen: dark in both modes, with its own inks. */
@@ -153,8 +156,14 @@ const { empty = false } = Astro.props;
     bottom: 0.85rem;
   }
 
-  /* Touch screens have no cursors to move, and a narrow screen has no room beside Hear it. */
-  @media (hover: none), (max-width: 520px) {
+  /* Touch screens have no cursors to move, and a narrow scope has no room beside Hear it. */
+  @media (hover: none) {
+    .sig__hint {
+      visibility: hidden;
+    }
+  }
+
+  @container (max-width: 27rem) {
     .sig__hint {
       visibility: hidden;
     }

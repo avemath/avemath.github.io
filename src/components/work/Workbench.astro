@@ -507,6 +507,11 @@ const order = [...placed].sort((a, b) => {
 </style>
 
 <style>
+  /* The bench and its detail lay themselves out by their own width (a container). */
+  .bench-wrap {
+    container: bench / inline-size;
+  }
+
   .bench-wrap {
     position: relative;
   }
@@ -523,7 +528,7 @@ const order = [...placed].sort((a, b) => {
     height: auto;
   }
 
-  @media (max-width: 759px) {
+  @container bench (max-width: 698px) {
     .bench-shelf {
       overflow-x: auto;
       overscroll-behavior-x: contain;
@@ -552,7 +557,7 @@ const order = [...placed].sort((a, b) => {
     color: var(--muted);
   }
 
-  @media (max-width: 759px) {
+  @container bench (max-width: 698px) {
     .bench-hint--wide {
       display: none;
     }
@@ -582,7 +587,7 @@ const order = [...placed].sort((a, b) => {
     display: none;
   }
 
-  @media (min-width: 900px) {
+  @container bench (min-width: 828px) {
     .bd {
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     }

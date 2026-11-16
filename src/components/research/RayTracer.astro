@@ -73,8 +73,9 @@ import { PROFILES } from '@/lib/raytrace';
   }
 
   /* An even grid: Environment beside Ping, Source depth beside Fan, Receiver range beside Receiver
-     depth. When the figure is wide enough, three columns: Environment, Source depth, Fan, then
-     Receiver range, Receiver depth, Ping. Each label sits with its value on one row over its slider. */
+     depth. When the figure is wide enough, two rows of four columns: Environment (two wide), Source
+     depth, Fan, then Receiver range, Receiver depth, Ping (two wide). Each label sits with its value on
+     one row over its slider. */
   .rt__ctl {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -89,14 +90,22 @@ import { PROFILES } from '@/lib/raytrace';
     grid-column: 2;
   }
 
-  @container (min-width: 560px) {
+  /* In em, so the switch follows the text: bigger type (a large screen, or enlarged text) keeps two
+     roomier columns longer, and nothing gets cut short. */
+  @container (min-width: 36em) {
     .rt__ctl {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    /* Environment and Ping each take two of the four columns: the select has room for its longest
+       option even with enlarged text, in the same two rows. */
+    .rt__ctl > :first-child {
+      grid-column: span 2;
     }
 
     .rt__go {
       grid-row: auto;
-      grid-column: auto;
+      grid-column: span 2;
     }
   }
 
@@ -119,16 +128,19 @@ import { PROFILES } from '@/lib/raytrace';
     min-width: 0;
   }
 
+  /* The label and its value on one row; only if the type is too big for that does the value drop to
+     the next line, never split itself. */
   .rt__k {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: 0 0.5rem;
     font-size: var(--fs-13);
-    white-space: nowrap;
     color: var(--muted);
   }
 
   .rt__k output {
+    white-space: nowrap;
     font-family: var(--font-mono);
     color: var(--text);
   }

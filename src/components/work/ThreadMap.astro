@@ -287,6 +287,11 @@ const V_ = build('v');
 </script>
 
 <style>
+  /* The map picks its horizontal or vertical drawing by its own width (a container). */
+  .tmap {
+    container: tmap / inline-size;
+  }
+
   .tmap {
     position: relative;
     padding: 1.1rem clamp(0.5rem, 2vw, 1.4rem) 0.6rem;
@@ -349,7 +354,7 @@ const V_ = build('v');
     margin-inline: auto;
   }
 
-  @media (max-width: 639px) {
+  @container tmap (max-width: 588px) {
     .tmap__svg--h {
       display: none;
     }
@@ -526,6 +531,7 @@ const V_ = build('v');
     position: absolute;
     z-index: 3;
     width: 240px;
+    max-width: 100%;
     padding: 5px;
     border: 1px solid var(--ink);
     background: var(--surface);

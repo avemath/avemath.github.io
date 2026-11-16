@@ -108,9 +108,12 @@ const host = url ? displayUrl(url) : '';
     background: var(--line-strong);
   }
 
+  /* The address may wrap rather than run under Try it or past the bar. */
   .frame__url {
     flex: 1;
+    min-width: 0;
     max-width: 16rem;
+    overflow-wrap: anywhere;
     margin-inline: auto;
     padding: 0.1rem 0.75rem;
     border-radius: var(--radius-pill);
@@ -119,9 +122,7 @@ const host = url ? displayUrl(url) : '';
     font-size: var(--fs-14);
     color: var(--text-soft);
     text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
     translate: -1.5rem 0;
   }
 

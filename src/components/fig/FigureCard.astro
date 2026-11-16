@@ -39,6 +39,7 @@ const views = [
 ];
 ---
 
+<div class="fc-box">
 <article class:list={['fc paper', flip && 'fc--flip', wide && 'fc--wide']} id={id} aria-labelledby={`${id}-title`} data-fc data-proj={proj}>
   <div class="fc__fig">
     <div class="fig__bar">
@@ -124,14 +125,21 @@ const views = [
     <div class="fc__actions"><slot name="actions" /></div>
   </div>
 </article>
+</div>
 
 <style>
+  /* The card lays itself out by its own width: its wrapper is the container. */
+  .fc-box {
+    container: fc / inline-size;
+    min-width: 0;
+  }
+
   .fc {
     display: grid;
     scroll-margin-top: 5rem;
   }
 
-  @media (min-width: 960px) {
+  @container fc (min-width: 883px) {
     .fc {
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     }
@@ -164,7 +172,7 @@ const views = [
   }
 
   /* Under a wide figure, the words run in two columns: title and body, then the actions. */
-  @media (min-width: 960px) {
+  @container fc (min-width: 883px) {
     .fc--wide .fc__text,
     .fc[data-wide] .fc__text {
       display: grid;
@@ -205,7 +213,7 @@ const views = [
     flex-direction: column;
   }
 
-  @media (max-width: 959px) {
+  @container fc (max-width: 882px) {
     .fc__fig {
       border-bottom: 1px solid var(--line);
     }

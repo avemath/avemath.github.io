@@ -29,6 +29,29 @@
    Base
    ------------------------------------------------------------------ */
 @layer base {
+  /* Fluid by rule, not by breakpoint. A long word or a URL breaks only when it cannot fit on a line of
+     its own, and because of that no text keeps a flex or grid child wider than its share (the job
+     min-width: 0 does). Controls can shrink with their column and never push past it. Readouts keep
+     their digits still with tabular figures. */
+  body {
+    overflow-wrap: anywhere;
+  }
+
+  :where(select, input, button, textarea) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  :where(output, [data-readout]) {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* A value and its unit (wrapped at build time, scripts/lib/unit-nbsp.mjs) never part. */
+  .nu {
+    white-space: nowrap;
+  }
+
   /* One root size for the whole site. It is 16px up to 1440px wide (laptops and phones are as
      before), then grows with the screen to about 19.8px at 2560 and stops there: body text is 17px
      at 1440, about 19px at 1920 and 21px at 2560, and everything sized in rem (headings, the hero
@@ -915,6 +938,9 @@
 }
 
 .prose table {
+  /* A table too wide for the column scrolls sideways in its own box instead of being cut off. */
+  display: block;
+  overflow-x: auto;
   width: 100%;
   max-width: 68.75rem;
   border-collapse: collapse;

@@ -451,13 +451,18 @@ const jsonLd = [
     font-size: var(--fs-15);
   }
 
+  /* As many cells per row as fit at 9em each (em of their own text, so enlarged text gets fewer, wider
+     cells and no label runs out of its box). The hairlines between cells are the 1px gaps showing the
+     line color behind them, so they are right for any number of columns. */
   .case__metrics {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9em), 1fr));
+    gap: 1px;
     margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    overflow: hidden;
     border: 1px solid var(--line);
     border-radius: var(--radius-16);
-    background: var(--surface);
+    background: var(--line);
   }
 
   /* Labels start at the top and values sit on one baseline at the bottom, however the labels wrap. */
@@ -466,44 +471,13 @@ const jsonLd = [
     flex-direction: column-reverse;
     justify-content: space-between;
     gap: 0.35rem;
-    padding: 1.25rem 1.4rem;
-  }
-
-  .case__metrics > div + div {
-    border-left: 1px solid var(--line);
-  }
-
-  @media (max-width: 560px) {
-    .case__metrics {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .case__metrics > div + div {
-      border-left: 0;
-    }
-
-    .case__metrics > div:nth-child(even) {
-      border-left: 1px solid var(--line);
-    }
-
-    .case__metrics > div:nth-child(n + 3) {
-      border-top: 1px solid var(--line);
-    }
-
-    .case__metrics > div:last-child:nth-child(odd) {
-      grid-column: 1 / -1;
-    }
+    min-width: 0;
+    padding: 1.25rem clamp(1rem, 3vw, 1.4rem);
+    background: var(--surface);
   }
 
   .case__metrics .label {
     text-wrap: balance;
-  }
-
-  /* At 320 a half-width cell needs a little less padding to fit a word like "accessibility". */
-  @media (max-width: 359px) {
-    .case__metrics > div {
-      padding-inline: 1rem;
-    }
   }
 
   .case__metric {

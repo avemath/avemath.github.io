@@ -35,7 +35,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 ---
 
 <Outer id={rowsOnly ? undefined : 'websites'} class={rowsOnly ? undefined : 'section'} aria-labelledby={rowsOnly ? undefined : 'websites-title'}>
-  <div class:list={[!rowsOnly && 'wrap']}>
+  <div class:list={['sites-box', !rowsOnly && 'wrap']}>
     {
       !rowsOnly && (
         <>
@@ -161,6 +161,11 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 </Outer>
 
 <style>
+  /* The rows lay themselves out by their own width (a container), not the window's. */
+  .sites-box {
+    container: sites / inline-size;
+  }
+
   .sites {
     display: grid;
     gap: clamp(4rem, 8vw, 6.5rem);
@@ -175,7 +180,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
 
   /* Desktop: media 7 columns, words 5, both halves centered on each other. The frame fills its
      column edge to edge; the rows alternate sides. */
-  @media (min-width: 960px) {
+  @container sites (min-width: 883px) {
     .site {
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
       gap: 2.5rem;
@@ -200,7 +205,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
   }
 
   /* Phones and small tablets: the media above the words, the full width of the container. */
-  @media (max-width: 959px) {
+  @container sites (max-width: 882px) {
     .sites {
       gap: 3rem;
     }
@@ -210,7 +215,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     }
   }
 
-  @media (max-width: 719px) {
+  @container sites (max-width: 661px) {
     .sites {
       margin-top: 1.5rem;
     }
@@ -333,21 +338,17 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     color: var(--muted);
   }
 
+  /* The scores share a row while they fit at their own width, and wrap onto the next line when they
+     don't (a narrow column, or enlarged text): a label never runs out of its box. */
   .site__metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  /* At 320 a third of the column is narrower than "Accessibility": two columns instead. */
-  @media (max-width: 359px) {
-    .site__metrics {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
   }
 
   .site__metrics > div {
     display: flex;
+    flex: 1 0 auto;
     flex-direction: column;
   }
 
@@ -396,7 +397,7 @@ const siteData = (id: string) => sitesData.find((s) => s.slug === id);
     color: var(--text-soft);
   }
 
-  @media (min-width: 960px) {
+  @container sites (min-width: 883px) {
     .sites__how {
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;

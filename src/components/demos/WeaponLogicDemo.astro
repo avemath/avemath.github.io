@@ -102,14 +102,25 @@ import DemoShell from './DemoShell.astro';
 </DemoShell>
 
 <style>
+  /* By the demo's own width: one column, then two (the log under both), then three. Every card can
+     shrink (min-width: 0) and long log lines wrap, so no card runs over another. */
   .wl {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
 
-  @media (min-width: 960px) {
+  .wl > * {
+    min-width: 0;
+  }
+
+  .wl__log :global(li) {
+    overflow-wrap: anywhere;
+  }
+
+  @container (min-width: 46rem) {
     .wl {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .wl__log {
@@ -117,9 +128,9 @@ import DemoShell from './DemoShell.astro';
     }
   }
 
-  @media (min-width: 1200px) {
+  @container (min-width: 64rem) {
     .wl {
-      grid-template-columns: 1fr 1fr 1.1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr);
     }
 
     .wl__log {

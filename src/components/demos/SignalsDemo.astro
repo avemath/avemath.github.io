@@ -495,9 +495,16 @@ const schemes = [
     height: auto;
   }
 
+  /* Columns at least 14em of their own text, so enlarged text gets fewer, wider columns and no select
+     cuts its option short. */
+  /* The pitch mapping's options are long: its field takes the whole row. */
+  .fh__settings > :has(#fh-pitch) {
+    grid-column: 1 / -1;
+  }
+
   .fh__settings {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14em), 1fr));
     gap: 1rem 1.5rem;
   }
 

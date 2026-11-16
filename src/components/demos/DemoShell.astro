@@ -28,7 +28,9 @@ const { id, title, lede, note } = Astro.props;
     padding-top: clamp(2.5rem, 5vw, 3.5rem);
   }
 
+  /* A container, so each demo lays itself out by its own width, not the window's. */
   .demo__frame {
+    container-type: inline-size;
     position: relative;
     padding: clamp(1.25rem, 3.5vw, 2.5rem);
     border: 1px solid var(--line);

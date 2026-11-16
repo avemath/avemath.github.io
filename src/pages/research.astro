@@ -111,9 +111,10 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
                   </button>
                 ))
               }
-              <p class="net__read" id="net-read" data-net-read aria-live="polite">Hover or focus a node.</p>
               <script type="application/json" data-net-nodes set:html={JSON.stringify(nodes.map(({ id, text }) => ({ id, text })))} />
             </div>
+            {/* Under the drawing, not on it, so no node can cover it at any width. */}
+            <p class="net__read" id="net-read" data-net-read aria-live="polite">Hover or focus a node.</p>
             <figcaption class="plate__cap">
               {/* TODO(ave): check wording (the node list). */}
               <b>Fig. R1.</b> A drawing of the kind of network the project is about, not project data: a ship, a buoy, an autonomous
@@ -526,14 +527,16 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
      bottom of the window. */
   /* Beside the text, the ray tracer's plot takes its height from the screen as well as its width:
      never taller than the room the panel has left, so the panel stays on one screen as the window
-     gets shorter, at any width, with no step. */
-  @media (min-width: 1024px) {
+     gets shorter, at any width, with no step (on screens tall enough for "one screen" at all). */
+  @media (min-width: 1024px) and (min-height: 780px) {
     #bellhop :global(.rt__main) {
       max-height: max(11rem, calc(100dvh - 36rem));
     }
   }
 
-  @media (min-width: 1024px) and (max-height: 900px) {
+  /* Only where "one screen" applies (780px tall and up): on a shorter screen nothing is squeezed, the
+     panel keeps its usual layout and the page scrolls. */
+  @media (min-width: 1024px) and (min-height: 780px) and (max-height: 900px) {
     .rpanel {
       padding: 1rem 1.5rem;
     }
@@ -733,10 +736,8 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   }
 
   .net__read {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    max-width: 16rem;
+    min-height: 3em;
+    margin: 0 0.75rem 0.75rem;
     padding: 0.45rem 0.6rem;
     border: 1px solid var(--line-strong);
     background: var(--paper);
@@ -1026,7 +1027,7 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
   const net = document.querySelector<HTMLElement>('[data-net]');
   if (net) {
     const texts: { id: string; text: string }[] = JSON.parse(net.querySelector('[data-net-nodes]')!.textContent!);
-    const read = net.querySelector<HTMLElement>('[data-net-read]')!;
+    const read = net.closest('figure')!.querySelector<HTMLElement>('[data-net-read]')!;
     const nodes = [...net.querySelectorAll<HTMLButtonElement>('[data-node]')];
     const links = [...net.querySelectorAll<SVGLineElement>('[data-a]')];
     const pick = (b: HTMLButtonElement) => {

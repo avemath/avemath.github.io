@@ -112,9 +112,10 @@ const lanes = [
     align-items: end;
   }
 
-  @container (min-width: 560px) {
+  /* In em, so bigger type keeps the roomier layout longer and no select cuts its text short. */
+  @container (min-width: 30em) {
     .race__ctl {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 2fr) minmax(7em, 1fr) minmax(7em, 1fr) auto;
     }
   }
 
@@ -145,6 +146,7 @@ const lanes = [
   }
 
   .race__field select {
+    width: 100%;
     min-height: 44px;
     padding: 0 0.6rem;
     border: 1px solid var(--line-strong);
@@ -213,7 +215,8 @@ const lanes = [
 
   .lane {
     display: grid;
-    grid-template-columns: 3.75rem minmax(0, 1fr) 7.5rem;
+    /* The lane's name column is as wide as the name needs (at least 3.75rem), so enlarged text fits. */
+    grid-template-columns: minmax(3.75rem, max-content) minmax(0, 1fr) minmax(7.5rem, max-content);
     align-items: center;
     gap: 0.6rem;
     min-height: 2.75rem;
@@ -221,7 +224,7 @@ const lanes = [
 
   @container (max-width: 459px) {
     .lane {
-      grid-template-columns: 3.25rem minmax(0, 1fr);
+      grid-template-columns: minmax(3.25rem, max-content) minmax(0, 1fr);
     }
 
     .lane__read {
