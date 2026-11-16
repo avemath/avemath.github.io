@@ -7,7 +7,7 @@ featured: false
 order: 12
 period: { start: "2026-06" }
 status: live
-summary: A daily health intake and auto-generated lesson reports for my dad's Infant Swim Resource instruction business, built entirely on free Google tools.
+summary: A daily health intake and auto-generated lesson reports for my dad's Infant Swimming Resource instruction business, built entirely on free Google tools.
 outcome: Replaced a paper weekly interview sheet with forms and reports that fill themselves in.
 role: Solo. I designed the form, wrote the Apps Script, and wrote the instructor's one-page guide.
 keywords: ["swim", "ISR", "forms", "Apps Script", "Google Sheets", "reports", "intake"]
@@ -18,7 +18,7 @@ threads: [family, web]
 
 ## What Little Explorer Swim needed
 
-Infant Swim Resource (ISR) lessons start with a check-in on how the child ate, slept and felt that day, because it changes what's safe in the water. My dad became an ISR instructor and a Red Cross CPR instructor in 2020, after my little brother's accident. My dad's ISR business, Little Explorer Swim, tracked that on a paper weekly interview sheet. Paper gets lost, it's hard to read across weeks, and it can't be in two places at once.
+Infant Swimming Resource (ISR) lessons start with a check-in on how the child ate, slept and felt that day, because it changes what's safe in the water. My dad became an ISR instructor and a Red Cross CPR instructor in 2020, after my little brother's accident. My dad's ISR business, Little Explorer Swim, tracked that on a paper weekly interview sheet. Paper gets lost, it's hard to read across weeks, and it can't be in two places at once.
 
 ## What I built
 
