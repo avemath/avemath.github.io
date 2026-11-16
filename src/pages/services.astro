@@ -42,7 +42,6 @@ const included = [
   ['Accessible', 'Keyboard support, readable contrast, alt text and reduced-motion support.'],
   ['Fast', 'Optimized images and very little JavaScript, so pages load quickly on real phones.'],
   ['Search basics', 'Titles, descriptions, a sitemap and structured data so Google understands your business.'],
-  ['Analytics', 'Simple, privacy-friendly visitor stats, with no cookie banner needed.'],
   // TODO(ave): check wording (Nov 16: Nicholas edits one file instead of an editor).
   ['Yours to edit', 'An editor (or one simple file) for your text and photos, plus a written guide to every page.'],
 ];
@@ -394,9 +393,14 @@ const faqLd = {
     grid-template-columns: 1fr;
   }
 
+  /* Two across; an odd last item runs the full width instead of sitting alone. */
   @media (min-width: 560px) {
     .included {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .included > .inc:nth-child(odd):last-child {
+      grid-column: 1 / -1;
     }
   }
 
