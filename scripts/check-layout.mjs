@@ -106,12 +106,22 @@ for (const scheme of ['light', 'dark']) {
       if (!b || b.height < 44) fail(`${label}: ${name} is ${b ? Math.round(b.height) : 0}px tall, under 44px`);
     }
 
-    // Press Fire in real time and check the plow moves out without anything scrolling.
+    // Press Fire in real time and check the plow moves out without anything scrolling. The plow
+    // slides out over 0.3s once the firmware opens the inlets, so at full speed it takes about a
+    // quarter second to move at all, and longer when frames run late (a big page on a busy machine):
+    // wait for it to move, up to two seconds, instead of reading it after a fixed time.
+    // Measured in the page both times (Playwright's own box includes the stroke, about a pixel off).
+    const plowX = () => page.evaluate(() => document.querySelector('#rampage [data-plow]').getBoundingClientRect().x);
+    const homeX = await plowX();
+    const plowMoved = () =>
+      page
+        .waitForFunction((x) => document.querySelector('#rampage [data-plow]').getBoundingClientRect().x > x + 2, homeX, { timeout: 2000, polling: 'raf' })
+        .catch(() => {});
     await page.locator('#rampage .tf__speed input[value="1"]').evaluate((r) => /** @type {HTMLInputElement} */ (r).click());
     const before = await plow.boundingBox();
     const scrollBefore = await page.evaluate(() => scrollY);
     await page.mouse.click(boxes.fire.x + boxes.fire.width / 2, boxes.fire.y + boxes.fire.height / 2);
-    await page.waitForTimeout(260);
+    await plowMoved();
     const out = await plow.boundingBox();
     const scrollAfter = await page.evaluate(() => scrollY);
     if (scrollAfter !== scrollBefore) fail(`${label}: the page scrolled when Fire was pressed`);
@@ -122,9 +132,14 @@ for (const scheme of ['light', 'dark']) {
     // Reset brings it home; Space on the focused drawing fires again.
     await page.waitForTimeout(800);
     await reset.click();
+    // Home again first, so the check below sees Space move it and not the slide back from the last strike.
+    const home = await page
+      .waitForFunction((x) => Math.abs(document.querySelector('#rampage [data-plow]').getBoundingClientRect().x - x) < 0.5, homeX, { timeout: 2000, polling: 'raf' })
+      .then(() => true, () => false);
+    if (!home) fail(`${label}: Reset did not bring the plow home`);
     await page.locator('#rampage [data-tf-pn]').focus();
     await page.keyboard.press('Space');
-    await page.waitForTimeout(260);
+    await plowMoved();
     const spaced = await plow.boundingBox();
     if (!(spaced && before && spaced.x > before.x + 2)) fail(`${label}: Space on the drawing did not fire`);
 
