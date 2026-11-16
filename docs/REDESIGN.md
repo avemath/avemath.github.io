@@ -791,6 +791,5 @@ Live (main), for reference:
 
 ### Open TODO(ave)
 
-- TODO(ave): decide whether to promote web work (Services in nav, hero line). For now the nav and the hero stay as they are (audit S1).
-- TODO(ave): confirm Integer is OK with "underwater network simulation tools". `integer-internship.md`, `experience.json`.
+- TODO(ave): check wording of the web signposts (Nov 16): the line under the home lede, the Services link at the end of Client sites on /work/, and the /services/ changes. The nav and the hero headline stay as they are; research stays the focus.
 - TODO(ave): check wording of the new copy: the /research/ lede and closing line, the RAMpage drawing's 35 ms line, the FILM note, the "Simulated" labels (bellhopSim gallery, Fig. R3, Fig. 1, the home card), the six client case studies, and the /work/ list's summary.

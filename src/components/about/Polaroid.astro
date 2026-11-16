@@ -9,7 +9,8 @@
 // follows. With fit="contain" (the datasheet's pin panel) the window stays square so the panel
 // keeps its height, and the whole photo sits inside it on the panel tint, with side margins for a
 // tall photo. With bare, a photo that is already a print (with its own border) shows as it is, at
-// the same outer width as a framed print.
+// the same outer width as a framed print. With no photo and no art, the window holds whatever is
+// passed in (a project drawing on /services/), at the shape given by ratio (width over height).
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import PrintArt from './PrintArt.astro';
@@ -29,14 +30,16 @@ interface Props {
   sizes?: string;
   fit?: 'natural' | 'contain';
   bare?: boolean;
+  /** Width over height of the window when it holds a drawing passed in (default square). */
+  ratio?: number;
   class?: string;
 }
 
-const { photo, alt = '', art, artLabel, caption = '', lines, tilt = 2, sizes = '20rem', fit = 'natural', bare = false, class: cls } = Astro.props;
-const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.height}` : '';
+const { photo, alt = '', art, artLabel, caption = '', lines, tilt = 2, sizes = '20rem', fit = 'natural', bare = false, ratio, class: cls } = Astro.props;
+const shape = photo && fit === 'natural' ? `aspect-ratio:${photo.width}/${photo.height}` : !photo && ratio ? `aspect-ratio:${ratio}` : '';
 // The strip, in % of the frame's width (cqw), so it is about 21% of the frame's height: the frame is
 // 5% border, then the window (90% of the width, at the photo's shape), then the strip.
-const aspect = photo && fit === 'natural' ? photo.width / photo.height : 1;
+const aspect = photo && fit === 'natural' ? photo.width / photo.height : !photo && ratio ? ratio : 1;
 const strip = ((0.21 / 0.79) * (5 + 90 / aspect)).toFixed(2);
 ---
 
@@ -53,7 +56,7 @@ const strip = ((0.21 / 0.79) * (5 + 90 / aspect)).toFixed(2);
         {photo ? (
           <Picture src={photo} alt={alt} formats={['avif', 'webp']} widths={[320, 480, 640]} sizes={sizes} quality={80} loading="lazy" />
         ) : (
-          art && <PrintArt name={art} label={artLabel} />
+          art ? <PrintArt name={art} label={artLabel} /> : <slot />
         )}
       </div>
       {lines?.length ? (

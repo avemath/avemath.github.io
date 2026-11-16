@@ -94,6 +94,7 @@ Facts with no document behind them, confirmed by Ave directly. Each line gives t
 - 2026-11-06: the acoustic pool alarm is Ave's own project; Because of ADAM is the reason it exists, not a partner.
 - 2026-11-06: Integer's thruster characterization sentence may stay (no numbers).
 - 2026-11-15: the kayak photo of Ave and Lea (OUTSIDE pin on /about/) may show.
+- 2026-11-16: Integer's "underwater network simulation tools" wording is approved (summary and My role on the case study, the résumé line).
 - 2026-11-06: keep as written: "Because of ADAM" (short form) on the résumé, "Grace Mae Alterations", the PLV Abstract Builder "AI reading step" line, and "quoted up front" on Services.
 
 ## The /work/ workbench (Nov 10)
