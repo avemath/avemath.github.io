@@ -24,18 +24,22 @@ const id = `term-${term.replace(/[^\w]/g, '')}-${Math.random().toString(36).slic
 (((Astro.locals as Record<string, unknown>).termsSeen ??= new Set<string>()) as Set<string>).add(term);
 ---
 
-<span class="term"><button type="button" class="term__btn" data-term={term} aria-describedby={id} aria-expanded="false">{label ?? term}</button><span class="term__pop" id={id} role="tooltip" hidden>{g.full && <b class="term__full">{g.full}</b>}{g.full && '. '}{g.meaning}</span></span>
+<span class="term"><button type="button" class="term__btn" data-term={term} aria-describedby={id} aria-expanded="false">{label ?? term}</button><span class="term__pop" id={id} role="tooltip" popover="manual" hidden>{g.full && <b class="term__full">{g.full}</b>}{g.full && '. '}{g.meaning}</span></span>
 
 <script>
   // One set of listeners for every term on the page.
   let open: HTMLButtonElement | null = null;
   let pinned = false;
   const popOf = (b: HTMLButtonElement) => document.getElementById(b.getAttribute('aria-describedby')!) as HTMLElement | null;
+  // Shown in the top layer where the browser has popovers, so no section around it (one that skips
+  // its own layout until it is near the screen, say) can clip it or move it.
+  const top = (pop: HTMLElement) => typeof pop.showPopover === 'function';
   const place = (b: HTMLButtonElement, pop: HTMLElement) => {
     const r = b.getBoundingClientRect();
     const w = Math.min(288, innerWidth - 24);
     pop.style.width = `${w}px`;
     pop.hidden = false;
+    if (top(pop) && !pop.matches(':popover-open')) pop.showPopover();
     const h = pop.offsetHeight;
     const below = r.bottom + 8 + h <= innerHeight - 8 || r.top - 8 - h < 8;
     pop.style.top = `${below ? r.bottom + 8 : r.top - 8 - h}px`;
@@ -53,6 +57,7 @@ const id = `term-${term.replace(/[^\w]/g, '')}-${Math.random().toString(36).slic
   function hide() {
     if (!open) return;
     const pop = popOf(open);
+    if (pop && top(pop) && pop.matches(':popover-open')) pop.hidePopover();
     if (pop) pop.hidden = true;
     open.setAttribute('aria-expanded', 'false');
     open = null;
@@ -122,9 +127,13 @@ const id = `term-${term.replace(/[^\w]/g, '')}-${Math.random().toString(36).slic
     border-radius: var(--radius-2);
   }
 
-  /* Out of the flow: fixed in place by the script, so it never moves the page. */
+  /* Out of the flow: fixed in place by the script, so it never moves the page. As a popover it sits
+     in the top layer; the browser's own popover box (centered, inset 0) is undone here. */
   .term__pop {
     position: fixed;
+    inset: auto;
+    margin: 0;
+    overflow: visible;
     z-index: 60;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--line-strong);
