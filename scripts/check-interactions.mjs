@@ -92,6 +92,9 @@ const settleOn = async (p, sel) => {
     y = b.y;
   }
 };
+// Text as a reader sees it: the no-break space between a value and its unit reads as a space.
+const txt = (s) => (s ?? '').replace(/\u00a0/g, ' ');
+
 const test = async (name, fn) => {
   if (only && !only.includes(name)) return;
   const before = problems;
@@ -578,13 +581,13 @@ await test('race', async () => {
   const d = p.locator('[data-race-d]');
   await d.focus();
   await p.keyboard.press('End');
-  if ((await p.locator('[data-race-dout]').textContent()) !== '10 km') fail('race', `End on the distance slider shows ${await p.locator('[data-race-dout]').textContent()}, not 10 km`);
-  if ((await d.getAttribute('aria-valuetext')) !== '10 km') fail('race', 'the slider does not say its distance to assistive tech');
+  if (txt(await p.locator('[data-race-dout]').textContent()) !== '10 km') fail('race', `End on the distance slider shows ${await p.locator('[data-race-dout]').textContent()}, not 10 km`);
+  if (txt(await d.getAttribute('aria-valuetext')) !== '10 km') fail('race', 'the slider does not say its distance to assistive tech');
   await p.keyboard.press('Home');
-  if ((await p.locator('[data-race-dout]').textContent()) !== '10 m') fail('race', 'Home on the distance slider is not 10 m');
+  if (txt(await p.locator('[data-race-dout]').textContent()) !== '10 m') fail('race', 'Home on the distance slider is not 10 m');
   for (let k = 0; k < 6; k++) await p.keyboard.press('PageUp');
   for (let k = 0; k < 67; k++) await p.keyboard.press('ArrowRight');
-  if ((await p.locator('[data-race-dout]').textContent()) !== '1 km') fail('race', 'the slider does not land on 1 km');
+  if (txt(await p.locator('[data-race-dout]').textContent()) !== '1 km') fail('race', 'the slider does not land on 1 km');
   await p.keyboard.press('Tab');
   const rf = p.locator('[data-race-rf]');
   if (!(await rf.evaluate((e) => e === document.activeElement))) fail('race', 'Tab from the slider does not reach the radio frequency');
@@ -596,11 +599,11 @@ await test('race', async () => {
   await p.keyboard.press('Enter');
   await p.waitForFunction(() => document.querySelector('[data-race-clock]').textContent !== '0.000', null, { timeout: 4000 }).catch(() => fail('race', 'the clock never runs'));
   await p.waitForFunction(() => document.querySelector('[data-race-live]').textContent.length > 20, null, { timeout: 12000 }).catch(() => fail('race', 'no summary after the race'));
-  const live = await p.locator('[data-race-live]').textContent();
+  const live = txt(await p.locator('[data-race-live]').textContent());
   const want = freq === '100000000' ? /radio in water lost after 0\.12 m at 100 MHz/ : /radio in water lost after/;
   if (!/^At 1 km: radio in air 3\.3 µs, sound in air 2\.9 s, sound in water 0\.67 s/.test(live) || !want.test(live)) fail('race', `the summary says "${live}" (radio at ${freq} Hz)`);
-  if ((await p.locator('[data-race-clock]').textContent()) !== '2.915') fail('race', `the clock stops at ${await p.locator('[data-race-clock]').textContent()}, not 2.915`);
-  if (!(await p.locator('[data-lane="radioWater"] [data-read]').textContent()).startsWith('lost after')) fail('race', 'the radio in water lane does not say where it is lost');
+  if (txt(await p.locator('[data-race-clock]').textContent()) !== '2.915') fail('race', `the clock stops at ${await p.locator('[data-race-clock]').textContent()}, not 2.915`);
+  if (!txt(await p.locator('[data-lane="radioWater"] [data-read]').textContent()).startsWith('lost after')) fail('race', 'the radio in water lane does not say where it is lost');
   await p.close();
 });
 
@@ -609,7 +612,7 @@ await test('raytracer', async () => {
   const p = await page('/research/');
   await settleOn(p, '[data-rt]');
   const root = p.locator('[data-rt]');
-  const first = await p.locator('[data-rt-sum]').textContent();
+  const first = txt(await p.locator('[data-rt-sum]').textContent());
   if (!/^\d+ eigenrays?, first arrival [\d.]+ s, last [\d.]+ s/.test(first)) fail('raytracer', `the Munk default reads "${first}"`);
   await p.locator('[data-rt-env]').focus();
   await p.keyboard.press('ArrowDown');
@@ -618,13 +621,13 @@ await test('raytracer', async () => {
   if (!(await p.locator('[data-rt-zs]').evaluate((e) => e === document.activeElement))) fail('raytracer', 'Tab does not reach the source depth');
   const z0 = await p.locator('[data-rt-zs-out]').textContent();
   for (let k = 0; k < 5; k++) await p.keyboard.press('ArrowRight');
-  if ((await p.locator('[data-rt-zs-out]').textContent()) === z0) fail('raytracer', 'the arrow keys do not move the source');
+  if (txt(await p.locator('[data-rt-zs-out]').textContent()) === z0) fail('raytracer', 'the arrow keys do not move the source');
   for (let k = 0; k < 4; k++) await p.keyboard.press('Tab');
   if (!(await p.locator('[data-rt-ping]').evaluate((e) => e === document.activeElement))) fail('raytracer', 'Tab does not reach Ping');
   await p.keyboard.press('Enter');
   await p.waitForFunction(() => document.querySelector('[data-rt-clock]').textContent !== '0.00', null, { timeout: 4000 }).catch(() => fail('raytracer', 'Ping does not start the clock'));
   await p.waitForFunction(() => document.querySelector('[data-rt]').hasAttribute('data-pinged'), null, { timeout: 15000 }).catch(() => fail('raytracer', 'the ping never finishes'));
-  const sum = await p.locator('[data-rt-sum]').textContent();
+  const sum = txt(await p.locator('[data-rt-sum]').textContent());
   if (!/Surface duct/.test(sum)) fail('raytracer', `after the changes the summary reads "${sum}"`);
   if ((await p.locator('[data-rt-sum]').getAttribute('aria-live')) !== 'polite') fail('raytracer', 'the summary is not a polite live region');
   // Dragging on the plot moves the receiver.
@@ -634,7 +637,7 @@ await test('raytracer', async () => {
   await p.mouse.down();
   await p.mouse.move(b.x + b.width * 0.55, b.y + b.height * 0.4, { steps: 6 });
   await p.mouse.up();
-  if ((await p.locator('[data-rt-rr-out]').textContent()) === r0) fail('raytracer', 'dragging on the plot does not move the receiver');
+  if (txt(await p.locator('[data-rt-rr-out]').textContent()) === r0) fail('raytracer', 'dragging on the plot does not move the receiver');
   await p.close();
 });
 

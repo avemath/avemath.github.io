@@ -24,13 +24,6 @@ import { PROFILES } from '@/lib/raytrace';
         {PROFILES.map((p, i) => <option value={p.id} selected={i === 0}>{p.name}</option>)}
       </select>
     </label>
-    <div class="rt__go">
-      <button type="button" class="btn btn--primary" data-rt-ping>Ping</button>
-      <p class="rt__clock">
-        <span class="rt__clock-k">time since ping</span>
-        <span class="rt__clock-v" data-readout><span data-rt-clock aria-hidden="true">0.00</span>&nbsp;s</span>
-      </p>
-    </div>
     <label class="rt__field">
       <span class="rt__k">Source depth <output data-rt-zs-out>1300&nbsp;m</output></span>
       <input type="range" min="0" max="1000" step="1" value="260" data-rt-zs />
@@ -47,6 +40,13 @@ import { PROFILES } from '@/lib/raytrace';
       <span class="rt__k">Receiver depth <output data-rt-rz-out>1300&nbsp;m</output></span>
       <input type="range" min="0" max="1000" step="1" value="260" data-rt-rz />
     </label>
+    <div class="rt__go">
+      <button type="button" class="btn btn--primary" data-rt-ping>Ping</button>
+      <p class="rt__clock">
+        <span class="rt__clock-k">time since ping</span>
+        <span class="rt__clock-v" data-readout><span data-rt-clock aria-hidden="true">0.00</span>&nbsp;s</span>
+      </p>
+    </div>
   </div>
   <canvas
     class="rt__main"
@@ -72,8 +72,9 @@ import { PROFILES } from '@/lib/raytrace';
     padding: 0.75rem 0.75rem 0.25rem;
   }
 
-  /* Two even columns: Environment beside Ping and its clock, then Source depth beside Fan, then
-     Receiver range beside Receiver depth, each label with its value on one row over its slider. */
+  /* An even grid: Environment beside Ping, Source depth beside Fan, Receiver range beside Receiver
+     depth. When the figure is wide enough, three columns: Environment, Source depth, Fan, then
+     Receiver range, Receiver depth, Ping. Each label sits with its value on one row over its slider. */
   .rt__ctl {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -81,10 +82,33 @@ import { PROFILES } from '@/lib/raytrace';
     align-items: end;
   }
 
+  /* Two columns: Ping and its clock beside Environment (it is last in the keyboard order, the action
+     after the settings), so the panel spends one row less. */
+  .rt__go {
+    grid-row: 1;
+    grid-column: 2;
+  }
+
+  @container (min-width: 560px) {
+    .rt__ctl {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .rt__go {
+      grid-row: auto;
+      grid-column: auto;
+    }
+  }
+
   /* A narrow figure: one control per row, Ping and the clock on their own row. */
   @container (max-width: 459px) {
     .rt__ctl {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rt__ctl .rt__go {
+      grid-row: auto;
+      grid-column: auto;
     }
   }
 

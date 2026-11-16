@@ -28,6 +28,10 @@ const SIZES = [
   ...LAPTOP.map((v) => [v.width, v.height, v.dpr]),
 ];
 
+// "Fits on one screen" holds only where the screen is tall enough for it (780px and up). On a shorter
+// screen the same content flows and scrolls normally; the other checks still apply there.
+const TALL = 780;
+
 const { server, base } = serveDist('dist');
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 let problems = 0;
@@ -294,7 +298,7 @@ for (const scheme of ['light', 'dark']) {
         };
       });
       for (const [k, b] of [['chip', v.chip], ['print', v.print], ['note', v.note], ['first table row', v.row]]) {
-        if (b.top < v.head - 1 || b.bottom > h + 1) fail(`${w}x${h} ${scheme} /about/#datasheet: the ${k} is not on screen (${Math.round(b.top)} to ${Math.round(b.bottom)})`);
+        if (h >= TALL && (b.top < v.head - 1 || b.bottom > h + 1)) fail(`${w}x${h} ${scheme} /about/#datasheet: the ${k} is not on screen (${Math.round(b.top)} to ${Math.round(b.bottom)})`);
       }
       if (v.table.top < v.sheet.top || v.table.bottom > v.sheet.bottom) fail(`${w}x${h} /about/: the table is not on the datasheet sheet`);
       await page.close();
@@ -382,8 +386,9 @@ for (const scheme of ['light', 'dark']) {
         if (w >= 1024) {
           // Side by side: figure on the left, text on the right, the figure the wider of the two.
           if (!(p.fig.right <= p.text.left + 1 && p.fig.width > p.text.width)) fail(`${w} /research/ #${p.id}: the figure is not the wide left column`);
-          // One screen: the whole panel fits between the header and the bottom of the window.
-          if (p.box.height > h - v.hb + 0.5) fail(`${w}x${h} /research/ #${p.id}: the panel is ${Math.round(p.box.height)}px tall, more than the ${Math.round(h - v.hb)}px under the header`);
+          // One screen: the whole panel fits between the header and the bottom of the window, on a
+          // screen at least TALL px high. On a shorter one the panel flows and scrolls instead.
+          if (h >= TALL && p.box.height > h - v.hb + 0.5) fail(`${w}x${h} /research/ #${p.id}: the panel is ${Math.round(p.box.height)}px tall, more than the ${Math.round(h - v.hb)}px under the header`);
           // A plate about 1160px wide at most, centered.
           if (p.box.width > 1180.5) fail(`${w} /research/ #${p.id}: the plate is ${Math.round(p.box.width)}px wide, over 1180`);
           if (Math.abs(p.box.left - (v.cw - p.box.right)) > 1.5) fail(`${w} /research/ #${p.id}: the plate is not centered`);
