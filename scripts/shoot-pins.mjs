@@ -5,6 +5,7 @@
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
+import { LAPTOP } from './lib/viewports.mjs';
 
 const out = process.argv[2] || 'docs/audit-nov14/about';
 await mkdir(out, { recursive: true });
@@ -13,11 +14,9 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PAT
 
 try {
   for (const scheme of ['light', 'dark']) {
-    for (const [w, h] of [
-      [1440, 900],
-      [390, 844],
-    ]) {
-      const page = await browser.newPage({ viewport: { width: w, height: h }, colorScheme: scheme, reducedMotion: 'reduce' });
+    // 1440x900 and 390, then the laptop sizes display scaling gives (scripts/lib/viewports.mjs).
+    for (const [w, h, dpr, tag] of [[1440, 900, 1, '1440'], [390, 844, 1, '390'], ...LAPTOP.map((v) => [v.width, v.height, v.dpr, v.label.replace(/ at /, '-').replace('%', '')])]) {
+      const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, colorScheme: scheme, reducedMotion: 'reduce' });
       await page.route(...localOnly(base));
       await page.goto(`${base}/about/#datasheet`, { waitUntil: 'networkidle' });
       await page.evaluate(() => document.fonts.ready);
@@ -32,7 +31,7 @@ try {
           ]),
         );
         const label = (await page.locator(`#datasheet [data-pin="${i}"] .pin__nm`).textContent()).trim().toLowerCase();
-        const file = `${out}/pin${String(i + 1).padStart(2, '0')}-${label}-${w}-${scheme}.png`;
+        const file = `${out}/pin${String(i + 1).padStart(2, '0')}-${label}-${tag}-${scheme}.png`;
         if (w > 860) {
           await page.evaluate(() => document.querySelector('#datasheet').scrollIntoView({ block: 'start', behavior: 'instant' }));
           await page.waitForTimeout(60);

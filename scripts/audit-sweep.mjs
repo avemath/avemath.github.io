@@ -9,6 +9,7 @@ import { mkdir, writeFile, readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
+import { LAPTOP } from './lib/viewports.mjs';
 
 const out = process.argv[2] || 'docs/audit-nov14/sweep';
 await mkdir(out, { recursive: true });
@@ -24,8 +25,8 @@ async function walk(dir, url) {
 }
 await walk('dist', '/');
 
-const WIDTHS = [320, 390, 768, 1024, 1280, 1440, 1920];
-const HEIGHT = { 320: 640, 390: 844, 768: 1024, 1024: 768, 1280: 800, 1440: 900, 1920: 1080 };
+// [width, height, pixel density, label]: the standard sizes, then the laptop ones (scripts/lib/viewports.mjs).
+const VIEWPORTS = [[320, 640, 1, '320'], [390, 844, 1, '390'], [768, 1024, 1, '768'], [1024, 768, 1, '1024'], [1280, 800, 1, '1280'], [1440, 900, 1, '1440'], [1920, 1080, 1, '1920'], ...LAPTOP.map((v) => [v.width, v.height, v.dpr, v.label])];
 const { server, base } = serveDist('dist');
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const findings = [];
@@ -35,10 +36,10 @@ const slug = (p) => (p === '/' ? 'home' : p.replace(/^\/|\/$/g, '').replace(/[/.
 
 try {
   for (const path of pages) {
-    for (const w of WIDTHS) {
+    for (const [w, h, dpr, vlabel] of VIEWPORTS) {
       for (const theme of ['light', 'dark']) {
         for (const motion of ['on', 'reduce']) {
-          const ctx = await browser.newContext({ viewport: { width: w, height: HEIGHT[w] }, colorScheme: theme, reducedMotion: motion === 'reduce' ? 'reduce' : 'no-preference', hasTouch: w <= 768, isMobile: false });
+          const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, colorScheme: theme, reducedMotion: motion === 'reduce' ? 'reduce' : 'no-preference', hasTouch: w <= 768, isMobile: false });
           // Count animation frames so a loop left running off screen shows up.
           await ctx.addInitScript(() => {
             const raf = window.requestAnimationFrame.bind(window);
@@ -50,7 +51,7 @@ try {
           });
           const page = await ctx.newPage();
           await page.route(...localOnly(base));
-          const where = { page: path, width: w, theme, motion };
+          const where = { page: path, width: vlabel, theme, motion };
           page.on('console', (m) => m.type() === 'error' && add({ ...where, kind: 'console', msg: m.text().slice(0, 200) }));
           page.on('pageerror', (e) => add({ ...where, kind: 'pageerror', msg: String(e).slice(0, 200) }));
           page.on('requestfailed', (r) => {
@@ -118,7 +119,7 @@ try {
           if (v.frames > 10) add({ ...where, kind: 'frames', msg: `${v.frames} animation frames in 1.5s at the bottom of the page` });
           if (motion === 'on') {
             await page.waitForTimeout(200);
-            await page.screenshot({ path: `${out}/${slug(path)}-${w}-${theme}.png`, fullPage: true }).catch((e) => add({ ...where, kind: 'screenshot', msg: String(e).slice(0, 120) }));
+            await page.screenshot({ path: `${out}/${slug(path)}-${String(vlabel).replace(/[ %]/g, '')}-${theme}.png`, fullPage: true }).catch((e) => add({ ...where, kind: 'screenshot', msg: String(e).slice(0, 120) }));
           }
           await ctx.close();
         }

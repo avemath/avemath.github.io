@@ -18,15 +18,18 @@ import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium, type Page } from 'playwright';
 import { serveDist, localOnly } from '../scripts/lib/serve-dist.mjs';
+import { LAPTOP } from '../scripts/lib/viewports.mjs';
 
 type Hit = { kind: 'photo' | 'text'; what: string; by: string; x: number; y: number };
 
-const WIDTHS: [number, number][] = [
-  [390, 844],
-  [768, 1024],
-  [1280, 800],
-  [1440, 900],
-];
+// [width, height, pixel density]: the four standard sizes, then the laptop sizes display scaling gives.
+const WIDTHS: [number, number, number][] = [
+  [390, 844, 1],
+  [768, 1024, 1],
+  [1280, 800, 1],
+  [1440, 900, 1],
+  ...LAPTOP.map((v: { width: number; height: number; dpr: number }) => [v.width, v.height, v.dpr] as [number, number, number]),
+]
 
 // Every page in the build, plus the 404 page.
 const pages: string[] = ['/404.html'];
@@ -197,8 +200,8 @@ const report = (label: string, hits: Hit[]) => {
   for (const h of byThing.values()) fail(`${label}: ${h.kind} ${h.what} is covered by ${h.by} (at ${h.x},${h.y})`);
 };
 
-const open = async (w: number, h: number, path: string) => {
-  const page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: 'reduce' });
+const open = async (w: number, h: number, path: string, dpr = 1) => {
+  const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, reducedMotion: 'reduce' });
   const [match, handler] = localOnly(base);
   await page.route(match, handler);
   await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
@@ -207,9 +210,9 @@ const open = async (w: number, h: number, path: string) => {
 };
 
 try {
-  for (const [w, h] of WIDTHS) {
+  for (const [w, h, dpr] of WIDTHS) {
     for (const path of pages) {
-      const page = await open(w, h, path);
+      const page = await open(w, h, path, dpr);
       report(`${w} ${path}`, await scan(page));
       if (path === '/about/') {
         const n = await page.locator('#datasheet [data-pin]').count();

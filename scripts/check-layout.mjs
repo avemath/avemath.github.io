@@ -14,15 +14,18 @@
 // Needs Playwright's Chromium (`npx playwright install chromium`), or set CHROMIUM_PATH to a Chromium binary.
 import { chromium } from 'playwright';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
+import { LAPTOP } from './lib/viewports.mjs';
 
+// [width, height, pixel density]. Then the laptop sizes display scaling gives (scripts/lib/viewports.mjs).
 const SIZES = [
-  [1366, 768],
-  [1440, 900],
-  [1920, 1080],
-  [2560, 1440],
-  [390, 844],
-  [375, 667],
-  [320, 568],
+  [1366, 768, 1],
+  [1440, 900, 1],
+  [1920, 1080, 1],
+  [2560, 1440, 1],
+  [390, 844, 1],
+  [375, 667, 1],
+  [320, 568, 1],
+  ...LAPTOP.map((v) => [v.width, v.height, v.dpr]),
 ];
 
 const { server, base } = serveDist('dist');
@@ -37,8 +40,8 @@ const inside = (b, vw, vh) => b && b.x >= 0 && b.y >= 0 && b.x + b.width <= vw +
 const fmt = (b) => (b ? `${Math.round(b.x)},${Math.round(b.y)} ${Math.round(b.width)}x${Math.round(b.height)}` : 'none');
 
 for (const scheme of ['light', 'dark']) {
-  for (const [w, h] of SIZES) {
-    const page = await browser.newPage({ viewport: { width: w, height: h }, colorScheme: scheme });
+  for (const [w, h, dpr] of SIZES) {
+    const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, colorScheme: scheme });
     await page.route(...localOnly(base));
     await page.goto(`${base}/work/rampage/`, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
@@ -127,7 +130,7 @@ for (const scheme of ['light', 'dark']) {
 }
 
 // ---- Specimen: the About chip, the Research seafloor and the bit girl ----
-const WIDTHS = [320, 390, 768, 1440, 1920, 2560];
+const WIDTHS = [320, 390, 768, 1440, 1920, 2560].map((w) => [w, 900, 1]).concat(LAPTOP.map((v) => [v.width, v.height, v.dpr]));
 // Every line of text on the page, in page coordinates (the bit girl's own canvas has none).
 const textBoxes = () => {
   const out = [];
@@ -146,10 +149,10 @@ const textBoxes = () => {
 };
 
 for (const scheme of ['light', 'dark']) {
-  for (const w of WIDTHS) {
-    const page = await browser.newPage({ viewport: { width: w, height: 900 }, colorScheme: scheme, reducedMotion: 'reduce' });
+  for (const [w, h, dpr] of WIDTHS) {
+    const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, colorScheme: scheme, reducedMotion: 'reduce' });
     await page.route(...localOnly(base));
-    const label = `${w} ${scheme}`;
+    const label = `${w}x${h}${dpr > 1 ? `@${dpr}` : ''} ${scheme}`;
     const sideways = () => page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
 
     // The chip and the tray.
@@ -270,9 +273,9 @@ for (const scheme of ['light', 'dark']) {
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
   // Landed on #datasheet at a laptop size, the chip, the pressed pin's print and note, and the
   // first table row are all on screen below the header.
-  for (const [w, h] of [[1440, 900], [1280, 800]]) {
+  for (const [w, h, dpr] of [[1440, 900, 1], [1280, 800, 1], ...LAPTOP.filter((v) => v.width >= 960).map((v) => [v.width, v.height, v.dpr])]) {
     for (const scheme of ['light', 'dark']) {
-      const page = await browser.newPage({ viewport: { width: w, height: h }, colorScheme: scheme });
+      const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, colorScheme: scheme });
       await page.route(...localOnly(base));
       await page.goto(`${base}/about/#datasheet`, { waitUntil: 'networkidle' });
       await page.evaluate(() => document.fonts.ready);
@@ -345,9 +348,9 @@ for (const scheme of ['light', 'dark']) {
 // (figure and text together, below the header), in a plate about 1160px wide and centered, with body
 // text of 16px or more and controls tall enough to use; nothing scrolls sideways on phones ----
 {
-  for (const [w, h] of [[1440, 900], [1280, 800], [390, 900], [320, 900]]) {
+  for (const [w, h, dpr] of [[1440, 900, 1], [1280, 800, 1], [390, 900, 1], [320, 900, 1], ...LAPTOP.map((v) => [v.width, v.height, v.dpr])]) {
     for (const theme of ['light', 'dark']) {
-      const page = await browser.newPage({ viewport: { width: w, height: h } });
+      const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr });
       await page.route(...localOnly(base));
       await page.goto(`${base}/research/`, { waitUntil: 'networkidle' });
       await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);

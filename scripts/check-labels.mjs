@@ -13,10 +13,13 @@
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { chromium } from 'playwright';
+import { LAPTOP } from './lib/viewports.mjs';
 import { serveDist, localOnly } from './lib/serve-dist.mjs';
 
 const DIST = 'dist';
 const WIDTHS = (process.env.LABEL_WIDTHS || '320,390,768,1366,1440,1920,2560').split(',').map(Number);
+// The widths above at 900 tall, then the laptop sizes display scaling gives (scripts/lib/viewports.mjs).
+const VIEWPORTS = [...WIDTHS.map((w) => ({ label: String(w), width: w, height: 900, dpr: 1 })), ...(process.env.LABEL_WIDTHS ? [] : LAPTOP)];
 const THEMES = (process.env.LABEL_THEMES || 'light,dark').split(',');
 const ONLY = process.env.LABEL_PAGES ? process.env.LABEL_PAGES.split(',') : null;
 const PLOW = ['Ready', 'Filling', 'Plow out', 'Venting', 'Settling', 'Out of air'];
@@ -267,8 +270,9 @@ const record = (path, width, theme, state, items) => {
 };
 
 for (const theme of THEMES) {
-  for (const width of WIDTHS) {
-    const ctx = await browser.newContext({ colorScheme: theme, viewport: { width, height: 900 }, reducedMotion: 'reduce' });
+  for (const vp of VIEWPORTS) {
+    const width = vp.label;
+    const ctx = await browser.newContext({ colorScheme: theme, viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: vp.dpr, reducedMotion: 'reduce' });
     await ctx.route(...localOnly(base));
     const page = await ctx.newPage();
     for (const path of list) {
@@ -324,7 +328,7 @@ await mkdir('audit', { recursive: true });
 const md = [
   '# Label overflow',
   '',
-  `Measured ${new Date().toISOString().slice(0, 10)}: ${list.length} pages at ${WIDTHS.join(', ')}, ${THEMES.join(' and ')}, every figure view, V2V stage, About pin and plow status. Rule: no label crosses its box or comes within 4px of it across (1px up and down), overlaps another label or a line it is not part of, or is clipped; no HTML text runs out of its box.`,
+  `Measured ${new Date().toISOString().slice(0, 10)}: ${list.length} pages at ${VIEWPORTS.map((v) => v.label).join(', ')}, ${THEMES.join(' and ')}, every figure view, V2V stage, About pin and plow status. Rule: no label crosses its box or comes within 4px of it across (1px up and down), overlaps another label or a line it is not part of, or is clipped; no HTML text runs out of its box.`,
   '',
   rows.length ? '| Page | Width | Theme | Figure | Label | Problem | px over | Seen in |' : 'Nothing found.',
   ...(rows.length ? ['|---|---|---|---|---|---|---|---|'] : []),
@@ -337,4 +341,4 @@ if (rows.length) {
   console.error(`check-labels: ${rows.length} label problem(s); see audit/label-overflow.md.`);
   process.exit(1);
 }
-console.log(`check-labels clean (${list.length} pages, ${WIDTHS.length} widths, ${THEMES.length} themes).`);
+console.log(`check-labels clean (${list.length} pages, ${VIEWPORTS.length} viewports, ${THEMES.length} themes).`);
