@@ -17,8 +17,11 @@
 //                  put their site on the laptop
 //   bench-keyboard every bench object is reached by Tab and chosen by Enter or Space; arrows, End
 //   bench-hash     /work/#because-of-adam opens it; /work/#websites still lands on its group
-//   thread-map     every station selects its project on the bench; every preview has a picture or a
+//   thread-map     every station selects its project on the bench (each click waits for the last
+//                  pick's scroll to end); every preview has a picture or a
 //                  drawing; stations keep a gap; labels stay inside the map at 640 to 1920; legend; phone labels
+//   thread-map-hits a real click at the center of every station opens its project, at 390, 960x640,
+//                  1280x720 and 1440 at 125% and 150% zoom; no two stations' capsules overlap
 //   bench-girl     nothing (the bit girl included) takes a click meant for a bench object
 //   bench-loop     the bench's loop runs on screen, stops off screen, never runs with reduced motion
 //   figure-viewer  the V2V figures: Next and Previous, arrow keys, thumbnails, swipe, full screen,
@@ -775,6 +778,26 @@ await test('bench-hash', async () => {
   await p.close();
 });
 
+// Resolves once the page has stopped scrolling (the same scroll position for 4 frames), or after 2 s.
+// A pick on the thread map scrolls the bench's detail into view smoothly; clicking the next station
+// before that scroll ends lands the click wherever the page has moved to.
+const scrollSettled = (p) =>
+  p.evaluate(
+    () =>
+      new Promise((done) => {
+        let last = -1;
+        let same = 0;
+        const end = performance.now() + 2000;
+        const tick = () => {
+          same = scrollY === last ? same + 1 : 0;
+          last = scrollY;
+          if (same >= 4 || performance.now() > end) done();
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+
 await test('thread-map', async () => {
   const p = await page('/work/');
   await settleOn(p, '[data-tmap]');
@@ -783,15 +806,20 @@ await test('thread-map', async () => {
   if (n < 15) fail('thread-map', `${n} stations, expected 15`);
   for (let i = 0; i < n; i++) {
     const slug = await stns.nth(i).getAttribute('data-stn');
-    // Each pick scrolls the bench's detail into view, so bring the next station back first.
+    // Each pick scrolls the bench's detail into view, so let that scroll end, then bring the next
+    // station back.
+    await scrollSettled(p);
     await stns.nth(i).evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await scrollSettled(p);
     await stns.nth(i).click({ force: true });
     await p.waitForTimeout(50);
     const cur = await p.evaluate(() => window.__bench?.current());
     if (cur !== slug) fail('thread-map', `station ${slug} selects ${cur} on the bench`);
   }
-  // Pointing at a station shows its preview card.
+  // Pointing at a station shows its preview card (once the last pick's scroll has ended).
+  await scrollSettled(p);
   await stns.nth(0).evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await scrollSettled(p);
   await stns.nth(0).hover({ force: true });
   const card = await p.evaluate(() => [...document.querySelectorAll('[data-card]')].filter((c) => !c.hidden).map((c) => c.dataset.card).join());
   if (card !== (await stns.nth(0).getAttribute('data-stn'))) fail('thread-map', `hovering the first station shows card "${card}"`);
@@ -849,6 +877,56 @@ await test('thread-map', async () => {
   if (clip) fail('thread-map', `phone map: ${clip}`);
   await v.close();
   await p.close();
+});
+
+// Every station on the thread map, clicked with a real pointer at the center of its own capsule (or
+// circle), opens its own project, at the laptop sizes Ave's display scaling gives (including 1440 by
+// 900 at 125% and 150% zoom) as well as a phone. Nothing under that point belongs to another station,
+// and no two stations' capsules overlap.
+await test('thread-map-hits', async () => {
+  for (const [label, w, h, dpr] of [['390', 390, 844, 3], ['960x640', 960, 640, 1], ['1280x720', 1280, 720, 1], ['1440 at 125%', 1152, 720, 1.25], ['1440 at 150%', 960, 600, 1.5]]) {
+    const p = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dpr });
+    await p.route(...localOnly(base));
+    await p.goto(`${base}/work/`, { waitUntil: 'networkidle' });
+    await settleOn(p, '[data-tmap]');
+    // The capsules, all measured at once before any click (a pick changes the bench's detail above
+    // the map, which moves the map), in the map's own units.
+    const { slugs, halos } = await p.evaluate(() => {
+      const svg = [...document.querySelectorAll('.tmap__svg')].find((x) => x.getBoundingClientRect().width > 0);
+      svg.setAttribute('data-test-map', '');
+      const st = [...svg.querySelectorAll('[data-stn]')];
+      return {
+        slugs: st.map((x) => x.dataset.stn),
+        halos: st.map((x) => {
+          const bb = x.querySelector('.tmap__halo').getBBox();
+          return [x.dataset.stn, { l: bb.x, r: bb.x + bb.width, t: bb.y, b: bb.y + bb.height }];
+        }),
+      };
+    });
+    for (const slug of slugs) {
+      await scrollSettled(p);
+      await p.evaluate((slug) => document.querySelector(`[data-test-map] [data-stn="${slug}"]`).scrollIntoView({ block: 'center', behavior: 'instant' }), slug);
+      await scrollSettled(p);
+      const c = await p.evaluate((slug) => {
+        const st = document.querySelector(`[data-test-map] [data-stn="${slug}"]`);
+        const r = st.querySelector('.tmap__halo').getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const y = r.top + r.height / 2;
+        return { x, y, under: document.elementFromPoint(x, y)?.closest('[data-stn]')?.dataset.stn ?? 'nothing' };
+      }, slug);
+      if (c.under !== slug) fail('thread-map-hits', `${label}: the center of ${slug} is ${c.under}`);
+      await p.mouse.click(c.x, c.y);
+      await p.waitForTimeout(80);
+      const cur = await p.evaluate(() => window.__bench?.current());
+      if (cur !== slug) fail('thread-map-hits', `${label}: clicking the center of ${slug} opens ${cur}`);
+    }
+    for (let i = 0; i < halos.length; i++)
+      for (let j = i + 1; j < halos.length; j++) {
+        const [a, b] = [halos[i][1], halos[j][1]];
+        if (Math.min(a.r, b.r) - Math.max(a.l, b.l) > 0 && Math.min(a.b, b.b) - Math.max(a.t, b.t) > 0) fail('thread-map-hits', `${label}: ${halos[i][0]} and ${halos[j][0]} overlap`);
+      }
+    await p.close();
+  }
 });
 
 await test('bench-girl', async () => {
