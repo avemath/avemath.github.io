@@ -4,7 +4,6 @@
 // focusable, labelled region with a visible hint, so wide screens get no extra tab stop.
 export function initHScroll() {
   const frames = [...document.querySelectorAll<HTMLElement>('[data-hscroll]')];
-  if (!frames.length) return;
 
   const update = (el: HTMLElement) => {
     // A frame in a hidden tab has no size yet. It starts out focusable, so the moment its tab opens
@@ -23,7 +22,7 @@ export function initHScroll() {
   };
 
   const ro = new ResizeObserver((entries) => entries.forEach((e) => update(e.target as HTMLElement)));
-  for (const el of frames) {
+  const watch = (el: HTMLElement) => {
     if (!(el.nextElementSibling instanceof HTMLElement && el.nextElementSibling.classList.contains('hscroll-hint'))) {
       const hint = document.createElement('p');
       hint.className = 'hscroll-hint';
@@ -33,5 +32,16 @@ export function initHScroll() {
     }
     // The observer's first report sets it up, so starting up forces no layout of its own.
     ro.observe(el);
-  }
+  };
+  frames.forEach(watch);
+  // A frame built later (a deferred tab view) is set up the moment it exists: focusable straight
+  // away, as a frame in a hidden tab is at load, and the observer settles it once it has a size.
+  document.addEventListener('panel:stamped', (e) =>
+    (e.target as Element).querySelectorAll<HTMLElement>('[data-hscroll]').forEach((el) => {
+      el.tabIndex = 0;
+      el.setAttribute('role', 'region');
+      el.setAttribute('aria-label', `${el.dataset.hscroll}, scrolls sideways`);
+      watch(el);
+    }),
+  );
 }

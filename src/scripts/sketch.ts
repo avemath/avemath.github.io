@@ -48,6 +48,8 @@ export function initSketches() {
     { threshold: 0.3 },
   );
   document.querySelectorAll<SVGElement>('[data-sketch]').forEach((svg) => io.observe(svg));
+  // A drawing built later (a deferred tab view) is watched from the moment it exists.
+  document.addEventListener('panel:stamped', (e) => (e.target as Element).querySelectorAll<SVGElement>('[data-sketch]').forEach((svg) => io.observe(svg)));
   window.addEventListener('motionchange', () => {
     if (!prefersReducedMotion()) return;
     io.disconnect();

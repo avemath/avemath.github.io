@@ -76,7 +76,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
         <RampagePlate />
 
       
-        <FigureCard id="v2v" proj="/work/v2v-bsm-ofdm/" fig="III" kind="Receiver chain" flip eyebrow="EE 4003, with lab partner Jason Phan" title="V2V collision warning over OFDM">
+        <FigureCard id="v2v" defer={['drawing', 'how']} proj="/work/v2v-bsm-ofdm/" fig="III" kind="Receiver chain" flip eyebrow="EE 4003, with lab partner Jason Phan" title="V2V collision warning over OFDM">
           <ChainFig />
           <V2vLink slot="drawing" />
           <V2vStagesHow slot="how" url={V2V_FILE} />
@@ -103,7 +103,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
           </Fragment>
         </FigureCard>
 
-        <FigureCard id="led" proj="/work/led-audio-spectrum/" fig="IV" kind="16 by 16 matrix" eyebrow="Personal project, one built for each sister" title="LED audio spectrum">
+        <FigureCard id="led" defer={['plate', 'drawing']} proj="/work/led-audio-spectrum/" fig="IV" kind="16 by 16 matrix" eyebrow="Personal project, one built for each sister" title="LED audio spectrum">
           <MatrixFig />
           <div slot="plate" class="fc-plate">
             <span class="plate fc-plate__frame"><LedMatrix /></span>
@@ -133,6 +133,7 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 
         <FigureCard
           id="signals"
+          defer={['drawing']}
           fig="VI"
           kind="Signal mesh"
           flip

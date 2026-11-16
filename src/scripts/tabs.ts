@@ -25,6 +25,15 @@ function openFromHash() {
   tab.closest<HTMLElement>('[data-fc], .mini, figure')?.scrollIntoView({ block: 'start' });
 }
 
+/** A view held in a <template data-defer> (FigureCard's defer) is built the first time its tab opens;
+ *  scripts that set up drawings listen for 'panel:stamped' to pick up what was just added. */
+export function stampPanel(panel: HTMLElement | null) {
+  const t = panel?.querySelector<HTMLTemplateElement>(':scope > template[data-defer]');
+  if (!panel || !t) return;
+  t.replaceWith(t.content.cloneNode(true));
+  panel.dispatchEvent(new CustomEvent('panel:stamped', { bubbles: true }));
+}
+
 export function initTabs() {
   initTabLinks();
   addEventListener('load', openFromHash);
@@ -35,7 +44,9 @@ export function initTabs() {
         const on = i === j;
         t.setAttribute('aria-selected', String(on));
         t.tabIndex = on ? 0 : -1;
-        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+        const panel = document.getElementById(t.getAttribute('aria-controls')!)!;
+        if (on) stampPanel(panel);
+        panel.hidden = !on;
       });
       if (focus) tabs[i].focus();
     };

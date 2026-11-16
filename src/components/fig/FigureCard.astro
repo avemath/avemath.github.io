@@ -21,9 +21,12 @@ interface Props {
   level?: 2 | 3;
   /** The name of the extra view (the plate slot), "Plate" unless set. */
   plateLabel?: string;
+  /** Hidden views to build only when their tab first opens (held in a <template> until then), so
+   *  the page parses less up front. Only for views whose scripts don't set them up at load. */
+  defer?: ('plate' | 'drawing' | 'how')[];
 }
 
-const { id, fig, kind, flip = false, wide = false, eyebrow, title, offers = ['Live', 'Drawing', 'Code'], proj, level = 3, plateLabel = 'Plate' } = Astro.props;
+const { id, fig, kind, flip = false, wide = false, eyebrow, title, offers = ['Live', 'Drawing', 'Code'], proj, level = 3, plateLabel = 'Plate', defer = [] } = Astro.props;
 const Title = level === 2 ? 'h2' : 'h3';
 // A card with a plate slot gets a fifth view, Plate: the line-art figure from the Specimen plates.
 const hasPlate = Astro.slots.has('plate');
@@ -64,17 +67,35 @@ const views = [
     {
       hasPlate && (
         <div class="fc__view fc__plate" id={`${id}-plate`} role="tabpanel" aria-labelledby={`${id}-tab-plate`} hidden>
-          <slot name="plate" />
+          {defer.includes('plate') ? (
+            <template data-defer>
+              <slot name="plate" />
+            </template>
+          ) : (
+            <slot name="plate" />
+          )}
         </div>
       )
     }
     <div class="fc__view" id={`${id}-drawing`} role="tabpanel" aria-labelledby={`${id}-tab-drawing`} hidden>
-      <slot name="drawing" />
+      {defer.includes('drawing') ? (
+        <template data-defer>
+          <slot name="drawing" />
+        </template>
+      ) : (
+        <slot name="drawing" />
+      )}
     </div>
     {
       Astro.slots.has('how') && (
   <div class="fc__view" id={`${id}-how`} role="tabpanel" aria-labelledby={`${id}-tab-how`} hidden>
-      <slot name="how" />
+      {defer.includes('how') ? (
+        <template data-defer>
+          <slot name="how" />
+        </template>
+      ) : (
+        <slot name="how" />
+      )}
     </div>
       )
     }
@@ -270,7 +291,9 @@ const views = [
 </style>
 
 <script>
-  // Tabs: click, or arrow keys, Home and End. The code views widen the card.
+  import { stampPanel } from '../../scripts/tabs';
+  // Tabs: click, or arrow keys, Home and End. The code views widen the card. A view held in a
+  // <template> (the defer prop) is built the first time its tab opens.
   document.querySelectorAll<HTMLElement>('[data-fc]').forEach((card) => {
     const tabs = [...card.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const select = (i: number, focus = false) => {
@@ -278,7 +301,9 @@ const views = [
         const on = i === j;
         t.setAttribute('aria-selected', String(on));
         t.tabIndex = on ? 0 : -1;
-        document.getElementById(t.getAttribute('aria-controls')!)!.hidden = !on;
+        const panel = document.getElementById(t.getAttribute('aria-controls')!)!;
+        if (on) stampPanel(panel);
+        panel.hidden = !on;
       });
       const view = tabs[i].dataset.view;
       card.toggleAttribute('data-wide', view === 'how' || view === 'code');

@@ -8,7 +8,8 @@
 //                  the same ray; a drag turns it and keeps that true
 //   signal-panel   the hero scope reads out where the mouse is; Hear it is a toggle button
 //   marquee        hovering the strip pauses it
-//   tabs           every figure card's tabs show their own view (home and the RAMpage case study)
+//   tabs           every figure card's tabs show their own view, built and not empty (home and the
+//                  RAMpage case study)
 //   chain          hovering a V2V receiver stage selects it; Step through always starts at stage 1,
 //                  then moves on, and only shows on the Live view; at 390, 1440 and 2560 every
 //                  stage's caption sits below the drawing, never over it
@@ -293,6 +294,13 @@ const tabsOn = async (p, where) => {
       const panelId = await tabs.nth(i).getAttribute('aria-controls');
       const shown = await p.evaluate((id) => [...document.querySelectorAll('[role="tabpanel"]')].filter((x) => x.id.split('-')[0] === id.split('-')[0] && !x.hidden).map((x) => x.id), panelId);
       if (shown.join() !== panelId) fail('tabs', `${where} card ${c + 1}: tab ${i + 1} shows ${shown.join() || 'nothing'}`);
+      // The view is really there: no deferred <template> left unbuilt, and it draws something.
+      const view = await p.evaluate((id) => {
+        const el = document.getElementById(id);
+        const r = el.getBoundingClientRect();
+        return { unbuilt: !!el.querySelector(':scope > template[data-defer]'), h: Math.round(r.height), kids: el.querySelectorAll('svg, img, canvas, p, pre, li').length };
+      }, panelId);
+      if (view.unbuilt || view.h < 40 || !view.kids) fail('tabs', `${where} card ${c + 1}: tab ${i + 1} (${panelId}) opens empty (${JSON.stringify(view)})`);
     }
     await tabs.first().click();
   }
