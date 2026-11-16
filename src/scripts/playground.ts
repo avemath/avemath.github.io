@@ -56,10 +56,10 @@ export function mountPlayground(root: HTMLElement) {
   const showOutputs = () => {
     const s = settings();
     const out = (k: string) => root.querySelector(`[data-pg-out="${k}"]`) ?? { textContent: '' };
-    out('snr').textContent = `${s.snrDb} dB SNR`;
-    out('echo').textContent = s.echoGain ? `${s.echoMs.toFixed(1)} ms, ${Math.round(s.echoGain * 100)}%` : 'off';
+    out('snr').textContent = `${s.snrDb}\u00a0dB SNR`;
+    out('echo').textContent = s.echoGain ? `${s.echoMs.toFixed(1)}\u00a0ms, ${Math.round(s.echoGain * 100)}%` : 'off';
     const shift = ((s.speed / C_WATER) * 11520).toFixed(0);
-    out('doppler').textContent = `${s.speed > 0 ? '+' : ''}${s.speed} m/s (${Number(shift) > 0 ? '+' : ''}${shift} Hz)`;
+    out('doppler').textContent = `${s.speed > 0 ? '+' : ''}${s.speed}\u00a0m/s (${Number(shift) > 0 ? '+' : ''}${shift}\u00a0Hz)`;
   };
 
   // ---- One run of the link ----
@@ -441,7 +441,8 @@ export function mountPlayground(root: HTMLElement) {
     hear.disabled = false;
     hear.setAttribute('aria-pressed', 'true');
     hearLabel.textContent = 'Stop';
-    live.textContent = `Playing the packet eight times slower, so three octaves lower: ${run.bits.length} chips, ${((run.bits.length * CHIP_S) / LISTEN_PITCH).toFixed(1)} s.`;
+    // TODO(ave): check wording (polish sweep: matches the Hear it line).
+    live.textContent = `Playing the packet back eight times slower, three octaves lower: ${run.bits.length} chips, ${((run.bits.length * CHIP_S) / LISTEN_PITCH).toFixed(1)}\u00a0s.`;
   });
   document.addEventListener('visibilitychange', () => document.hidden && src && stopAudio());
 

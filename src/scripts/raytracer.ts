@@ -9,8 +9,8 @@ const DEG = Math.PI / 180;
 const DRAWN = 31;
 const DENSE = 361;
 
-const fmtM = (m: number) => (m >= 1000 ? `${Number((m / 1000).toPrecision(3))} km` : `${Math.round(m)} m`);
-const fmtS = (s: number) => (s >= 10 ? `${s.toFixed(1)} s` : s >= 1 ? `${s.toFixed(2)} s` : `${(s * 1000).toFixed(0)} ms`);
+const fmtM = (m: number) => (m >= 1000 ? `${Number((m / 1000).toPrecision(3))}\u00a0km` : `${Math.round(m)}\u00a0m`);
+const fmtS = (s: number) => (s >= 10 ? `${s.toFixed(1)}\u00a0s` : s >= 1 ? `${s.toFixed(2)}\u00a0s` : `${(s * 1000).toFixed(0)}\u00a0ms`);
 
 export function mountRayTracer(root: HTMLElement) {
   const $ = <T extends Element>(s: string) => root.querySelector<T>(s)!;
@@ -43,7 +43,10 @@ export function mountRayTracer(root: HTMLElement) {
   const readInk = () => {
     ink = Object.fromEntries(['--surface', '--text', '--muted', '--line', '--line-strong', '--gold', '--accent', '--teal', '--lilac', '--rose'].map((n) => [n, token(n)]));
   };
-  const bounceColor = (s: number, b: number) => (s === 0 && b === 0 ? ink['--accent'] : b === 0 ? ink['--teal'] : s === 0 ? ink['--lilac'] : ink['--rose']);
+  // Four kinds of path, four colors that can't be mistaken for each other (and match the legend).
+  const kindOf = (s: number, b: number) => (s === 0 && b === 0 ? 'd' : b === 0 ? 's' : s === 0 ? 'b' : 'sb');
+  const KIND_INK: Record<string, string> = { d: '--text', s: '--teal', b: '--lilac', sb: '--rose' };
+  const bounceColor = (s: number, b: number) => ink[KIND_INK[kindOf(s, b)]];
 
   // ---- Geometry ----
   let W = 0;
@@ -59,7 +62,8 @@ export function mountRayTracer(root: HTMLElement) {
     const bottom = H - 26 * dpr;
     const sspL = 46 * dpr;
     const sspR = sspL + Math.max(60 * dpr, W * 0.16);
-    const plotL = sspR + 14 * dpr;
+    // Room between the sound speed axis's last value and the range axis's 0.
+    const plotL = sspR + 30 * dpr;
     const plotR = W - pad;
     return { top, bottom, sspL, sspR, plotL, plotR };
   };
@@ -96,6 +100,9 @@ export function mountRayTracer(root: HTMLElement) {
       ? `${n} eigenray${n === 1 ? '' : 's'}, first arrival ${fmtS(eig[0].t)}, last ${fmtS(eig[n - 1].t)}, at ${fmtM(rr())} and ${fmtM(rz())} deep (${prof.name}).`
       : `No eigenrays reach ${fmtM(rr())} at ${fmtM(rz())} in this fan (${prof.name}). Widen the fan or move the receiver.`;
     root.dataset.eig = String(n);
+    // The legend fades the kinds of path this setup has no eigenray of.
+    const kinds = new Set<string>(eig.map((e) => kindOf(e.surf, e.bot)));
+    root.querySelectorAll<HTMLElement>('[data-rt-lg]').forEach((l) => l.toggleAttribute('data-none', !kinds.has(l.dataset.rtLg!)));
     drawAll();
   };
   const scheduleEig = () => {
@@ -221,7 +228,18 @@ export function mountRayTracer(root: HTMLElement) {
     text(`${Math.round(lo)}`, b.sspL, b.bottom + 16 * dpr, 'left', mu);
     text(`${Math.round(hi)}`, b.sspR, b.bottom + 16 * dpr, 'right', mu);
     text('c(z), m/s', b.sspL, b.top - 8 * dpr, 'left', ink['--gold']);
-    if (prof.axis) text(`axis ${prof.axis} m`, b.plotR - 4 * dpr, Y(prof.axis) - 6 * dpr, 'right', ink['--gold']);
+    if (prof.axis) {
+      // On a solid tag of the plate's color, so the rays never run through the words.
+      const t = `axis ${prof.axis}\u00a0m`;
+      const w = c.measureText(t).width;
+      const x = b.plotR - 4 * dpr;
+      const y = Y(prof.axis) - 6 * dpr;
+      c.fillStyle = ink['--surface'];
+      c.globalAlpha = 0.92;
+      c.fillRect(x - w - 4 * dpr, y - 11 * dpr, w + 8 * dpr, 15 * dpr);
+      c.globalAlpha = 1;
+      text(t, x, y, 'right', ink['--gold']);
+    }
     const kmMax = prof.rmax / 1000;
     const narrow = (b.plotR - b.plotL) / dpr < 260;
     const step = (kmMax > 50 ? 20 : kmMax > 20 ? 10 : 2) * (narrow ? 2.5 : 1);

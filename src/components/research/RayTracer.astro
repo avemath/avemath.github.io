@@ -24,8 +24,15 @@ import { PROFILES } from '@/lib/raytrace';
         {PROFILES.map((p, i) => <option value={p.id} selected={i === 0}>{p.name}</option>)}
       </select>
     </label>
+    <div class="rt__go">
+      <button type="button" class="btn btn--primary" data-rt-ping>Ping</button>
+      <p class="rt__clock">
+        <span class="rt__clock-k">time since ping</span>
+        <span class="rt__clock-v" data-readout><span data-rt-clock aria-hidden="true">0.00</span>&nbsp;s</span>
+      </p>
+    </div>
     <label class="rt__field">
-      <span class="rt__k">Source depth <output data-rt-zs-out>1300 m</output></span>
+      <span class="rt__k">Source depth <output data-rt-zs-out>1300&nbsp;m</output></span>
       <input type="range" min="0" max="1000" step="1" value="260" data-rt-zs />
     </label>
     <label class="rt__field">
@@ -33,17 +40,13 @@ import { PROFILES } from '@/lib/raytrace';
       <input type="range" min="2" max="40" step="1" value="20" data-rt-fan />
     </label>
     <label class="rt__field">
-      <span class="rt__k">Receiver range <output data-rt-rr-out>65 km</output></span>
+      <span class="rt__k">Receiver range <output data-rt-rr-out>65&nbsp;km</output></span>
       <input type="range" min="1" max="1000" step="1" value="650" data-rt-rr />
     </label>
     <label class="rt__field">
-      <span class="rt__k">Receiver depth <output data-rt-rz-out>1300 m</output></span>
+      <span class="rt__k">Receiver depth <output data-rt-rz-out>1300&nbsp;m</output></span>
       <input type="range" min="0" max="1000" step="1" value="260" data-rt-rz />
     </label>
-    <div class="rt__go">
-      <button type="button" class="btn btn--primary" data-rt-ping>Ping</button>
-      <p class="rt__clock" aria-hidden="true"><span data-rt-clock>0.00</span> s</p>
-    </div>
   </div>
   <canvas
     class="rt__main"
@@ -53,7 +56,10 @@ import { PROFILES } from '@/lib/raytrace';
   ></canvas>
   <canvas class="rt__stem" data-rt-stem aria-hidden="true"></canvas>
   <p class="rt__legend" aria-hidden="true">
-    <span class="rt__sw rt__sw--d"></span>direct <span class="rt__sw rt__sw--s"></span>surface <span class="rt__sw rt__sw--b"></span>bottom <span class="rt__sw rt__sw--sb"></span>both
+    <span class="rt__lg" data-rt-lg="d"><span class="rt__sw rt__sw--d"></span>direct</span>
+    <span class="rt__lg" data-rt-lg="s"><span class="rt__sw rt__sw--s"></span>surface</span>
+    <span class="rt__lg" data-rt-lg="b"><span class="rt__sw rt__sw--b"></span>bottom</span>
+    <span class="rt__lg" data-rt-lg="sb"><span class="rt__sw rt__sw--sb"></span>both</span>
   </p>
   <p class="rt__sum" aria-live="polite" data-rt-sum></p>
 </div>
@@ -66,17 +72,13 @@ import { PROFILES } from '@/lib/raytrace';
     padding: 0.75rem 0.75rem 0.25rem;
   }
 
+  /* Two even columns: Environment beside Ping and its clock, then Source depth beside Fan, then
+     Receiver range beside Receiver depth, each label with its value on one row over its slider. */
   .rt__ctl {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem 1rem;
+    gap: 0.6rem 1.25rem;
     align-items: end;
-  }
-
-  @container (min-width: 540px) {
-    .rt__ctl {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
   }
 
   /* A narrow figure: one control per row, Ping and the clock on their own row. */
@@ -98,6 +100,7 @@ import { PROFILES } from '@/lib/raytrace';
     justify-content: space-between;
     gap: 0.5rem;
     font-size: var(--fs-13);
+    white-space: nowrap;
     color: var(--muted);
   }
 
@@ -113,6 +116,7 @@ import { PROFILES } from '@/lib/raytrace';
   }
 
   .rt__field select {
+    width: 100%;
     min-height: 44px;
     padding: 0 0.6rem;
     border: 1px solid var(--line-strong);
@@ -125,17 +129,30 @@ import { PROFILES } from '@/lib/raytrace';
 
   .rt__go {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.9rem;
+    gap: 0.5rem 0.9rem;
+    min-width: 0;
   }
 
-  .rt__go .btn {
-  }
-
+  /* The clock: what it counts on top, then the seconds, number and unit together, in a fixed
+     width (tabular figures, room for "999.99 s") so nothing moves while it runs. */
   .rt__clock {
+    display: grid;
     margin: 0;
+  }
+
+  .rt__clock-k {
+    font-size: var(--fs-13);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .rt__clock-v {
+    min-width: 8ch;
     font-family: var(--font-mono);
-    font-size: var(--fs-24);
+    font-size: var(--fs-20);
+    line-height: 1.2;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
@@ -173,12 +190,22 @@ import { PROFILES } from '@/lib/raytrace';
     display: inline-block;
     width: 14px;
     height: 3px;
-    margin-left: 0.35rem;
-    vertical-align: middle;
+  }
+
+  .rt__lg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-right: 0.5rem;
+  }
+
+  /* A kind of path with no eigenray in this setup is shown faded, not removed. */
+  .rt__lg[data-none] {
+    opacity: 0.4;
   }
 
   .rt__sw--d {
-    background: var(--accent);
+    background: var(--text);
   }
 
   .rt__sw--s {
@@ -186,7 +213,7 @@ import { PROFILES } from '@/lib/raytrace';
   }
 
   .rt__sw--b {
-    background: var(--lilac, #8f79c4);
+    background: var(--lilac);
   }
 
   .rt__sw--sb {

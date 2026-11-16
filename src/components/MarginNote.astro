@@ -28,7 +28,6 @@ const note = facts.find((f) => f.where === Astro.props.where);
         <span class="mnote__detail" data-note-detail data-text={note.detail} aria-hidden="true">{note.detail}</span>
         <span class="mnote__hint" aria-hidden="true">
           <span class="mnote__tap">tap to decode</span>
-          <span class="mnote__done">decoded</span>
         </span>
       </button>
     </aside>
@@ -111,12 +110,8 @@ const note = facts.find((f) => f.where === Astro.props.where);
     color: var(--accent-ink);
   }
 
-  .mnote__done {
-    color: var(--muted);
-  }
-
-  .mnote__card:not([data-masked]) .mnote__tap,
-  .mnote__card[data-masked] .mnote__done {
+  /* Once decoded, the hint goes: the note is just the note. */
+  .mnote__card:not([data-masked]) .mnote__hint {
     display: none;
   }
 </style>

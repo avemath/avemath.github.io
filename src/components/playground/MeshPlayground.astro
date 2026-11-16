@@ -42,7 +42,7 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
           tone) and the sent bits, and Hear it plays the packet. Same script, same link code. */}
       {bits && (
         <div class="pg__spec-wrap">
-          <canvas class="pg__spec" data-pg-spec role="img" aria-label={`Spectrogram of the received signal from ${F_LOW} to ${F_HIGH} Hz: each chip is a short dash at its tone, hopping up and down the band.`} />
+          <canvas class="pg__spec" data-pg-spec role="img" aria-label={`Spectrogram of the received signal from ${F_LOW} to ${F_HIGH}\u00a0Hz: each chip is a short dash at its tone, hopping up and down the band.`} />
           <p class="pg__spec-k mono">
             <span>{(F_HIGH / 1000).toFixed(1)} kHz</span>
             <span>spectrogram, received</span>
@@ -66,7 +66,8 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
           </button>
         )}
         {/* TODO(ave): check wording (Nov 11: Hear it is lowered). */}
-        {bits && <p class="pg__lowered">Hear it plays the packet eight times slower, so three octaves lower, and easier on the ears.</p>}
+        {/* TODO(ave): check wording (polish sweep: the Hear it line). */}
+        {bits && <p class="pg__lowered">Hear it plays the packet back eight times slower, which drops it three octaves so it's easier to listen to.</p>}
         <p class="pg__sum mono" data-pg-sum aria-live="polite">“hi from Ave”, 88 bits, one 6.25 ms chip each</p>
         <a class="link pg__full" href="/work/signals-playground/#playground">Open the full playground</a>
       </div>
@@ -87,7 +88,8 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
     <button type="submit" class="btn btn--primary" data-pg-send>Send</button>
     <button type="button" class="btn" data-pg-hear aria-pressed="false"><span data-pg-hear-label>Hear it</span></button>
     {/* TODO(ave): check wording (Nov 11: Hear it is lowered). */}
-    <p class="pg__lowered">Hear it plays the packet eight times slower, so three octaves lower, and easier on the ears.</p>
+    {/* TODO(ave): check wording (polish sweep: the Hear it line). */}
+    <p class="pg__lowered">Hear it plays the packet back eight times slower, which drops it three octaves so it's easier to listen to.</p>
   </form>
 
   <p class="pg__k">Sent bits <span class="pg__dim">(8 per character)</span></p>
@@ -114,7 +116,7 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
   </div>
 
   <div class="pg__spec-wrap">
-    <canvas class="pg__spec" data-pg-spec role="img" aria-label={`Spectrogram of the received signal from ${F_LOW} to ${F_HIGH} Hz: each chip is a short dash at its tone, hopping up and down the band.`}></canvas>
+    <canvas class="pg__spec" data-pg-spec role="img" aria-label={`Spectrogram of the received signal from ${F_LOW} to ${F_HIGH}\u00a0Hz: each chip is a short dash at its tone, hopping up and down the band.`}></canvas>
     <p class="pg__spec-k mono"><span>{(F_HIGH / 1000).toFixed(1)} kHz</span><span>spectrogram, received</span><span>{(F_LOW / 1000).toFixed(2)} kHz</span></p>
   </div>
 
@@ -199,7 +201,7 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
     min-height: 1.5em;
     font-size: var(--fs-13);
     line-height: 1.6;
-    word-break: break-all;
+    overflow-wrap: anywhere;
     color: var(--text-soft);
   }
 
@@ -308,14 +310,14 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
   .pg__rx-text {
     min-height: 1.4em;
     font: 500 1.25rem var(--font-mono);
-    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   .pg__rx-bits {
     min-height: 1.5em;
     font-size: var(--fs-12);
     line-height: 1.6;
-    word-break: break-all;
+    overflow-wrap: anywhere;
     color: var(--text-soft);
   }
 

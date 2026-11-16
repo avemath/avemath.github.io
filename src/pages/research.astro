@@ -188,7 +188,6 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
             </div>
             <div id="r3-rays" role="tabpanel" aria-labelledby="r3-tab-rays">
               <RayTracer />
-              <p class="fig__note">Traced in your browser through bellhopSim's sound speed profiles, with the ray equations of BELLHOP (a standard model of how sound travels underwater). Ping sends a pulse along every ray at the local speed of sound; the bold rays are the eigenrays that reach the receiver. There is no bottom loss here, so paths that BELLHOP would let the seabed absorb still show.</p>
             </div>
             <div id="r3-arr" role="tabpanel" aria-labelledby="r3-tab-arr" hidden>
               <div class="arr-row">
@@ -226,9 +225,12 @@ const at = (id: string) => nodes.find((n) => n.id === id)!;
               </p>
             </div>
             <figcaption class="plate__cap">
-              {/* TODO(ave): check wording (Nov 15: marked as simulation). */}
-              <b>Fig. R3.</b> Sound bends toward the slow water. Simulated: rays and eigenrays traced in the browser, and the arrivals BELLHOP
-              computed for bellhopSim's comms scenario.
+              {/* TODO(ave): check wording (polish sweep: the rays note and the caption merged into one). */}
+              <b>Fig. R3.</b> Sound bends toward the slow water, simulated. The ray tracer follows rays through bellhopSim's sound speed
+              profiles in your browser, with the ray equations of BELLHOP (a standard model of how sound travels underwater); the bold rays are
+              the eigenrays that reach the receiver. Ping sends a pulse along every ray at the local speed of sound, and the clock runs until
+              the pulse has crossed the whole plot. There is no bottom loss here, so paths the seabed would absorb still show. BELLHOP
+              arrivals shows the arrivals BELLHOP itself computed for bellhopSim's comms scenario.
             </figcaption>
           </figure>
         </div>
