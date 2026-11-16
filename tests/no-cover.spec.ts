@@ -18,6 +18,7 @@ import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium, type Page } from 'playwright';
 import { serveDist, localOnly } from '../scripts/lib/serve-dist.mjs';
+import { coverInPage } from '../scripts/lib/page-checks.mjs';
 import { LAPTOP } from '../scripts/lib/viewports.mjs';
 
 type Hit = { kind: 'photo' | 'text'; what: string; by: string; x: number; y: number };
@@ -49,141 +50,8 @@ if (only) pages.splice(0, pages.length, ...pages.filter((p) => only.includes(p))
 
 // Runs in the page: scrolls a screen at a time and reports every covered point.
 async function scan(page: Page): Promise<Hit[]> {
-  return page.evaluate(async () => {
-    const hits: Hit[] = [];
-    const force = document.createElement('style');
-    // Every element must answer elementsFromPoint, decorations that ignore the pointer included.
-    force.textContent = '*, *::before, *::after { pointer-events: auto !important; }';
-    document.head.append(force);
-
-    const transparent = (c: string) => c === 'transparent' || /rgba\([^)]*,\s*0\)$/.test(c);
-    const paints = (el: Element) => {
-      if (/^(IMG|VIDEO)$/.test(el.tagName)) return true;
-      const s = getComputedStyle(el);
-      if (!transparent(s.backgroundColor) || s.backgroundImage !== 'none') return true;
-      return (['Top', 'Right', 'Bottom', 'Left'] as const).some(
-        (side) => parseFloat(s.getPropertyValue(`border-${side.toLowerCase()}-width`)) > 0 && s.getPropertyValue(`border-${side.toLowerCase()}-style`) !== 'none' && !transparent(s.getPropertyValue(`border-${side.toLowerCase()}-color`)),
-      );
-    };
-    const shown = (el: Element) => {
-      for (let n: Element | null = el; n; n = n.parentElement) {
-        const s = getComputedStyle(n);
-        if (s.visibility === 'hidden' || Number(s.opacity) < 0.05) return false;
-      }
-      return true;
-    };
-    const floating = (el: Element) => {
-      for (let n: Element | null = el; n && n !== document.body; n = n.parentElement) {
-        const p = getComputedStyle(n).position;
-        if (p === 'fixed' || p === 'sticky') return true;
-      }
-      return false;
-    };
-    const layered = (el: Element) => !!el.closest('[data-overlap="layered"]');
-    const name = (el: Element) => {
-      const id = el.id ? `#${el.id}` : '';
-      const cls = typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/).slice(0, 2).join('.')}` : '';
-      return `${el.tagName.toLowerCase()}${id}${cls}`;
-    };
-
-    const head = document.querySelector('.site-header');
-    const topEdge = () => Math.max(0, head ? head.getBoundingClientRect().bottom : 0);
-    const seen = new Set<string>();
-
-    // What is painted above `target` at (x, y): the first thing over it that covers it, if any.
-    const coverAt = (x: number, y: number, target: Element, isPhoto: boolean, inside?: (e: Element) => boolean) => {
-      const stack = document.elementsFromPoint(x, y);
-      const at = stack.findIndex((e) => e === target || (inside && inside(e)));
-      if (at < 0) return null; // the point is off the target (a tilted print's corner)
-      for (const e of stack.slice(0, at)) {
-        if (target.contains(e) || e.contains(target)) continue;
-        if (floating(e) || !shown(e) || !paints(e)) continue;
-        if (!isPhoto && e.closest('[data-overlap="ok"]')) continue;
-        return e;
-      }
-      return null;
-    };
-
-    const photos = () =>
-      [...document.querySelectorAll<HTMLElement>('img, video, canvas[data-photo]')].filter((el) => {
-        if (el instanceof HTMLImageElement && /\.svg($|\?)/.test(el.currentSrc || el.src)) return false;
-        const r = el.getBoundingClientRect();
-        return r.width >= 24 && r.height >= 24 && shown(el) && !floating(el) && !layered(el);
-      });
-
-    const texts = () => {
-      const out: Text[] = [];
-      const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-        acceptNode: (n) => {
-          const p = n.parentElement;
-          if (!p || !n.textContent?.trim()) return NodeFilter.FILTER_REJECT;
-          if (p.closest('svg, script, style, noscript, template, .sr-only, [hidden]')) return NodeFilter.FILTER_REJECT;
-          // A closed <details> keeps its answer in the DOM but does not draw it.
-          const shut = p.closest('details:not([open])');
-          if (shut && !p.closest('summary')) return NodeFilter.FILTER_REJECT;
-          if (floating(p) || layered(p) || !shown(p)) return NodeFilter.FILTER_REJECT;
-          return NodeFilter.FILTER_ACCEPT;
-        },
-      });
-      for (let n = tw.nextNode(); n; n = tw.nextNode()) out.push(n as Text);
-      return out;
-    };
-
-    const vh = window.innerHeight;
-    const total = document.documentElement.scrollHeight;
-    for (let y = 0; y < total; y += Math.max(200, vh - 160)) {
-      window.scrollTo({ top: y, behavior: 'instant' as ScrollBehavior });
-      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-      const top = topEdge() + 2;
-      const bottom = vh - 2;
-      const sy = window.scrollY;
-
-      for (const el of photos()) {
-        const r = el.getBoundingClientRect();
-        if (r.bottom < top || r.top > bottom) continue;
-        const s = getComputedStyle(el);
-        const pad = (k: string) => parseFloat(s.getPropertyValue(k)) || 0;
-        const L = r.left + pad('border-left-width') + pad('padding-left');
-        const R = r.right - pad('border-right-width') - pad('padding-right');
-        const T = r.top + pad('border-top-width') + pad('padding-top');
-        const B = r.bottom - pad('border-bottom-width') - pad('padding-bottom');
-        for (let i = 0; i <= 8; i++) {
-          for (let j = 0; j <= 8; j++) {
-            const x = L + 1 + ((R - L - 2) * i) / 8;
-            const yy = T + 1 + ((B - T - 2) * j) / 8;
-            if (yy < top || yy > bottom || x < 0 || x > window.innerWidth) continue;
-            const key = `p${Math.round(x)},${Math.round(yy + sy)}`;
-            if (seen.has(key)) continue;
-            seen.add(key);
-            const by = coverAt(x, yy, el, true);
-            if (by) hits.push({ kind: 'photo', what: `${name(el)} ${(el.getAttribute('alt') || '').slice(0, 40)}`, by: name(by), x: Math.round(x), y: Math.round(yy + sy) });
-          }
-        }
-      }
-
-      for (const t of texts()) {
-        const range = document.createRange();
-        range.selectNodeContents(t);
-        const owner = t.parentElement as Element;
-        for (const r of range.getClientRects()) {
-          if (r.width < 2 || r.height < 2 || r.bottom < top || r.top > bottom) continue;
-          for (const fx of [0.15, 0.5, 0.85]) {
-            const x = r.left + r.width * fx;
-            const yy = r.top + r.height / 2;
-            if (yy < top || yy > bottom || x < 0 || x > window.innerWidth) continue;
-            const key = `t${Math.round(x)},${Math.round(yy + sy)}`;
-            if (seen.has(key)) continue;
-            seen.add(key);
-            const by = coverAt(x, yy, owner, false, (e) => e.contains(t));
-            if (by) hits.push({ kind: 'text', what: `${name(owner)} "${(t.textContent || '').trim().slice(0, 40)}"`, by: name(by), x: Math.round(x), y: Math.round(yy + sy) });
-          }
-        }
-      }
-    }
-    force.remove();
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-    return hits;
-  });
+  // The check itself is shared with the sweep: scripts/lib/page-checks.mjs.
+  return page.evaluate(coverInPage) as Promise<Hit[]>;
 }
 
 const { server, base } = serveDist('dist');

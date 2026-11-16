@@ -15,6 +15,7 @@ import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium, type Page } from 'playwright';
 import { serveDist, localOnly } from '../scripts/lib/serve-dist.mjs';
+import { fitInPage } from '../scripts/lib/page-checks.mjs';
 import { ALL, pageOpts } from '../scripts/lib/viewports.mjs';
 
 const pages: string[] = ['/404.html'];
@@ -34,137 +35,9 @@ const onlyVp = process.env.FIT_VIEWPORTS?.split(',');
 const VIEWPORTS = onlyVp ? ALL.filter((v: { label: string }) => onlyVp.includes(v.label)) : ALL;
 const THEMES = (process.env.FIT_THEMES || 'light').split(',');
 
-// Runs in the page; returns one line per problem.
+// Runs in the page (scripts/lib/page-checks.mjs, shared with the sweep); one line per problem.
 async function check(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
-    const out: string[] = [];
-    const vw = document.documentElement.clientWidth;
-    const name = (el: Element) => {
-      const id = el.id ? `#${el.id}` : '';
-      const cls = typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/)[0]}` : '';
-      return `${el.tagName.toLowerCase()}${id}${cls}`;
-    };
-    const shown = (el: Element) => {
-      if (el.closest('[hidden], template, .sr-only, [inert]')) return false;
-      // Inside a closed <details> (its summary aside) nothing is drawn, whatever box Chrome reports.
-      const shut = el.closest('details:not([open])');
-      if (shut && !el.closest('summary')) return false;
-      const r = el.getBoundingClientRect();
-      if (!r.width || !r.height) return false;
-      for (let n: Element | null = el; n; n = n.parentElement) {
-        const s = getComputedStyle(n);
-        if (s.display === 'none' || s.visibility === 'hidden' || Number(s.opacity) < 0.05) return false;
-      }
-      return true;
-    };
-    const scrollsOrBleeds = (el: Element) => {
-      for (let n = el.parentElement; n && n !== document.body; n = n.parentElement) {
-        if (n.matches('[data-hscroll], [data-clip-ok], [aria-hidden="true"]')) return true;
-        const s = getComputedStyle(n);
-        if (/(auto|scroll)/.test(s.overflowX)) return true;
-        if (s.position === 'fixed') return true;
-      }
-      return el.closest('[aria-hidden="true"], [data-clip-ok]') !== null;
-    };
-
-    // ---- Unit split ----
-    const UNIT = /(\d[\d.,]*)[  ](kg\/m³|g\/cm³|m\/s|km\/h|kHz|MHz|GHz|Hz|dB|km|cm|mm|ms|µs|kg|lbf|psi|KB|MB|GB|fps|ac|°C|m|s|g)(?![\p{L}\p{N}])/gu;
-    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    for (let n = tw.nextNode() as Text | null; n; n = tw.nextNode() as Text | null) {
-      const p = n.parentElement;
-      if (!p || !n.data.trim() || p.closest('script, style, code, pre, textarea') || !shown(p)) continue;
-      for (const m of n.data.matchAll(UNIT)) {
-        const r = document.createRange();
-        r.setStart(n, m.index!);
-        r.setEnd(n, m.index! + m[0].length);
-        const tops = [...r.getClientRects()].filter((x) => x.width > 0).map((x) => Math.round(x.top));
-        if (tops.length > 1 && Math.max(...tops) - Math.min(...tops) > 4) out.push(`unit split: "${m[0]}" breaks across lines in ${name(p)}`);
-      }
-    }
-
-    // ---- Truncation ----
-    const ctx = document.createElement('canvas').getContext('2d')!;
-    for (const el of document.querySelectorAll<HTMLElement>('select, button, [role="tab"], .chip, .filter, label, summary, .btn, .tabset > *')) {
-      if (!shown(el)) continue;
-      if (el instanceof HTMLSelectElement) {
-        const s = getComputedStyle(el);
-        ctx.font = `${s.fontStyle} ${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
-        const text = el.selectedOptions[0]?.text ?? '';
-        const need = ctx.measureText(text).width;
-        // Room for the text: the box less its padding and the arrow (about 20px).
-        const room = el.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight) - 20;
-        if (need > room + 1) out.push(`truncated: ${name(el)} shows "${text}" in ${Math.round(room)}px, needs ${Math.round(need)}px`);
-        continue;
-      }
-      const s = getComputedStyle(el);
-      if (el.scrollWidth > el.clientWidth + 1 && (s.overflowX !== 'visible' || s.textOverflow === 'ellipsis')) {
-        out.push(`truncated: ${name(el)} "${(el.textContent || '').trim().slice(0, 30)}" (${el.scrollWidth} in ${el.clientWidth}px)`);
-        continue;
-      }
-      // Visible text that spills out of its own box (overflow left visible) also counts. Text for
-      // screen readers only (.sr-only) sits outside on purpose and is skipped.
-      const box = el.getBoundingClientRect();
-      const inner = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-      let spill = false;
-      for (let t = inner.nextNode() as Text | null; t && !spill; t = inner.nextNode() as Text | null) {
-        if (!t.data.trim() || !t.parentElement || !shown(t.parentElement)) continue;
-        const range = document.createRange();
-        range.selectNodeContents(t);
-        for (const r of range.getClientRects()) if (r.width > 0 && (r.right > box.right + 1.5 || r.left < box.left - 1.5)) spill = true;
-      }
-      if (spill) out.push(`truncated: ${name(el)} "${(el.textContent || '').trim().slice(0, 30)}" runs out of its box`);
-    }
-
-    // ---- Clipping ----
-    const clippers = (el: Element) => {
-      const list: Element[] = [];
-      for (let n = el.parentElement; n && n !== document.body; n = n.parentElement) {
-        const s = getComputedStyle(n);
-        if (/(hidden|clip)/.test(s.overflowX) || /(hidden|clip)/.test(s.overflowY)) list.push(n);
-      }
-      return list;
-    };
-    const past = (r: DOMRect, el: Element, what: string) => {
-      if (r.right > vw + 1 || r.left < -1) return `clipped: ${what} in ${name(el)} runs past the screen (${Math.round(r.left)} to ${Math.round(r.right)} of ${vw})`;
-      for (const c of clippers(el)) {
-        const b = c.getBoundingClientRect();
-        if (r.right > b.right + 1.5 || r.left < b.left - 1.5) return `clipped: ${what} in ${name(el)} is cut by ${name(c)}`;
-      }
-      return null;
-    };
-    const seen = new Set<string>();
-    const tw2 = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    for (let n = tw2.nextNode() as Text | null; n; n = tw2.nextNode() as Text | null) {
-      const p = n.parentElement;
-      if (!p || !n.data.trim() || p.closest('script, style, svg, code, pre, textarea, option') || !shown(p) || scrollsOrBleeds(p)) continue;
-      const r = document.createRange();
-      r.selectNodeContents(n);
-      for (const rr of r.getClientRects()) {
-        if (!rr.width) continue;
-        const msg = past(rr, p, `"${n.data.trim().slice(0, 24)}"`);
-        if (msg && !seen.has(msg)) (seen.add(msg), out.push(msg));
-        break;
-      }
-    }
-    for (const el of document.querySelectorAll('img, canvas, video, svg:not(svg svg), .pol, .pol-bare, a, button, figcaption')) {
-      if (!shown(el) || scrollsOrBleeds(el)) continue;
-      // An image filling a cropped window (object-fit) is cropped on purpose: judge its window instead.
-      const target = el.matches('img') && el.parentElement && /(hidden|clip)/.test(getComputedStyle(el.parentElement).overflow) ? el.parentElement : el;
-      const msg = past(target.getBoundingClientRect(), target, name(el));
-      if (msg && !seen.has(msg)) (seen.add(msg), out.push(msg));
-    }
-
-    // ---- Readouts ----
-    for (const el of document.querySelectorAll('output, [data-readout]')) {
-      if (!shown(el)) continue;
-      const box = el.closest('figure, .plate, .rfig, [data-fc], .card, .paper, [data-readout-box]');
-      if (!box) continue;
-      const a = el.getBoundingClientRect();
-      const b = box.getBoundingClientRect();
-      if (a.left < b.left - 1 || a.right > b.right + 1 || a.top < b.top - 1 || a.bottom > b.bottom + 1) out.push(`readout: ${name(el)} "${(el.textContent || '').trim()}" sits outside ${name(box)}`);
-    }
-    return out;
-  });
+  return page.evaluate(fitInPage);
 }
 
 // Every state a reader can open: each tab of each tablist, and each About pin. Returns after each one.

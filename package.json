@@ -18,6 +18,7 @@
     "assets": "node scripts/render-assets.mjs",
     "test:layout": "node scripts/check-layout.mjs && node scripts/check-interactions.mjs && node tests/no-cover.spec.ts && node tests/fit.spec.ts",
     "test:fit": "node tests/fit.spec.ts",
+    "test:sweep": "node tests/sweep.spec.ts",
     "test:cover": "node tests/no-cover.spec.ts"
   },
   "dependencies": {
