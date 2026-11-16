@@ -66,7 +66,6 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
           </button>
         )}
         {/* TODO(ave): check wording (Nov 11: Hear it is lowered). */}
-        {/* TODO(ave): check wording (polish sweep: the Hear it line). */}
         {bits && <p class="pg__lowered">Hear it plays the packet back eight times slower, which drops it three octaves so it's easier to listen to.</p>}
         <p class="pg__sum mono" data-pg-sum aria-live="polite">“hi from Ave”, 88 bits, one 6.25 ms chip each</p>
         <a class="link pg__full" href="/work/signals-playground/#playground">Open the full playground</a>
@@ -88,7 +87,6 @@ const { n = 'VIII', compact = false, bits = false } = Astro.props;
     <button type="submit" class="btn btn--primary" data-pg-send>Send</button>
     <button type="button" class="btn" data-pg-hear aria-pressed="false"><span data-pg-hear-label>Hear it</span></button>
     {/* TODO(ave): check wording (Nov 11: Hear it is lowered). */}
-    {/* TODO(ave): check wording (polish sweep: the Hear it line). */}
     <p class="pg__lowered">Hear it plays the packet back eight times slower, which drops it three octaves so it's easier to listen to.</p>
   </form>
 

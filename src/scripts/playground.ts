@@ -441,7 +441,6 @@ export function mountPlayground(root: HTMLElement) {
     hear.disabled = false;
     hear.setAttribute('aria-pressed', 'true');
     hearLabel.textContent = 'Stop';
-    // TODO(ave): check wording (polish sweep: matches the Hear it line).
     live.textContent = `Playing the packet back eight times slower, three octaves lower: ${run.bits.length} chips, ${((run.bits.length * CHIP_S) / LISTEN_PITCH).toFixed(1)}\u00a0s.`;
   });
   document.addEventListener('visibilitychange', () => document.hidden && src && stopAudio());
