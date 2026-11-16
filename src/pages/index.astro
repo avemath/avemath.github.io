@@ -237,14 +237,86 @@ const hopY = (hz: number) => 12 + ((F_HIGH - hz) / (F_HIGH - F_LOW)) * 96;
 </BaseLayout>
 
 <style>
-  /* Below the fold, the browser skips laying these out until they near the screen, so the body font's
-     swap after first paint relayouts only what is visible. (Not Projects: its sticky RAMpage
-     toolbar and tooltips must not be clipped.) */
-  :global(html:not(.cv-off) .below),
-  :global(html:not(.cv-off) #websites),
-  :global(html:not(.cv-off) #toolbox) {
+  /* Everything after the hero starts below the first screen at every width, so the browser skips
+     laying it out until it nears the screen: the first layout, and the relayout when the web fonts
+     arrive, cover only what is visible. Each section's placeholder height is close to its real one
+     (measured at 390, 768 and 1440), and `auto` keeps the real height once it has been shown, so the
+     scrollbar barely moves. Term popovers sit in the top layer, so nothing here can clip them.
+     Arriving at a #hash turns this off (the script at the top of the page), so the jump lands true. */
+  :global(html:not(.cv-off)) :is(.status, .about-t, #projects, .below, #websites, #toolbox) {
     content-visibility: auto;
-    contain-intrinsic-size: auto 1200px;
+  }
+
+  :global(html:not(.cv-off)) .status {
+    contain-intrinsic-size: auto 450px;
+  }
+
+  :global(html:not(.cv-off)) .about-t {
+    contain-intrinsic-size: auto 950px;
+  }
+
+  :global(html:not(.cv-off)) #projects {
+    contain-intrinsic-size: auto 6800px;
+  }
+
+  :global(html:not(.cv-off)) .below {
+    contain-intrinsic-size: auto 520px;
+  }
+
+  :global(html:not(.cv-off)) #websites {
+    contain-intrinsic-size: auto 4750px;
+  }
+
+  :global(html:not(.cv-off)) #toolbox {
+    contain-intrinsic-size: auto 1000px;
+  }
+
+  @media (min-width: 768px) {
+    :global(html:not(.cv-off)) .status {
+      contain-intrinsic-size: auto 240px;
+    }
+
+    :global(html:not(.cv-off)) .about-t {
+      contain-intrinsic-size: auto 860px;
+    }
+
+    :global(html:not(.cv-off)) #projects {
+      contain-intrinsic-size: auto 5200px;
+    }
+
+    :global(html:not(.cv-off)) #websites {
+      contain-intrinsic-size: auto 5100px;
+    }
+
+    :global(html:not(.cv-off)) #toolbox {
+      contain-intrinsic-size: auto 1150px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :global(html:not(.cv-off)) .status {
+      contain-intrinsic-size: auto 215px;
+    }
+
+    :global(html:not(.cv-off)) .about-t {
+      contain-intrinsic-size: auto 680px;
+    }
+
+    :global(html:not(.cv-off)) #projects {
+      contain-intrinsic-size: auto 3750px;
+    }
+
+    :global(html:not(.cv-off)) .below {
+      contain-intrinsic-size: auto 670px;
+    }
+
+    :global(html:not(.cv-off)) #websites {
+      contain-intrinsic-size: auto 3750px;
+    }
+
+    :global(html:not(.cv-off)) #toolbox {
+      contain-intrinsic-size: auto 960px;
+    }
   }
 
   .projects__head {
