@@ -69,9 +69,18 @@ const fail = (test, msg) => {
   problems++;
   console.log(`  FAIL ${test}: ${msg}`);
 };
+// Every page a test opens, so the test's end can close any it left open (a test that throws skips
+// its own close, and a page left running would keep animating and slow every test after it). Pages
+// opened outside a test (the shared home page) belong to the whole run and are left alone.
+const openPages = new Set();
+let inTest = false;
 const page = async (path, opts = {}) => {
   const b = opts.gl ? await glBrowser() : browser;
   const p = await b.newPage({ viewport: { width: opts.w ?? 1440, height: opts.h ?? 900 }, reducedMotion: opts.reduce ? 'reduce' : 'no-preference', hasTouch: !!opts.touch, isMobile: !!opts.touch });
+  if (inTest) {
+    openPages.add(p);
+    p.on('close', () => openPages.delete(p));
+  }
   await p.route(...localOnly(base));
   // Loaded, then quiet on the network if it gets there soon (a busy machine can hold it off).
   await p.goto(`${base}${path}`, { waitUntil: 'load', timeout: 60000 });
@@ -98,10 +107,15 @@ const txt = (s) => (s ?? '').replace(/\u00a0/g, ' ');
 const test = async (name, fn) => {
   if (only && !only.includes(name)) return;
   const before = problems;
+  inTest = true;
   try {
     await fn();
   } catch (e) {
     fail(name, process.env.VERBOSE ? e.message.split('\n').slice(0, 25).join('\n') : e.message.split('\n')[0]);
+  } finally {
+    inTest = false;
+    // Each test starts from a clean browser: nothing left open by this one carries into the next.
+    await Promise.all([...openPages].map((p) => p.close().catch(() => {})));
   }
   if (problems === before) passed.push(name);
 };
@@ -672,15 +686,29 @@ await test('field-notes', async () => {
   const shown0 = (await val.textContent()).trim();
   if (!/^[01\s]+$/.test(shown0)) fail('field-notes', `before it is on screen the note shows "${shown0}", not bits`);
   await settleOn(p, '[data-note] >> nth=-1');
-  await p.waitForTimeout(2200);
-  if ((await val.textContent()).trim() !== want) fail('field-notes', `scrolled to, the note reads "${await val.textContent()}", not "${want}"`);
-  // The note's own click, not a tap at a screen position: after other /research/ tests a positional
-  // tap sometimes missed it, which made this test flaky without the page being wrong.
-  await note.evaluate((n) => n.click());
-  // The replay starts within a frame or two; a busy machine can take longer, so watch for it.
-  const replayed = await p
-    .waitForFunction((w) => [...document.querySelectorAll('[data-note]')].at(-1).querySelector('[data-note-value]').textContent !== w, want, { timeout: 1000, polling: 10 })
+  // The decode takes about a second once the note is on screen; wait for its end rather than a set time.
+  const decoded = await p
+    .waitForFunction((w) => [...document.querySelectorAll('[data-note]')].at(-1).querySelector('[data-note-value]').textContent.trim() === w, want, { timeout: 8000 })
     .then(() => true, () => false);
+  if (!decoded) fail('field-notes', `scrolled to, the note reads "${await val.textContent()}", not "${want}"`);
+  // The note's own click, not a tap at a screen position: after other /research/ tests a positional
+  // tap sometimes missed it. Every text the note shows is recorded in the page from before the
+  // click, so the replay is seen however its frames are timed: the decode runs on the clock, and on
+  // a slow frame it can finish in one step, before a check made from outside the page could look.
+  const replayed = await note.evaluate((n, w) => {
+    const v = n.querySelector('[data-note-value]');
+    const seen = [];
+    const mo = new MutationObserver(() => seen.push(v.textContent));
+    mo.observe(v, { childList: true, characterData: true, subtree: true });
+    n.click();
+    seen.push(v.textContent);
+    window.__noteSeen = { mo, seen };
+    return seen.some((t) => t.trim() !== w);
+  }, want);
+  await p
+    .waitForFunction((w) => [...document.querySelectorAll('[data-note]')].at(-1).querySelector('[data-note-value]').textContent.trim() === w, want, { timeout: 8000 })
+    .catch(() => {});
+  await p.evaluate(() => window.__noteSeen.mo.disconnect());
   if (!replayed) {
     const why = await note.evaluate((n) => {
       const r = n.getBoundingClientRect();
@@ -689,7 +717,6 @@ await test('field-notes', async () => {
     });
     fail('field-notes', `a tap does not replay the decode (${why})`);
   }
-  await p.waitForTimeout(1800);
   if ((await val.textContent()).trim() !== want) fail('field-notes', 'the replay does not end on the text');
   const rm = await page('/research/', { reduce: true });
   const v2 = rm.locator('[data-note] [data-note-value]').last();
