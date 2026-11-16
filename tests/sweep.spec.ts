@@ -48,7 +48,7 @@ const COMPONENTS: [string, string, string][] = [
   ['/work/', '[data-tmap]', 'Thread map'],
   ['/', '#top', 'Home hero'],
   ['/work/bellhop-sim/', '#gallery', 'Case study gallery'],
-  ['/services/', '.tiles, .tile', 'Website tiles'],
+  ['/services/', '.prints', 'Services prints'],
   ['/', '#websites', 'Website showcase'],
 ];
 

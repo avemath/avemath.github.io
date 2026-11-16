@@ -17,6 +17,8 @@ import SignalPanel from './SignalPanel.astro';
         M.S. student in Electrical and Computer Engineering. Research assistant on an Office of Naval Research (ONR) project about distributed naval platforms.
         Co-founder of Because of ADAM, a drowning awareness nonprofit.
       </p>
+      {/* TODO(ave): check wording (Nov 16: the web work line under the lede). */}
+      <p class="hero__also">I also build <a class="link" href="/work/#client-sites">websites</a> and tools for small businesses.</p>
       <div class="hero__ctas">
         <a class="btn btn--primary" href="/work/">See my work</a>
         <a class="btn" href={site.resumePdf}>Résumé (PDF)</a>
@@ -92,6 +94,14 @@ import SignalPanel from './SignalPanel.astro';
     .hero__sub {
       font-size: var(--fs-16);
     }
+  }
+
+  /* The web work, said once and quietly: a step smaller than the lede. */
+  .hero__also {
+    max-width: 42ch;
+    margin-top: 0.6rem;
+    font-size: var(--fs-15);
+    color: var(--muted);
   }
 
   .hero__ctas {

@@ -91,6 +91,8 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
           </>
         )
       }
+      {/* TODO(ave): check wording (Nov 16: the link to Services). */}
+      <p class="work-sites__more"><a class="link" href="/services/">Want one for your business? Here's how I work.</a></p>
     </div>
   </section>
 
@@ -292,6 +294,12 @@ const when = (p: (typeof order)[number]) => projectWhen(p.data.period.start, p.d
     padding-bottom: 0.6rem;
     border-bottom: 1px solid var(--rule);
     font-size: clamp(1.5rem, 2.6vw, 2rem);
+  }
+
+  /* The way on to Services, after the last client panel. */
+  .work-sites__more {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    font-size: var(--fs-18);
   }
 
   /* The client tools: large panels at the scale of the website displays above them. */

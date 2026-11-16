@@ -1,16 +1,32 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Icon from '@/components/Icon.astro';
-import ProjectTile from '@/components/ProjectTile.astro';
-import { getProjects, isWebsite } from '@/lib/projects';
+import Polaroid from '@/components/about/Polaroid.astro';
+import ProjectArt from '@/components/ProjectArt.astro';
+import Terms from '@/components/Terms.astro';
+import { getWorkOrder, workSection, projectHref } from '@/lib/projects';
+import { displayUrl } from '@/lib/format';
 
-const sites = (await getProjects()).filter((p) => isWebsite(p) && p.data.links.live);
+// The six client case studies (four sites and two tools), in /work/ order, each as a print: its
+// cover, or its drawing where there are no screenshots, with a name written in the strip.
+const recent = (await getWorkOrder()).filter((p) => workSection(p) === 'websites');
+const printName: Record<string, string> = {
+  'because-of-adam': 'ADAM',
+  'grace-mae-alterations': 'Grace Mae',
+  'petro-land-ventures': 'Petro Land',
+  'nicholas-domke': 'Nicholas',
+  'little-explorer-swim': 'Swim intake',
+  'plv-abstract-builder': 'Abstract Builder',
+};
+const tilts = [-2, 1.5, -1, 2, -1.5, 1];
 
 const offers = [
   { title: 'Small business sites', body: 'A site that explains what you do, shows your work, and makes it easy to call or book. Built for phones first.' },
   { title: 'Nonprofit sites', body: 'Mission, story, events and ways to help, with sources for every claim and pages your volunteers can update.' },
   { title: 'Forms that do the work', body: 'Inquiry, intake and booking forms that collect what you need the first time and land in your inbox, organized.' },
   { title: 'Redesigns', body: "If your current site is slow, dated or hard to change, I'll rebuild it and keep what's working." },
+  // TODO(ave): check wording (Nov 16: the tools offer, from the swim intake and Abstract Builder case studies).
+  { title: 'Tools for the slow parts', body: 'Small tools for manual work, like intake forms with reports that fill themselves in, or a stack of records turned into one finished document.' },
 ];
 
 const steps = [
@@ -26,8 +42,8 @@ const included = [
   ['Accessible', 'Keyboard support, readable contrast, alt text and reduced-motion support.'],
   ['Fast', 'Optimized images and very little JavaScript, so pages load quickly on real phones.'],
   ['Search basics', 'Titles, descriptions, a sitemap and structured data so Google understands your business.'],
-  ['Analytics', 'Simple, privacy-friendly visitor stats, with no cookie banner needed.'],
-  ['Yours to edit', 'An editor for your text and photos, plus a written guide to every page.'],
+  // TODO(ave): check wording (Nov 16: Nicholas edits one file instead of an editor).
+  ['Yours to edit', 'An editor (or one simple file) for your text and photos, plus a written guide to every page.'],
 ];
 
 const faqs = [
@@ -45,7 +61,8 @@ const faqs = [
   },
   {
     q: 'Can I make changes myself after launch?',
-    a: "Yes. Every site I build comes with an editor for the parts that change, like text, photos, events and team members, plus a guide written for you. For bigger changes, just ask.",
+    // TODO(ave): check wording (Nov 16: matched to the case studies; Nicholas edits one file on github.com).
+    a: "Yes. The people who run each site I've built keep it up to date themselves, most through an editor for text, photos and events, and one through a single file edited on github.com. You also get a guide written for you. For bigger changes, just ask.",
   },
   {
     q: 'What does it cost?',
@@ -74,7 +91,7 @@ const faqLd = {
       <div>
         <p class="section-lede">
           I design, build and launch websites for small businesses and nonprofits. You get a quote up front, a preview link while it's
-          built, and a written guide when it's done. Every site I've shipped is live, and each one can be updated without touching the code.
+          built, and a written guide when it's done. Every site I've shipped is live, and the people who run each one keep it up to date themselves.
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
           <a class="btn btn--primary" href="/contact/?topic=website">Start a project <Icon name="arrow-right" /></a>
@@ -141,9 +158,37 @@ const faqLd = {
     <div class="wrap">
       <p class="eyebrow">Recent work</p>
       <h2 id="recent-title" class="section-title">Live and in use</h2>
-      <div class="recent">
-        {sites.map((p) => <ProjectTile project={p} />)}
-      </div>
+      {/* TODO(ave): check wording (Nov 16: the line under Live and in use). */}
+      <p class="section-lede recent__lede">Four sites and two tools, each with a case study.</p>
+      <ul class="prints" role="list">
+        {
+          recent.map((p, i) => (
+            <li class="print">
+              <Polaroid
+                photo={p.data.cover}
+                alt={p.data.coverAlt ?? ''}
+                caption={printName[p.id] ?? p.data.short ?? p.data.title}
+                tilt={tilts[i % tilts.length]}
+                ratio={1.6}
+                sizes="(min-width: 1000px) 22rem, (min-width: 560px) 46vw, 92vw"
+              >
+                {!p.data.cover && <ProjectArt slug={p.id} fit="meet" />}
+              </Polaroid>
+              <h3 class="print__title">
+                <a class="link" href={projectHref(p)}>{p.data.title}</a>
+              </h3>
+              {p.data.outcome && <p class="print__out"><Terms text={p.data.outcome} /></p>}
+              <p class="print__role"><Terms text={p.data.role} /></p>
+              <p class="print__links">
+                <a class="link" href={projectHref(p)} aria-label={`Case study: ${p.data.title}`}>Case study</a>
+                {p.data.links.live && (
+                  <a class="link" href={p.data.links.live} rel="noopener">{displayUrl(p.data.links.live)}</a>
+                )}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 
@@ -211,7 +256,7 @@ const faqLd = {
     }
   }
 
-  /* Two by two on tablets and four across on desktop, so four cards never leave a lone one. */
+  /* Five cards: two across on tablets with the last one wide, three then two on desktop. */
   .offers {
     display: grid;
     gap: 1rem;
@@ -225,9 +270,24 @@ const faqLd = {
     }
   }
 
+  @media (min-width: 560px) {
+    .offers > .offer:nth-child(odd):last-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* Desktop: six narrow columns, three cards on the first row and two wider ones on the second. */
   @media (min-width: 1100px) {
     .offers {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .offers > .offer {
+      grid-column: span 2;
+    }
+
+    .offers > .offer:nth-last-child(-n + 2):nth-child(n + 4) {
+      grid-column: span 3;
     }
   }
 
@@ -333,9 +393,14 @@ const faqLd = {
     grid-template-columns: 1fr;
   }
 
+  /* Two across; an odd last item runs the full width instead of sitting alone. */
   @media (min-width: 560px) {
     .included {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .included > .inc:nth-child(odd):last-child {
+      grid-column: 1 / -1;
     }
   }
 
@@ -377,34 +442,68 @@ const faqLd = {
     font-size: var(--fs-15);
   }
 
-  /* Balanced rows for any number of sites. Tablets: two across, and an odd last tile runs wide.
-     Desktop: three across when the count divides by three; otherwise it stays two across, so a
-     count like four is two full rows instead of three plus one alone. */
-  .recent {
+  .recent__lede {
+    margin-top: 1rem;
+  }
+
+  /* The six case studies as prints: one across on a phone, two on tablets, three on desktop, so
+     six always fills its rows. Each print sits a little tilted and straightens on hover or focus. */
+  .prints {
     display: grid;
-    gap: 1.1rem;
+    gap: clamp(2.5rem, 5vw, 3.5rem) clamp(1.5rem, 3vw, 2.5rem);
     margin-top: 2.5rem;
+    padding: 0;
+    list-style: none;
     grid-template-columns: 1fr;
   }
 
-  @media (min-width: 720px) {
-    .recent {
+  @media (min-width: 560px) {
+    .prints {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .recent > :global(.tile:nth-child(odd):last-child) {
-      grid-column: 1 / -1;
     }
   }
 
-  @media (min-width: 1100px) {
-    .recent:has(> :global(.tile:nth-child(3n):last-child)) {
+  @media (min-width: 1000px) {
+    .prints {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+  }
 
-    .recent:has(> :global(.tile:nth-child(3n):last-child)) > :global(.tile:nth-child(odd):last-child) {
-      grid-column: auto;
-    }
+  .print {
+    display: flex;
+    flex-direction: column;
+    max-width: 28rem;
+    min-width: 0;
+    color: var(--text-soft);
+    font-size: var(--fs-15);
+  }
+
+  .print :global(.pol__img svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .print__title {
+    margin: 1.4rem 0 0.4rem;
+    font-size: var(--fs-19);
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .print__role {
+    margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: var(--fs-14);
+  }
+
+  .print__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    margin-top: auto;
+    padding-top: 0.9rem;
+    overflow-wrap: anywhere;
   }
 
   .faqs {
