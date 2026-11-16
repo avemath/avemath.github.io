@@ -30,7 +30,7 @@ export function init(panel: HTMLElement) {
     const pts = constellation(scheme);
     const db = Number(inSnr.value);
     const sigma = sigmaFor(dbToLin(db));
-    outSnr.value = `${db.toFixed(1)} dB`;
+    outSnr.value = `${db.toFixed(1)}\u00a0dB`;
 
     const w = canvas.width, h = canvas.height;
     const sc = w / 4.2;
@@ -99,7 +99,7 @@ export function init(panel: HTMLElement) {
     s('sigma').textContent = sigma.toFixed(3);
     s('bits').textContent = String(k);
     s('ser').textContent = `${errors} of ${N} (${((errors / N) * 100).toFixed(1)}%)`;
-    status.textContent = `${schemes[scheme].label} at ${db.toFixed(1)} dB: ${errors} of ${N} symbols decided wrong.`;
+    status.textContent = `${schemes[scheme].label} at ${db.toFixed(1)}\u00a0dB: ${errors} of ${N} symbols decided wrong.`;
   }
 
   const rerun = () => requestAnimationFrame(run);

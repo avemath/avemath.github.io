@@ -24,5 +24,5 @@ export const threads: { id: Thread; name: string; color: string }[] = [
   { id: 'signals', name: 'Signals and sound', color: '--accent' },
   { id: 'family', name: 'Water safety', color: '--rose' },
   { id: 'web', name: 'Websites and tools', color: '--lilac' },
-  { id: 'land', name: 'Land', color: '--teal' },
+  { id: 'land', name: 'Land', color: '--clay' },
 ];

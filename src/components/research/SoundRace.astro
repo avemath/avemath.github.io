@@ -55,7 +55,7 @@ const lanes = [
   </div>
 
   <div class="race__clockrow" aria-hidden="true">
-    <p class="race__clock"><span data-race-clock>0.000</span> s</p>
+    <p class="race__clock" data-readout><span data-race-clock>0.000</span>&nbsp;s</p>
     <p class="race__rate" data-race-rate></p>
   </div>
 
@@ -385,7 +385,7 @@ const lanes = [
       dOut.textContent = fmtDist(s.meters);
       dIn.setAttribute('aria-valuetext', fmtDist(s.meters));
       rateEl.textContent = rateText(playback());
-      lossEl.textContent = `Radio in seawater at ${fmtFreq(Number(rf.value))}: skin depth ${fmtDist(s.skinDepth)}, ${Math.round(s.radioWaterLossDb).toLocaleString('en-US')} dB lost over ${fmtDist(s.meters)}. Sound at ${fmtFreq(Number(af.value))}: ${Number(s.soundWaterDbPerKm.toPrecision(2))} dB/km, ${Number(s.soundWaterLossDb.toPrecision(2))} dB over ${fmtDist(s.meters)}.`;
+      lossEl.textContent = `Radio in seawater at ${fmtFreq(Number(rf.value))}: skin depth ${fmtDist(s.skinDepth)}, ${Math.round(s.radioWaterLossDb).toLocaleString('en-US')}\u00a0dB lost over ${fmtDist(s.meters)}. Sound at ${fmtFreq(Number(af.value))}: ${Number(s.soundWaterDbPerKm.toPrecision(2))}\u00a0dB/km, ${Number(s.soundWaterLossDb.toPrecision(2))}\u00a0dB over ${fmtDist(s.meters)}.`;
     };
 
     /** Draw the race at simulated time t seconds. */
@@ -416,7 +416,7 @@ const lanes = [
       });
       if (t > 0) {
         set(l, '--on-stop', s.radioWaterArrives ? 0 : 1);
-        l.querySelector<HTMLElement>('[data-read]')!.textContent = s.radioWaterArrives ? `${fmtTime(s.radioWaterTime)}, ${Math.round(s.radioWaterLossDb)} dB down` : `lost after ${fmtDist(s.radioWaterReach)}`;
+        l.querySelector<HTMLElement>('[data-read]')!.textContent = s.radioWaterArrives ? `${fmtTime(s.radioWaterTime)}, ${Math.round(s.radioWaterLossDb)}\u00a0dB down` : `lost after ${fmtDist(s.radioWaterReach)}`;
       }
       clock.textContent = t.toFixed(t < 0.1 ? 4 : 3);
     };

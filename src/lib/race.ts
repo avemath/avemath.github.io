@@ -38,13 +38,13 @@ export const travelTime = (meters: number, speed: number) => meters / speed;
 const sig2 = (x: number) => Number(x.toPrecision(2));
 
 /** A time in the unit that reads best: 3.3 µs, 29 ms, 0.67 s, 2.9 s. */
-export const fmtTime = (s: number) => (s < 1e-3 ? `${sig2(s * 1e6)} µs` : s < 0.1 ? `${sig2(s * 1e3)} ms` : `${sig2(s)} s`);
+export const fmtTime = (s: number) => (s < 1e-3 ? `${sig2(s * 1e6)}\u00a0µs` : s < 0.1 ? `${sig2(s * 1e3)}\u00a0ms` : `${sig2(s)}\u00a0s`);
 
 /** A distance: 12 m, 0.12 m, 1 km, 2.5 km. */
-export const fmtDist = (m: number) => (m >= 1000 ? `${sig2(m / 1000)} km` : `${sig2(m)} m`);
+export const fmtDist = (m: number) => (m >= 1000 ? `${sig2(m / 1000)}\u00a0km` : `${sig2(m)}\u00a0m`);
 
 /** A frequency: 1 kHz, 100 MHz, 2.4 GHz. */
-export const fmtFreq = (f: number) => (f >= 1e9 ? `${sig2(f / 1e9)} GHz` : f >= 1e6 ? `${sig2(f / 1e6)} MHz` : `${sig2(f / 1e3)} kHz`);
+export const fmtFreq = (f: number) => (f >= 1e9 ? `${sig2(f / 1e9)}\u00a0GHz` : f >= 1e6 ? `${sig2(f / 1e6)}\u00a0MHz` : `${sig2(f / 1e3)}\u00a0kHz`);
 
 /** The distance slider: 0 to 1000 maps to 10 m to 10 km on a log scale, rounded to two figures. */
 export const sliderToMeters = (v: number) => sig2(10 * 1000 ** (v / 1000));
@@ -72,7 +72,7 @@ export function raceAt(meters: number, radioHz: number, soundHz: number) {
 export function summary(meters: number, radioHz: number, soundHz: number) {
   const r = raceAt(meters, radioHz, soundHz);
   const water = r.radioWaterArrives
-    ? `radio in water arrives at ${fmtFreq(radioHz)}, ${Math.round(r.radioWaterLossDb)} dB down`
+    ? `radio in water arrives at ${fmtFreq(radioHz)}, ${Math.round(r.radioWaterLossDb)}\u00a0dB down`
     : `radio in water lost after ${fmtDist(r.radioWaterReach)} at ${fmtFreq(radioHz)}`;
-  return `At ${fmtDist(meters)}: radio in air ${fmtTime(r.radioAir)}, sound in air ${fmtTime(r.soundAir)}, sound in water ${fmtTime(r.soundWater)}, ${water}. Sound in water loses ${sig2(r.soundWaterDbPerKm)} dB per km at ${fmtFreq(soundHz)}.`;
+  return `At ${fmtDist(meters)}: radio in air ${fmtTime(r.radioAir)}, sound in air ${fmtTime(r.soundAir)}, sound in water ${fmtTime(r.soundWater)}, ${water}. Sound in water loses ${sig2(r.soundWaterDbPerKm)}\u00a0dB per km at ${fmtFreq(soundHz)}.`;
 }

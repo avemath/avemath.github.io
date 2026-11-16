@@ -39,7 +39,7 @@ const rows = [
       [done, SPAN],
     ],
     fill: 'var(--text)',
-    tip: ['exhaust valve, GP14', `open at idle so the plow stays home; closes ${SOLENOID_SEQUENCE_DELAY} ms into a strike, reopens to vent`],
+    tip: ['exhaust valve, GP14', `open at idle so the plow stays home; closes ${SOLENOID_SEQUENCE_DELAY}\u00a0ms into a strike, reopens to vent`],
   },
   {
     key: 'piston',
@@ -47,7 +47,7 @@ const rows = [
     y: 156,
     high: [[openPiston, done]],
     fill: 'var(--accent)',
-    tip: ['both inlet valves, GP15', `open together ${SOLENOID_ACTIVATION_TIME} ms, plow out to full extension`],
+    tip: ['both inlet valves, GP15', `open together ${SOLENOID_ACTIVATION_TIME}\u00a0ms, plow out to full extension`],
   },
 ];
 
@@ -89,7 +89,7 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
       {
         ticks.map((t) => (
           <text class="tf__tick" x={x(t)} y="252" text-anchor="middle">
-            {t === SPAN ? `${t} ms` : t}
+            {t === SPAN ? `${t}\u00a0ms` : t}
           </text>
         ))
       }
@@ -107,7 +107,7 @@ const ticks = [0, 100, 200, 300, 400, 500, 600, 700];
           ))
         }
       </g>
-      <g class="tf__row" tabindex="0" role="img" aria-label={`Air budget: about ${FULL_FORCE} cycles of at least 30 lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware, which locks out at zero.`} data-tip={`air budget\nabout ${FULL_FORCE} cycles of at least 30 lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware`} data-y="190" data-budget-row>
+      <g class="tf__row" tabindex="0" role="img" aria-label={`Air budget: about ${FULL_FORCE} cycles of at least 30\u00a0lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware, which locks out at zero.`} data-tip={`air budget\nabout ${FULL_FORCE} cycles of at least 30\u00a0lbf, ${MAX_WEAPON_ACTIVATIONS} allowed by firmware`} data-y="190" data-budget-row>
         <rect class="tf__hit" x="0" y="190" width="640" height="34" />
         <text class="tf__name" x="0" y="208">air budget</text>
         {cells.map((cx, i) => <rect class:list={['tf__cell', i >= FULL_FORCE && 'tf__cell--weak']} x={cx + 1.5} y="196" width={cellW - 3} height="14" data-cell={i} />)}

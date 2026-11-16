@@ -249,8 +249,8 @@ const stages = [
     function run() {
       const cfoHz = Number(inCfo.value) * 1000;
       const snrDb = Number(inSnr.value);
-      outCfo.value = `${(cfoHz / 1000).toFixed(1)} kHz`;
-      outSnr.value = `${snrDb} dB`;
+      outCfo.value = `${(cfoHz / 1000).toFixed(1)}\u00a0kHz`;
+      outSnr.value = `${snrDb}\u00a0dB`;
       const on = Object.fromEntries(stages.map((x) => [x.dataset.stage!, x.checked])) as { cfo: boolean; lin: boolean; pll: boolean; mmse: boolean };
       const { rx, pts, H, Hhat, est, phaseErr, errors, bits, sync } = receiver.receive(cfoHz, snrDb, on);
       const p = { bits, sync };
@@ -260,8 +260,8 @@ const stages = [
       drawConstellation(ofdmCanvas, pts, (i) => p.bits[i] === 1);
       drawChannel(hCanvas, H, on.mmse ? Hhat : null);
 
-      s('cfo').textContent = `${(cfoHz / 1000).toFixed(2)} kHz`;
-      s('est').textContent = on.cfo ? `${(est / 1000).toFixed(2)} kHz` : 'n/a';
+      s('cfo').textContent = `${(cfoHz / 1000).toFixed(2)}\u00a0kHz`;
+      s('est').textContent = on.cfo ? `${(est / 1000).toFixed(2)}\u00a0kHz` : 'n/a';
       s('ph').textContent = `${((phaseErr * 180) / Math.PI).toFixed(1)}°`;
       const ber = errors / p.bits.length;
       s('ber').textContent = `${(ber * 100).toFixed(1)}%  (${errors}/${p.bits.length})`;

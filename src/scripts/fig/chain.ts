@@ -67,7 +67,7 @@ export function mountChain(root: HTMLElement) {
         `<tr><td></td><th scope="colgroup" colspan="2">car 1</th><th scope="colgroup" colspan="2">car 2</th></tr>` +
         `<tr><th scope="col">field</th><th scope="col">sent</th><th scope="col">rx</th><th scope="col">sent</th><th scope="col">rx</th></tr></thead><tbody>` +
         rows.map(([f, a, b]) => `<tr><th scope="row">${f}</th><td>${a}</td><td>${a}</td><td>${b}</td><td>${b}</td></tr>`).join('') +
-        `</tbody></table><p>gap ${GAP_M.toFixed(1)} m, closing ${c.closingRate.toFixed(0)} m/s, TTC ${c.ttc.toFixed(1)} s, under ${TTC_WARN.toFixed(1)} s</p>` +
+        `</tbody></table><p>gap ${GAP_M.toFixed(1)}\u00a0m, closing ${c.closingRate.toFixed(0)}\u00a0m/s, TTC ${c.ttc.toFixed(1)}\u00a0s, under ${TTC_WARN.toFixed(1)}\u00a0s</p>` +
         `<p class="cf__warn">${c.brakeWarn ? 'WARNING: Brake Recommended' : 'no warning'}</p>`;
       cap.textContent = `${stages[i].look} Decoded on the radios, the same in all five runs.`;
       return;

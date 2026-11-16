@@ -15,7 +15,7 @@ const SLICE = 20_000; // symbols per slice
 
 const curves: { id: Scheme | 'bq'; label: string; scheme: Scheme; color: string; dash: boolean }[] = [
   { id: 'bq', label: 'BPSK and QPSK', scheme: 'bpsk', color: 'var(--accent)', dash: false },
-  { id: '8psk', label: '8-PSK (approx.)', scheme: '8psk', color: 'var(--amber-ink)', dash: true },
+  { id: '8psk', label: '8-PSK (approx.)', scheme: '8psk', color: 'var(--gold-ink)', dash: true },
   { id: '16qam', label: '16-QAM (approx.)', scheme: '16qam', color: 'var(--text-soft)', dash: true },
 ];
 
@@ -41,8 +41,8 @@ export function init(panel: HTMLElement) {
   // Reference numbers, computed from the same formulas the curves use.
   const b5 = ebn0ForBer('bpsk', 1e-5), q16 = ebn0ForBer('16qam', 1e-5), p8 = ebn0ForBer('8psk', 1e-5);
   q(panel, '[data-ber-ref]').textContent =
-    `At a BER of 1e-5, BPSK and QPSK need ${b5.toFixed(1)} dB, 8-PSK about ${p8.toFixed(1)} dB and 16-QAM about ${q16.toFixed(1)} dB. ` +
-    `So 16-QAM costs about ${(q16 - b5).toFixed(1)} dB more than QPSK for twice the bits per symbol.`;
+    `At a BER of 1e-5, BPSK and QPSK need ${b5.toFixed(1)}\u00a0dB, 8-PSK about ${p8.toFixed(1)}\u00a0dB and 16-QAM about ${q16.toFixed(1)}\u00a0dB. ` +
+    `So 16-QAM costs about ${(q16 - b5).toFixed(1)}\u00a0dB more than QPSK for twice the bits per symbol.`;
 
   q(panel, '[data-ber-legend]').innerHTML =
     curves.map((c) => `<li><span class="sw" style="background:${c.color}"></span>${c.label}</li>`).join('') +
@@ -92,7 +92,7 @@ export function init(panel: HTMLElement) {
       .map((p) => {
         const th = berTheory(selected(), dbToLin(p.db));
         const meas = p.errors >= MIN_ERRORS ? (p.errors / p.bits).toExponential(2) : `under ${MIN_ERRORS} errors`;
-        return `<tr><td>${p.db} dB</td><td>${p.errors.toLocaleString('en-US')}</td><td>${p.bits.toLocaleString('en-US')}</td><td>${meas}</td><td>${th.toExponential(2)}</td></tr>`;
+        return `<tr><td>${p.db}\u00a0dB</td><td>${p.errors.toLocaleString('en-US')}</td><td>${p.bits.toLocaleString('en-US')}</td><td>${meas}</td><td>${th.toExponential(2)}</td></tr>`;
       })
       .join('');
   }
@@ -110,7 +110,7 @@ export function init(panel: HTMLElement) {
     for (let db = 0; db <= X_MAX; db += 2) {
       // Stop once the theory says a million bits would show almost no errors.
       if (berTheory(scheme, dbToLin(db)) * MAX_BITS < MIN_ERRORS) break;
-      status.textContent = `Simulating ${schemes[scheme].label} at ${db} dB.`;
+      status.textContent = `Simulating ${schemes[scheme].label} at ${db}\u00a0dB.`;
       const p: Point = { db, errors: 0, bits: 0 };
       pts.push(p);
       while (p.errors < 200 && p.bits < MAX_BITS) {

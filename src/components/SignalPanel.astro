@@ -15,7 +15,7 @@ const { empty = false } = Astro.props;
 <figure class="sig" data-sig data-empty={empty ? '' : undefined} aria-labelledby="sig-cap">
   <div class="sig__screen" data-sig-screen data-fig>
     <canvas class="sig__canvas" aria-hidden="true"></canvas>
-    <div class="sig__scope" data-sig-scope tabindex="0" role="img" aria-label={empty ? 'An empty scope: no signal on any tone. Use the arrow keys to move the cursors.' : `A frequency hopping preamble: ${CHIPS} chips of ${CHIP_MS} ms, each one tone between ${F_LOW} and ${F_HIGH} Hz. Use the arrow keys to read chip by chip.`}></div>
+    <div class="sig__scope" data-sig-scope tabindex="0" role="img" aria-label={empty ? 'An empty scope: no signal on any tone. Use the arrow keys to move the cursors.' : `A frequency hopping preamble: ${CHIPS} chips of ${CHIP_MS}\u00a0ms, each one tone between ${F_LOW} and ${F_HIGH}\u00a0Hz. Use the arrow keys to read chip by chip.`}></div>
     <span class="sig__cur sig__cur--v" data-sig-v aria-hidden="true"></span>
     <span class="sig__cur sig__cur--h" data-sig-h aria-hidden="true"></span>
     <p class="sig__read mono" data-sig-read aria-hidden="true"></p>

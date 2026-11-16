@@ -42,6 +42,8 @@
   --lilac-ink: #765c9c;
   --sage-ink: #48705b;
   --gold-ink: #81632e;
+  /* An earthy brown for the Land thread on /work/'s thread map, apart from the greens. */
+  --clay: #9a5b3b;
   --rose-ink: #97536d;
   /* The deep band: the same in both themes (the footer, the Research teaser, the marquee). */
   --deep: #0e2a22;
@@ -192,6 +194,7 @@
   --lilac-ink: var(--lilac);
   --sage-ink: var(--sage);
   --gold-ink: var(--gold);
+  --clay: #e0a37f;
   --rose-ink: var(--rose);
   --screen: #08100d;
   --bench-mat: #12241d;

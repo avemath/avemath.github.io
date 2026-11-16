@@ -72,7 +72,7 @@ export function init(panel: HTMLElement) {
     plot('corr').innerHTML =
       `<line x1="0" x2="${w}" y1="${cy(0)}" y2="${cy(0)}" stroke="var(--line)" vector-effect="non-scaling-stroke"/>` +
       `<line x1="0" x2="${w}" y1="${cy(side)}" y2="${cy(side)}" stroke="var(--muted)" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>` +
-      `<line x1="${cx(pos)}" x2="${cx(pos)}" y1="112" y2="120" stroke="var(--amber-ink)" stroke-width="3" vector-effect="non-scaling-stroke"/>` +
+      `<line x1="${cx(pos)}" x2="${cx(pos)}" y1="112" y2="120" stroke="var(--gold-ink)" stroke-width="3" vector-effect="non-scaling-stroke"/>` +
       `<polyline points="${Array.from(corr, (v, m) => `${cx(m).toFixed(1)},${cy(Math.min(cMax, Math.max(cMin, v))).toFixed(1)}`).join(' ')}" fill="none" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>` +
       `<line x1="${cx(peak)}" x2="${cx(peak)}" y1="${cy(Math.min(cMax, corr[peak]))}" y2="${cy(0)}" stroke="${found ? 'var(--accent)' : 'var(--danger)'}" stroke-width="3" vector-effect="non-scaling-stroke"/>`;
 

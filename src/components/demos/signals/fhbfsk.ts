@@ -25,12 +25,12 @@ const store = {
 };
 
 const pitchNotes: Record<Mode, string> = {
-  exag: 'The band maps to about 165 to 1320 Hz. Within each pair, 0 sits 2 semitones below the pair center and 1 sits 2 above.',
-  prop: 'The band maps to about 165 to 1320 Hz on a log scale. Every tone keeps its spacing in proportion, so 0 against 1 is a small step.',
-  true: 'Plays the actual band tone, 9.5 to 13.5 kHz. Many people find that shrill, so keep the volume low.',
+  exag: 'The band maps to about 165 to 1320\u00a0Hz. Within each pair, 0 sits 2 semitones below the pair center and 1 sits 2 above.',
+  prop: 'The band maps to about 165 to 1320\u00a0Hz on a log scale. Every tone keeps its spacing in proportion, so 0 against 1 is a small step.',
+  true: 'Plays the actual band tone, 9.5 to 13.5\u00a0kHz. Many people find that shrill, so keep the volume low.',
 };
 
-const fmtHz = (f: number) => (f >= 1000 ? `${(f / 1000).toFixed(3)} kHz` : `${f.toFixed(1)} Hz`);
+const fmtHz = (f: number) => (f >= 1000 ? `${(f / 1000).toFixed(3)}\u00a0kHz` : `${f.toFixed(1)}\u00a0Hz`);
 
 export function init(panel: HTMLElement) {
   const svg = q<SVGSVGElement>(panel, '[data-fh-plot]');
@@ -116,7 +116,7 @@ export function init(panel: HTMLElement) {
     }
     h += `<line x1="${L}" x2="${x1}" y1="${y(fc)}" y2="${y(fc)}" stroke="var(--muted)" stroke-dasharray="2 4" stroke-width="0.8"/>`;
     h += `<text x="18" y="${T + plotH / 2}" transform="rotate(-90 18 ${T + plotH / 2})" text-anchor="middle">frequency, kHz</text>`;
-    h += `<text x="${L}" y="${T - 10}">center 11520 Hz, dotted</text>`;
+    h += `<text x="${L}" y="${T - 10}">center 11520\u00a0Hz, dotted</text>`;
     h += `<text x="${x1 + 6}" y="${T - 10}">pair</text>`;
 
     const pts = hops.map((p, i) => `${L + i * colW + colW / 2},${y(toneHz(p, bits[i]))}`).join(' ');
@@ -127,12 +127,12 @@ export function init(panel: HTMLElement) {
       const yTop = y(F_LOW + (2 * p + 2) * DF), yBot = y(F_LOW + 2 * p * DF);
       const y0 = y(toneHz(p, 0)), y1 = y(toneHz(p, 1));
       const on = b ? y1 : y0, off = b ? y0 : y1;
-      const col = b ? 'var(--amber-ink)' : 'var(--accent)';
+      const col = b ? 'var(--gold-ink)' : 'var(--accent)';
       h += `<g class="fh-col" data-i="${i}" tabindex="0" role="button" aria-label="Chip ${i}, pair ${p}, bit ${b}. Press to flip.">`;
       h += `<rect class="fh-colbg" x="${x}" y="${T}" width="${colW}" height="${plotH}" fill="transparent"/>`;
       h += `<rect x="${x + 3}" y="${yTop}" width="${colW - 6}" height="${yBot - yTop}" fill="var(--accent-wash-strong)" rx="2"/>`;
       h += `<line x1="${x + 5}" x2="${x + colW - 5}" y1="${y0}" y2="${y0}" stroke="var(--accent)" stroke-width="1.4" opacity="${b ? 0.45 : 1}"/>`;
-      h += `<line x1="${x + 5}" x2="${x + colW - 5}" y1="${y1}" y2="${y1}" stroke="var(--amber-ink)" stroke-width="1.4" opacity="${b ? 1 : 0.45}"/>`;
+      h += `<line x1="${x + 5}" x2="${x + colW - 5}" y1="${y1}" y2="${y1}" stroke="var(--gold-ink)" stroke-width="1.4" opacity="${b ? 1 : 0.45}"/>`;
       h += `<rect x="${x + colW / 2 - 4}" y="${off - 4}" width="8" height="8" fill="var(--surface)" stroke="var(--muted)"/>`;
       h += `<rect x="${x + colW / 2 - 7}" y="${on - 7}" width="14" height="14" fill="${col}" stroke="var(--text)"/>`;
       h += `<line x1="${x}" x2="${x}" y1="${T}" y2="${T + plotH}" stroke="var(--line)"/>`;
@@ -172,7 +172,7 @@ export function init(panel: HTMLElement) {
     r('chip').textContent = `${i} of ${c.n - 1}`;
     r('pair').textContent = `P${p}`;
     r('bit').textContent = `${b} (${b ? 'high' : 'low'} tone)`;
-    r('f').textContent = `${toneHz(p, b).toFixed(0)} Hz`;
+    r('f').textContent = `${toneHz(p, b).toFixed(0)}\u00a0Hz`;
     r('pairf').textContent = `${toneHz(p, 0).toFixed(0)} / ${toneHz(p, 1).toFixed(0)}`;
     r('audio').textContent = fmtHz(audioHz(c.mode, p, b));
   }
@@ -286,7 +286,7 @@ export function init(panel: HTMLElement) {
     bits[i] ^= 1;
     render();
     readout(i);
-    status.textContent = `Chip ${i} is now ${bits[i]}, the ${bits[i] ? 'high' : 'low'} tone at ${toneHz(hops[i], bits[i]).toFixed(0)} Hz.`;
+    status.textContent = `Chip ${i} is now ${bits[i]}, the ${bits[i] ? 'high' : 'low'} tone at ${toneHz(hops[i], bits[i]).toFixed(0)}\u00a0Hz.`;
     svg.querySelector<SVGGElement>(`[data-i="${i}"]`)?.focus();
   }
 
@@ -321,7 +321,7 @@ export function init(panel: HTMLElement) {
   btn('ones', setAll(() => 1));
 
   inSlow.addEventListener('input', () => {
-    outSlow.value = `${inSlow.value} ms`;
+    outSlow.value = `${inSlow.value}\u00a0ms`;
     save();
   });
   inVol.addEventListener('input', () => {
@@ -367,7 +367,7 @@ export function init(panel: HTMLElement) {
   } else {
     bits = '1011001110100101'.split('').map(Number);
   }
-  outSlow.value = `${inSlow.value} ms`;
+  outSlow.value = `${inSlow.value}\u00a0ms`;
   outVol.value = `${Math.round(Number(inVol.value) * 100)}%`;
   render();
   readout(0);

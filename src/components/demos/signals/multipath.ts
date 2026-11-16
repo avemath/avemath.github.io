@@ -67,7 +67,7 @@ export function init(panel: HTMLElement) {
       `<line x1="0" x2="${w}" y1="${hR / 2}" y2="${hR / 2}" stroke="var(--line-strong)" vector-effect="non-scaling-stroke"/>` +
       copies
         .slice(1)
-        .map((c) => `<polyline points="${line(c, hR, max)}" fill="none" stroke="var(--amber-ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0.8" vector-effect="non-scaling-stroke"/>`)
+        .map((c) => `<polyline points="${line(c, hR, max)}" fill="none" stroke="var(--gold-ink)" stroke-width="1" stroke-dasharray="3 3" opacity="0.8" vector-effect="non-scaling-stroke"/>`)
         .join('') +
       `<polyline points="${line(rx, hR, max)}" fill="none" stroke="var(--accent)" stroke-width="1.8" vector-effect="non-scaling-stroke"/>` +
       dots;

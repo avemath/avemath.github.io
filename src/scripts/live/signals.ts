@@ -19,7 +19,7 @@ export function mount(panel: HTMLElement) {
   const L = 30, T = 14, plotH = 150, colW = (320 - L - 26) / N;
   const y = (f: number) => T + ((F_HIGH - f) / (F_HIGH - F_LOW)) * plotH;
   const say = (i: number) =>
-    (read.textContent = `Chip ${i}: pair P${hops[i]}, bit ${bits[i]}, ${toneHz(hops[i], bits[i]).toFixed(0)} Hz (${bits[i] ? 'high' : 'low'} tone)`);
+    (read.textContent = `Chip ${i}: pair P${hops[i]}, bit ${bits[i]}, ${toneHz(hops[i], bits[i]).toFixed(0)}\u00a0Hz (${bits[i] ? 'high' : 'low'} tone)`);
 
   function render() {
     let h = '';
@@ -34,7 +34,7 @@ export function mount(panel: HTMLElement) {
       const p = hops[i], b = bits[i], x = L + i * colW;
       const yTop = y(F_LOW + (2 * p + 2) * DF), yBot = y(F_LOW + 2 * p * DF);
       const on = y(toneHz(p, b)), off = y(toneHz(p, b ^ 1));
-      const col = b ? 'var(--amber-ink)' : 'var(--accent)';
+      const col = b ? 'var(--gold-ink)' : 'var(--accent)';
       h += `<g class="sl-col" data-i="${i}" tabindex="0" role="button" aria-label="Chip ${i}, pair ${p}, bit ${b}. Press to flip.">`;
       h += `<rect class="sl-bg" x="${x}" y="${T}" width="${colW}" height="${plotH + 40}" fill="transparent" rx="3"/>`;
       h += `<rect x="${x + 3}" y="${yTop}" width="${colW - 6}" height="${yBot - yTop}" fill="var(--accent-wash-strong)" rx="2"/>`;

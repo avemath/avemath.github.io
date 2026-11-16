@@ -25,7 +25,7 @@ export const v2vStages: V2vStage[] = [
     name: 'PRE detect',
     text: 'Cross-correlates the samples with the known BPSK preamble: 63 symbols, 16 samples each, root-raised-cosine pulses. One peak per packet gives coarse timing.',
     io: 'Takes raw samples from the radio; hands a rough packet start to the tau sweep.',
-    look: 'Timing found, nothing corrected yet: the 5 kHz carrier offset still spins the preamble symbols round a ring.',
+    look: 'Timing found, nothing corrected yet: the 5\u00a0kHz carrier offset still spins the preamble symbols round a ring.',
     lines: span('%% RX-3b. PRE cross-correlation', "'MinPeakDistance'"),
   },
   {
@@ -39,7 +39,7 @@ export const v2vStages: V2vStage[] = [
   {
     key: 'cfo',
     name: 'CFO',
-    text: 'Estimates the carrier frequency offset from the phase step between preamble symbols and spins it out. The transmitter adds 5000 Hz on purpose; the radios’ own oscillators added more, for estimates of about minus 5100 to minus 5900 Hz. Anything over 200 kHz is rejected.',
+    text: 'Estimates the carrier frequency offset from the phase step between preamble symbols and spins it out. The transmitter adds 5000\u00a0Hz on purpose; the radios’ own oscillators added more, for estimates of about minus 5100 to minus 5900\u00a0Hz. Anything over 200\u00a0kHz is rejected.',
     io: 'Takes spinning symbols; hands nearly still ones to the TRAIN fit.',
     look: 'With the offset spun out the ring collapses into two clusters, still tilted by the leftover phase.',
     lines: span('% CFO from PRE phase increments', 'rxSig    = rxSig .* exp(-1j*2*pi*(CFO_try/Fs)*n_rx_try);'),
@@ -63,7 +63,7 @@ export const v2vStages: V2vStage[] = [
   {
     key: 'ofdm',
     name: 'OFDM',
-    text: 'Strips the 16-sample cyclic prefix (1.6 µs at 10 MHz) and takes the FFT. The received OFDM preamble divided by the known one gives the channel Hk on each subcarrier: 52 at 156.25 kHz, 48 for data and 4 pilots at ±7 and ±21.',
+    text: 'Strips the 16-sample cyclic prefix (1.6\u00a0µs at 10\u00a0MHz) and takes the FFT. The received OFDM preamble divided by the known one gives the channel Hk on each subcarrier: 52 at 156.25\u00a0kHz, 48 for data and 4 pilots at ±7 and ±21.',
     io: 'Takes payload samples; hands raw subcarriers and Hk to MMSE.',
     look: 'After the FFT and before equalizing, each subcarrier still carries its own channel gain and phase, so the points scatter. That is expected: MMSE is next.',
     lines: span('% slice and demod', 'H_est_try              = repmat'),

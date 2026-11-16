@@ -11,8 +11,8 @@ const F_MIN = 8000;
 const F_MAX = 14000;
 const GRID_HZ = [8000, 10000, 12000, 14000];
 
-const fmtHz = (hz: number) => `${Math.round(hz).toLocaleString('en-US').replace(/,/g, ' ')} Hz`;
-const fmtMs = (ms: number) => `${ms.toFixed(2)} ms`;
+const fmtHz = (hz: number) => `${Math.round(hz).toLocaleString('en-US').replace(/,/g, ' ')}\u00a0Hz`;
+const fmtMs = (ms: number) => `${ms.toFixed(2)}\u00a0ms`;
 
 export function mountSignalPanel(fig: HTMLElement) {
   const screen = fig.querySelector<HTMLElement>('[data-sig-screen]')!;
@@ -95,7 +95,7 @@ export function mountSignalPanel(fig: HTMLElement) {
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'right';
     for (const f of GRID_HZ.slice(1, -1)) {
-      const label = `${f / 1000} kHz`;
+      const label = `${f / 1000}\u00a0kHz`;
       const y = yOf(f) - 8;
       const tw = ctx.measureText(label).width;
       ctx.fillStyle = ink.plate;
