@@ -9,6 +9,8 @@ period: { start: "2026-05" }
 sameMonth: 2
 status: ongoing
 summary: Office of Naval Research project with Integer Technologies. I started on it during my internship at Integer in summer 2026 and continue on a different part of it at LSU.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: Office of Naval Research project with Integer Technologies.
 outcome: Ongoing. I continue on a different part of the same project at LSU, through my M.S.
 role: Started during my internship at Integer Technologies in summer 2026; now a graduate research assistant at LSU, advised by Dr. Shuangqing Wei.
 team: An LSU team working with Integer Technologies engineers.

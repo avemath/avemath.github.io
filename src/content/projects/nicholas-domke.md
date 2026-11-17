@@ -8,6 +8,8 @@ order: 9
 period: { start: "2026-10" }
 status: live
 summary: A portfolio and long-form résumé for a senior in mechanical engineering at LSU, styled like an engineering drawing, with a 3D model from his real computer-aided design (CAD) files.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: A portfolio and résumé styled like an engineering drawing.
 outcome: A portfolio drawn like an engineering sheet, with no build step and one file to edit.
 role: Design, build, content, 3D model pipeline, hosting.
 keywords: ["mechanical engineering", "portfolio", "three.js", "CAD", "dot matrix", "LSU"]

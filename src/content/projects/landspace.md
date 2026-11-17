@@ -8,6 +8,8 @@ order: 4
 period: { start: "2025" }
 status: live
 summary: A local-first workspace for mineral title work that maps parcels, imports messy runsheets, and flags problems in the chain of title on its own.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: A local-first workspace for mineral title work that maps parcels.
 outcome: About 130 instrument types, nine test suites, and title flags that compute themselves instead of going stale.
 role: Solo. I designed and built it from my own work as a land agent.
 keywords: ["land", "title", "minerals", "map", "GIS", "runsheet", "Leaflet", "Electron", "local-first"]

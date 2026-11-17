@@ -24,6 +24,8 @@ const projects = defineCollection({
       period: z.object({ start: month, end: month.optional() }),
       status: z.enum(['live', 'ongoing', 'complete', 'archived']),
       summary: z.string().max(200),
+      // The social card's one line, cut from the summary (public/og/, scripts/render-assets.mjs).
+      cardLine: z.string().max(70).optional(),
       // One line for bento tiles: what came of it.
       outcome: z.string().optional(),
       role: z.string(),

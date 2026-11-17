@@ -8,6 +8,8 @@ order: 2
 period: { start: "2026-01", end: "2026-05" }
 status: complete
 summary: A vehicle-to-vehicle (V2V) collision warning over an 802.11p-style orthogonal frequency-division multiplexing (OFDM) link I designed and wrote in MATLAB and ran on two software-defined radios.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: A vehicle-to-vehicle collision warning on two software-defined radios.
 outcome: Five over-the-air runs, every one decoded with zero bit errors, ending in the brake warning.
 role: Final project for EE 4003 with lab partner Jason Phan. I designed and wrote the transmitter, receiver and warning logic, and ran all five hardware tests.
 team: Jason Phan, lab partner

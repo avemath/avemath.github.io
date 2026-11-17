@@ -1,7 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#1c2823"/>
-  <path d="M6 13 C 12 4, 18 22, 27 9" fill="none" stroke="#b0607f" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M6 13 C 12 8, 18 18, 27 13" fill="none" stroke="#c6b0ea" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M6 13 C 12 12, 18 14, 27 17" fill="none" stroke="#7ccac3" stroke-width="2.2" stroke-linecap="round"/>
-  <circle cx="6" cy="13" r="3" fill="#e2c17e"/>
+  <style>
+    .bg{fill:#f8faf6;stroke:#cbd6ce}.r1{stroke:#1f5e44}.r2{stroke:#2e7d5b}.r3{stroke:#246a6c}.g{stroke:#9a7637}.s{fill:#9a7637}
+    @media (prefers-color-scheme: dark){.bg{fill:#13201b;stroke:#13201b}.r1{stroke:#7fd6a8}.r2{stroke:#5fae86}.r3{stroke:#7ccac3}.g{stroke:#e2c17e}.s{fill:#e2c17e}}
+  </style>
+  <rect class="bg" x=".5" y=".5" width="31" height="31" rx="6"/>
+  <path class="g" d="M9 3.5 C 4.5 10, 4.5 18, 7.5 28.5" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+  <path class="r1" d="M7 14 C 12 1.5, 20 19, 27.5 5" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="r2" d="M7 14 C 13 10, 20 19, 27.5 15" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="r3" d="M7 14 C 12 22, 19 28, 27.5 25" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+  <circle class="s" cx="7" cy="14" r="3.4"/>
 </svg>

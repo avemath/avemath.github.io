@@ -8,6 +8,8 @@ period: { start: "2026-05" }
 sameMonth: 3
 status: complete
 summary: Notebooks that drive BELLHOP (a program that traces sound paths through the ocean) from Python, to show how sound bends and echoes and what that does to a binary phase-shift keying (BPSK) link.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: Notebooks that drive BELLHOP from Python, to show how sound bends.
 outcome: With no equalizer, a BPSK link through the BELLHOP channel got about 3 bits in 10 wrong even at 20 dB SNR. The echoes caused the errors, not the noise.
 role: Solo. Code, notebooks and figures.
 keywords: ["sonar", "underwater", "ocean", "acoustics", "ray tracing", "SOFAR", "multipath", "transmission loss", "Python", "Jupyter"]

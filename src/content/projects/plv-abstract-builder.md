@@ -8,6 +8,8 @@ order: 11
 period: { start: "2026-10" }
 status: live
 summary: A private tool that turns a parcel's recorded documents into a run sheet, an Ownership Report and one finished abstract PDF with every document attached and linked.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: A private tool that turns recorded documents into a finished abstract.
 outcome: A stack of county records becomes a linked abstract in six steps, with the examiner checking every row.
 role: Design, build, tests and deployment.
 keywords: ["land", "title", "abstract", "run sheet", "ownership report", "OCR", "PDF", "oil and gas"]

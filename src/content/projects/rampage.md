@@ -8,6 +8,8 @@ order: 1
 period: { start: "2024-08", end: "2025-05" }
 status: complete
 summary: Senior design capstone (2024 to 2025). I wrote the control software for a 30 lb pneumatic combat robot, splitting weapon safety and live video across two controllers so neither could stall the other.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: I wrote the control software for a 30 lb pneumatic combat robot.
 outcome: First place overall in the Bengal Bot Brawl, LSU's combat robotics competition.
 role: Lead programmer and systems integration. I owned the Pico W weapon and safety firmware, the Pi 4B video pipeline, and the test scripts.
 team: "Avery Matherne (computer engineering: control software and systems integration), Chris Cashen and Nicholas Woodroffe (mechanical), Matthew van Winkle and Miles Mouton (electrical), advised by Dr. Adrian Stein."

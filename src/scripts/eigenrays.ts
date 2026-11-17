@@ -16,7 +16,7 @@
 // Drag or use the arrow keys to rotate. It turns slowly on its own while it is on screen; with
 // reduced motion it draws one still frame and only moves when you move it. In dark mode the rays
 // add up like light. Nothing is traced or drawn until the browser is idle after first paint.
-import { token } from '../lib/tokens-client';
+import { token, mixHex } from '../lib/tokens-client';
 import { MUNK, traceRay } from '../lib/raytrace';
 import { prefersReducedMotion } from './preferences';
 
@@ -72,8 +72,11 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
 
   let ink: Record<string, string> = {};
   const readInks = () => {
-    ink = Object.fromEntries(['--surface', '--muted', '--rule', '--gold', '--teal', '--lilac', '--rose'].map((n) => [n, token(n)]));
+    ink = Object.fromEntries(['--surface', '--muted', '--rule', '--gold', '--teal', '--green', '--green-strong', '--rose'].map((n) => [n, token(n)]));
     ink.dark = token('--bit-glow') === '1' ? '1' : '';
+    // The steep rays: the darker green in light; in dark the two greens are one color, so a
+    // softer green, mixed toward the plate.
+    ink.outer = ink.dark ? mixHex(ink['--green'], 0.8, ink['--surface']) : ink['--green-strong'];
   };
 
   const line = (pts: Pt[], color: string, w: number, alpha: number) => {
@@ -86,7 +89,7 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
   };
   const rayColor = (a: number) => {
     const t = Math.abs(a) / 13;
-    return t < 0.34 ? ink['--teal'] : t < 0.67 ? ink['--lilac'] : ink['--rose'];
+    return t < 0.34 ? ink['--teal'] : t < 0.67 ? ink['--green'] : ink.outer;
   };
 
   function draw() {
@@ -114,7 +117,8 @@ export function mountEigenrays(cv: HTMLCanvasElement) {
     line([world(0, 0, 0), world(0, 1, 0)], mu, 1.2 * k, 0.6);
     for (const s of [-SPREAD / 2, SPREAD / 2]) line([world(1, 0, s), world(1, 1, s)], ru, k, 0.9);
 
-    // The rays, one path per color (teal, lilac, rose) across every slice, so a frame is three strokes.
+    // The rays, one path per color (teal, then two greens) across every slice, so a frame is three
+    // strokes. Rose is kept for the one highlighted ray, so it stands out.
     if (dark) ctx.globalCompositeOperation = 'lighter';
     const byColor = new Map<string, Path2D>();
     for (let i = 0; i < SLICES; i++) {

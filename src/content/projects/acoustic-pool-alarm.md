@@ -5,6 +5,8 @@ tags: [research, nonprofit]
 period: { start: "2026-10" }
 status: ongoing
 summary: "An alarm that uses underwater acoustics to detect a child in trouble in a backyard pool, because drowning is usually silent. Built from my family's story and my background in underwater acoustics."
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: An alarm that uses underwater acoustics to detect a child in trouble.
 role: "My own project. Early research and planning."
 keywords: ["drowning", "pool safety", "pool alarm", "underwater acoustics", "underwater sound"]
 stack: [Underwater acoustics, Signal processing, Prior-art review]

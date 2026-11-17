@@ -8,6 +8,8 @@ order: 3
 period: { start: "2026-09" }
 status: live
 summary: The website for my family's drowning awareness nonprofit, built so a scared parent can find the facts fast and act on them tonight.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: The website for my family's drowning awareness nonprofit.
 outcome: 30+ pages, every statistic sourced, and an editor my family runs on their own.
 role: Co-founder of the nonprofit. I designed and built the site, wrote the content plan, and set up the editor and publishing pipeline.
 keywords: ["nonprofit", "drowning", "water safety", "family", "Pagefind", "Pages CMS"]
