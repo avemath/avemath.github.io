@@ -9,6 +9,8 @@ period: { start: "2026-05", end: "2026-08" }
 sameMonth: 1
 status: complete
 summary: Acoustic characterization of a thruster on a test stand in the lab tank, and work with the underwater network simulation tools.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: Acoustic characterization of a thruster in the lab tank.
 outcome: Internship completed August 2026.
 role: Engineering intern on the Baton Rouge team.
 seoTitle: "Integer Technologies internship"

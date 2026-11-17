@@ -29,7 +29,7 @@ Tokens live in `src/styles/tokens.css`, light first and dark under `[data-theme=
 
 Green is the accent for links, buttons, headings and focus; purple is no longer a UI accent. Prints and handwritten notes stay light in both themes (`--photo-ink`, `--note-*`). Outside CSS, `src/lib/theme.ts` (the two theme-color tags), `src/lib/tokens-client.ts` (canvases) and `scripts/render-assets.mjs` (favicon, social cards) read the tokens, so `npm run assets` follows any change.
 
-Social cards (`public/og/`, 1200x630) are light paper with green only: the eyebrow and the domain line in `--green-strong`, the rule in `--green`, the title in Bodoni, the description, and the project's cover or line drawing in a double-hairline frame (the home and Research cards keep Plate I, with green rays). `scripts/render-assets.mjs` makes them; `docs/og/contact-sheet.png` and `docs/og/thumbnails.png` (LinkedIn's 400x210 size) show them all.
+Social cards (`public/og/`, 1200x630) are light paper with green only: the eyebrow and the domain line in `--green-strong`, the rule in `--green`, the title in Bodoni, the project's `cardLine` (one line of 70 characters or fewer, cut from its summary), and its cover or line drawing in a double-hairline frame (the home and Research cards keep Plate I, with green rays). `scripts/render-assets.mjs` makes them; `docs/og/contact-sheet.png` and `docs/og/thumbnails.png` (LinkedIn's 400x210 size) show them all. The favicon is the same green rays from a gold source beside the gold sound speed curve, one SVG with a light and a dark version (the ICO is the light one, the touch icon the dark one). Plate I on the home page draws its rays in teal and greens; rose is only for the one highlighted ray the note points to.
 
 ### Surfaces
 

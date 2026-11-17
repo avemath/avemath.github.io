@@ -20,16 +20,24 @@ const site = JSON.parse(await readFile('src/data/site.json', 'utf8'));
 // small text.
 const tokensCss = await readFile('src/styles/tokens.css', 'utf8');
 const lightBlock = tokensCss.slice(0, tokensCss.search(/^\[data-theme='dark'\] \{/m));
-const T = Object.fromEntries(['paper', 'sheet', 'ink', 'muted', 'rule', 'lilac', 'teal', 'rose', 'gold', 'green', 'green-strong'].map((k) => [k, new RegExp(`--${k}:\\s*(#[0-9a-fA-F]{6})`).exec(lightBlock)[1]]));
+const T = Object.fromEntries(['paper', 'sheet', 'ink', 'muted', 'rule', 'teal', 'gold', 'green', 'green-strong'].map((k) => [k, new RegExp(`--${k}:\\s*(#[0-9a-fA-F]{6})`).exec(lightBlock)[1]]));
 
-// The favicon: three sound rays bending through the channel and a gold source, on ink. Paths only,
-// so it never depends on a font.
+// The favicon: three sound rays bending through the channel from a gold source, beside the gold
+// sound speed curve, in greens. One file with a light and a dark version (the browser picks by its
+// color scheme). Paths only, so it never depends on a font. The dark colors are the dark theme's.
+const darkBlock = tokensCss.slice(tokensCss.search(/^\[data-theme='dark'\] \{/m));
+const D = Object.fromEntries(['sheet', 'green', 'teal', 'gold'].map((k) => [k, new RegExp(`--${k}:\\s*(#[0-9a-fA-F]{6})`).exec(darkBlock)[1]]));
 const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="${T.ink}"/>
-  <path d="M6 13 C 12 4, 18 22, 27 9" fill="none" stroke="${T.rose}" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M6 13 C 12 8, 18 18, 27 13" fill="none" stroke="#c6b0ea" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M6 13 C 12 12, 18 14, 27 17" fill="none" stroke="#7ccac3" stroke-width="2.2" stroke-linecap="round"/>
-  <circle cx="6" cy="13" r="3" fill="#e2c17e"/>
+  <style>
+    .bg{fill:${T.sheet};stroke:${T.rule}}.r1{stroke:${T['green-strong']}}.r2{stroke:${T.green}}.r3{stroke:${T.teal}}.g{stroke:${T.gold}}.s{fill:${T.gold}}
+    @media (prefers-color-scheme: dark){.bg{fill:${D.sheet};stroke:${D.sheet}}.r1{stroke:${D.green}}.r2{stroke:#5fae86}.r3{stroke:${D.teal}}.g{stroke:${D.gold}}.s{fill:${D.gold}}}
+  </style>
+  <rect class="bg" x=".5" y=".5" width="31" height="31" rx="6"/>
+  <path class="g" d="M9 3.5 C 4.5 10, 4.5 18, 7.5 28.5" fill="none" stroke-width="1.8" stroke-linecap="round"/>
+  <path class="r1" d="M7 14 C 12 1.5, 20 19, 27.5 5" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="r2" d="M7 14 C 13 10, 20 19, 27.5 15" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="r3" d="M7 14 C 12 22, 19 28, 27.5 25" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+  <circle class="s" cx="7" cy="14" r="3.4"/>
 </svg>
 `;
 for (const f of ['public/favicon.svg', join(DIST, 'favicon.svg')]) await writeFile(f, favicon);
@@ -98,7 +106,7 @@ for (const f of (await readdir('src/content/projects')).filter((f) => f.endsWith
     return v === undefined ? v : unquote(v);
   };
   if (field('draft') === 'true') continue;
-  projects.push({ id: f.replace(/\.md$/, ''), title: field('title'), type: LABELS[field('type')] ?? '', summary: field('summary'), cover: field('cover') });
+  projects.push({ id: f.replace(/\.md$/, ''), title: field('title'), type: LABELS[field('type')] ?? '', summary: field('summary'), cardLine: field('cardLine'), cover: field('cover') });
 }
 // Each project card shows the project's own picture: its cover, or where it has none, its line
 // drawing as the case study shows it (svg.art, captured from the built page in the light theme).
@@ -125,7 +133,8 @@ const cards = [
   { file: 'default', eyebrow: site.title.split('|')[1].trim(), title: site.name, sub: 'I research communication systems at LSU and build websites for small businesses and nonprofits.' },
   { file: 'research', eyebrow: 'Research', title: 'Research, below the surface.', sub: 'Underwater acoustic channels, the ONR data management work, bellhopSim, and the acoustic pool alarm.' },
 ];
-for (const p of projects) cards.push({ file: p.id, eyebrow: p.type, title: p.title, sub: p.summary, pic: await picture(p) });
+// The card gives one short line (cardLine), not the whole summary, so it reads as a small preview.
+for (const p of projects) cards.push({ file: p.id, eyebrow: p.type, title: p.title, sub: p.cardLine ?? p.summary, pic: await picture(p) });
 await artPage.close();
 
 // The card is the home hero in miniature: paper, the title in Bodoni Moda, the one-line description,
@@ -181,12 +190,12 @@ body{width:1200px;height:630px;background:${T.paper};color:${T.ink};font-family:
 .pic{position:absolute;left:752px;top:170px;width:390px;padding:9px;background:${T.sheet};border:1px solid ${T.rule};outline:1px solid ${T.rule};outline-offset:-6px}
 .pic img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:center top}
 h1{font-family:BO;font-weight:400;font-size:${c.title.length > 40 ? 58 : c.title.length > 24 ? 70 : 92}px;line-height:.98;letter-spacing:-.015em;margin-top:18px}
-p{margin-top:20px;font-size:32px;line-height:1.28;color:${T.muted}}
+p{margin-top:22px;font-size:38px;line-height:1.25;color:${T.muted}}
 .f{margin-top:auto;display:flex;align-items:center;gap:14px;font-family:JM;font-size:26px;color:${T['green-strong']}}
 .f:before{content:'';width:40px;height:3px;background:${T.green}}
 </style></head><body>
 ${c.pic ? figure(c.pic) : `<svg class="g" viewBox="0 0 1200 630">${plate}</svg>`}
-<div class="c"><div class="e">${c.eyebrow}</div><h1>${c.title}</h1><p>${c.sub}</p>
+<div class="c"><div class="e">${c.eyebrow}</div><h1>${c.title}</h1><p>${c.sub.replace(/(\d) (?=(?:lb|kg|m|km|ms|s|Hz|kHz|MB|KB|dB)\b)/g, '$1\u00a0')}</p>
 <div class="f">avemath.github.io</div></div></body></html>`;
 
 await mkdir('public/og', { recursive: true });
@@ -222,11 +231,15 @@ console.log(`social cards: ${cards.length}`);
 
 // ---- Apple touch icon ----
 await page.setViewportSize({ width: 180, height: 180 });
-await page.setContent(`<body style="margin:0;background:${T.ink}"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
+// The touch icon is the dark version, full bleed (the phone rounds its corners).
+await page.emulateMedia({ colorScheme: 'dark' });
+await page.setContent(`<body style="margin:0;background:${D.sheet}"><img src="${base}/favicon.svg" style="width:180px;height:180px;display:block"></body>`);
 await page.waitForTimeout(200);
 await page.screenshot({ path: 'public/apple-touch-icon.png' });
 
 // ---- favicon.ico: 16 and 32 px PNGs in one container ----
+// The ICO is the light version, for the browsers that skip SVG icons.
+await page.emulateMedia({ colorScheme: 'light' });
 const icons = [];
 for (const size of [16, 32]) {
   await page.setViewportSize({ width: size, height: size });

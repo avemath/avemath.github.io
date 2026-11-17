@@ -8,6 +8,8 @@ order: 10
 period: { start: "2026-10" }
 status: ongoing
 summary: "Interactive demos of the ideas behind my comms work: frequency hopping, constellations, bit error rates, matched filters and multipath."
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: Interactive demos of the ideas behind my comms work.
 outcome: Five browser demos you can see and hear. The bit error curves are checked against the textbook math on every build.
 role: Solo. Built to study, then cleaned up to share.
 keywords: ["radio", "communications", "FH-BFSK", "frequency hopping", "JANUS", "underwater acoustics", "BER", "QAM", "PSK", "matched filter", "multipath", "Web Audio"]

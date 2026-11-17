@@ -8,6 +8,8 @@ order: 8
 period: { start: "2026-04", end: "2026-09" }
 status: live
 summary: A bridal alterations studio site with interactive guides that explain bustles and hems better than words can, and inquiry forms that arrive ready to quote.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: A bridal alterations studio site with guides to bustles and hems.
 outcome: PageSpeed Insights 100 for accessibility and search engine optimization (SEO), inquiries that arrive ready to quote, and about 435 fields the owner edits herself.
 role: Design, build, CMS, email, testing and launch.
 keywords: ["bridal", "sewing", "alterations", "Pittsburgh", "Sanity", "Next.js", "bustle"]

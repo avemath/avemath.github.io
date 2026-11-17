@@ -8,6 +8,8 @@ order: 7
 period: { start: "2026-06", end: "2026-09" }
 status: live
 summary: A site for a two-person firm of Certified Professional Landmen that speaks to oil companies and confused landowners at the same time.
+# TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+cardLine: A site that speaks to oil companies and landowners at the same time.
 outcome: Two audiences, one site, and an owner who edits it without me.
 role: Design, build, content structure, CMS, hosting and DNS.
 keywords: ["landmen", "oil and gas", "minerals", "Cloudflare", "Sveltia", "coverage map"]
