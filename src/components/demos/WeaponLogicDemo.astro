@@ -94,8 +94,8 @@ import DemoShell from './DemoShell.astro';
       <li>Power cycle with the kill switch on. The startup interlock catches it.</li>
       <li>
         Flip the kill switch on, then the trigger on, then the kill switch off. The plow fires on reset. That's a real bug in the
-        firmware: the trigger's last state isn't tracked during an E-stop, so a trigger left on looks like a fresh press. The fix is to
-        re-arm only after the trigger has been seen off.
+        competition firmware: the trigger's last state isn't tracked during an E-stop, so a trigger left on looks like a fresh press. I
+        fixed it after the competition by re-arming only after the trigger has been seen off.
       </li>
     </ul>
   </details>

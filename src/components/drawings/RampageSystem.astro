@@ -5,6 +5,10 @@
 // exhaust (GP14) and the inlets (GP15), and switches the receiver's power through a solid-state
 // relay; the Pi 4B streams JPEG frames over UDP port 5000 to video_direct.py on the driver's
 // laptop. There is no link between the Pico W and the Pi.
+// TODO(ave): confirm the relay link (Nov 19). The deck lists the solid-state relay and says the kill
+// switch cuts power within 35 ms, but the competition firmware has no output that drives a relay, so
+// the Pico-to-relay line below may not be how it was wired. This drawing is the competition build;
+// the Nov 2026 repo routes drive through the Pico instead (see the case study's last section).
 import Drawing from './Drawing.astro';
 ---
 

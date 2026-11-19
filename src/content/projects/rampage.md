@@ -9,6 +9,10 @@ period: { start: "2024-08", end: "2025-05" }
 status: complete
 summary: Senior design capstone (2024 to 2025). I wrote the control software for a 30 lb pneumatic combat robot, splitting weapon safety and live video across two controllers so neither could stall the other.
 # TODO(ave): check wording (Nov 16: the social card line, cut from the summary).
+# TODO(ave): confirm how the solid-state relay was switched (Nov 19). The deck (page 50) says the kill
+#   switch cuts power within 35 ms, but the competition firmware only drives GP14, GP15 and the LED, so no
+#   code drives a relay. If it was wired outside the Pico, "Fail safe three ways" is right. If it was never
+#   connected, cut the relay sentence there, in RampageFigure.astro and in RampageSystem.astro.
 cardLine: I wrote the control software for a 30 lb pneumatic combat robot.
 outcome: First place overall in the Bengal Bot Brawl, LSU's combat robotics competition.
 role: Lead programmer and systems integration. I owned the Pico W weapon and safety firmware, the Pi 4B video pipeline, and the test scripts.
@@ -67,7 +71,7 @@ The team was Avery Matherne (computer engineering: control software and systems 
 
 **Split by criticality.** Drive never touches either computer: the RC receiver feeds the speed controllers directly, so a software crash can't take away steering. The Pico W reads only two switch channels and runs the weapon. The Pi 4B only does video. Neither one waits on the other.
 
-**Read the radio directly.** The Pico times RC pulses with pin interrupts on both edges in microseconds. Anything outside 900 to 2100 µs is thrown out as noise, and a switch only counts as on above 1700 µs and off below 1300 µs.
+**Read the radio directly.** The Pico times RC pulses with pin interrupts on both edges in microseconds. Anything outside 900 to 2100 µs is thrown out as noise, and a switch only counts as on above 1700 µs.
 
 <figure class="case__fig case__fig--print">
 
@@ -80,7 +84,7 @@ The team was Avery Matherne (computer engineering: control software and systems 
 
 **Fire in a fixed sequence.** Each strike runs six steps: the exhaust stays open for 50 ms with the plow home, the exhaust closes, a 50 ms dwell, both inlets open for 400 ms to drive the plow out to full extension, the inlets close, and the exhaust reopens so the plow vents and retracts. Firing is edge-triggered, so holding the switch fires once, not repeatedly. There's a 500 ms cooldown and a hard limit of 17 activations in firmware, of which about the first six push with at least 30 lbf before reservoir pressure drops. The team's air analysis predicted five cycles of at least 30 lbf; testing measured six.
 
-**Fail safe three ways.** The kill switch is RC channel 5 and the weapon trigger is channel 6. A kill, a lost signal (either channel quiet for more than a second) or an error forces the exhaust open and cuts power to the FlySky receiver through a solid-state relay, which puts the motor controllers into failsafe. The kill switch also blocks firing if it is already on at power-up. The drive motors connect from the receiver straight to the electronic speed controller (ESC), with no software in the path. The status LED tells the pit crew which state the board is in from across the arena.
+**Fail safe three ways.** The kill switch is RC channel 5 and the weapon trigger is channel 6. In the firmware, a kill, a lost signal (either channel quiet for more than a second) or an error forces the exhaust open and stops the weapon. The kill switch also cuts power to the FlySky receiver through a solid-state relay, which puts the motor controllers into failsafe. If the kill switch is already on at power-up, it blocks firing. The drive motors connect from the receiver straight to the electronic speed controller (ESC), with no software in the path. The status LED tells the pit crew which state the board is in from across the arena.
 
 <figure class="case__fig case__fig--print">
 
@@ -113,12 +117,14 @@ RAMpage took first place overall in the Bengal Bot Brawl.
 <figcaption>RAMpage, left, before a match</figcaption>
 </figure>
 
-## What I'd do next
+## What I changed after the competition
 
-Going back through the firmware to build the simulator above, I found two things I'd fix.
+Going back through the firmware to build the simulator above, I found problems worth fixing, and in November 2026 I fixed them in the [repo](https://github.com/avemath/RAMpage). Everything above this section, the simulator and the firmware excerpt describe the code as it competed. The repo's main branch has the newer version.
 
-**Re-arm after an E-stop.** The trigger's last state isn't updated while the board is in an E-stop. If the driver flips the trigger on during a stop, the plow fires the moment the stop clears, because it looks like a fresh press. The fix is to require the trigger to be seen off before the weapon re-arms.
+**Re-arm after an E-stop.** The trigger's last state wasn't updated during an E-stop, so a trigger flipped on during a stop fired the plow the moment the stop cleared. The weapon now re-arms only after the trigger has been seen off, including at power-up.
 
-**Never block the safety loop.** The firing sequence sleeps for about half a second, so the kill switch isn't checked mid-strike. A small state machine on a timer would keep the safety checks running the whole time.
+**Never block the safety loop.** The firing sequence slept for about half a second, so the kill switch wasn't checked mid-strike. The sequence is now a small state machine, so the loop checks the kill switch about every 5 ms, even mid-strike.
 
-I'd also log latency and temperature results to files instead of the console, so the numbers outlive the test day.
+**Drive goes through the Pico.** In the competition firmware, the code itself could only stop the weapon. Drive now goes from the receiver through the Pico W to the ESC, so an E-stop also holds both motors at neutral. That trades away the "no software in the drive path" rule from above, so a hardware watchdog resets the Pico if the loop ever hangs.
+
+I've tested these changes in a simulation, not on the robot yet. Still to do: log latency and temperature results to files instead of the console, so the numbers outlive the test day.
