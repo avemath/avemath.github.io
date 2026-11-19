@@ -10,7 +10,9 @@ import CodeFile from '@/components/fig/CodeFile.astro';
 import { cut, lineOf } from '@/lib/excerpt';
 import pico from '../../vendor/rampage/pico_direct.py?raw';
 
-const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/929c280/pico_direct.py';
+// Pinned to 92787d1, the commit that first added the code and is still on main. Its pico_direct.py is
+// byte-identical to vendor/rampage/pico_direct.py, so the #L line ranges below stay right.
+const RAMPAGE = 'https://github.com/avemath/RAMpage/blob/92787d1/pico_direct.py';
 
 // Plate II, How it works: the strike itself, straight from the Pico's firmware.
 const picoHow = cut(pico, '# Increment activation counter', 45, 'py');
@@ -38,8 +40,8 @@ const picoNotes: { text: string; lines: [number, number] }[] = [
             <p>
               A 30 lb combat robot with a pneumatic plow. I wrote the control software: a Pico W reads the radio control (RC) receiver with hardware
               interrupts, sequences the inlet and exhaust valves, and holds a hard limit of 17 activations in firmware, of which about the
-              first six push with at least 30 lbf before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust and cuts the
-              receiver's power through a solid-state relay. A Pi 4B streams video over UDP on its own, so a video crash never touches the
+              first six push with at least 30 lbf before reservoir pressure drops. A kill, a lost signal or an error opens the exhaust, and the
+              kill switch also cuts the receiver's power through a solid-state relay. A Pi 4B streams video over UDP on its own, so a video crash never touches the
               weapon.
             </p>
           </Fragment>
